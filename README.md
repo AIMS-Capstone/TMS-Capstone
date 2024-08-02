@@ -1,2 +1,2 @@
-# AIMS-Capstone
-An Accounting Information Management System for Capstone Project
+# TMS-Capstone
+Taxation Management System for Capstone Project
