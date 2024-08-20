@@ -1,6 +1,13 @@
-.custom-background {
-    background-image: url('/images/subtle-prism.png'); /* Root-relative path */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+/* .bg-color {
+    color: rgb(245 251 255);
+} */
+.auth-color, .taxuri-color{
+    color: rgb(29 30 78);
 }
+.taxuri-text{
+    color: rgb(61 64 62);
+}
+/* .carousel-size{
+    height: 50px;
+    width: 50px;
+} */
