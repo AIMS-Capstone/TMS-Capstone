@@ -6,6 +6,18 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/reset-password', function () {
+    return view('auth/reset-password');
+});
+
+Route::get('/register-success-page', function () {
+    return view('components/register-success-page');
+});
+
+Route::get('/check-mail', function () {
+    return view('components/check-mail');
+});
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),

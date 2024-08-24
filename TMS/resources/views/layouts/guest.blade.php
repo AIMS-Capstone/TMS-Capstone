@@ -15,8 +15,9 @@
         <!-- Scripts -->
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
         <script src="https://cdn.tailwindcss.com"></script>
+        <script src="{{ asset('js/custom.js') }}"></script>
         
-        @vite(['resources/css/app.css', 'resources/css/custom.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/css/custom.css', 'resources/js/app.js', 'resources/js/password.js'])
 
 
         <!-- Styles -->
