@@ -1,11 +1,11 @@
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
-            <x-authentication-card-logo /> <span class="ml-3 font-bold taxuri-color text-3xl">TAXURI <p class="font-medium text-sm">Taxation Management System</p></span>
+            <x-authentication-card-logo /> <span class="ml-3 font-extrabold taxuri-color text-3xl">TAXURI <p class="font-medium text-sm">Taxation Management System</p></span>
         </x-slot>
 
         <div class="mb-4 text-sm mt-10">
-            <p class="font-bold text-4xl text-center auth-color mt-36">Forgot Password</p>
+            <p class="font-extrabold text-4xl text-center auth-color mt-36">Forgot Password</p>
             <p class="font-normal mt-2 text-base text-center taxuri-text mb-10">No worries, just let us know your email address and we will email you a password reset link.</p>
         </div>
 

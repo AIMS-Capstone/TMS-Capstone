@@ -1,7 +1,7 @@
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
-            <x-authentication-card-logo /> <span class="ml-3 font-bold taxuri-color text-3xl">TAXURI <p class="font-medium text-sm">Taxation Management System</p></span>
+            <x-authentication-card-logo /> <span class="ml-3 font-extrabold taxuri-color text-3xl">TAXURI <p class="font-medium text-sm">Taxation Management System</p></span>
         </x-slot>
 
         <p class="font-extrabold text-3xl text-center auth-color mt-10">Register</p>
@@ -22,7 +22,7 @@
                     <x-input id="last_name" class="block mt-1 w-full" type="text" name="last_name" :value="old('last_name')" autofocus autocomplete="last_name" placeholder="Enter your Last Name" oninput="validateForm()"/>
                 </div>
 
-                <div class="sm:col-span-1 mt-1">
+                <div class="sm:col-span-1 mt-2">
                     <x-label for="suffix" value="{{ __('Suffix') }}" />
                     <x-input id="suffix" class="block mt-1 w-full" type="text" name="suffix" :value="old('suffix')" autofocus autocomplete="suffix" placeholder="e.g. Jr." />
                 </div>
