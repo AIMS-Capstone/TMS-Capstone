@@ -32,7 +32,28 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
+    Route::get('/recycle-bin', function () {
+        return view('recycle-bin');
+    })->name('recycle-bin');
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+    Route::get('/transactions', function () {
+        return view('transactions');
+    })->name('transactions');
+    Route::get('/coa', function () {
+        return view('coa');
+    })->name('coa');
+    Route::get('/financial-reports', function () {
+        return view('financial-reports');
+    })->name('financial-reports');
+    Route::get('/predictive-analytics', function () {
+        return view('predictive-analytics');
+    })->name('predictive-analytics');
+    Route::get('/org-setup', function () {
+        return view('org-setup');
+    })->name('org-setup');
+    Route::get('/add-user', function () {
+        return view('add-user');
+    })->name('add-user');
 });

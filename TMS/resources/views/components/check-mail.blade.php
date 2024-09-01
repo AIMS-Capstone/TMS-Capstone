@@ -20,9 +20,9 @@
         @endif
 
         <div class="flex items-center justify-center mt-6">
-            <button type="button" onclick="window.location.href='https://mail.google.com/mail/u/0/'" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md focus:outline-none hover:bg-blue-700">
+            <x-auth-button type="button" onclick="window.location.href='https://mail.google.com/mail/u/0/'" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md focus:outline-none hover:bg-blue-700">
                 {{ __('Open the mail app') }}
-            </button>
+            </x-auth-button>
         </div>
 
         <div class="flex items-center justify-center w-full mt-10">

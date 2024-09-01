@@ -1,10 +1,7 @@
-/* .bg-color {
-    color: rgb(245 251 255);
-} */
-/* added inter font by force */
 body, head, title, span, p, a, 
 h1, h2, h3, h4, h5, h6, 
-input, label, button, div, form, main, nav {
+input, label, button, div, form, main, nav,
+li, ul {
     font-family: 'Inter var', sans-serif;
 }
 .auth-color, .taxuri-color{
@@ -16,8 +13,43 @@ input, label, button, div, form, main, nav {
 .indicator {
     transition: all 0.3s ease;
 }
-.carousel-image {
-    max-height: 500px; /* Adjust this value to make the image larger */
-    max-width: 100%; /* Ensure it doesn't overflow horizontally */
-    object-fit: contain; /* Keep the image within its container without distortion */
+/* width */
+::-webkit-scrollbar {
+    width: 5px;
+}
+/* Track */
+::-webkit-scrollbar-track {
+    background: #D1D5DF;
+    border-radius: 5px;
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #6b7280;
+    border-radius: 5px;
+}
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+.sidebar-open {
+    @apply w-[250px];
+}
+.sidebar-closed {
+    @apply w-[50px];
+}
+.sidebar-closed .content {
+    @apply hidden;
+}
+.sidebar-active {
+    @apply border-l-[8px] bg-slate-100 border-blue-950 text-blue-950 px-6 py-2 font-bold;
+ /* place all shared classes */
+}
+.sidebar-text {
+    @apply text-blue-950 hover:text-blue-950 text-[14px] hover:font-bold;
+}
+.sidebar-icon {
+    @apply w-6 h-6;
+}
+.datetime-navbar{
+    color: rgb(29 30 78);
 }
