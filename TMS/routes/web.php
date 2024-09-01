@@ -5,7 +5,7 @@ use App\Http\Controllers\CustomVerificationController;
 use App\Http\Controllers\sendPasswordReset;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth/login');
 });
 
 Route::get('/reset-password', function () {
