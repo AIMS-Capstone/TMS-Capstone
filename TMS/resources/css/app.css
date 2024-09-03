@@ -1,7 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+.select2-container--default .select2-selection--single
+{
+    border: none !important;
+    width: 10rem !important;
+    z-index: 0 !important;
+}
+.select2-input{
+    z-index: 0 !important;
+}
+.select2-dropdown{
+    z-index:10 !important;
+}
 [x-cloak] {
     display: none;
 }

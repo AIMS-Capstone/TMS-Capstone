@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ContactsController;
+use App\Http\Controllers\TransactionsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -17,6 +19,8 @@ Route::get('/register-success-page', function () {
 Route::get('/check-mail', function () {
     return view('components/check-mail');
 });
+
+Route::get('/Transactions/create', [TransactionsController::class, 'create']);
 
 Route::middleware([
     'auth:sanctum',
