@@ -35,24 +35,50 @@ Route::middleware([
     Route::get('/recycle-bin', function () {
         return view('recycle-bin');
     })->name('recycle-bin');
+
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
     Route::get('/transactions', function () {
         return view('transactions');
     })->name('transactions');
+
+    Route::get('/general-ledger', function () {
+        return view('general-ledger');
+    })->name('general-ledger');
+    Route::get('/sales-book', function () {
+        return view('sales-book');
+    })->name('sales-book');
+    Route::get('/purchase-book', function () {
+        return view('purchase-book');
+    })->name('purchase-book');
+    Route::get('/cash-receipt', function () {
+        return view('cash-receipt');
+    })->name('cash-receipt');
+    Route::get('/cash-disb', function () {
+        return view('cash-disb');
+    })->name('cash-disb');
+    Route::get('/general-journal', function () {
+        return view('general-journal');
+    })->name('general-journal');
+
     Route::get('/coa', function () {
         return view('coa');
     })->name('coa');
+
     Route::get('/financial-reports', function () {
         return view('financial-reports');
     })->name('financial-reports');
+
     Route::get('/predictive-analytics', function () {
         return view('predictive-analytics');
     })->name('predictive-analytics');
+
     Route::get('/org-setup', function () {
         return view('org-setup');
     })->name('org-setup');
+    
     Route::get('/add-user', function () {
         return view('add-user');
     })->name('add-user');
