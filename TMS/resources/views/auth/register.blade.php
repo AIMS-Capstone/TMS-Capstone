@@ -1,10 +1,10 @@
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
-            <x-authentication-card-logo /> <span class="ml-3 font-bold taxuri-color text-3xl">TAXURI <p class="font-medium text-sm">Taxation Management System</p></span>
+            <x-authentication-card-logo /> <span class="ml-3 font-extrabold taxuri-color text-3xl">TAXURI <p class="font-medium text-sm">Taxation Management System</p></span>
         </x-slot>
 
-        <p class="font-extrabold text-3xl text-center auth-color mt-10">Register</p>
+        <p class="font-extrabold text-3xl text-center auth-color mt-3">Register</p>
         <p class="font-normal mt-2 text-base text-center taxuri-text mb-4">Enter the fields below to get started</p>
         <x-validation-errors class="mb-4" />
 
@@ -13,24 +13,24 @@
 
             <div>
                 <x-auth-label for="first_name" value="{{ __('First Name') }}" />
-                <x-input id="first_name" class="block mt-1 w-full" type="text" name="first_name" :value="old('first_name')" required autofocus autocomplete="first_name" placeholder="Enter your First Name" oninput="validateForm()"/>
+                <x-input id="first_name" class="block mt-1 w-full" type="text" name="first_name" :value="old('first_name')" required autofocus autocomplete="first_name" placeholder="Enter your First Name" oninput="validateForm()" maxlength="50em"/>
             </div>
 
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-3 gap-3">
                 <div class="sm:col-span-2 mt-2">
                     <x-auth-label for="last_name" value="{{ __('Last Name') }}" />
-                    <x-input id="last_name" class="block mt-1 w-full" type="text" name="last_name" :value="old('last_name')" autofocus autocomplete="last_name" placeholder="Enter your Last Name" oninput="validateForm()"/>
+                    <x-input id="last_name" class="block mt-1 w-full" type="text" name="last_name" :value="old('last_name')" autofocus autocomplete="last_name" placeholder="Enter your Last Name" oninput="validateForm()" maxlength="30em"/>
                 </div>
 
-                <div class="sm:col-span-1 mt-1">
+                <div class="sm:col-span-1 mt-2">
                     <x-label for="suffix" value="{{ __('Suffix') }}" />
-                    <x-input id="suffix" class="block mt-1 w-full" type="text" name="suffix" :value="old('suffix')" autofocus autocomplete="suffix" placeholder="e.g. Jr." />
+                    <x-input id="suffix" class="block mt-1 w-full" type="text" name="suffix" :value="old('suffix')" autofocus autocomplete="suffix" placeholder="e.g. Jr." maxlength="3em"/>
                 </div>
             </div>
 
             <div class="mt-1">
                 <x-auth-label for="email" value="{{ __('Email Address') }}" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" placeholder="Enter your Email Address" oninput="validateForm()"/>
+                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" placeholder="Enter your Email Address" oninput="validateForm()" maxlength="30em"/>
             </div>
 
             <div class="mt-1">

@@ -1,11 +1,11 @@
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
-            <x-authentication-card-logo /> <span class="ml-3 font-bold taxuri-color text-3xl">TAXURI <p class="font-medium text-sm">Taxation Management System</p></span>
+            <x-authentication-card-logo /> <span class="ml-3 font-extrabold taxuri-color text-3xl">TAXURI <p class="font-medium text-sm">Taxation Management System</p></span>
         </x-slot>
 
         
-        <p class="font-bold text-4xl text-center auth-color mt-28">Log In</p>
+        <p class="font-extrabold text-4xl text-center auth-color mt-20">Log In</p>
         <p class="font-normal mt-2 text-base text-center taxuri-text mb-6">Enter your details to sign in to your account</p>
         <x-validation-errors class="mb-2" />
 

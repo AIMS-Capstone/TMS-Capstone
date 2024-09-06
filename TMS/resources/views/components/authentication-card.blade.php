@@ -5,14 +5,14 @@
               {{ $logo }}
           </div>
 
-          <div class="fixed lg:inset-20 w-full overflow-hidden h-5/6 lg:w-1/2" id="carousel-container">
+          <div class="fixed lg:inset-20 w-full overflow-hidden mt-4 h-5/6 lg:w-1/2" id="carousel-container">
             <div class="flex transition-transform duration-500 ease-out w-full h-full" id="carousel">
                 <!-- Slide 1 -->
                 <div class="min-w-full flex-shrink-0 p-12 flex flex-col items-center justify-center">
-                    <img src="images/Visual data-pana.png" alt="Slide 1" class="object-contain h-60 lg:w-1/2" />
+                    <img src="images/Visual data-pana.png" alt="Slide 1" class="object-contain h-80 lg:w-1/2" />
                     <div class="text-center mt-2">
-                        <h2 class="text-2xl font-bold">Unlock Insightful Reports</h2>
-                        <p class="taxuri-color text-sm mt-2">
+                        <h2 class="text-2xl font-extrabold taxuri-color">Unlock Insightful Reports</h2>
+                        <p class="text-sm mt-2">
                             Taxuri provides insightful reports that help <br>
                             you understand financial landscape
                         </p>
@@ -20,10 +20,10 @@
                 </div>
                 <!-- Slide 2 -->
                 <div class="min-w-full flex-shrink-0 p-12 flex flex-col items-center justify-center">
-                    <img src="images/Audit-pana.png" alt="Slide 2" class="object-contain h-52 lg:w-1/2" />
+                    <img src="images/Audit-pana.png" alt="Slide 2" class="object-contain h-80 lg:w-1/2" />
                     <div class="text-center mt-2">
-                        <h2 class="text-2xl font-bold text-center">Manage Taxes with Ease</h2>
-                        <p class="text-center taxuri-color mt-2">
+                        <h2 class="text-2xl font-extrabold text-center taxuri-color">Manage Taxes with Ease</h2>
+                        <p class="text-center mt-2">
                             Taxuri ensures that managing taxes is straightforward and <br>
                             stress-free, so you can focus on what matters most
                         </p>
@@ -31,10 +31,10 @@
                 </div>
                 <!-- Slide 3 -->
                 <div class="min-w-full flex-shrink-0 p-12 flex flex-col items-center justify-center">
-                    <img src="images/Data extraction-amico.png" alt="Slide 3" class="object-contain h-52 lg:w-1/2" />
+                    <img src="images/Data extraction-amico.png" alt="Slide 3" class="object-contain h-80 lg:w-1/2" />
                     <div class="text-center mt-2">
-                        <h2 class="text-2xl font-bold text-center mt-4">Smart Tax Solutions</h2>
-                        <p class="text-center taxuri-color mt-2">
+                        <h2 class="text-2xl font-extrabold text-center mt-4 taxuri-color">Smart Tax Solutions</h2>
+                        <p class="text-center mt-2">
                             With built-in predictive analytics, Taxuri delivers smart <br>
                             solutions that adapt to your needs <br>
                             saving your time and effort
@@ -55,14 +55,14 @@
         </div>
         
         <!-- Indicators -->
-        <div class="flex justify-center items-center mt-96 lg:mt-96 xl:mt-80 space-x-3">
-            <div class="w-2 h-2 md:w-3 md:h-3 bg-gray-400 rounded-xl" id="indicator-1"></div>
-            <div class="w-2 h-2 md:w-3 md:h-3 bg-gray-400 rounded-xl" id="indicator-2"></div>
-            <div class="w-2 h-2 md:w-3 md:h-3 bg-gray-400 rounded-xl" id="indicator-3"></div>
+        <div class="absolute inset-x-0 bottom-4 md:bottom-6 lg:bottom-8 xl:bottom-10 flex justify-center space-x-3">
+            <div class="w-2 h-2 md:w-3 md:h-3 bg-gray-400 rounded-xl indicator" id="indicator-1"></div>
+            <div class="w-2 h-2 md:w-3 md:h-3 bg-gray-400 rounded-xl indicator" id="indicator-2"></div>
+            <div class="w-2 h-2 md:w-3 md:h-3 bg-gray-400 rounded-xl indicator" id="indicator-3"></div>
         </div>
       </div>
 
-      <div hidden role="hidden" class="fixed inset-0 w-2/5 ml-auto bg-white lg:block sm:rounded-3xl overflow-hidden shadow-xl"></div>
+      <div hidden role="hidden" class="fixed inset-0 w-2/5 ml-auto bg-white lg:block sm:rounded-l-3xl overflow-hidden shadow-xl"></div>
           <div class="relative h-full ml-auto lg:w-2/5 px-40 py-6 items-center sm:justify-center">
               {{ $slot }}
           </div>
@@ -70,6 +70,21 @@
   </div>
 
 <script>
+    function updateCarousel() {
+      const offset = currentIndex * -100;
+      carousel.style.transform = `translateX(${offset}%)`;
+
+      indicators.forEach((indicator, index) => {
+        if (index === currentIndex) {
+          indicator.classList.remove('bg-gray-400', 'rounded-xl', 'w-2', 'h-2', 'md:w-3', 'md:h-3');
+          indicator.classList.add('bg-blue-900', 'w-8', 'h-3', 'rounded-full');
+        } else {
+          indicator.classList.remove('bg-blue-900', 'w-8', 'h-3', 'rounded-full');
+          indicator.classList.add('bg-gray-400', 'w-2', 'h-2', 'md:w-3', 'md:h-3', 'rounded-xl');
+        }
+      });
+    }
+
     const carousel = document.getElementById('carousel');
     const slides = carousel.children;
     const indicators = Array.from(document.querySelectorAll('[id^=indicator-]'));
@@ -88,12 +103,11 @@
       resetAutoplay(); 
     });
 
-    // Add click event listeners to each indicator
     indicators.forEach((indicator, index) => {
       indicator.addEventListener('click', () => {
         currentIndex = index;
         updateCarousel();
-        resetAutoplay(); // Reset autoplay on indicator click
+        resetAutoplay(); 
       });
     });
 
@@ -115,21 +129,6 @@
       updateCarousel();
     }
 
-    function updateCarousel() {
-      const offset = currentIndex * -100;
-      carousel.style.transform = `translateX(${offset}%)`;
-
-      indicators.forEach((indicator, index) => {
-        if (index === currentIndex) {
-          indicator.classList.add('bg-blue-900');
-          indicator.classList.remove('bg-gray-400');
-        } else {
-          indicator.classList.add('bg-gray-400');
-          indicator.classList.remove('bg-blue-900');
-        }
-      });
-    }
-
     function startAutoplay() {
       autoplay = setInterval(() => {
         moveToNextSlide();
@@ -140,7 +139,5 @@
       clearInterval(autoplay);
       startAutoplay();
     }
-
     startAutoplay();
-  
 </script>

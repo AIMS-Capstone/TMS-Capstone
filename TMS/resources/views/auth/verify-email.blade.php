@@ -1,10 +1,10 @@
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
-            <x-authentication-card-logo /> <span class="ml-3 font-bold taxuri-color text-3xl">TAXURI <p class="font-medium text-sm">Taxation Management System</p></span>
+            <x-authentication-card-logo /> <span class="ml-3 font-extrabold taxuri-color text-3xl">TAXURI <p class="font-medium text-sm">Taxation Management System</p></span>
         </x-slot>
 
-        <p class="font-bold text-4xl text-center auth-color mt-44">One Step Away</p>
+        <p class="font-extrabold text-4xl text-center auth-color mt-44">One Step Away</p>
         <div class="font-normal mt-2 text-base text-center taxuri-text mb-6">
             {{ __('Before continuing, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
         </div>
