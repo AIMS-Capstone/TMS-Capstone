@@ -20,6 +20,8 @@ Route::get('/check-mail', function () {
     return view('components/check-mail');
 });
 
+Route::get('/Transactions/create', [TransactionsController::class, 'create']);
+
 Route::get('/email/verify/{id}/{hash}', [CustomVerificationController::class, 'verify'])
     ->name('verification.verify')
     ->middleware(['signed', 'throttle:6,1']);
