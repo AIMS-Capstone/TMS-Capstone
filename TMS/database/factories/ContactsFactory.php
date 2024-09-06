@@ -16,12 +16,12 @@ class ContactsFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->company(),
-            'type' => 'Non-Individual',
-            'tax_identification_number' => $this->generateTIN(),
-            'address' => fake()->address(),
-            'city' => fake()->city(),
-            'zip'=>fake()->postcode()
+            'bus_name' => fake()->company(),
+            'contact_type' => 'Non-Individual',
+            'contact_tin' => $this->generateTIN(),
+            'contact_address' => fake()->address(),
+            'contact_city' => fake()->city(),
+            'contact_zip'=>fake()->postcode()
         ];
     }
 

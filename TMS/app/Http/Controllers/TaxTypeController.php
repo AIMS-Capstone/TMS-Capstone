@@ -2,22 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Transactions;
-use App\Http\Requests\StoreTransactionsRequest;
-use App\Http\Requests\UpdateTransactionsRequest;
-use App\Models\atc;
-use App\Models\coa;
-use App\Models\Contacts;
 use App\Models\TaxType;
+use App\Http\Requests\StoreTaxTypeRequest;
+use App\Http\Requests\UpdateTaxTypeRequest;
 
-class TransactionsController extends Controller
+
+class TaxTypeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+      
     }
 
     /**
@@ -25,14 +22,13 @@ class TransactionsController extends Controller
      */
     public function create()
     {
-        // Redirect to the Livewire component route if applicable
-        return view('transactions.create');
+        //
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTransactionsRequest $request)
+    public function store(StoreTaxTypeRequest $request)
     {
         //
     }
@@ -40,7 +36,7 @@ class TransactionsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Transactions $transactions)
+    public function show(TaxType $taxType)
     {
         //
     }
@@ -48,7 +44,7 @@ class TransactionsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Transactions $transactions)
+    public function edit(TaxType $taxType)
     {
         //
     }
@@ -56,7 +52,7 @@ class TransactionsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(updateTransactionsRequest $request, Transactions $transactions)
+    public function update(UpdateTaxTypeRequest $request, TaxType $taxType)
     {
         //
     }
@@ -64,8 +60,9 @@ class TransactionsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Transactions $transactions)
+    public function destroy(TaxType $taxType)
     {
         //
     }
+  
 }

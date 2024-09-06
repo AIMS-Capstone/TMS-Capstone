@@ -1,12 +1,31 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-.select2-container--default .select2-selection--single
-{
-    border: none !important;
-    width: 10rem !important;
-    z-index: 0 !important;
+.select2-container--default .select2-selection--single {
+    border: none !important; /* Tailwind: border-none */
+    border-radius: 0.75rem; /* Tailwind: rounded-xl */
+    z-index: 0 !important; /* Retain the original z-index styling */
 }
+
+.select2-container--default .select2-selection--single::placeholder {
+    color: #9ca3af; /* Tailwind: placeholder:text-gray-400 */
+    font-weight: 300; /* Tailwind: placeholder:font-light */
+    font-size: 0.875rem; /* Tailwind: placeholder:text-sm */
+}
+
+.select2-container--default .select2-selection--single:focus {
+    border-color: #64748b; /* Tailwind: focus:border-slate-500 */
+    outline: 2px solid #64748b; /* Tailwind: focus:ring-slate-500 */
+    box-shadow: 0 0 0 2px #64748b; /* Alternative focus ring */
+}
+
+/* If disabled, apply these styles */
+.select2-container--default .select2-selection--single.disabled,
+.select2-container--default .select2-selection--single[disabled] {
+    background-color: #e5e7eb; /* Tailwind: bg-gray-200 */
+    cursor: not-allowed; /* Tailwind: cursor-not-allowed */
+}
+
 .select2-input{
     z-index: 0 !important;
 }

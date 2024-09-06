@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Contacts;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class ContactsSeeder extends Seeder
+class CoaSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,6 +13,5 @@ class ContactsSeeder extends Seeder
     public function run(): void
     {
         //
-        Contacts::factory()->count(10)->create();
     }
 }

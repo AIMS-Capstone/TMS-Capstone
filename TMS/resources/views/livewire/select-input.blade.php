@@ -1,8 +1,12 @@
+
 <div class="form-group" wire:ignore>
     <select 
+ 
+
         name="{{ $name }}" 
-        class="select2 {{ $class }}" 
+        class="select2 {{ $class }} mr-2" 
         id="{{ $id }}"
+
         @if($isGrouped) data-grouped="true" @endif
     >
         @foreach($options as $option)
@@ -40,6 +44,7 @@
 @script
     <script>
         $(document).ready(function() {
+            $('.select2').select2();
             $('#select_contact').select2({
                 templateResult: function(data) {
                     if (!data.id) {
