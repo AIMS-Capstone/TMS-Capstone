@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ContactsController;
+use App\Http\Controllers\TransactionsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomVerificationController;
 use App\Http\Controllers\sendPasswordReset;
@@ -25,7 +27,6 @@ Route::get('/email/verify/{id}/{hash}', [CustomVerificationController::class, 'v
 Route::get('/register-success-page', function () {
     return view('components/register-success-page');
 })->name('register-success-page');
-
 
 Route::middleware([
     'auth:sanctum',

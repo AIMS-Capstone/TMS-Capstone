@@ -8,14 +8,17 @@
         <title>{{ config('app.name', 'Laravel') }}</title>
 
         <!-- Fonts -->
+
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
         <!-- Scripts -->
         <script src="https://cdn.tailwindcss.com"></script>
 
         @vite(['resources/css/app.css', 'resources/css/custom.css', 'resources/js/app.js'])
         <!-- Styles -->
         @livewireStyles
+        
     </head>
 
     <body class="font-sans antialiased">
