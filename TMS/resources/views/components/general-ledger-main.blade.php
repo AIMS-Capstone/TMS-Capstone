@@ -60,6 +60,8 @@
                     </div>
                 </div>
                 <div class="h-8 border-l border-gray-200"></div>
+
+                {{-- Add filter button: para magenerate kung anong period of TIME, YEAR, and STATUS ipapakita niya --}}
                 <div class="flex items-center space-x-4">
                     <button class="flex items-center bg-white border border-gray-300 rounded-md px-4 py-2 whitespace-nowrap">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 32 32">

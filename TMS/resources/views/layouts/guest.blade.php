@@ -6,6 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Taxuri') }}</title>
+        <link rel="icon" href="{{ asset('images/favicon.ico') }}">
 
         <!-- Fonts -->
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
@@ -15,7 +16,7 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="{{ asset('js/custom.js') }}"></script>
         
-        @vite(['resources/css/app.css', 'resources/css/custom.css', 'resources/js/app.js', 'resources/js/password.js'])
+        @vite(['resources/css/app.css', 'resources/css/custom.css', 'resources/js/app.js'])
 
 
         <!-- Styles -->

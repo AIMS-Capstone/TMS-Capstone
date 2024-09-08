@@ -6,6 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Taxuri') }}</title>
+        <link rel="icon" href="{{ asset('images/favicon.ico') }}">
 
         <!-- Fonts -->
 
@@ -13,8 +14,8 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
         <!-- Scripts -->
-        <script defer src="https://cdn.jsdelivr.net/npm/@imacrayon/alpine-ajax@0.9.0/dist/cdn.min.js"></script>
-        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+        {{-- <script defer src="https://cdn.jsdelivr.net/npm/@imacrayon/alpine-ajax@0.9.0/dist/cdn.min.js"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script> --}}
         <script src="https://cdn.tailwindcss.com"></script>
 
         @vite(['resources/css/app.css', 'resources/css/custom.css', 'resources/js/app.js'])
@@ -31,7 +32,7 @@
             sidebar-open py-6 pr-4 border-r-2 shadow-sm overfow-hidden transition-all duration-500">
                 <div class="relative flex justify-center items-center">
                     <a href="{{ route('dashboard') }}" class="text-center content">
-                        <img src="https://readymadeui.com/readymadeui.svg" alt="logo" class='w-[160px]' />
+                        <img src="{{ asset('images/Taxuri Logo-name.png') }}" alt="logo" class='w-[160px]' />
                     </a>
                     <button id="toggleSidebar" class="absolute -right-8 -top-2 h-8 w-8 p-[6px] border-gray-300 cursor-pointer bg-slate-50 flex items-center justify-center transition-all rounded-full drop-shadow-md">
                         <svg id="sidebarArrow" class="w-3 h-3 transform rotate-90 transition-transform duration-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">

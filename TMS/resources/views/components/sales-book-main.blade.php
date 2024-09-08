@@ -49,6 +49,8 @@
     {{-- Posted Tab --}}
     <div id="tab-posted-content" role="tabpanel" aria-labelledby="tab-posted" class="overflow-x-auto px-10 hidden">
         <div class="bg-white border border-gray-300 rounded-tl-lg rounded-tr-lg grid grid-cols-8 gap-4">
+
+            {{-- NAKA BASED SA KUNG ANONG NAKA FILTER, HINDI SA KUNG SINO CLIENT --}}
             <div class="col-span-2 bg-blue-50 p-4 rounded-tl-lg">
                 {{-- Org/Client --}}
                 <span class="font-bold text-blue-950">Redondo Inc - Champion Dept</span>
@@ -60,7 +62,6 @@
             <div class="col-span-5 flex items-center justify-between space-x-4 p-4">
                 <div class="flex items-center space-x-8">
                     <div class="h-8 border-l border-gray-200"></div>
-                    <!-- Year -->
                     <div class="flex flex-col w-32">
                         <label for="year_select" class="font-bold text-blue-950">Month</label>
                         <select id="year_select" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
@@ -76,7 +77,7 @@
                             <option selected>October</option>
                             <option selected>November</option>
                             <option selected>December</option>
-                            <!-- Other options -->
+                            <!-- Other options based sa client/org -->
                         </select>
                     </div>
                     <div class="h-8 border-l border-gray-200"></div>
@@ -88,11 +89,13 @@
                             <option selected>2021</option>
                             <option selected>2022</option>
                             <option selected>2023</option>
-                            <!-- Other options -->
+                            <!-- Other options based sa client/org-->
                         </select>
                     </div>
                 </div>
                 <div class="h-8 border-l border-gray-200"></div>
+
+                {{-- Add filter button: para magenerate kung anong MONTH and YEAR ipapakita niya --}}
                 <div class="flex items-center space-x-4">
                     <button class="flex items-center bg-white border border-gray-300 rounded-md px-4 py-2 whitespace-nowrap">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 32 32">
@@ -104,6 +107,8 @@
                         Clear all filters
                     </button>
                 </div>
+
+                {{-- ITONG DROPDOWN NA TO, WALA NAMAN SA FIGMA PERO BA PARA SA TABI 'TO NG MARK AS DRAFT BUTTON --}}
                 <div x-data="paginationComponent()" class="relative inline-block space-x-4 text-left">
                     <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" class="flex items-center text-gray-600" type="button">
                         <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
@@ -139,7 +144,8 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24"><path fill="#949494" d="m17 18l-5-2.18L7 18V5h10m0-2H7a2 2 0 0 0-2 2v16l7-3l7 3V5a2 2 0 0 0-2-2"/></svg>
                         <span class="font-normal text-md text-gray-600">Mark as Draft</span>
                     </button>
-        
+                    
+                    {{-- NOT SURE PA KUNG PARA SAAN 'TONG BUTTON NA 'TO --}}
                     <div class="relative inline-block text-left">
                         <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" class="flex items-center text-gray-600" type="button">
                             <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
@@ -164,13 +170,13 @@
         <div x-data="paginationComponent()" x-init="showCheckboxes = false">
             <div class="mt-4 overflow-x-auto">
                 <table class="w-full text-left text-sm text-neutral-600 dark:text-neutral-300">
-                    <thead class="border-b border-gray-200 bg-gray-100 text-sm text-gray-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white">
+                    <thead class="border-b border-gray-200 bg-gray-100 text-sm text-gray-600">
                         <tr>
                             <th scope="col" class="p-4">
-                                <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600 dark:text-neutral-300">
+                                <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                     <div class="relative flex items-center">
-                                        <input type="checkbox" x-model="checkAll" id="checkAll" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-blue-950 checked:before:bg-blue-950 active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
+                                        <input type="checkbox" x-model="checkAll" id="checkAll" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-blue-950 checked:before:bg-blue-950 active:outline-offset-0" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
                                         </svg>
                                     </div>
@@ -189,10 +195,10 @@
                         <template x-for="(item, index) in paginatedData" :key="index">
                             <tr>
                                 <td class="py-6 px-3">
-                                    <label for="user2335" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600 dark:text-neutral-300">
+                                    <label for="user2335" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                         <div class="relative flex items-center">
-                                            <input type="checkbox" id="user2335" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-blue-950 checked:before:bg-blue-950 active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" :checked="checkAll" />
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
+                                            <input type="checkbox" id="user2335" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-blue-950 checked:before:bg-blue-950 active:outline-offset-0" :checked="checkAll" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
                                             </svg>
                                         </div>
@@ -212,7 +218,6 @@
                 
                 <!-- Pagination Component -->
                 <div class="flex justify-between items-center mt-6">
-                    <!-- Pagination aligned to the left -->
                     <div class="flex items-center space-x-1">
                         <button @click="previousPage()" class="p-2 text-gray-600 hover:font-bold">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -234,7 +239,6 @@
                         </button>
                     </div>
                 
-                    <!-- Showing Entries aligned to the right -->
                     <div class="ml-auto text-gray-600">
                         Showing <span x-text="startEntry"></span>-<span x-text="endEntry"></span> of <span x-text="totalEntries"></span> Entries
                     </div>
@@ -269,7 +273,7 @@
     function setEntries(entries) {
         const component = document.querySelector('[x-data="paginationComponent()"]').__x;
         component.perPage = entries;
-        component.currentPage = 1; // Reset to first page
+        component.currentPage = 1;
         console.log(`Setting ${entries} entries per page`);
         document.getElementById('dropdownDots').classList.add('hidden');
     }
@@ -279,11 +283,11 @@
             data: [
                 {date: 'January 01, 2020', tin: '001-112-223-334', name: 'Aluminum Supply', address: 'Taguig', invNum: '0.00', refNum: '382439', vat: '14,109', selected: false},
                 {date: 'January 01, 2020', tin: '001-112-223-334', name: 'Anadio', address: 'Taguig', invNum: '0.00', refNum: '35345', vat: '14,109', selected: false},
-                // Add more data here
+                // dito di ko sure kaya hindi ko rin mapagana show entries and pagination
             ],
             perPage: 5,
             currentPage: 1,
-            showCheckboxes: false, // This controls the visibility of the checkboxes
+            showCheckboxes: false,
             get totalPages() {
                 return Math.ceil(this.data.length / this.perPage);
             },
@@ -321,7 +325,7 @@
             markAsDraft() {
                 const selectedItems = this.data.filter(item => item.selected);
                 console.log("Marked as Draft:", selectedItems);
-                // Implement your draft marking logic here
+                // draft marking logic 
             }
         };
     }
