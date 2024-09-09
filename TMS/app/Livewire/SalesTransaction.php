@@ -1,98 +1,106 @@
 <?php
+
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\Atc;
+use App\Models\TaxRow;
+use App\Models\ATC;
+use App\Models\TaxType;
 use App\Models\Coa;
 use App\Models\Transactions;
-use App\Models\Contacts;
-use App\Models\TaxType;
 
 class SalesTransaction extends Component
 {
-    public $contacts;
-    public $taxTypes;
-    public $atcs;
-    public $coas;
-    public $contact_id;
-    public $tax_code;
-    public $amount = 0;
-    public $tax_amount = 0;
-    public $net_amount = 0;
-    public $description;
-    public $coa;
-    public $reference;
+    public $taxRows = [];
+    public $totalAmount = 0;
     public $date;
+    public $inv_number;
+    public $reference;
+
+    protected $listeners = ['taxRowUpdated' => 'updateTaxRow'];
+
+    protected $rules = [
+        'date' => 'required|date',
+        'inv_number' => 'required|string',
+        'reference' => 'nullable|string',
+        'taxRows.*.amount' => 'required|numeric|min:0',
+        'taxRows.*.tax_code' => 'nullable|exists:atcs,id',
+        'taxRows.*.coa' => 'nullable|string',
+    ];
 
     public function mount()
     {
-        $this->contacts = Contacts::all();
-        $this->taxTypes = TaxType::all();
-        $this->atcs = Atc::all();
-        $this->coas = Coa::all();
+        $this->addTaxRow();
     }
 
-    public function updated($propertyName)
+    public function addTaxRow()
     {
-        if ($propertyName === 'amount' || $propertyName === 'tax_code') {
-            $this->calculateAmounts();
-        }
+        $this->taxRows[] = [
+            'description' => '',
+            'tax_type' => '',
+            'tax_code' => '',
+            'coa' => '',
+            'amount' => 0,
+            'tax_amount' => 0,
+            'net_amount' => 0
+        ];
     }
 
-    public function calculateAmounts()
+    public function removeTaxRow($index)
     {
-        $atc = $this->atcs->find($this->tax_code);
+        unset($this->taxRows[$index]);
+        $this->taxRows = array_values($this->taxRows); // Re-index array
+        $this->totalAmount = $this->calculateTotalAmount();
+    }
 
-        // Ensure amount is a number
-        $amount = is_numeric($this->amount) ? (float) $this->amount : 0;
+    public function updateTaxRow($data)
+    {
+        $this->taxRows[$data['index']] = $data;
+        $this->totalAmount = $this->calculateTotalAmount();
+    }
 
-        if ($atc) {
-            // Ensure tax rate is a number
-            $tax_rate = is_numeric($atc->tax_rate) ? (float) $atc->tax_rate : 0;
-
-            // Calculate tax amount and net amount based on the tax rate
-            $this->tax_amount = $amount * ($tax_rate / 100);
-            $this->net_amount = $amount + $this->tax_amount;
-        } else {
-            // Clear tax amount and net amount if ATC is not selected
-            $this->tax_amount = 0;
-            $this->net_amount = $amount;
-        }
+    public function calculateTotalAmount()
+    {
+        return collect($this->taxRows)->sum('amount');
     }
 
     public function saveTransaction()
     {
-        $this->validate([
-            'contact_id' => 'required',
-            'tax_code' => 'required',
-            'amount' => 'required|numeric',
-            'description' => 'required|string',
-            'coa' => 'required|string',
-            'reference' => 'required|string',
-            'date' => 'required|date',
+        $this->validate();
+
+        // Create a transaction with 'Sales' type
+        $transaction = Transactions::create([
+            'transaction_type' => 'Sales',
+            'date' => $this->date,
+            'inv_number' => $this->inv_number,
+            'reference' => $this->reference,
+            'total_amount' => $this->totalAmount,
         ]);
 
-        // Store the transaction
-        $transaction = new Transactions();
-        $transaction->contact_id = $this->contact_id;
-        $transaction->tax_code = $this->tax_code;
-        $transaction->amount = $this->amount;
-        $transaction->tax_amount = $this->tax_amount;
-        $transaction->net_amount = $this->net_amount;
-        $transaction->description = $this->description;
-        $transaction->coa = $this->coa;
-        $transaction->reference = $this->reference;
-        $transaction->date = $this->date;
-        $transaction->save();
+        // Save each tax row linked to the transaction
+        foreach ($this->taxRows as $row) {
+            TaxRow::create([
+                'transaction_id' => $transaction->id,
+                'amount' => $row['amount'],
+                'tax_code' => $row['tax_code'],
+                'tax_type' => $row['tax_type'],
+                'tax_amount' => $row['tax_amount'],
+                'net_amount' => $row['net_amount'],
+                'coa' => $row['coa'],
+            ]);
+        }
 
-        // Reset form fields
-        $this->reset();
-
+        // Optionally, redirect or provide feedback to the user
         session()->flash('message', 'Transaction saved successfully!');
+        return redirect()->route('transactions.show', ['transaction' => $transaction->id]);
     }
 
     public function render()
     {
-        return view('livewire.sales-transaction');
+        return view('livewire.sales-transaction', [
+            'taxTypes' => TaxType::all(),
+            'atcs' => ATC::all(),
+            'coas' => Coa::all()
+        ]);
     }
 }

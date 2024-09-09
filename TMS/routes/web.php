@@ -20,7 +20,9 @@ Route::get('/check-mail', function () {
     return view('components/check-mail');
 });
 
-Route::get('/Transactions/create', [TransactionsController::class, 'create']);
+Route::get('/transactions/create', [TransactionsController::class, 'create']);
+Route::get('/transactions/{transaction}', [TransactionsController::class, 'show'])->name('transactions.show');
+
 
 Route::get('/email/verify/{id}/{hash}', [CustomVerificationController::class, 'verify'])
     ->name('verification.verify')
