@@ -56,6 +56,7 @@ class DynamicModal extends Component
             return [
                 'value' => $contact->id,
                 'name' => $contact->bus_name,
+                'tin' => $contact->contact_tin,
             ];
         })->toArray();
 

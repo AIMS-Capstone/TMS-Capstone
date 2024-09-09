@@ -13,8 +13,14 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
+            $table->string('transaction_type'); // e.g., "Sales", "Purchase", etc.
+            $table->date('date');
+            $table->string('inv_number');
+            $table->string('reference')->nullable();
+            $table->decimal('total_amount', 10, 2);
             $table->timestamps();
         });
+        
     }
 
     /**

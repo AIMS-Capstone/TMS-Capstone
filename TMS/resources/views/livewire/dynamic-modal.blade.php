@@ -34,17 +34,46 @@
             $.each(optionsArray, function(key, option){
         options.push({
             id: option.value,
-            text: option.name
+            text: option.name,
+            tax_id: option.tin
         });
     });
 
     $('#select_contact')
-        .empty()
-        .append('<option selected value="">Select contact</option>')
-        .select2({
-            data: options
-        });
-            console.log('Select2 dropdown updated with new options.');
+    .empty() // Clear existing options
+
+    .select2({
+        data: options, // New data options
+        templateResult: function(data) {
+            // Custom formatting for the dropdown list
+            if (!data.id) {
+                return data.text;
+            }
+            var $result = $(
+                '<span>' + data.text + 
+                '<small style="display:block; font-size:15px; line-height:1; margin-top:0; padding-top:0;">' + 
+                data.tax_id + '</small></span>' // Assuming tax_id comes from data object
+            );
+            return $result;
+        },
+        templateSelection: function(data) {
+            // Custom formatting for the selected item
+            if (!data.id) {
+                return data.text;
+            }
+            var $selection = $(
+                '<span>' + data.text + 
+                '<small style="display:block; font-size:15px; line-height:1; margin-top:0; padding-top:0;">' + 
+                data.tax_id + '</small></span>' // Assuming tax_id comes from data object
+            );
+            return $selection;
+        },
+        escapeMarkup: function (markup) {
+            return markup; // Allow custom HTML
+        }
+    });
+
+console.log('Select2 dropdown updated with new options.');
         });
     </script>
 @endscript

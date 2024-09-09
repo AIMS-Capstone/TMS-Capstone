@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Transactions;
 use App\Http\Requests\StoreTransactionsRequest;
 use App\Http\Requests\UpdateTransactionsRequest;
+use App\Livewire\TaxRow;
 use App\Models\atc;
 use App\Models\coa;
 use App\Models\Contacts;
+use App\Models\TaxRow as ModelsTaxRow;
 use App\Models\TaxType;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class TransactionsController extends Controller
 {
@@ -23,10 +27,13 @@ class TransactionsController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        // Redirect to the Livewire component route if applicable
-        return view('transactions.create');
+        // Get the type from the query string, default to 'sales'
+        $transactionType = $request->query('type', 'sales');
+
+        // Pass the type to the view
+        return view('transactions.create', compact('transactionType'));
     }
 
     /**
@@ -40,9 +47,14 @@ class TransactionsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Transactions $transactions)
+    public function show(Transactions $transaction)
     {
-        //
+        // Fetch associated tax rows for the transaction
+        $taxRows = ModelsTaxRow::where('transaction_id', $transaction->id)->get();
+    
+
+        // Pass the transaction and tax rows to the view
+        return view('transactions.show', compact('transaction', 'taxRows'));
     }
 
     /**

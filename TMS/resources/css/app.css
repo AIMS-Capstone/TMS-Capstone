@@ -5,6 +5,18 @@
     border: none !important; /* Tailwind: border-none */
     border-radius: 0.75rem; /* Tailwind: rounded-xl */
     z-index: 0 !important; /* Retain the original z-index styling */
+    padding-top: 0 !important;
+ 
+}
+.select2-selection.select2-selection--single:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important; /* optional, depending on your styling */
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered{
+    padding: 0 !important;
+    border-bottom: 1px solid #64748b !important;
 }
 
 .select2-container--default .select2-selection--single::placeholder {
