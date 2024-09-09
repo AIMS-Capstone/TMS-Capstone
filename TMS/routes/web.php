@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\CoaController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\TransactionsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomVerificationController;
 use App\Http\Controllers\sendPasswordReset;
+use App\Http\Controllers\OrgSetupController;
 
 Route::get('/', function () {
     return view('auth/login');
@@ -28,7 +30,7 @@ Route::get('/email/verify/{id}/{hash}', [CustomVerificationController::class, 'v
     ->name('verification.verify')
     ->middleware(['signed', 'throttle:6,1']);
 
-Route::get('/register-success-page', function () {
+Route::get('/register-success-page', function () {      
     return view('components/register-success-page');
 })->name('register-success-page');
 
@@ -68,9 +70,15 @@ Route::middleware([
         return view('general-journal');
     })->name('general-journal');
 
-    Route::get('/coa', function () {
-        return view('coa');
-    })->name('coa');
+    //Org Setup Routes
+    Route::get('/create-org', function(){
+        return view('components/create-org');
+    })->name('create-org');
+    Route::post('org-setup', [OrgSetupController::class, 'store'])->name('OrgSetup.store');
+
+    //Charts of Accounts routings
+    Route::get('/coa', [CoaController::class, 'index'])->name('coa');
+    Route::post('coa', [CoaController::class, 'store'])->name('coa.store');
 
     Route::get('/financial-reports', function () {
         return view('financial-reports');

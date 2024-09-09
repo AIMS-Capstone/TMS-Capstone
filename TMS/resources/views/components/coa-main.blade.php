@@ -13,7 +13,7 @@
         </div>      
     </div>
 
-    <div x-data="{ showCheckboxes: false, selectedTab: 'All', checkAll: false }" class="container mx-auto pt-2 ">
+    <div x-data="coaTable() { showCheckboxes: false, selectedTab: 'All', checkAll: false }" class="container mx-auto pt-2 ">
         <!-- Second Header -->
         <div class="container mx-auto ps-8">
             <div class="flex flex-row space-x-2 items-center justify-center">
@@ -48,7 +48,7 @@
                 aria-label="tab options">
                 
                 <!-- Tab 1: All -->
-                <button @click="selectedTab = 'All'" 
+                <button @click="selectedTab = 'All'; fetchData()" 
                     :aria-selected="selectedTab === 'All'" 
                     :tabindex="selectedTab === 'All' ? '0' : '-1'" 
                     :class="selectedTab === 'All' 
@@ -57,12 +57,13 @@
                     class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
                     type="button" 
                     role="tab" 
-                    aria-controls="tabpanelAll">
+                    aria-controls="tabpanelAll"
+                    >
                     All
                 </button>
                 
                 <!-- Tab 2: Assets -->
-                <button @click="selectedTab = 'Assets'" 
+                <button @click="selectedTab = 'Assets'; fetchData()" 
                     :aria-selected="selectedTab === 'Assets'" 
                     :tabindex="selectedTab === 'Assets' ? '0' : '-1'" 
                     :class="selectedTab === 'Assets' 
@@ -76,7 +77,7 @@
                 </button>
                 
                 <!-- Tab 3: Liabilities -->
-                <button @click="selectedTab = 'Liabilities'" 
+                <button @click="selectedTab = 'Liabilities'; fetchData()" 
                     :aria-selected="selectedTab === 'Liabilities'" 
                     :tabindex="selectedTab === 'Liabilities' ? '0' : '-1'" 
                     :class="selectedTab === 'Liabilities' 
@@ -90,7 +91,7 @@
                 </button>
                 
                 <!-- Tab 4: Equity -->
-                <button @click="selectedTab = 'Equity'" 
+                <button @click="selectedTab = 'Equity'; fetchData()" 
                     :aria-selected="selectedTab === 'Equity'" 
                     :tabindex="selectedTab === 'Equity' ? '0' : '-1'" 
                     :class="selectedTab === 'Equity' 
@@ -104,7 +105,7 @@
                 </button>
                 
                 <!-- Tab 5: Revenue -->
-                <button @click="selectedTab = 'Revenue'" 
+                <button @click="selectedTab = 'Revenue'; fetchData()" 
                     :aria-selected="selectedTab === 'Revenue'" 
                     :tabindex="selectedTab === 'Revenue' ? '0' : '-1'" 
                     :class="selectedTab === 'Revenue' 
@@ -118,7 +119,7 @@
                 </button>
 
                 <!-- Tab 6: Cost of Sales -->
-                <button @click="selectedTab = 'Cost of Sales'" 
+                <button @click="selectedTab = 'Cost of Sales'; fetchData()" 
                     :aria-selected="selectedTab === 'Cost of Sales'" 
                     :tabindex="selectedTab === 'Cost of Sales' ? '0' : '-1'" 
                     :class="selectedTab === 'Cost of Sales' 
@@ -132,7 +133,7 @@
                 </button>
                 
                 <!-- Tab 7: Expenses -->
-                <button @click="selectedTab = 'Expenses'" 
+                <button @click="selectedTab = 'Expenses'; fetchData()" 
                     :aria-selected="selectedTab === 'Expenses'" 
                     :tabindex="selectedTab === 'Expenses' ? '0' : '-1'" 
                     :class="selectedTab === 'Expenses' 
@@ -146,7 +147,7 @@
                 </button>
 
                 <!-- Tab 8: Percentage of Revenue -->
-                <button @click="selectedTab = 'Percentage of Revenue'" 
+                <button @click="selectedTab = 'Percentage of Revenue'; fetchData()" 
                     :aria-selected="selectedTab === 'Percentage of Revenue'" 
                     :tabindex="selectedTab === 'Percentage of Revenue' ? '0' : '-1'" 
                     :class="selectedTab === 'Percentage of Revenue' 
@@ -168,9 +169,15 @@
                 <div class="flex flex-row space-x-2 items-center justify-between">
                     <!-- Search row -->
                     <div x-data="{ search: '' }" class="relative w-80 p-5">
-                        <input type="text" x-model="search" placeholder="Search..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900 focus:border-sky-900" />
+                        <input 
+                        type="text" 
+                        x-model="search" 
+                        placeholder="Search..." 
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900 focus:border-sky-900" 
+                        @input.debounce.500ms="fetchData"
+                        />
                         <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        <i class="fa-solid fa-xmark absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer" @click="search = ''"></i>
+                        <i class="fa-solid fa-xmark absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"></i>
                     </div>
                     <!-- End row -->
                     <div class="mx-auto space-x-4 pr-12">
@@ -235,68 +242,98 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
-                        <!-- Check if there is any data for the current page -->
-                        <template x-if="data.slice((currentPage - 1) * perPage, currentPage * perPage).length > 0">
-                            <template x-for="(item, index) in data.slice((currentPage - 1) * perPage, currentPage * perPage)" :key="index">
+                        <template x-for="coa in coas" :key="coa.id">
+                            @if (count($coas) >0)
+                                @foreach ($coas as $coa)
+                                    <tr>
+                                        <td class="p-4">
+                                            <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600 dark:text-neutral-300">
+                                                <div class="relative flex items-center">
+                                                    <input type="checkbox" x-model="checkAll" @click="toggleCheckboxes">
+                                                </div>
+                                            </label>
+                                        </td>
+                                        <td x-text="coa.code">{{$coa ->code}}</td>
+                                        <td x-text="coa.name">{{$coa ->name}}</td>
+                                        <td x-text="coa.type">{{$coa ->type}}</td>
+                                        <td x-text="coa.created_at">{{$coa ->created_at}}</td>
+                                        <td>edit</td>
+                                    </tr>                           
+                                @endforeach
+                        </template>  
+                             @else
                                 <tr>
-                                    <td class="p-4">
-                                        <label for="user2335" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600 dark:text-neutral-300">
-                                            <div class="relative flex items-center">
-                                                <input type="checkbox" id="user2335" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-black checked:before:bg-black focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" :checked="checkAll" />
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-                                                </svg>
-                                            </div>
-                                        </label>
+                                    <td><!-- Placeholder Image -->
+                                        <tr>
+                                            <td colspan="6" class="text-center p-4">
+                                                <img src="{{ asset('images/Wallet 02.png') }}" alt="No data available" class="mx-auto" />
+                                                <h1 class="font-bold mt-2">No Charts of accounts yet</h1>
+                                                <p class="text-sm text-neutral-500 mt-2">Start adding accounts with the <br> + button beside the import button.</p>
+                                            </td>
+                                        </tr>
                                     </td>
-                                    <td x-text="item.contact">Contact</td>
-                                    <td x-text="item.date">Date</td>
-                                    <td x-text="item.reference">Reference</td>
-                                    <td x-text="item.amount">Amount</td>
-                                    <td x-text="item.type">Type</td>
                                 </tr>
-                            </template>
-                        </template>
-                        
-                        <!-- Placeholder Image -->
-                        <template x-if="data.slice((currentPage - 1) * perPage, currentPage * perPage).length === 0">
-                            <tr>
-                                <td colspan="6" class="text-center p-4">
-                                    <img src="{{ asset('images/Wallet 02.png') }}" alt="No data available" class="mx-auto" />
-                                    <h1 class="font-bold mt-2">No Charts of accounts yet</h1>
-                                    <p class="text-sm text-neutral-500 mt-2">Start adding accounts with the <br> + button beside the import button.</p>
-                                </td>
-                            </tr>
-                        </template> 
+                            @endif
                     </tbody>
                 </table>
-                <nav aria-label="pagination">
-                    <ul class="flex flex-shrink-0 items-center gap-2 text-sm font-medium mt-4">
-                        <li>
-                            <button @click="currentPage = Math.max(currentPage - 1, 1)" :disabled="currentPage === 1" class="flex items-center rounded-md p-1 text-neutral-600 hover:text-black dark:text-neutral-300 dark:hover:text-white" aria-label="previous page">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="size-6">
-                                    <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                        </li>
-                        <template x-for="page in totalPages" :key="page">
-                            <li x-show="page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1) || page === currentPage">
-                                <button @click="currentPage = page" :class="currentPage === page ? 'bg-sky-900 text-neutral-100 dark:bg-white dark:text-black' : 'text-neutral-600 hover:text-black dark:text-neutral-300 dark:hover:text-white'" class="flex size-6 items-center justify-center rounded-full p-1" :aria-current="currentPage === page" :aria-label="'page ' + page" x-text="page"></button>
-                            </li>
-                            <li x-show="page === currentPage - 2 || page === currentPage + 2">
-                                <span class="flex items-center justify-center rounded-md p-1 text-neutral-600 dark:text-neutral-300" aria-label="ellipsis">...</span>
-                            </li>
-                        </template>
-                        <li>
-                            <button @click="currentPage = Math.min(currentPage + 1, totalPages)" :disabled="currentPage === totalPages" class="flex items-center rounded-md p-1 text-neutral-600 hover:text-black dark:text-neutral-300 dark:hover:text-white" aria-label="next page">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="size-6">
-                                    <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                        </li>
-                    </ul>
-                </nav>
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <button @click="prevPage" :disabled="currentPage === 1">Prev</button>
+                        <span x-text="currentPage"></span>
+                        <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+                    </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+
+    function coaTable() {
+    return {
+        coas: [],
+        search: '',
+        filter: 'All',
+        currentPage: 1,
+        totalPages: 1,
+
+        fetchData() {
+            fetch(`/api/coa/filter?search=${this.search}&filter=${this.filter}&page=${this.currentPage}`)
+                .then(response => response.json())
+                .then(data => {
+                    this.coas = data.data;
+                    this.totalPages = data.last_page;
+                    this.currentPage = data.current_page;
+                });
+        },
+
+        prevPage() {
+            if (this.currentPage > 1) {
+                this.currentPage--;
+                this.fetchData();
+            }
+        },
+
+        nextPage() {
+            if (this.currentPage < this.totalPages) {
+                this.currentPage++;
+                this.fetchData();
+            }
+        }
+    }
+}
+    document.addEventListener('search', event => {
+        window.location.href = `?search=${event.detail.search}`;
+    });
+
+    document.addEventListener('filter', event => {
+        window.location.href = `?type=${event.detail.type}`;
+    });
+
+    function toggleCheckboxes() {
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = this.checkAll;
+        });
+    }
+    
+</script>

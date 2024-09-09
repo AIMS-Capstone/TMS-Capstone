@@ -8,4 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class coa extends Model
 {
     use HasFactory;
+
+    protected $table = 'coas';
+
+    protected $fillable = [
+        'type',
+        'code', 
+        'name',
+        'description'
+    ];
 }
