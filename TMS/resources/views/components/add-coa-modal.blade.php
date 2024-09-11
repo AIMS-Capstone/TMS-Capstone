@@ -34,7 +34,6 @@
                         <option value="revenues">Revenue</option>
                         <option value="sales">Cost of Sales</option>
                         <option value="expense">Expenses</option>
-                        <option value="per-revenue">Percentage of Revenue</option>
                     </select>
                 </div>
 

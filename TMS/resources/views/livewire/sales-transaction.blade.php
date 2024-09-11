@@ -99,7 +99,7 @@
             <x-slot:actions>
          
                 <div class="flex justify-end mt-4">
-                    <x-button type="submit" class="ml-4 bg-blue-500 text-white px-4 py-2 rounded shadow-md">
+                    <x-button type="submit" class="ml-4 text-white px-4 py-2 rounded-lg shadow-md">
                         {{ __('Save Transaction') }}
                     </x-button>
                 </div>

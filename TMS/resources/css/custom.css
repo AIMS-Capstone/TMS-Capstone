@@ -4,11 +4,15 @@ input, label, button, div, form, main, nav,
 li, ul {
     font-family: 'Inter var', sans-serif;
 }
+
+/* Use these styles for TITLES, HEADINGS */
 .auth-color, .taxuri-color{
     color: #1e3a8a;
 }
+
+/* Use taxuri-text for all subheadings or normal text/body */
 .taxuri-text{
-    color: rgb(61 64 62);
+    color: #3f3f46;
 }
 .indicator {
     transition: all 0.3s ease;

@@ -2,7 +2,7 @@
 <div class="container mx-auto my-4 pt-6">
     <div class="px-10">
         <div class="flex flex-row w-64 items-start space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 256 256"><path fill="#172554" d="M216 40H40a16 16 0 0 0-16 16v152a8 8 0 0 0 11.58 7.15L64 200.94l28.42 14.21a8 8 0 0 0 7.16 0L128 200.94l28.42 14.21a8 8 0 0 0 7.16 0L192 200.94l28.42 14.21A8 8 0 0 0 232 208V56a16 16 0 0 0-16-16m-40 104H80a8 8 0 0 1 0-16h96a8 8 0 0 1 0 16m0-32H80a8 8 0 0 1 0-16h96a8 8 0 0 1 0 16"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 256 256"><path fill="#1e3a8a" d="M216 40H40a16 16 0 0 0-16 16v152a8 8 0 0 0 11.58 7.15L64 200.94l28.42 14.21a8 8 0 0 0 7.16 0L128 200.94l28.42 14.21a8 8 0 0 0 7.16 0L192 200.94l28.42 14.21A8 8 0 0 0 232 208V56a16 16 0 0 0-16-16m-40 104H80a8 8 0 0 1 0-16h96a8 8 0 0 1 0 16m0-32H80a8 8 0 0 1 0-16h96a8 8 0 0 1 0 16"/></svg>
             <p class="font-bold text-3xl text-left taxuri-color">Transactions</p>
         </div>
     </div>
@@ -11,13 +11,23 @@
             <p class="font-normal text-sm">The Transactions feature ensures accurate tracking and categorization <br> of each transaction.</p>
         </div>
         <div class="items-end float-end">
-            <!-- routing papunta kay peter -->
-            {{-- <a href = {{ route('/create') }}> --}}
-            <button type="button" class= "text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
+            <button type="button" id="dropdownDefaultButton" class="text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-2 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
                 <i class="fas fa-plus-circle mr-1"></i>
-                    Add Transaction
+                Add Transaction
             </button>
-            {{-- </a>  --}}
+            <div id="dropdown" class="absolute z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 mt-2">
+                <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefaultButton">
+                    <li>
+                        <a href="{{ url('/transactions/create?type=sales') }}" class="block px-4 py-2 hover:bg-gray-100">Add Sale</a>
+                    </li>
+                    <li>
+                        <a href="{{ url('/transactions/create?type=purchase') }}" class="block px-4 py-2 hover:bg-gray-100">Add Purchase</a>
+                    </li>
+                    <li>
+                        <a href="{{ url('/transactions/create?type=journal') }}" class="block px-4 py-2 hover:bg-gray-100">Add Manual Journal</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>  
 </div>  
@@ -288,6 +298,20 @@
     </div>
 </div>
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dropdownButton = document.getElementById('dropdownDefaultButton');
+        const dropdown = document.getElementById('dropdown');
+
+        dropdownButton.addEventListener('click', function () {
+            dropdown.classList.toggle('hidden');
+        });
+        document.addEventListener('click', function (event) {
+            if (!dropdownButton.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    });
+
     document.getElementById('sortButton').addEventListener('click', function() {
         const dropdown = document.getElementById('dropdownMenu');
         dropdown.classList.toggle('hidden');

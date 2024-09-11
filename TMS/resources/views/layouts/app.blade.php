@@ -197,14 +197,14 @@
                                 <span class="sidebar-text">Organization Setup</span>
                             </a>
                         </li>
-                        <li class="pl-0">
+                        {{-- <li class="pl-0">
                             <a href="{{ route('add-user') }}"
                             class="flex items-center rounded-r-full px-6 py-2 ease-in transition-all
                             {{ request()->routeIs('add-user') ? 'sidebar-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon mr-2" viewBox="0 0 20 20"><path fill="#273C75" d="M11 9V5H9v4H5v2h4v4h2v-4h4V9zm-1 11a10 10 0 1 1 0-20a10 10 0 0 1 0 20"/></svg>
                                 <span class="sidebar-text">Add User Account</span>
                             </a>
-                        </li>
+                        </li> --}}
                     </ul>
                 </div>
             </nav>

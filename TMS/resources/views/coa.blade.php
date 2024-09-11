@@ -5,14 +5,14 @@
                     <!-- Page Main -->
                         <div class="container mx-auto my-auto pt-6">
                             <div class="px-10">
-                                <div class="flex flex-row w-full items-center">
-                                    <img src="{{ asset('images/Frame 17.png') }}" class="px-2"> 
+                                <div class="flex flex-row w-full items-center space-x-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg"  class="w-8 h-8" viewBox="0 0 512 512"><path fill="none" stroke="#1e3a8a" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M160 144h288M160 256h288M160 368h288"/><circle cx="80" cy="144" r="16" fill="none" stroke="#52525b" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><circle cx="80" cy="256" r="16" fill="none" stroke="#52525b" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><circle cx="80" cy="368" r="16" fill="none" stroke="#52525b" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
                                     <p class="font-bold text-3xl auth-color">Charts of Accounts</p>
                                 </div>
                             </div>
                             <div class="flex items-center px-10">
-                                <div class="flex items-center px-2">            
-                                    <p class="auth-color">The Chart of Accounts feature organizes all your financial accounts in one <br> place, making it simple to manage and track your company’s finances.</p>
+                                <div class="flex items-center">            
+                                    <p class="taxuri-text text-sm font-normal">The Chart of Accounts feature organizes all your financial accounts in one <br> place, making it simple to manage and track your company’s finances.</p>
                                 </div>
                             </div>      
                         </div>
@@ -147,20 +147,6 @@
                                         role="tab" 
                                         aria-controls="tabpanelExpenses">
                                         Expenses
-                                    </button>
-
-                                    <!-- Tab 8: Percentage of Revenue -->
-                                    <button @click="$dispatch('filter', { type: 'Percentage of Revenue' })"
-                                        :aria-selected="selectedTab === 'Percentage of Revenue'" 
-                                        :tabindex="selectedTab === 'Percentage of Revenue' ? '0' : '-1'" 
-                                        :class="selectedTab === 'Percentage of Revenue' 
-                                            ? 'font-semibold text-sky-900 bg-slate-100 border-slate-200 border-b-2 rounded-t-lg'
-                                            : 'text-neutral-600 font-medium hover:text-sky-900'" 
-                                        class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
-                                        type="button" 
-                                        role="tab" 
-                                        aria-controls="tabpanelPercentageOfRevenue">
-                                        Percentage of Revenue
                                     </button>
                                 </div>
                             </div>
