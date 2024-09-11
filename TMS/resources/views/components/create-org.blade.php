@@ -1,309 +1,414 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-
-        <title>{{ config('app.name', 'Taxuri') }}</title>
-        <link rel="icon" href="{{ asset('images/favicon.ico') }}">
-
-        <!-- Fonts -->
-
-        <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-        <!-- Scripts -->
-        <script defer src="https://cdn.jsdelivr.net/npm/@imacrayon/alpine-ajax@0.9.0/dist/cdn.min.js"></script>
-        <script src="https://cdn.tailwindcss.com"></script>
-
-        @vite(['resources/css/app.css', 'resources/css/custom.css', 'resources/js/app.js'])
-        <!-- Styles -->
-        @livewireStyles
-        
-    </head>
-
-    <body class="font-sans antialiased">
-        <!-- Page Header -->
-        <div class="py-12">
+{{-- Previous look nasa "sample.blade.php" --}}
+<x-organization-layout>
+    <div class="bg-white px-20">
+        <div class="py-8">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="flex container mx-auto my-auto pt-6 items-center justify-between">
-                    <!-- Left side with button -->
-                    <div class="flex items-center">
+                <div class="flex container my-auto pt-6 items-center justify-between relative">
+                    <div class="absolute -left-16 flex items-center">
                         <a href="{{ route('org-setup') }}">
-                            <button class="text-sky-900 hover:text-sky-700 text-2xl font-bold mr-4">
-                                &lt; <!-- This will display the "<" character -->
+                            <button class="text-zinc-600 hover:text-zinc-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5" viewBox="0 0 24 24"><g fill="none" stroke="#52525b" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 12H8m4-4l-4 4l4 4"/></g></svg>
+                                <span class="text-zinc-600 text-sm font-normal hover:text-zinc-700">Go back to portal</span>
                             </button>
                         </a>
                     </div>
-
-                    <!-- Centered Title -->
-                    <div class="flex-grow text-center">
-                        <h1 class="text-xl font-bold text-sky-900">Create Organization</h1>
+                    <div class="w-full text-center">
+                        <h1 class="text-3xl font-bold text-blue-900">Create Organization</h1>
                     </div>
                 </div>
             </div>
         </div>
+        {{-- TAB STEPPER --}}
+        <div class="flex justify-center border-b border-gray-200 mb-4 px-4 sm:px-6 lg:px-8">
+            <div id="tabs" class="flex space-x-12 sm:space-x-14 lg:space-x-16" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
+              <button class="tab text-blue-900 font-semibold py-2 px-4 border-b-4 border-blue-900"
+                id="tab-class"
+                role="tab"
+                aria-selected="true">Classification</button>
+              <button class="tab text-gray-500 py-2 px-4 focus:outline-none"
+                id="tab-bg"
+                role="tab"
+                aria-selected="true">Background</button>
+              <button class="tab text-gray-500 py-2 px-4 focus:outline-none"
+                id="tab-add"
+                role="tab"
+                aria-selected="true">Address</button>
+              <button class="tab text-gray-500 py-2 px-4 focus:outline-none"
+                id="tab-contact"
+                role="tab"
+                aria-selected="true">Contact</button>
+              <button class="tab text-gray-500 py-2 px-4 focus:outline-none"
+                id="tab-tax"
+                role="tab"
+                aria-selected="true">Tax Information</button>
+              <button class="tab text-gray-500 py-2 px-4 focus:outline-none"
+                id="tab-financial"
+                role="tab"
+                aria-selected="true">Financial Settings</button>
+            </div>
+        </div>
 
-        <!-- Multi-step Form Container -->
-        <div class="container mx-auto">
-            <!-- Progress Bar -->
-            <div class="flex justify-around py-3 border-b border-gray-200">
-                <div :class="{ 'text-sky-900': step === 1 }" class="flex flex-col items-center">
-                    <span class="font-semibold">1</span>
-                    <span>Classification</span>
+        <!-- Tab Content -->
+        {{-- naka-comment form dahil nagiging 404 error or 419 page expired --}}
+        {{-- <form action="{{'OrgSetup.store'}}" method="POST">
+            @csrf  --}}
+            <div id="tab-content" class="container border border-gray-200 rounded-lg p-4 my-10 text-center max-w-full h-[500px] mx-auto flex flex-col">
+                <!-- Classification Content -->
+                <div class="tab-content-item classification-content">
+                    <p class="p-10 text-zinc-600 font-medium text-lg">What is your organization classification?</p>
+                    <div class="flex justify-center space-x-8">
+                        <!-- Non-Individual Option -->
+                        <label for="non_individual" class="flex flex-col items-center">
+                            <input type="radio" name="type" id="non_individual" wire:model="type" value="non-individual" class="hidden peer">
+                            <div class="group flex items-center justify-center w-44 h-44 rounded-full bg-gray-100 border-2 border-transparent peer-checked:bg-blue-900 peer-checked:border-blue-900">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20" viewBox="0 0 36 36">
+                                    <path d="M31 8h-9v25h11V10a2 2 0 0 0-2-2m-5 17h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Zm4 10h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Z" class="group-peer-checked:fill-yellow-500 fill-gray-400"/>
+                                    <path d="M17.88 3H6.12A2.12 2.12 0 0 0 4 5.12V33h5v-3h6v3h5V5.12A2.12 2.12 0 0 0 17.88 3M9 25H7v-2h2Zm0-5H7v-2h2Zm0-5H7v-2h2Zm0-5H7V8h2Zm4 15h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2V8h2Zm4 15h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2V8h2Z" class="group-peer-checked:fill-yellow-500 fill-gray-400"/>
+                                </svg>
+                            </div>
+                            <span class="text-blue-900 font-semibold mt-2">Non-Individual</span>
+                        </label>
+                
+                        <!-- Individual Option -->
+                        <label for="individual" class="flex flex-col items-center">
+                            <input type="radio" name="type" id="individual" wire:model="type" value="individual" class="hidden peer">
+                            <div class="group flex items-center justify-center w-44 h-44 rounded-full bg-gray-100 border-2 border-transparent peer-checked:bg-blue-900 peer-checked:border-blue-900">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20" viewBox="0 0 16 16">
+                                    <path d="M8 8a3 3 0 1 0 0-6a3 3 0 0 0 0 6m4.735 6c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139z" class="group-peer-checked:fill-yellow-500 fill-gray-400"/>
+                                </svg>
+                            </div>
+                            <span class="text-blue-900 font-semibold mt-2">Individual</span>
+                        </label>
+                    </div>
                 </div>
-                <div :class="{ 'text-sky-900': step === 2 }" class="flex flex-col items-center">
-                    <span class="font-semibold">2</span>
-                    <span>Background</span>
+            
+                <!-- Background Content -->
+                <div class="tab-content-item">
+                    <p class="p-10 text-zinc-600 font-medium text-lg">What should we call this organization?</p>
+                    <div class="flex flex-col items-center h-full">
+                        <div class="flex flex-col mb-4 w-80">
+                            <div class="flex flex-col">
+                                <x-field-label for="registration_name" value="{{ __('Registered Name') }}" class="mb-2 text-left" />
+                                <x-input type="text" name="registration_name" id="registration_name" wire:model="registration_name" placeholder="e.g. ABC Corp" />
+                            </div>
+                        </div>
+                        <div class="flex flex-col w-80">
+                            <div class="flex flex-col">
+                                <x-field-label for="line_of_business" value="{{ __('Line of Business') }}" class="mb-2 text-left" />
+                                <x-input type="text" name="line_of_business" id="line_of_business" wire:model="line_of_business" placeholder="Line of Business" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div :class="{ 'text-sky-900': step === 3 }" class="flex flex-col items-center">
-                    <span class="font-semibold">3</span>
-                    <span>Address</span>
+            
+                <!-- Address Content -->
+                <div class="tab-content-item">
+                    <p class="p-10 text-zinc-600 font-medium text-lg">Organization Address Information</p>
+                    <div class="flex flex-col items-center h-full">
+                        <div class="flex flex-col mb-4 w-full max-w-md">
+                            <div class="flex flex-col">
+                                <x-field-label for="address_line" value="{{ __('Address Line') }}" class="mb-2 text-left" />
+                                <x-input type="text" name="address_line" id="address_line" wire:model="address_line" placeholder="e.g. ESI Bldg 124 Yakal Street" />
+                            </div>
+                        </div>
+                
+                        <div class="flex flex-col mb-4 w-full max-w-md">
+                            <div class="flex flex-col">
+                                <x-field-label for="region" value="{{ __('Region') }}" class="mb-2 text-left" />
+                                <select wire:model="region" name="region" id="region" class="border rounded-xl px-4 py-2 w-full border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                                    <option value="">Select Region</option>
+                                    <option value="Region 4-A">Region 4-A</option>
+                                    <!-- Add na lang siguro ng parang plugin na js (i forgot what it's called)-->
+                                </select>
+                            </div>
+                        </div>
+                
+                        <div class="flex flex-row space-x-4 w-full max-w-md">
+                            <div class="flex flex-col w-full">
+                                <x-field-label for="city" value="{{ __('City') }}" class="mb-2 text-left" />
+                                <select wire:model="city" name="city" id="city" class="border rounded-xl px-4 py-2 w-full border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                                    <option value="">Select City</option>
+                                    <option value="Santa Rosa">Santa Rosa</option>
+                                    <!-- Add na lang siguro ng parang plugin na js (i forgot what it's called)-->
+                                </select>
+                            </div>
+                            <div class="flex flex-col w-32">
+                                <x-field-label for="zip_code" value="{{ __('Zip Code') }}" class="mb-2 text-left" />
+                                <x-input type="text" name="zip_code" id="zip_code" wire:model="zip_code" placeholder="1203" class="border rounded-xl px-4 py-2 w-full" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div :class="{ 'text-sky-900': step === 4 }" class="flex flex-col items-center">
-                    <span class="font-semibold">4</span>
-                    <span>Contact</span>
+            
+                <!-- Contact Content -->
+                <div class="tab-content-item">
+                    <p class="p-10 text-zinc-600 font-medium text-lg">Contact Information</p>
+                    <div class="flex flex-col items-center h-full">
+                        <div class="flex flex-col mb-4 w-80">
+                            <div class="flex flex-col">
+                                <x-field-label for="contact_number" value="{{ __('Contact Number') }}" class="mb-2 text-left" />
+                                <x-input type="text" name="contact_number" id="contact_number" wire:model="contact_number" placeholder="e.g. 09123456789" />
+                            </div>
+                        </div>
+                        <div class="flex flex-col w-80">
+                            <div class="flex flex-col">
+                                <x-field-label for="email" value="{{ __('Email Address') }}" class="mb-2 text-left" />
+                                <x-input type="email" name="email" id="email" x-model="email" placeholder="Enter Email Address" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div :class="{ 'text-sky-900': step === 5 }" class="flex flex-col items-center">
-                    <span class="font-semibold">5</span>
-                    <span>Tax Information</span>
+            
+                <!-- Tax Information Content -->
+                <div class="tab-content-item">
+                    <div class="flex justify-between">
+                        {{-- TIN & RDO --}}
+                        <div class="flex flex-col w-1/2 pr-4">
+                            <p class="p-10 text-zinc-600 font-medium text-lg">Its TIN and RDO?</p>
+                            <div class="flex flex-col mb-4 items-center">
+                                <div class="flex flex-col w-80">
+                                    <x-field-label for="tin" value="{{ __('Tax Identification Number (TIN)') }}" class="mb-2 text-left" />
+                                    <x-input type="text" name="tin" id="tin" wire:model="tin" placeholder="e.g. 000-000-000-000" class="w-80" />
+                                </div>
+                            </div>
+                        
+                            <div class="flex flex-col items-center">
+                                <div class="flex flex-col 80">
+                                    <x-field-label for="rdo" value="{{ __('Revenue District Office (RDO)') }}" class="mb-2 text-left" />
+                                    <select wire:model="rdo" name="rdo" id="rdo" class="border rounded-xl px-4 py-2 w-80 border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                                        <option value="">Select Revenue District Office (RDO)</option>
+                                        <option value="Santa Rosa Branch">Santa Rosa Branch</option>
+                                        <!-- may list for this one-->
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                
+                        {{-- Tax Type --}}
+                        <div class="flex flex-col w-1/2 pl-4">
+                            <p class="p-10 text-zinc-600 font-medium text-lg mb-4">Tax type organization complies with?</p>
+                            <div class="flex flex-col gap-2 justify-center items-center">
+                                <label for="percentage_tax" class="flex w-80 min-w-[14rem] cursor-pointer items-center justify-start gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2 font-medium text-slate-700">
+                                    <input type="radio" name="tax_type" id="percentage_tax" wire:model="tax_type" value="Percentage Tax" class="relative h-4 w-4 appearance-none rounded-full border border-gray-200 bg-white checked:border-blue-900 checked:bg-blue-900 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-slate-800">
+                                    <span class="text-sm">Percentage Tax</span>
+                                </label>
+                                <label for="value_added_tax" class="flex w-80 min-w-[14rem] cursor-pointer items-center justify-start gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2 font-medium text-slate-700">
+                                    <input type="radio" name="tax_type" id="value_added_tax" wire:model="tax_type" value="Value-Added Tax" class="relative h-4 w-4 appearance-none rounded-full border border-gray-200 bg-white checked:border-blue-900 checked:bg-blue-900 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-slate-800">
+                                    <span class="text-sm">Value-Added Tax</span>
+                                </label>
+                                <label for="tax_exempt" class="flex w-80 min-w-[14rem] cursor-pointer items-center justify-start gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2 font-medium text-slate-700">
+                                    <input type="radio" name="tax_type" id="tax_exempt" wire:model="tax_type" value="Tax Exempt" class="relative h-4 w-4 appearance-none rounded-full border border-gray-200 bg-white checked:border-blue-900 checked:bg-blue-900 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-slate-800">
+                                    <span class="text-sm">Tax Exempt</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div :class="{ 'text-sky-900': step === 6 }" class="flex flex-col items-center">
-                    <span class="font-semibold">6</span>
-                    <span>Financial Settings</span>
+            
+                <!-- Financial Settings Content -->
+                <div class="tab-content-item">
+                    <p class="p-10 text-zinc-600 font-medium text-lg">Lastly, enter the organization's<br/>Start Date and Financial Year End</p>
+                    <div class="flex flex-col items-center h-full">
+                        <div class="flex flex-col mb-2 w-80">
+                            <div class="flex flex-col">
+                                <x-field-label for="start_date" value="{{ __('Start Date') }}" class="mb-2 text-left" />
+                                <div class="relative max-w-sm">
+                                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+                                        </svg>
+                                    </div>
+                                    <input name="start_date" id="start_date" wire:model="start_date" id="datepicker-format" datepicker datepicker-min-date="06/04/2024" datepicker-max-date="05/05/2025" class="border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-900 focus:border-blue-900 block w-full ps-10 p-2.5" placeholder="Enter Start Date">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col mb-2 w-80">
+                            <div class="flex flex-col">
+                                <x-field-label for="registration_date" value="{{ __('Registration Date') }}" class="mb-2 text-left" />
+                                <div class="relative max-w-sm">
+                                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+                                        </svg>
+                                    </div>
+                                    <input name="registration_date" id="registration_date" wire:model="registration_date" id="datepicker-format" datepicker datepicker-min-date="06/04/2024" datepicker-max-date="05/05/2025" class="border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-900 focus:border-blue-900 block w-full ps-10 p-2.5" placeholder="Enter Registration Date">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col mb-2 w-80">
+                            <div class="flex flex-col">
+                                <x-field-label for="financial_year_end" value="{{ __('Financial Year End') }}" class="mb-2 text-left" />
+                                <select name="financial_year_end" id="financial_year_end" wire:model="financial_year_end" class="border rounded-xl px-4 py-2 w-full mb-4 border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                                    <option value="">Select Financial Year End</option>
+                                    <option value="December 31">December 31</option>
+                                    <!-- idk where to find other selections here-->
+                                </select>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            
+                <!-- Back and Next Buttons -->
+                <div class="absolute inset-x-20 bottom-1 flex justify-between px-4">
+                    <button id="prevBtn" class="border border-blue-900 bg-white text-blue-900 font-bold px-4 py-2 rounded-xl disabled:opacity-50">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 16 16">
+                                <path fill="#1e3a8a" fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m10.25.75a.75.75 0 0 0 0-1.5H6.56l1.22-1.22a.75.75 0 0 0-1.06-1.06l-2.5 2.5a.75.75 0 0 0 0 1.06l2.5 2.5a.75.75 0 1 0 1.06-1.06L6.56 8.75z" clip-rule="evenodd"/>
+                            </svg>
+                        </span>
+                        Go back
+                    </button>
+                    <button id="nextBtn" class="bg-blue-900 text-white font-semibold px-4 py-2 rounded-xl">
+                        Next
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 24 24">
+                                <g fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M8 12h8m-4 4l4-4l-4-4"/>
+                                </g>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+
+                <div x-show="showModal" x-data="{ showModal: false }" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30">
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center max-w-lg w-full">
+                        <!-- Centered Image -->
+                        <div class="flex justify-center mb-4">
+                            <img src="{{ asset('images/Ok-amico.png') }}" alt="Organization Created" class="w-40 h-40 mr-6">
+                        </div>
+                        <h2 class="text-emerald-500 font-bold text-3xl whitespace-normal mb-4">Organization Added</h2>
+                        <p class="font-normal text-sm mb-4">The organization has been successfully<br>added! Go back to the portal to open<br/> and start the session.</p>
+                        <div class="flex items-center justify-center mt-4 mb-4">
+                            <button type="button" onclick="window.location.href='{{ route('org-setup') }}'" @click="showModal = false" class="inline-flex items-center w-48 justify-center py-2 bg-emerald-500 border border-transparent rounded-xl 
+                            font-bold text-sm text-white tracking-widest hover:bg-emerald-600 focus:bg-emerald-700 active:bg-emerald-700 focus:outline-none disabled:opacity-50 transition ease-in-out duration-150">
+                                {{ __('Go Back to Portal') }} 
+                                <div class="ms-2 w-5 h-5 flex items-center justify-center border-2 border-white rounded-full">
+                                    <svg class="rtl:rotate-180 w-3.5 h-3.5 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                                    </svg>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <!-- Form Steps -->
-            <form action="{{'OrgSetup.store'}}" method="POST">
-                @csrf  
-            <div class="p-6 m-auto h-[300px]"> 
-
-                    <div class="flex flex-col justify-center items-center h-full">
-                        <h2 class="font-semibold text-lg text-center mb-6">What is your organization classification?</h2>
-                        <select name="type" id="type" wire:model="type" class="border rounded px-4 py-2 w-64">
-                            <option value="">Select Classification</option>
-                            <option value="non-individual">Non-Individual</option>
-                            <option value="individual">Individual</option>
-                        </select>
-                        <span class="text-red-500" x-show="!classification && isStepValid">* Required</span>
-                    </div>
-
-
-                    <div class="flex flex-col justify-center items-center h-full">
-                        <h2 class="font-semibold text-lg">Background Information</h2>
-                        <input type="text" name="registration_name" id="registration_name" wire:model="registration_name" placeholder="Registered Name" class="border rounded px-4 py-2 w-64 mb-4">
-                        <span class="text-red-500" x-show="!registeredName && isStepValid">* Required</span>
-                        <input type="text" name="line_of_business" id="line_of_business" wire:model="line_of_business" placeholder="Line of Business" class="border rounded px-4 py-2 w-64">
-                        <span class="text-red-500" x-show="!lineOfBusiness && isStepValid">* Required</span>
-                    </div>
-
-
-                        <div class="flex flex-col justify-center items-center h-full">
-                            <input type="text" name="address_line" id="address_line" wire:model="address_line" placeholder="Address Line" class="border rounded px-4 py-2 w-64 mb-4">
-                            <span class="text-red-500" x-show="!addressLine && isStepValid">* Required</span>
-
-                            <select wire:model="regio" name="region" id="region" class="border rounded px-4 py-2 w-64 mb-4">
-                                <option value="">Select Region</option>
-                                <option value="Region 4-A">Region 4-A</option>
-                            </select>
-
-                            <span class="text-red-500" x-show="!region && isStepValid">* Required</span>
-                            <select wire:model="city" name = "city" id="city" class="border rounded px-4 py-2 w-64 mb-4">
-                                <option value="">Select City</option>
-                                <option value="Santa Rosa" >Santa Rosa</option>
-                                <!-- Add more cities based on region -->
-                            </select>
-
-                            <span class="text-red-500" x-show="!city && isStepValid">* Required</span>
-                            <input type="text" name="zip_code" id="zip_code" wire:model="zip_code" placeholder="Zip Code" class="border rounded px-4 py-2 w-64">
-                            <span class="text-red-500" x-show="!zipCode && isStepValid">* Required</span>
-                        </div>
-
-
-                    <div class="flex flex-col justify-center items-center h-full">
-                        <input type="text" name="contact_number" id="contact_number" wire:model="contact_number" placeholder="Contact Number" class="border rounded px-4 py-2 w-64 mb-4">
-                        <span class="text-red-500" x-show="(!contactNumber || contactNumber.length !== 11) && isStepValid">* Required (11 digits)</span>
-                        <input type="email" name="email" id="email" x-model="emailAddress" placeholder="Email Address" class="border rounded px-4 py-2 w-64">
-                        <span class="text-red-500" x-show="!validateEmail(emailAddress) && isStepValid">* Invalid Email</span>
-                    </div>
-
-
-                    <div class="flex flex-col justify-center items-center h-full">
-                        <input type="text" name="tin" id="tin" wire:model="tin" placeholder="TIN (000-000-000-000)" class="border rounded px-4 py-2 w-64 mb-4">
-                        <span class="text-red-500" x-show="!TIN && isStepValid">* Required</span>
-
-                        <select wire:model="rdo" name="rdo" id="rdo" class="border rounded px-4 py-2 w-64 mb-4">
-                            <option value="">Select RDO</option>
-                            <option value="Santa Rosa Branch">Santa Rosa Branch</option>
-                            <!-- Add RDO options here -->
-                        </select>
-                        <span class="text-red-500" x-show="!RDO && isStepValid">* Required</span>
-
-                        <div class="flex items-center space-x-4">
-                            <label><input type="radio" name = "tax_type" id="percentage_tax" wire:model="tax_type" value="Percentage Tax"> Percentage Tax</label>
-                            <label><input type="radio" name = "tax_type" id="value_added_tax" wire:model="tax_type" value="Value-Added Tax"> Value-Added Tax</label>
-                            <label><input type="radio" name = "tax_type" id="tax_exempt" wire:model="tax_type" value="Tax Exempt"> Tax Exempt</label>
-                        </div>
-                        <span class="text-red-500" x-show="taxType.length === 0 && isStepValid">* At least one tax type required</span>
-                    </div>
-
-                    <div class="flex flex-col justify-center items-center h-full">
-                        <input type="date" name = "start_date" id="start_date" wire:model="start_date" class="border rounded px-4 py-2 w-64 mb-4">
-                        <span class="text-red-500" x-show="!startDate && isStepValid">* Required</span>
-
-                        <input type="date" name = "registration_date" id="registration_date" wire:model="registration_date" class="border rounded px-4 py-2 w-64 mb-4">
-                        <span class="text-red-500" x-show="!registeredDate && isStepValid">* Required</span>
-
-                        <input type="date"  name = "financial_year_end" id="financial_year_end" wire:model="financial_year_end" class="border rounded px-4 py-2 w-64 mb-4">
-                        <span class="text-red-500" x-show="!financialYearEnd || startDate >= financialYearEnd && isStepValid">* Required (must be later than Start Date)</span>
-                    </div>
-
-                    <button type ="submit">Submit</button>
-                </form>
-
-        </div>
-
-        <!-- Navigation Buttons -->
-        <div class="flex justify-between p-6">
-            <button 
-                x-show="step > 1"
-                x-on:click="step--"
-                class="px-4 py-2 bg-gray-500 text-white rounded-md"
-            >
-                Previous
-            </button>
-
-            <button 
-                x-show="step < 6"
-                x-on:click="nextStep()"
-                class="px-4 py-2 bg-sky-500 text-white rounded-md float-right"
-                :disabled="!isStepValid"
-            >
-                Next
-            </button>
-
-            <!-- Show Save button only on the last step -->
-            <button 
-                type="submit"
-                x-show="step === 6" 
-                class="px-4 py-2 bg-green-500 text-white rounded-md float-right"
-                :disabled="!isStepValid"
-            >
-                Save
-            </button>
-        </div>
-        </form>
+        {{-- </form> --}}
     </div>
 
-   <!-- Alpine.js Script -->
-<script>
-    function formSteps() {
-        return {
-            step: 1,
-            type: '',
-            registration_name: '',
-            lineOfBusiness: '',
-            addressLine: '',
-            region: '',
-            city: '',
-            zipCode: '',
-            contactNumber: '',
-            emailAddress: '',
-            TIN: '',
-            RDO: '',
-            taxType: [],
-            startDate: '',
-            registeredDate: '',
-            financialYearEnd: '',
-            isStepValid: false,
+    {{-- Simple remedy muna nilagay ko kapag mag aappear na "Save" button sa Financial Settings. --}}
+    {{-- kasi nag search ako, puro pang controller pinakita --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content-item');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const saveBtnHtml = `
+            <button type="submit" id="saveBtn" class="bg-blue-900 text-white font-semibold px-4 py-2 rounded-xl" @click="showModal = true">
+                Save
+                <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 24 24">
+                        <g fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M8 12h8m-4 4l4-4l-4-4"/>
+                        </g>
+                    </svg>
+                </span>
+            </button>
+        `;
+        let currentTab = 0;
 
-            // Automatically validate the step whenever inputs change
-            init() {
-                this.$watch('step', () => this.validateStep());
-                this.$watch('type', () => this.validateStep());
-                this.$watch('registration_name', () => this.validateStep());
-                this.$watch('lineOfBusiness', () => this.validateStep());
-                this.$watch('addressLine', () => this.validateStep());
-                this.$watch('region', () => this.validateStep());
-                this.$watch('city', () => this.validateStep());
-                this.$watch('zipCode', () => this.validateStep());
-                this.$watch('contactNumber', () => this.validateStep());
-                this.$watch('emailAddress', () => this.validateStep());
-                this.$watch('TIN', () => this.validateStep());
-                this.$watch('RDO', () => this.validateStep());
-                this.$watch('taxType', () => this.validateStep());
-                this.$watch('startDate', () => this.validateStep());
-                this.$watch('registeredDate', () => this.validateStep());
-                this.$watch('financialYearEnd', () => this.validateStep());
-            },
-
-            // Validate current step inputs
-            validateStep() {
-                switch (this.step) {
-                    case 1:
-                        this.isStepValid = !!this.type;
-                        break;
-                    case 2:
-                        this.isStepValid = !!this.registration_name && !!this.lineOfBusiness;
-                        break;
-                    case 3:
-                        this.isStepValid = !!this.addressLine && !!this.region && !!this.city && !!this.zipCode;
-                        break;
-                    case 4:
-                        this.isStepValid = !!this.contactNumber && !!this.emailAddress &&
-                                          this.contactNumber.length === 11 && this.validateEmail(this.emailAddress);
-                        break;
-                    case 5:
-                        this.isStepValid = !!this.TIN && !!this.RDO && this.taxType.length > 0;
-                        break;
-                    case 6:
-                        this.isStepValid = !!this.startDate && !!this.registeredDate && !!this.financialYearEnd &&
-                                          new Date(this.startDate) < new Date(this.financialYearEnd);
-                        break;
+        function updateButtonsVisibility() {
+            const activeTabId = tabs[currentTab].id;
+            if (activeTabId === 'tab-financial') {
+                nextBtn.outerHTML = saveBtnHtml;
+            } else {
+                if (!document.getElementById('nextBtn')) {
+                    document.querySelector('.flex.justify-between').insertAdjacentHTML('beforeend', `
+                        <button id="nextBtn" class="bg-blue-900 text-white font-semibold px-4 py-2 rounded-xl">
+                            Next
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 24 24">
+                                    <g fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <path d="M8 12h8m-4 4l4-4l-4-4"/>
+                                    </g>
+                                </svg>
+                            </span>
+                        </button>
+                    `);
                 }
-            },
-
-            // Move to the next step
-            nextStep() {
-                if (this.isStepValid && this.step < 6) {
-                    this.step++;
-                    this.isStepValid = false; // Reset for the next step
-                }
-            },
-
-            // Save the form data
-            saveForm() {
-                if (this.isStepValid) {
-                    // Combine address fields into a single address string
-                    const fullAddress = `${this.addressLine} ${this.region} ${this.city} ${this.zipCode}`;
-                    // Example of form submission via AJAX or you can use a form post
-                    console.log('Form Data:', {
-                        type: this.type,
-                        registration_name: this.registration_name,
-                        lineOfBusiness: this.lineOfBusiness,
-                        address: fullAddress, // Send combined address
-                        contactNumber: this.contactNumber,
-                        emailAddress: this.emailAddress,
-                        TIN: this.TIN,
-                        RDO: this.RDO,
-                        taxType: this.taxType,
-                        startDate: this.startDate,
-                        registeredDate: this.registeredDate,
-                        financialYearEnd: this.financialYearEnd,
-                    });
-                    alert('Form submitted successfully!');
-                }
-            },
-
-            // Email validation function
-            validateEmail(email) {
-                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                return re.test(email);
             }
-        };
-    }
-</script>
+        }
 
-    </body>
-</html>
+        function activateTab(tabId) {
+            tabContents.forEach(item => item.classList.add('hidden'));
+            switch (tabId) {
+                case 'tab-class':
+                    tabContents[0].classList.remove('hidden');
+                    break;
+                case 'tab-bg':
+                    tabContents[1].classList.remove('hidden');
+                    break;
+                case 'tab-add':
+                    tabContents[2].classList.remove('hidden');
+                    break;
+                case 'tab-contact':
+                    tabContents[3].classList.remove('hidden');
+                    break;
+                case 'tab-tax':
+                    tabContents[4].classList.remove('hidden');
+                    break;
+                case 'tab-financial':
+                    tabContents[5].classList.remove('hidden');
+                    break;
+            }
+            updateButtonsVisibility();
+        }
+
+        function updateTabs() {
+            tabs.forEach((tab, index) => {
+                tab.classList.remove('text-blue-900', 'font-semibold', 'border-b-4', 'border-blue-900', 'rounded-t-lg');
+                tab.classList.add('text-gray-500');
+                tabContents[index].classList.add('hidden');
+                
+                if (index === currentTab) {
+                    tab.classList.add('text-blue-900', 'font-semibold', 'border-b-4', 'border-blue-900', 'rounded-t-lg');
+                    tab.classList.remove('text-gray-500');
+                    tabContents[index].classList.remove('hidden');
+                }
+            });
+            prevBtn.disabled = currentTab === 0;
+            nextBtn.disabled = currentTab === tabs.length - 1;
+            updateButtonsVisibility(); 
+        }
+        prevBtn.addEventListener('click', () => {
+            if (currentTab > 0) {
+                currentTab--;
+                updateTabs();
+            }
+        });
+        nextBtn.addEventListener('click', () => {
+            if (currentTab < tabs.length - 1) {
+                currentTab++;
+                updateTabs();
+            }
+        });
+        tabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                currentTab = index;
+                updateTabs();
+            });
+        });
+        updateTabs();
+    });
+        
+    </script>
+
+</x-organization-layout>
+    {{-- </body>
+</html> --}}

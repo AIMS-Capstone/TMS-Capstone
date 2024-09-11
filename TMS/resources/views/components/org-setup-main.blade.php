@@ -10,15 +10,15 @@
         id="tab-tax"
         role="tab"
         aria-selected="false"
-        onclick="activateTab('tab-tax')">
-        Tax Reminder
+        onclick="activateTab('tab-account')">
+        Add User Account
     </button>
 </nav>
 
-<hr class="mx-8 mt-4">
+<hr class="mx-8 my-4">
 
 {{-- Organizations TAB --}}
-<div id="tab-org-content" role="tabpanel" aria-labelledby="tab-org" class="overflow-x-auto pt-6 px-10">
+<div id="tab-org-content" role="tabpanel" aria-labelledby="tab-org" class="overflow-x-auto px-10">
     <p class="font-bold text-3xl taxuri-color">
         Organizations
     </p>
@@ -31,7 +31,7 @@
         <div class="items-end float-end">
             <!-- routing for create org -->
             <a href = {{ route('create-org') }}>
-            <button type="button" class= "text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
+            <button type="button" class= "text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
                 <i class="fas fa-plus-circle mr-1"></i>
                     Create Organization
             </button>   
@@ -319,7 +319,6 @@
         </div>
     </div>
 </div>
-
 
 <script>
     function activateTab(tabId) {

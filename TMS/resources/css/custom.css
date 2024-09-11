@@ -5,7 +5,7 @@ li, ul {
     font-family: 'Inter var', sans-serif;
 }
 .auth-color, .taxuri-color{
-    color: #172554;
+    color: #1e3a8a;
 }
 .taxuri-text{
     color: rgb(61 64 62);
@@ -41,7 +41,7 @@ li, ul {
     @apply hidden;
 }
 .sidebar-active {
-    @apply border-l-[8px] bg-slate-100 border-blue-950 text-blue-950 px-6 py-2 font-bold;
+    @apply border-l-[8px] bg-slate-100 border-blue-900 text-blue-900 px-6 py-2 font-bold;
  /* place all shared classes */
 }
 .sidebar-submenu-active {
@@ -66,4 +66,10 @@ li, ul {
 .active-tab {
     background-color: #f3f4f6;
     color: #172554;
+}
+.active-tab-dashboard {
+    background-color: #1e3a8a; /* Blue background */
+    color: #ffffff; /* White text */
+    font-weight: bold; /* Bold text */
+    border-radius: 9999px; /* Fully rounded background */
 }

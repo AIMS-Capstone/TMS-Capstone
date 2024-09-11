@@ -42,7 +42,7 @@
     {{-- Draft Tab --}}
     <div id="tab-draft-content" role="tabpanel" aria-labelledby="tab-draft" class="overflow-x-auto px-10">
         <p class="text-gray-500 dark:text-neutral-400">
-            This is the <em class="font-semibold text-gray-800 dark:text-neutral-200">first</em> item's tab body.
+            
         </p>
     </div>
 
