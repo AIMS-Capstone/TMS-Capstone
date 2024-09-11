@@ -9,6 +9,7 @@ class TaxType extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'transaction_type',
         'tax_type',
         'description',
         'VAT',

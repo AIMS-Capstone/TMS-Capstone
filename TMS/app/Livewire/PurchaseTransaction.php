@@ -9,17 +9,17 @@ use App\Models\TaxType;
 use App\Models\Coa;
 use App\Models\Transactions;
 
-class SalesTransaction extends Component
+class PurchaseTransaction extends Component
 {
-    public $type = 'sales';
     public $taxRows = [];
     public $totalAmount = 0;
     public $date;
+
     public $contact;
     public $inv_number;
+    public $type = 'purchase'; 
     public $reference;
     public $selectedContact;
-
 
     protected $listeners = ['taxRowUpdated' => 'updateTaxRow', 'contactSelected', 'taxRowRemoved' => 'removeTaxRow'];
 
@@ -34,8 +34,6 @@ class SalesTransaction extends Component
 
     public function mount()
     {
-        $this->addTaxRow();
-        $this->addTaxRow();
         $this->addTaxRow();
     }
 
@@ -55,6 +53,7 @@ class SalesTransaction extends Component
     {
         $this->selectedContact = $contactId;
     }
+
     public function removeTaxRow($index)
     {
         unset($this->taxRows[$index]);
@@ -75,11 +74,11 @@ class SalesTransaction extends Component
 
     public function saveTransaction()
     {
-        $this->validate();
+
 
         // Create a transaction with 'Sales' type
         $transaction = Transactions::create([
-            'transaction_type' => 'Sales',
+            'transaction_type' => 'Purchase',
             'date' => $this->date,
             'contact' =>  $this->selectedContact,
             'inv_number' => $this->inv_number,
@@ -108,8 +107,8 @@ class SalesTransaction extends Component
 
     public function render()
     {
-        return view('livewire.sales-transaction', [
-            'type' => $this->type
+        return view('livewire.purchase-transaction', [
+            'type' => $this->type,
         ]);
     }
 }

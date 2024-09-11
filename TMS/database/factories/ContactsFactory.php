@@ -18,6 +18,7 @@ class ContactsFactory extends Factory
         return [
             'bus_name' => fake()->company(),
             'contact_type' => 'Non-Individual',
+            'contact_role' => fake()->randomElement(['Vendor', 'Customer']),
             'contact_tin' => $this->generateTIN(),
             'contact_address' => fake()->address(),
             'contact_city' => fake()->city(),
