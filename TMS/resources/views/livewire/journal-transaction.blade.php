@@ -63,11 +63,14 @@
         </div>
 
         <!-- Add New Line Button -->
-        <div class="mt-4">
-            <button type="button" wire:click="addJournalRow" class="flex items-center space-x-2 text-blue-600 hover:text-blue-800">
-                <span>➕ Add New Line</span>
-            </button>
-        </div>
+        <x-slot name="after">
+            <div class="mt-4">
+                <button type="button" wire:click="addJournalRow" class="flex items-center space-x-2 text-blue-600 hover:text-blue-800">
+                    <span>➕ Add New Line</span>
+                </button>
+            </div>
+            
+        </x-slot>
     </x-slot:form>
 
     <!-- Save Button -->

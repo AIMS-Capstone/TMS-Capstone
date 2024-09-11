@@ -77,23 +77,27 @@
             </table>
         </div>
         
+        <x-slot name="after">
+            <div class="mt-4">
+                <button type="button" wire:click="addTaxRow" class="flex items-center space-x-2 text-blue-600 hover:text-blue-800">
+                    <span>➕ Add New Line</span>
+                </button>
+            </div>
+            
+        </x-slot>
         
 
-        <!-- Add New Line Button -->
-     
+    
     
     </x-slot:form>
-    <div>
-        
+
+
     
 
     <!-- Save Button -->
     <x-slot:actions>
-        <div class="mt-4">
-            <button type="button" wire:click="addTaxRow" class="flex items-center space-x-2 text-blue-600 hover:text-blue-800">
-                <span>➕ Add New Line</span>
-            </button>
-        </div>
+        
+  
         
      
         <div class="flex justify-end mt-4">

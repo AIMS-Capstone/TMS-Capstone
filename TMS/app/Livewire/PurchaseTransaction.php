@@ -21,7 +21,7 @@ class PurchaseTransaction extends Component
     public $reference;
     public $selectedContact;
 
-    protected $listeners = ['taxRowUpdated' => 'updateTaxRow', 'contactSelected'];
+    protected $listeners = ['taxRowUpdated' => 'updateTaxRow', 'contactSelected', 'taxRowRemoved' => 'removeTaxRow'];
 
     protected $rules = [
         'date' => 'required|date',
@@ -108,9 +108,6 @@ class PurchaseTransaction extends Component
     public function render()
     {
         return view('livewire.purchase-transaction', [
-            'taxTypes' => TaxType::all(),
-            'atcs' => ATC::all(),
-            'coas' => Coa::all(),
             'type' => $this->type,
         ]);
     }

@@ -20,7 +20,8 @@ class SalesTransaction extends Component
     public $reference;
     public $selectedContact;
 
-    protected $listeners = ['taxRowUpdated' => 'updateTaxRow', 'contactSelected'];
+
+    protected $listeners = ['taxRowUpdated' => 'updateTaxRow', 'contactSelected', 'taxRowRemoved' => 'removeTaxRow'];
 
     protected $rules = [
         'date' => 'required|date',
@@ -33,6 +34,8 @@ class SalesTransaction extends Component
 
     public function mount()
     {
+        $this->addTaxRow();
+        $this->addTaxRow();
         $this->addTaxRow();
     }
 
@@ -106,9 +109,6 @@ class SalesTransaction extends Component
     public function render()
     {
         return view('livewire.sales-transaction', [
-            'taxTypes' => TaxType::all(),
-            'atcs' => ATC::all(),
-            'coas' => Coa::all(),
             'type' => $this->type
         ]);
     }

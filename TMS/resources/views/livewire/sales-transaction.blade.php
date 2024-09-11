@@ -81,20 +81,23 @@
                         </tbody>
                     </table>
                 </div>
-        
-                <!-- Add New Line Button -->
+                <x-slot name="after">
+                    <div class="mt-4">
+                        <button type="button" wire:click="addTaxRow" class="flex items-center space-x-2 text-blue-600 hover:text-blue-800">
+                            <span>➕ Add New Line</span>
+                        </button>
+                    </div>
+                    
+                </x-slot>
+    
              
             
             </x-slot:form>
-            
+         
         
             <!-- Save Button -->
             <x-slot:actions>
-                <div class="mt-4">
-                    <button type="button" wire:click="addTaxRow" class="flex items-center space-x-2 text-blue-600 hover:text-blue-800">
-                        <span>➕ Add New Line</span>
-                    </button>
-                </div>
+         
                 <div class="flex justify-end mt-4">
                     <x-button type="submit" class="ml-4 bg-blue-500 text-white px-4 py-2 rounded shadow-md">
                         {{ __('Save Transaction') }}
