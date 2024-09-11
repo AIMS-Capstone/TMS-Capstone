@@ -25,10 +25,14 @@
     </td>
 
     <!-- COA -->
-    <td class="border px-4 py-2">
-        <input id="coa" type="text" class="block w-full border-none" wire:model="coa" />
+    <td class="border px-4 py-2" >
+        <select class="block w-full h-full border-none select2" id="coa" wire:model="coa">
+            <option value="" disabled selected>Select Tax Code</option>
+            @foreach($coas as $coa)
+                <option value="{{ $coa->id }}">{{ $coa->code }} {{ $coa->name }}</option>
+            @endforeach
+        </select>
     </td>
-
     <!-- Amount -->
     <td class="border px-4 py-2">
         <input id="amount" type="number" class="block w-full border-none" wire:model.blur="amount" />

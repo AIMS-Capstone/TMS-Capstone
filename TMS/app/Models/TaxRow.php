@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class TaxRow extends Model
 {
     use HasFactory;
-    protected $fillable = ['transaction_id', 'amount', 'tax_code', 'tax_amount', 'net_amount', 'coa', 'tax_type'];
+    protected $fillable = ['transaction_id', 'amount', 'tax_code', 'tax_amount', 'net_amount', 'coa', 'tax_type', 'debit', 'credit', 'description'];
 
     public function salesTransaction()
     {
@@ -21,5 +21,9 @@ class TaxRow extends Model
     public function taxType()
     {
         return $this->belongsTo(TaxType::class, 'tax_type');
+    }
+    public function coaAccount()
+    {
+        return $this->belongsTo(Coa::class, 'coa'); // 'coa' is the foreign key in the TaxRow table
     }
 }

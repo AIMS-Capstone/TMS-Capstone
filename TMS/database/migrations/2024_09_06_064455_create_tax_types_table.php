@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('tax_types', function (Blueprint $table) {
             $table->id();
+            $table->enum('transaction_type',['sales','purchase']);
             $table->string('tax_type');
             $table->integer('VAT');
             $table->string('description');

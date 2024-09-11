@@ -1,6 +1,8 @@
 
     <x-transaction-form-section>
-     
+        @php
+        $type = request()->query('type', 'sales');
+        @endphp
             <!-- Redirection Link -->
             <x-slot:redirection>
                 <a href="/transactions" class="flex items-center space-x-2 text-blue-600">
@@ -26,6 +28,7 @@
                                 valueKey="value"
                                 class="form-control w-full select2-input"
                                 id="select_contact"
+                                :type="$type"
                             />
                         </div>
                     </div>
@@ -72,8 +75,9 @@
                         </thead>
                         <tbody>
                             @foreach($taxRows as $index => $row)
-                                <livewire:tax-row :key="$index" :index="$index" :tax-row="$row" />
-                            @endforeach
+                            <livewire:tax-row :key="$index" :index="$index" :tax-row="$row" :type="$type" />
+                        @endforeach
+                        
                         </tbody>
                     </table>
                 </div>
@@ -145,6 +149,10 @@
         return markup;
     }
 });
+
+$('#select_contact').on('change', function() {
+        $wire.set('selectedContact', $(this).val()); // Update Livewire component
+    });
 
     
 

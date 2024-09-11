@@ -7,6 +7,7 @@
         class="select2 {{ $class }} mr-2" 
         id="{{ $id }}"
 
+
         @if($isGrouped) data-grouped="true" @endif
     >
         @foreach($options as $option)

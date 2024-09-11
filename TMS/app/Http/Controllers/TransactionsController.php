@@ -30,7 +30,7 @@ class TransactionsController extends Controller
     public function create(Request $request)
     {
         // Get the type from the query string, default to 'sales'
-        $transactionType = $request->query('type', 'sales');
+        $transactionType = $request->query('type', 'purchase');
 
         // Pass the type to the view
         return view('transactions.create', compact('transactionType'));

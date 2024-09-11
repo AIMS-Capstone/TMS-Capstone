@@ -17,6 +17,7 @@
 
 @script
     <script>
+        
         // Listening for the 'triggerModal' event
         $wire.on('triggerModal', (data) => {
             console.log('triggerModal event received', data);
@@ -75,5 +76,54 @@
 
 console.log('Select2 dropdown updated with new options.');
         });
+        $wire.on('refreshPurchaseDropdown', (data) => {
+            console.log('refreshDropdown event triggered:', data);
+
+            let optionsArray = data[0].options;
+            let options = [];
+
+            $.each(optionsArray, function(key, option){
+        options.push({
+            id: option.value,
+            text: option.name,
+            tax_id: option.tin
+        });
+    });
+
+    $('#select_contact')
+    .empty() // Clear existing options
+
+    .select2({
+        data: options, // New data options
+        templateResult: function(data) {
+            // Custom formatting for the dropdown list
+            if (!data.id) {
+                return data.text;
+            }
+            var $result = $(
+                '<span>' + data.text + 
+                '<small style="display:block; font-size:15px; line-height:1; margin-top:0; padding-top:0;">' + 
+                data.tax_id + '</small></span>' // Assuming tax_id comes from data object
+            );
+            return $result;
+        },
+        templateSelection: function(data) {
+            // Custom formatting for the selected item
+            if (!data.id) {
+                return data.text;
+            }
+            var $selection = $(
+                '<span>' + data.text + 
+                '<small style="display:block; font-size:15px; line-height:1; margin-top:0; padding-top:0;">' + 
+                data.tax_id + '</small></span>' // Assuming tax_id comes from data object
+            );
+            return $selection;
+        },
+        escapeMarkup: function (markup) {
+            return markup; // Allow custom HTML
+        }
+    });
+});
+        
     </script>
 @endscript

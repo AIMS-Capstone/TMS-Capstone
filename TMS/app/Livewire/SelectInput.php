@@ -13,10 +13,12 @@ class SelectInput extends Component
     public $class;
     public $id;
     public $isGrouped;
+    public $type;
+    public $selectedValue; 
 
     protected $listeners = ['contactAddedToSelectContact' => 'updateOptions'];
 
-    public function mount($name, $options = [], $labelKey = 'name', $valueKey = 'value', $class = '', $id = '', $isGrouped = false)
+    public function mount($name, $options = [], $labelKey = 'name', $valueKey = 'value', $class = '', $id = '', $isGrouped = false, $type = '')
     {
         $this->name = $name;
         $this->options = $options;
@@ -25,8 +27,13 @@ class SelectInput extends Component
         $this->class = $class;
         $this->id = $id;
         $this->isGrouped = $isGrouped;
+        $this->type = $type; 
 
         $this->updateOptions();
+    }
+    public function updatedSelectedValue($value)
+    {
+        $this->dispatch('contactSelected', $value); // Emit event with selected value
     }
 
     public function updateOptions($data = null)
@@ -48,13 +55,26 @@ class SelectInput extends Component
 
     protected function fetchOptions()
     {
-        return Contacts::all()->map(function ($contact) {
-            return [
-                'value' => $contact->id,
-                'name' => $contact->bus_name,
-                'tax_identification_number' => $contact->contact_tin
-            ];
-        })->toArray();
+        // Modify the query based on the type
+        if ($this->type === 'purchase') {
+            return Contacts::where('contact_role', 'Vendor')->get()->map(function ($contact) {
+                return [
+                    'value' => $contact->id,
+                    'name' => $contact->bus_name,
+                    'tax_identification_number' => $contact->contact_tin
+                ];
+            })->toArray();
+        } elseif ($this->type === 'sales') {
+            return Contacts::where('contact_role', 'Customer')->get()->map(function ($contact) {
+                return [
+                    'value' => $contact->id,
+                    'name' => $contact->bus_name,
+                    'tax_identification_number' => $contact->contact_tin
+                ];
+            })->toArray();
+        }
+
+        return [];
     }
 
     public function render()

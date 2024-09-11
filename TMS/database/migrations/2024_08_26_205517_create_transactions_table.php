@@ -15,9 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('transaction_type'); // e.g., "Sales", "Purchase", etc.
             $table->date('date');
-            $table->string('inv_number');
+            $table->string('inv_number')->nullable();
+            $table->boolean('itr_include')->nullable();
+            $table->foreignId('contact')->nullable()->constrained('contacts')->nullOnDelete();
             $table->string('reference')->nullable();
-            $table->decimal('total_amount', 10, 2);
+            $table->decimal('total_amount', 10, 2)->nullable();
+            $table->decimal('total_amount_credit', 10, 2)->nullable();
+            $table->decimal('total_amount_debit', 10, 2)->nullable();
             $table->timestamps();
         });
         
