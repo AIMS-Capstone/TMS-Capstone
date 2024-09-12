@@ -3,16 +3,15 @@
     x-show="show"
     x-on:open-add-modal.window="show = true"
     x-on:close-modal.window="show = false"
-    class="fixed z-50 inset-0 flex items-center justify-center m-2"
->
+    class="fixed z-50 inset-0 flex items-center justify-center m-2">
     <!-- Modal background -->
     <div class="fixed inset-0 bg-gray-300 opacity-60"></div>
 
     <!-- Modal container -->
     <div class="bg-white rounded-lg shadow-lg w-full max-w-md max-h-screen mx-auto h-auto z-10">
         <!-- Modal header -->
-        <div class="flex justify-center items-center p-3 border-b border-opacity-80 w-2/3 mx-auto">
-            <h1 class="text-lg font-bold">Add New Account</h1>
+        <div class="flex bg-blue-900 justify-center rounded-t-lg items-center p-3 border-b border-opacity-80 mx-auto">
+            <h1 class="text-lg font-bold text-white">Add New Account</h1>
         </div>
 
         <!-- Modal body -->
@@ -25,15 +24,18 @@
                     <label for="type" class="block font-semibold text-sm text-gray-700">
                         Account Type <span class="text-red-500">*</span>
                     </label>
+                    {{-- Naming of value and option must be the same para gumana nang maayos ang filter tab --}}
                     <select name="type" id="accountType" required
-                        class="mt-1 block w-full ps-4 p-2 text-xs border rounded-md focus:ring-sky-900 focus:border-sky-900">
+                        class="mt-1 block w-full ps-4 p-2 text-xs border rounded-md focus:ring-blue-900 focus:border-blue-900">
                         <option value="" disabled selected>Select Account Type</option>
-                        <option value="assets">Assets</option>
-                        <option value="liabilities">Liabilities</option>
-                        <option value="equity">Equity</option>
-                        <option value="revenues">Revenue</option>
-                        <option value="sales">Cost of Sales</option>
-                        <option value="expense">Expenses</option>
+                        <option value="Assets">Assets</option>
+                        <option value="Liabilities">Liabilities</option>
+                        <option value="Equity">Equity</option>
+                        <option value="Revenue">Revenue</option>
+
+                        {{-- either ang gamitin sa lahat ay Sales or Cost of Sales. Hindi pwede na magkaiba dahil hindi gagana ang filter tab --}}
+                        <option value="Cost of Sales">Cost of Sales</option>
+                        <option value="Expenses">Expenses</option>
                     </select>
                 </div>
 
@@ -43,8 +45,8 @@
                         Code <span class="text-red-500">*</span>
                     </label>
                     <input type="text" name="code" id="code" required
-                        class="mt-1 block w-full ps-4 p-2 text-sm border rounded-md focus:ring-sky-900 focus:border-sky-900">
-                    <p class="text-xs opacity-75 px-1">Unique code/number for this account (max 10 characters)</p>
+                        maxlength="5" class="mt-1 block w-full ps-4 p-2 text-sm border rounded-md focus:ring-blue-900 focus:border-blue-900">
+                    <p class="text-xs opacity-75 px-1">Unique code/number for this account (limited 5 characters)</p>
                 </div>
 
                 <!-- Account Name -->
@@ -53,8 +55,8 @@
                         Name <span class="text-red-500">*</span>
                     </label>
                     <input type="text" name="name" id="name" required
-                        class="mt-1 block w-full ps-4 p-2 text-sm border rounded-md focus:ring-sky-900 focus:border-sky-900">
-                    <p class="text-xs opacity-75 px-1">Short title for this account (max 150 characters)</p>
+                        maxlength="150" class="mt-1 block w-full ps-4 p-2 text-sm border rounded-md focus:ring-blue-900 focus:border-blue-900">
+                    <p class="text-xs opacity-75 px-1">Short title for this account (limited 150 characters)</p>
                 </div>
 
                 <!-- Account Description -->    
@@ -63,21 +65,19 @@
                         Description
                     </label>
                     <input type="text" name="description" id="description"  
-                        class="mt-1 block w-full ps-4 p-2 text-sm border rounded-md focus:ring-sky-900 focus:border-sky-900">
+                        maxlength="100" class="mt-1 block w-full ps-4 p-2 text-sm border rounded-md focus:ring-blue-900 focus:border-blue-900">
                     <p class="text-xs opacity-75 px-1">A description of how this account should be used</p>
                 </div>
                 <!-- Modal Footer -->
                 <div class="flex justify-end mb-4 float-end">
                     <button 
                         x-on:click="$dispatch('close-modal')"
-                        class="mr-2 font-semibold text-black px-3 py-1 rounded-md hover:bg-sky-900 hover:text-white transition"
-                    >
+                        class="mr-2 font-semibold text-zinc-700 px-3 py-1 rounded-md hover:bg-blue-900 hover:text-white transition">
                         Cancel
                     </button>
                     <button 
                         type="submit" 
-                        class="font-semibold bg-sky-900 text-white px-3 py-1 me-8 rounded-md border-x-8 border-sky-900 hover:border-x-8 hover:text-black transition"
-                    >
+                        class="font-semibold bg-blue-900 text-white px-3 py-1 me-8 rounded-md border-x-8 border-blue-900 hover:border-x-8 hover:text-white transition">
                         Save
                     </button>
                 </div>
