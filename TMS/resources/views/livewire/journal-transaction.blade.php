@@ -16,7 +16,8 @@
 
     <!-- Form Fields (Date, Reference, etc.) -->
     <x-slot:form>
-        <div class="grid grid-cols-4 gap-4">
+        <!-- Form Header with Total Amount -->
+        <div class="grid grid-cols-4 gap-4 mb-4">
             <!-- Date Field -->
             <div class="mt-5">
                 <x-transaction-label for="date" :value="__('Date')" />
@@ -29,16 +30,10 @@
                 <x-transaction-input id="reference" type="text" class="mt-1 block w-full" wire:model.defer="reference" />
             </div>
 
-            <!-- Total Debit Amount Field -->
-            <div class="col-span-1 bg-blue-50 p-4 rounded-tr-sm">
-                <x-transaction-label for="total_debit" :value="__('Total Debit')" />
-                <x-transaction-input id="total_debit" type="text" class="mt-1 block w-full bg-white border-0" value="{{ $totalAmountDebit }}" wire:model.defer="totalAmountDebit" readonly />
-            </div>
-
-            <!-- Total Credit Amount Field -->
-            <div class="col-span-1 bg-blue-50 p-4 rounded-tr-sm">
-                <x-transaction-label for="total_credit" :value="__('Total Credit')" />
-                <x-transaction-input id="total_credit" type="text" class="mt-1 block w-full bg-white border-0" value="{{ $totalAmountCredit }}" wire:model.defer="totalAmountCredit" readonly />
+            <!-- Total Amount Field -->
+            <div class="col-span-2 bg-blue-50 p-4 rounded-tr-sm">
+                <x-transaction-label for="total_amount" :value="__('Total Amount')" />
+                <x-transaction-input id="total_amount" type="text" class="mt-1 block w-full bg-white border-0" value="{{ $totalAmount }}" wire:model.defer="totalAmount" readonly />
             </div>
         </div>
 
@@ -48,7 +43,7 @@
                 <thead class="bg-gray-100">
                     <tr>
                         <th class="px-4 py-2">Description</th>
-                        <th class="px-4 py-2">COA (Account)</th>
+                        <th class="px-4 pr-5 py-2">Accounts</th>
                         <th class="px-4 py-2">Debit</th>
                         <th class="px-4 py-2">Credit</th>
                         <th></th>
@@ -62,14 +57,27 @@
             </table>
         </div>
 
-        <!-- Add New Line Button -->
+        <!-- Add New Line Button and Total Amount Due Section -->
         <x-slot name="after">
-            <div class="mt-4">
+            <div class="flex justify-between mt-4">
                 <button type="button" wire:click="addJournalRow" class="flex items-center space-x-2 text-blue-600 hover:text-blue-800">
                     <span>➕ Add New Line</span>
                 </button>
+
+                <!-- Total Amount Due Section -->
+                <div class="w-96">
+                    <table class="w-96 text-left">
+                        <tbody>
+                            <tr>
+                                <td class="border-t px-4 py-2 font-bold">Total Amount Due:</td>
+                                <td class="border-t px-4 py-2">{{ $totalAmountDebit }}</td>
+                                <td class="border-t px-4 py-2">{{ $totalAmountCredit }}</td>
+                            <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            
         </x-slot>
     </x-slot:form>
 
@@ -81,7 +89,6 @@
             </x-button>
         </div>
     </x-slot:actions>
-
 </x-transaction-form-section>
 
 @assets
@@ -127,7 +134,7 @@ $(document).ready(function() {
     $(document).on('click', '.use-anyway-btn', function(e) {
         e.preventDefault();
         let title = 'New Contact';
-        let body = `
+        let body = ` 
           <form wire:submit.prevent="saveJournalEntry">
             <!-- Add new contact fields here if needed -->
           </form>

@@ -88,6 +88,44 @@
                         </button>
                     </div>
                     
+                    <div class="mt-4">
+                        <div class="flex justify-end">
+                            <table class="table-auto">
+                                <tbody>
+                                    
+                                    @if($vatableSales > 0)
+                                    <tr>
+                                        <td class="px-4 py-2">VATable Sales</td>
+                                        <td class="px-4 py-2 text-right">{{ number_format($vatableSales, 2) }}</td>
+                                    </tr>
+                                    @endif
+                
+                                    @if($vatAmount > 0)
+                                    <tr>
+                                        <td class="px-4 py-2">VAT Amount (12%)</td>
+                                        <td class="px-4 py-2 text-right">{{ number_format($vatAmount, 2) }}</td>
+                                    </tr>
+                                    @endif
+                
+                                    @if($nonVatableSales > 0)
+                                    <tr>
+                                        <td class="px-4 py-2">Non-VATable Sales</td>
+                                        <td class="px-4 py-2 text-right">{{ number_format($nonVatableSales, 2) }}</td>
+                                    </tr>
+                                    @endif
+                
+                                    @if($totalAmount > 0)
+                                    <tr>
+                                        <td class="px-4 py-2 font-bold">Total Amount Due</td>
+                                        <td class="px-4 py-2 text-right font-bold">{{ number_format($totalAmount, 2) }}</td>
+                                    </tr>
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    
                 </x-slot>
     
              

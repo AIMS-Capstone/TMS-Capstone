@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Livewire;
 
 use Livewire\Component;
@@ -14,12 +13,14 @@ class SalesTransaction extends Component
     public $type = 'sales';
     public $taxRows = [];
     public $totalAmount = 0;
+    public $vatableSales = 0;
+    public $vatAmount = 0;
+    public $nonVatableSales = 0; // New property to hold non-vatable sales
     public $date;
     public $contact;
     public $inv_number;
     public $reference;
     public $selectedContact;
-
 
     protected $listeners = ['taxRowUpdated' => 'updateTaxRow', 'contactSelected', 'taxRowRemoved' => 'removeTaxRow'];
 
@@ -51,32 +52,56 @@ class SalesTransaction extends Component
             'net_amount' => 0
         ];
     }
+
     public function contactSelected($contactId)
     {
         $this->selectedContact = $contactId;
     }
+
     public function removeTaxRow($index)
     {
         unset($this->taxRows[$index]);
         $this->taxRows = array_values($this->taxRows); // Re-index array
-        $this->totalAmount = $this->calculateTotalAmount();
+        $this->calculateTotals(); // Recalculate after removing a row
     }
 
     public function updateTaxRow($data)
     {
         $this->taxRows[$data['index']] = $data;
-        $this->totalAmount = $this->calculateTotalAmount();
+        $this->calculateTotals(); // Recalculate after updating a row
     }
 
-    public function calculateTotalAmount()
+    public function calculateTotals()
     {
-        return collect($this->taxRows)->sum('amount');
+        // Initialize totals to zero
+        $this->vatableSales = 0;
+        $this->vatAmount = 0;
+        $this->totalAmount = 0;
+        $this->nonVatableSales = 0; // Reset non-vatable sales
+    
+        // Loop through each tax row to calculate the totals
+        foreach ($this->taxRows as $row) {
+            $taxType = TaxType::find($row['tax_type']);
+            $vatRate = $taxType ? $taxType->VAT : 0; // Get VAT rate (0 or 12)
+    
+            if ($vatRate > 0) {
+                // VATable sales
+                $this->vatableSales += $row['amount'] - $row['tax_amount'];
+                $this->vatAmount += $row['tax_amount'];
+            } else {
+                // Non-VATable sales
+                $this->nonVatableSales += $row['amount'];
+            }
+            
+            $this->totalAmount += $row['amount'];
+        }
     }
+    
 
     public function saveTransaction()
     {
         $this->validate();
-
+    
         // Create a transaction with 'Sales' type
         $transaction = Transactions::create([
             'transaction_type' => 'Sales',
@@ -85,8 +110,11 @@ class SalesTransaction extends Component
             'inv_number' => $this->inv_number,
             'reference' => $this->reference,
             'total_amount' => $this->totalAmount,
+            'vatable_sales' => $this->vatableSales,
+            'vat_amount' => $this->vatAmount,
+            'non_vatable_sales' => $this->nonVatableSales // Save non-vatable sales
         ]);
-
+    
         // Save each tax row linked to the transaction
         foreach ($this->taxRows as $row) {
             TaxRow::create([
@@ -100,11 +128,12 @@ class SalesTransaction extends Component
                 'coa' => $row['coa'],
             ]);
         }
-
+    
         // Optionally, redirect or provide feedback to the user
         session()->flash('message', 'Transaction saved successfully!');
         return redirect()->route('transactions.show', ['transaction' => $transaction->id]);
     }
+    
 
     public function render()
     {

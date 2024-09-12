@@ -73,30 +73,37 @@ class TaxRow extends Component
     {
         return $this->type === 'sales' ? 'App\Livewire\SalesTransaction' : 'App\Livewire\PurchaseTransaction';
     }
-
     public function calculateTax()
     {
-        if ($this->type === 'sales') {
-            // For sales, calculate based on tax_type only
-            $taxRate = $this->getTaxRateByType($this->tax_type);
-        } else {
-            // For purchases, calculate based on tax_code
-            $vatRate = $this->getTaxRateByType($this->tax_type);
-
-            // Get tax rate from tax_code (like ATC)
-            $taxRateFromCode = $this->getTaxRate($this->tax_code);
+        // Retrieve the tax rate based on the tax type
+        $taxRate = $this->getTaxRateByType($this->tax_type);
     
-            // Combine both rates
-            $taxRate = $vatRate + $taxRateFromCode;
+        // Calculate VAT-exclusive amount and VAT amount for VAT-inclusive totals
+        if ($taxRate > 0) {
+            $vatExclusiveAmount = $this->amount / (1 + ($taxRate / 100));
+            $this->tax_amount = $this->amount - $vatExclusiveAmount; // VAT amount
+            $this->net_amount = $vatExclusiveAmount; // VAT-exclusive amount
+        } else {
+            // For non-VAT cases
+            $this->tax_amount = 0;
+            $this->net_amount = $this->amount;
         }
-
-        // Ensure tax_rate is properly handled even if not found
-        $taxRate = $taxRate ?: 0;
-
-        $this->tax_amount = $this->amount * ($taxRate / 100);
-        $this->net_amount = $this->amount - $this->tax_amount;
+    
+        // Notify the parent component to update totals
+        $this->dispatch('taxRowUpdated', [
+            'index' => $this->index,
+            'description' => $this->description,
+            'tax_type' => $this->tax_type,
+            'tax_code' => $this->tax_code,
+            'coa' => $this->coa,
+            'amount' => $this->amount,
+            'tax_amount' => $this->tax_amount,
+            'net_amount' => $this->net_amount,
+        ]);
     }
-
+    
+    
+    
     public function getTaxRate($taxCode)
     {
         $tax = ATC::find($taxCode);

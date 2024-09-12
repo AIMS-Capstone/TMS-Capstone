@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('tax_type')->nullable()->constrained('tax_types')->nullOnDelete(); // Make nullable with constraint
             $table->decimal('tax_amount', 10, 2)->nullable(); // Make nullable
             $table->decimal('net_amount', 10, 2)->nullable(); // Make nullable
+            $table->decimal('atc_amount', 10, 2)->nullable(); // Make nullable
             $table->decimal('credit', 10, 2)->nullable();
             $table->decimal('debit', 10, 2)->nullable();
             $table->foreignId('coa')->nullable()->constrained('coas')->nullOnDelete(); // Make nullable with constraint
