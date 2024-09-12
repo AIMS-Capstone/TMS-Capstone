@@ -82,7 +82,54 @@
                 <button type="button" wire:click="addTaxRow" class="flex items-center space-x-2 text-blue-600 hover:text-blue-800">
                     <span>➕ Add New Line</span>
                 </button>
+                
             </div>
+            <div class="mt-4">
+                <div class="flex justify-end">
+                    <table class="table-auto">
+                        <tbody>
+                            @if($vatablePurchase > 0)
+                            <tr>
+                                <td class="px-4 py-2">VATable Purchase</td>
+                                <td class="px-4 py-2 text-right">{{ number_format($vatablePurchase, 2) }}</td>
+                            </tr>
+                            @endif
+    
+                            @if($nonVatablePurchase > 0)
+                            <tr>
+                                <td class="px-4 py-2">Non-VATable Purchase</td>
+                                <td class="px-4 py-2 text-right">{{ number_format($nonVatablePurchase, 2) }}</td>
+                            </tr>
+                            @endif
+    
+                            @if($vatAmount > 0)
+                            <tr>
+                                <td class="px-4 py-2">VAT Amount</td>
+                                <td class="px-4 py-2 text-right">{{ number_format($vatAmount, 2) }}</td>
+                            </tr>
+                            @endif
+                            @if(count($appliedATCs) > 0)
+                            @foreach($appliedATCs as $atc)
+                            <tr>
+                                <td class="px-4 py-2 font-bold">{{ $atc['code'] }} ({{ number_format($atc['rate'], 2) }}%)</td>
+                                <td class="px-4 py-2 text-right">{{ number_format($atc['tax_amount'], 2) }}</td>
+                            @endforeach
+                            </tr>
+                            @endif
+    
+                            @if($totalAmount > 0)
+                            <tr>
+                                <td class="px-4 py-2 font-bold">Total Amount Due</td>
+                                <td class="px-4 py-2 text-right font-bold">{{ number_format($totalAmount, 2) }}</td>
+                            </tr>
+                       
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+          
+            
             
         </x-slot>
         

@@ -13,13 +13,17 @@ class PurchaseTransaction extends Component
 {
     public $taxRows = [];
     public $totalAmount = 0;
+    public $vatablePurchase = 0;
+    public $nonVatablePurchase = 0;
+    public $vatAmount = 0;
+    public $appliedATCsTotalAmount = 0; // Add this line to define the property
     public $date;
-
     public $contact;
     public $inv_number;
-    public $type = 'purchase'; 
+    public $type = 'purchase';
     public $reference;
     public $selectedContact;
+    public $appliedATCs = []; // Array to hold applied ATC details
 
     protected $listeners = ['taxRowUpdated' => 'updateTaxRow', 'contactSelected', 'taxRowRemoved' => 'removeTaxRow'];
 
@@ -46,9 +50,11 @@ class PurchaseTransaction extends Component
             'coa' => '',
             'amount' => 0,
             'tax_amount' => 0,
-            'net_amount' => 0
+            'net_amount' => 0,
+            'atc_amount' => 0
         ];
     }
+
     public function contactSelected($contactId)
     {
         $this->selectedContact = $contactId;
@@ -58,32 +64,85 @@ class PurchaseTransaction extends Component
     {
         unset($this->taxRows[$index]);
         $this->taxRows = array_values($this->taxRows); // Re-index array
-        $this->totalAmount = $this->calculateTotalAmount();
+        $this->calculateTotals(); // Recalculate after removing a row
     }
 
     public function updateTaxRow($data)
     {
         $this->taxRows[$data['index']] = $data;
-        $this->totalAmount = $this->calculateTotalAmount();
+        $this->calculateTotals(); // Recalculate after updating a row
     }
 
-    public function calculateTotalAmount()
-    {
-        return collect($this->taxRows)->sum('amount');
+    public function calculateTotals()
+{
+    $this->vatablePurchase = 0;
+    $this->nonVatablePurchase = 0;
+    $this->vatAmount = 0;
+    $this->totalAmount = 0;
+    $this->appliedATCs = [];
+    $this->appliedATCsTotalAmount = 0;
+
+    foreach ($this->taxRows as &$row) {  // Use reference (&) to modify array elements
+        $amount = $row['amount'];
+        $taxAmount = $row['tax_amount'];
+        $taxTypeId = $row['tax_type'];
+
+        $taxType = TaxType::find($taxTypeId);
+        $vatRate = $taxType ? $taxType->VAT : 0;
+
+        $atc = ATC::find($row['tax_code']);
+        $atcRate = $atc ? $atc->tax_rate : 0;
+
+        if ($vatRate > 0) {
+            $netAmount = $amount / (1 + ($vatRate / 100));
+            $this->vatablePurchase += $netAmount;
+            $this->vatAmount += $amount - $netAmount;
+
+            if ($atcRate > 0) {
+                $atcAmount = $netAmount * ($atcRate / 100);
+                $row['atc_amount'] = $atcAmount;  // Ensure atc_amount is set
+                $this->appliedATCs[$row['tax_code']] = [
+                    'code' => $atc->tax_code,
+                    'rate' => $atcRate,
+                    'amount' => $netAmount,
+                    'tax_amount' => $atcAmount
+                ];
+            } else {
+                // Ensure atc_amount is set to 0 if no ATC is applicable
+                $row['atc_amount'] = 0;
+            }
+        } else {
+            $this->nonVatablePurchase += $amount;
+            // Ensure atc_amount is set to 0 if there's no VAT
+            $row['atc_amount'] = 0;
+        }
     }
+
+    $this->appliedATCsTotalAmount = collect($this->appliedATCs)->sum('tax_amount');
+    $vatInclusiveAmount = $this->vatablePurchase + $this->vatAmount;
+    $this->totalAmount = $vatInclusiveAmount - $this->appliedATCsTotalAmount;
+}
+
+    
+    
+    
+    
 
     public function saveTransaction()
     {
+   
 
-
-        // Create a transaction with 'Sales' type
+        // Create a transaction with 'Purchase' type
         $transaction = Transactions::create([
             'transaction_type' => 'Purchase',
             'date' => $this->date,
-            'contact' =>  $this->selectedContact,
+            'contact' => $this->selectedContact,
             'inv_number' => $this->inv_number,
             'reference' => $this->reference,
             'total_amount' => $this->totalAmount,
+            'vatable_purchase' => $this->vatablePurchase,
+            'non_vatable_purchase' => $this->nonVatablePurchase,
+            'vat_amount' => $this->vatAmount,
         ]);
 
         // Save each tax row linked to the transaction
@@ -95,6 +154,7 @@ class PurchaseTransaction extends Component
                 'tax_code' => $row['tax_code'],
                 'tax_type' => $row['tax_type'],
                 'tax_amount' => $row['tax_amount'],
+                'atc_amount' => $row['atc_amount'], // Save ATC amount if applicable
                 'net_amount' => $row['net_amount'],
                 'coa' => $row['coa'],
             ]);
@@ -108,7 +168,13 @@ class PurchaseTransaction extends Component
     public function render()
     {
         return view('livewire.purchase-transaction', [
-            'type' => $this->type,
+            'taxRows' => $this->taxRows,
+            'totalAmount' => $this->totalAmount,
+            'vatablePurchase' => $this->vatablePurchase,
+            'nonVatablePurchase' => $this->nonVatablePurchase,
+            'vatAmount' => $this->vatAmount,
+            'appliedATCs' => $this->appliedATCs,
+            'appliedATCsTotalAmount' => $this->appliedATCsTotalAmount, // Pass this to the view
         ]);
     }
 }

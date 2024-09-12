@@ -12,6 +12,7 @@ class JournalTransaction extends Component
     public $journalRows = []; // Rows for the journal entry
     public $totalAmountDebit = 0; // Total Debit
     public $totalAmountCredit = 0; // Total Credit
+    public $totalAmount = 0; // Total Amount (should reflect balance if debits and credits match)
     public $date; // Transaction date
     public $contact; // Contact involved in the transaction
     public $inv_number; // Invoice number
@@ -46,10 +47,10 @@ class JournalTransaction extends Component
     public function removeJournalRow($index)
     {
         unset($this->journalRows[$index]);  // Remove the row by index
-    $this->journalRows = array_values($this->journalRows);  // Reindex the array
+        $this->journalRows = array_values($this->journalRows);  // Reindex the array
 
-    // Optionally recalculate totals if necessary
-    $this->calculateTotals();
+        // Recalculate totals
+        $this->calculateTotals();
     }
 
     // Updates a journal row based on the data provided by the child component
@@ -64,6 +65,9 @@ class JournalTransaction extends Component
     {
         $this->totalAmountDebit = collect($this->journalRows)->sum('debit'); // Sum debits
         $this->totalAmountCredit = collect($this->journalRows)->sum('credit'); // Sum credits
+
+        // Set the total amount as the balanced amount if debits and credits match
+        $this->totalAmount = $this->totalAmountDebit; // Total amount should reflect the balance
     }
 
     // Handles saving the transaction

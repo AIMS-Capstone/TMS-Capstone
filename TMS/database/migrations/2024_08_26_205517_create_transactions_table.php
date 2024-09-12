@@ -20,6 +20,11 @@ return new class extends Migration
             $table->foreignId('contact')->nullable()->constrained('contacts')->nullOnDelete();
             $table->string('reference')->nullable();
             $table->decimal('total_amount', 10, 2)->nullable();
+            $table->decimal('vat_amount', 10, 2)->nullable();
+            $table->decimal('vatable_sales', 10, 2)->nullable();
+            $table->decimal('vatable_purchase', 10, 2)->nullable();
+            $table->decimal('non_vatable_sales', 10, 2)->nullable();
+            $table->decimal('non_vatable_purchase', 10, 2)->nullable();
             $table->decimal('total_amount_credit', 10, 2)->nullable();
             $table->decimal('total_amount_debit', 10, 2)->nullable();
             $table->timestamps();
