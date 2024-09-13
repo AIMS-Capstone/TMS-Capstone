@@ -1,6 +1,6 @@
 <div class="h-full bg-blue-900 p-10 mx-auto sm:px-6 lg:px-8">
     <div class="relative">
-        <h1 class="text-amber-400 text-3xl font-bold">Green Leaf Cafe</h1>
+        <h1 class="text-amber-400 text-3xl font-bold">{{ $orgsetups->registration_name }}</h1>
         <p class="mt-2 text-white text-sm">
             All transactions, activities, and reports are directly linked to this organization. 
             You will find a<br />comprehensive overview of the organization’s financial activities and 

@@ -20,8 +20,7 @@ return new class extends Migration
             $table->string('address_line');  
             $table->string('region');  
             $table->string('city');    
-            $table->string('zip_code');  
-            $table->string('address');  // Combine lahat address for fetching purposes
+            $table->string('zip_code'); 
             $table->string('contact_number');
             $table->string('email');
             $table->string('tin');

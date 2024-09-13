@@ -4,15 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Models\OrgSetup;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class OrgSetupController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $search = $request->input('search');
+        
+        $query = OrgSetup::query();
+        
+        if ($search) {  
+            $query->where('registration_name', 'like', "%{$search}%")
+                ->orWhere('tax_type', 'like', "%{$search}%")
+                ->orWhere('type', 'like', "%{$search}%");
+        }
+
+        $orgsetups = $query->paginate(4);
+
+        return view('org-setup', compact('orgsetups'));
     }
 
     /**
@@ -21,51 +35,44 @@ class OrgSetupController extends Controller
 
     public function create(Request $request)
     {
-        return view('organization.create');
-    }
+
+    }   
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+ public function store(Request $request)
     {
         // Validate the request data
-        // $request->validate([
-        //     'type' => 'required|in:non-individual,individual',
-        //     'registration_name' => 'required|string|max:255',
-        //     'line_of_business' => 'required|string|max:255',
-        //     'address_line' => 'required|string|max:255',
-        //     'address' => 'required|string|max:255',
-        //     'contact_number' => 'required|string|max:20',
-        //     'email' => 'required|email|max:255',
-        //     'tin' => 'required|string|max:20',
-        //     'rdo' => 'required|string|max:20',
-        //     'tax_type' => 'required|string|max:255',
-        //     'registration_date' => 'required|date',
-        //     'start_date' => 'required|date',
-        //     'financial_year_end' => 'required|date',
-        // ]);
-
-        // Create new OrgSetup record
-        OrgSetup::create([
-            'fname' => $request->input('fname'),
-            'lname' => $request->input('lname'),
-            'type' => $request->input('type'),
-            'registration_name' => $request->input('registration_name'),
-            'line_of_business' => $request->input('line_of_business'),
-            'address_line' => $request->input('address_line'),
-            'address' => $request->input('address'),
-            'contact_number' => $request->input('contact_number'),
-            'email' => $request->input('email'),
-            'tin' => $request->input('tin'),
-            'rdo' => $request->input('rdo'),
-            'tax_type' => $request->input('tax_type'),
-            'registration_date' => $request->input('registration_date'),
-            'start_date' => $request->input('start_date'),
-            'financial_year_end' => $request->input('financial_year_end'),
+        $validatedData = $request->validate([
+            'type' => 'required|in:non-individual,individual',
+            'registration_name' => 'required|string|max:255',
+            'line_of_business' => 'required|string|max:255',
+            'address_line' => 'required|string|max:255',
+            'region' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:10',
+            'contact_number' => 'required|string|max:20',
+            'email' => 'required|email|max:255',
+            'tin' => 'required|string|max:20|unique:org_setups,tin',
+            'rdo' => 'required|string|max:20',
+            'tax_type' => 'required|string|max:255',
+            'registration_date' => 'required|date_format:m/d/Y',
+            'start_date' => 'required|date_format:m/d/Y',
+            'financial_year_end' => 'required|date_format:m/d/Y',
         ]);
 
-        // Return a response (customize as needed)
+
+        // pang bago nung format sa db para tumangan ng date
+        $validatedData['start_date'] = Carbon::createFromFormat('m/d/Y', $validatedData['start_date'])->format('Y-m-d');
+        $validatedData['registration_date'] = Carbon::createFromFormat('m/d/Y', $validatedData['registration_date'])->format('Y-m-d');
+        $validatedData['financial_year_end'] = Carbon::createFromFormat('m/d/Y', $validatedData['financial_year_end'])->format('Y-m-d');
+
+
+        // Create new OrgSetup record
+        OrgSetup::create($validatedData);
+
+        // Redirect to the org-setup route with a success message
         return redirect()->route('org-setup')->with('success', 'Organization setup created successfully.');
     }
 

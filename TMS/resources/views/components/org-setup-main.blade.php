@@ -105,12 +105,22 @@
         {{-- Right Table --}}
         <div class="w-full md:w-3/4 mt-8 ml-0 md:ml-8 border border-gray-300 rounded-lg p-4 bg-white">
             <div class="flex flex-row items-center">
-                <!-- Search row -->
-                <div x-data="{ search: '' }" class="relative sm:w-80 p-5">
-                    <input type="text" x-model="search" placeholder="Search..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-950 focus:border-blue-950" />
-                    <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    <i class="fa-solid fa-xmark absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer" @click="search = ''"></i>
-                </div>
+<!-- Search row -->
+                                            <div class="relative w-80 p-5">
+                                                <form x-target="tableid" action="/coa" role="search" aria-label="Table" autocomplete="off">
+                                                    <input 
+                                                    type="search" 
+                                                    name="search" 
+                                                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900 focus:border-sky-900" 
+                                                    aria-label="Search Term" 
+                                                    placeholder="Search..." 
+                                                    @input.debounce="$el.form.requestSubmit()" 
+                                                    @search="$el.form.requestSubmit()"
+                                                    >
+                                                    </form>
+                                                <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                                <i class="fa-solid fa-xmark absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer" @click="search = ''"></i>
+                                            </div>
     
                 <!-- Sort by dropdown -->
                 <div class="relative inline-block text-left sm:w-auto">
@@ -173,6 +183,8 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-200 text-sm text-zinc-700">
+                        @if (count($orgsetups) >0)
+                            @foreach ($orgsetups as $orgsetup)
                         <tr>
                             <td class="text-left py-2 px-3">
                                 <div class="font-bold">Green Leaf Cafe</div>
@@ -313,6 +325,17 @@
                                 </div>
                             </td>
                         </tr>
+                        @endforeach
+                        @else
+                                                                            <tr>
+                                                        <td colspan="6" class="text-center p-4">
+                                                            <img src="{{ asset('images/Wallet 02.png') }}" alt="No data available" class="mx-auto" />
+                                                            <h1 class="font-bold mt-2">No Charts of accounts yet</h1>
+                                                            <p class="text-sm text-neutral-500 mt-2">Start adding accounts with the <br> + button beside the import button.</p>
+                                                        </td>
+                                                    </tr>
+                        @endif
+
                     </tbody>
                 </table>
             </div>
