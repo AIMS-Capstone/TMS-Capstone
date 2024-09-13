@@ -62,7 +62,7 @@
 <div class="py-4 h-full">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="grid grid-cols-4 gap-4 whitespace-nowrap text-wrap">
-            <div class="p-6 col-span-2 bg-white border-gray-200 rounded-lg">
+            <div class="p-6 col-span-2 bg-white border-gray-200 rounded-lg h-100">
                 <div class="flex items-center space-x-2 mb-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 36 36"><path fill="#1e3a8a" d="M32.25 6h-4v3a2.2 2.2 0 1 1-4.4 0V6H12.2v3a2.2 2.2 0 0 1-4.4 0V6h-4A1.78 1.78 0 0 0 2 7.81v22.38A1.78 1.78 0 0 0 3.75 32h28.5A1.78 1.78 0 0 0 34 30.19V7.81A1.78 1.78 0 0 0 32.25 6M10 26H8v-2h2Zm0-5H8v-2h2Zm0-5H8v-2h2Zm6 10h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Zm6 10h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Zm6 10h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Z" class="clr-i-solid clr-i-solid-path-1"/><path fill="#172554" d="M10 10a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v6a1 1 0 0 0 1 1" class="clr-i-solid clr-i-solid-path-2"/><path fill="#172554" d="M26 10a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v6a1 1 0 0 0 1 1" class="clr-i-solid clr-i-solid-path-3"/><path fill="none" d="M0 0h36v36H0z"/></svg>
                     <span class="font-bold text-2xl taxuri-color leading-tight">Tax Reminder</span>
@@ -97,7 +97,7 @@
                     <div id="accordion-flush-1" data-accordion="collapse" data-active-classes="bg-white text-gray-900" data-inactive-classes="text-gray-500">
                     <h2 id="accordion-flush-heading-1">
                         <button type="button" id="accordion-button-1" class="flex items-center justify-between w-full py-5 font-medium rtl:text-right text-blue-900 border-b border-gray-200 gap-3" data-accordion-target="#accordion-flush-body-1" aria-expanded="false" aria-controls="accordion-flush-body-1">
-                        <span>September 11, 2024</span>
+                        <span>September 13, 2024</span>
                         <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
                         </svg>
@@ -105,9 +105,9 @@
                     </h2>
                     <div id="accordion-flush-body-1" class="hidden" aria-labelledby="accordion-flush-heading-1">
                         <div class="py-5 border-b border-gray-200 max-h-40 overflow-y-auto">
-                        <b class="text-blue-900">e-FILING</b>
-                        <p class="mb-2 text-gray-500 text-sm">
-                        <br/>BIR Forms 1601-C (Monthly Remittance Return of Income Taxes Withheld on Compensation) and/or 0619-E (Monthly Remittance Form of Creditable Income Taxes Withheld-Expanded) and/or 0619-F (Monthly Remittance Form of Final Income Taxes Withheld) – eFPS Filers under Group E.  <b>Month of August 2024</b></p>
+                            <b class="text-blue-900">e-FILING</b>
+                            <p class="mb-2 text-gray-500 text-sm">
+                            <br/>BIR Forms 1601-C (Monthly Remittance Return of Income Taxes Withheld on Compensation) and/or 0619-E (Monthly Remittance Form of Creditable Income Taxes Withheld-Expanded) and/or 0619-F (Monthly Remittance Form of Final Income Taxes Withheld) – eFPS Filers under Group C.<b>Month of August 2024</b></p>
                         </div>
                     </div>
                     </div>
@@ -119,7 +119,7 @@
                     <div id="accordion-flush-2" data-accordion="collapse" data-active-classes="bg-white text-gray-900" data-inactive-classes="text-gray-500">
                         <h2 id="accordion-flush-heading-2">
                             <button type="button" id="accordion-button-2" class="flex items-center justify-between w-full py-5 font-medium rtl:text-right text-blue-900 border-b border-gray-200 gap-3" data-accordion-target="#accordion-flush-body-2" aria-expanded="false" aria-controls="accordion-flush-body-2">
-                                <span>September 12, 2024</span>
+                                <span>September 14, 2024</span>
                                 <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
                                 </svg>
@@ -129,7 +129,7 @@
                             <div class="py-5 border-b border-gray-200 max-h-40 overflow-y-auto">
                                 <b class="text-blue-900">e-FILING</b>
                                 <p class="mb-2 text-gray-500 text-sm">
-                                <br/>BIR Forms 1601-C (Monthly Remittance Return of Income Taxes Withheld on Compensation) and/or 0619-E (Monthly Remittance Form of Creditable Income Taxes Withheld-Expanded) and/or 0619-F (Monthly Remittance Form of Final Income Taxes Withheld) – eFPS Filers under Group D.  <b>Month of August 2024</b></p>
+                                <br/>BIR Forms 1601-C (Monthly Remittance Return of Income Taxes Withheld on Compensation) and/or 0619-E (Monthly Remittance Form of Creditable Income Taxes Withheld-Expanded) and/or 0619-F (Monthly Remittance Form of Final Income Taxes Withheld) – eFPS Filers under Group B. <b>Month of August 2024</b></p>
                             </div>
                         </div>
                     </div>
@@ -137,7 +137,7 @@
                     <div id="accordion-flush-3" data-accordion="collapse" data-active-classes="bg-white text-gray-900" data-inactive-classes="text-gray-500">
                         <h2 id="accordion-flush-heading-3">
                             <button type="button" id="accordion-button-3" class="flex items-center justify-between w-full py-5 font-medium rtl:text-right text-blue-900 border-b border-gray-200 gap-3" data-accordion-target="#accordion-flush-body-3" aria-expanded="false" aria-controls="accordion-flush-body-3">
-                                <span>September 13, 2024</span>
+                                <span>September 15, 2024</span>
                                 <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
                                 </svg>
@@ -145,9 +145,10 @@
                         </h2>
                         <div id="accordion-flush-body-3" class="hidden" aria-labelledby="accordion-flush-heading-3">
                             <div class="py-5 border-b border-gray-200 max-h-40 overflow-y-auto">
-                                <b class="text-blue-900">e-FILING</b>
+                                <b class="text-blue-900">SUBMISSION</b>
                                 <p class="mb-2 text-gray-500 text-sm">
-                                <br/>BIR Forms 1601-C (Monthly Remittance Return of Income Taxes Withheld on Compensation) and/or 0619-E (Monthly Remittance Form of Creditable Income Taxes Withheld-Expanded) and/or 0619-F (Monthly Remittance Form of Final Income Taxes Withheld) – eFPS Filers under Group C.<b>Month of August 2024</b></p>
+                                <br/>Monthly Summary Report/Schedule of Transferred Titled/Untitled Real Properties by City or Municipal Assessors, RDs & LRAs.  Month of August 2024
+                                <br/>Summary List of Blank OCTs/TCTs/CCTs issued to all RDs.<b>Month of August 2024</b></p>
                             </div>
                         </div>
                     </div>

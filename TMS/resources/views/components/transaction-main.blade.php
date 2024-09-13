@@ -10,21 +10,21 @@
         <div class="flex items-center px-2">            
             <p class="font-normal text-sm">The Transactions feature ensures accurate tracking and categorization <br> of each transaction.</p>
         </div>
-        <div class="items-end float-end">
+        <div class="items-end float-end relative sm:w-auto">
             <button type="button" id="dropdownDefaultButton" class="text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-2 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
                 <i class="fas fa-plus-circle mr-1"></i>
                 Add Transaction
             </button>
-            <div id="dropdown" class="absolute z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 mt-2">
-                <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefaultButton">
+            <div id="dropdown" class="absolute z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-md w-48 mt-2">
+                <ul class="py-2 px-2 text-sm text-gray-700" aria-labelledby="dropdownDefaultButton">
                     <li>
-                        <a href="{{ url('/transactions/create?type=sales') }}" class="block px-4 py-2 hover:bg-gray-100">Add Sale</a>
+                        <a href="{{ url('/transactions/create?type=sales') }}" class="block px-4 py-2 hover-dropdown">Add Sale</a>
                     </li>
                     <li>
-                        <a href="{{ url('/transactions/create?type=purchase') }}" class="block px-4 py-2 hover:bg-gray-100">Add Purchase</a>
+                        <a href="{{ url('/transactions/create?type=purchase') }}" class="block px-4 py-2 hover-dropdown">Add Purchase</a>
                     </li>
                     <li>
-                        <a href="{{ url('/transactions/create?type=journal') }}" class="block px-4 py-2 hover:bg-gray-100">Add Manual Journal</a>
+                        <a href="{{ url('/transactions/create?type=journal') }}" class="block px-4 py-2 hover-dropdown">Add Manual Journal</a>
                     </li>
                 </ul>
             </div>
