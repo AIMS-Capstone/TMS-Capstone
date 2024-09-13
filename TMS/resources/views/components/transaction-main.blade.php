@@ -101,105 +101,116 @@
     </div>
     <hr>
 
-    <!-- Filtering Tab -->
-    <div x-data="{ selectedTab: 'All', checkAll: false }" class="w-full p-5">
-        <div @keydown.right.prevent="$focus.wrap().next()" 
-            @keydown.left.prevent="$focus.wrap().previous()" 
-            class="flex flex-row text-center gap-2 overflow-x-auto ps-8" 
-            role="tablist" 
-            aria-label="tab options">
-            
-            <!-- Tab 1: All -->
-            <button @click="selectedTab = 'All'" 
-                :aria-selected="selectedTab === 'All'" 
-                :tabindex="selectedTab === 'All' ? '0' : '-1'" 
-                :class="selectedTab === 'All' 
-                    ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg' 
-                    : 'text-neutral-600 font-medium hover:text-sky-900'" 
-                class="flex h-min items-center gap-2 px-4 py-2 text-sm" 
-                type="button" 
-                role="tab" 
-                aria-controls="tabpanelAll">
-                All
-                <span :class="selectedTab === 'All' 
-                    ? 'text-white bg-sky-900 ' 
-                    : 'bg-slate-500 text-white'" 
-                    class="text-xs font-medium px-1 rounded-full">0</span>
-            </button>
-            
-            <!-- Tab 2: Sales -->
-            <button @click="selectedTab = 'Sales'" 
-                :aria-selected="selectedTab === 'Sales'" 
-                :tabindex="selectedTab === 'Sales' ? '0' : '-1'" 
-                :class="selectedTab === 'Sales' 
-                    ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg' 
-                    : 'text-neutral-600 font-medium hover:text-sky-900'" 
-                class="flex h-min items-center gap-2 px-4 py-2 text-sm" 
-                type="button" 
-                role="tab" 
-                aria-controls="tabpanelSales">
-                Sales
-                <span :class="selectedTab === 'Sales' 
-                    ? 'text-white bg-sky-900 ' 
-                    : 'bg-slate-500 text-white'" 
-                    class="text-xs font-medium px-1 rounded-full">0</span>
-            </button>
-            
-            <!-- Tab 3: Purchases -->
-            <button @click="selectedTab = 'Purchases'" 
-                :aria-selected="selectedTab === 'Purchases'" 
-                :tabindex="selectedTab === 'Purchases' ? '0' : '-1'" 
-                :class="selectedTab === 'Purchases' 
-                    ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg' 
-                    : 'text-neutral-600 font-medium hover:text-sky-900'" 
-                class="flex h-min items-center gap-2 px-4 py-2 text-sm" 
-                type="button" 
-                role="tab" 
-                aria-controls="tabpanelPurchases">
-                Purchases
-                <span :class="selectedTab === 'Purchases' 
-                    ? 'text-white bg-sky-900 ' 
-                    : 'bg-slate-500 text-white'" 
-                    class="text-xs font-medium px-1 rounded-full">0</span>
-            </button>
-            
-            <!-- Tab 4: Journal -->
-            <button @click="selectedTab = 'Journal'" 
-                :aria-selected="selectedTab === 'Journal'" 
-                :tabindex="selectedTab === 'Journal' ? '0' : '-1'" 
-                :class="selectedTab === 'Journal' 
-                    ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg' 
-                    : 'text-neutral-600 font-medium hover:text-sky-900'" 
-                class="flex h-min items-center gap-2 px-4 py-2 text-sm" 
-                type="button" 
-                role="tab" 
-                aria-controls="tabpanelJournal">
-                Journal
-                <span :class="selectedTab === 'Journal' 
-                    ? 'text-white bg-sky-900 ' 
-                    : 'bg-slate-500 text-white'" 
-                    class="text-xs font-medium px-1 rounded-full">0</span>
-            </button>
-            
-            <!-- Tab 5: Archived -->
-            <button @click="selectedTab = 'Archived'" 
-                :aria-selected="selectedTab === 'Archived'" 
-                :tabindex="selectedTab === 'Archived' ? '0' : '-1'" 
-                :class="selectedTab === 'Archived' 
-                    ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg' 
-                    : 'text-neutral-600 font-medium hover:text-sky-900'" 
-                class="flex h-min items-center gap-2 px-4 py-2 text-sm" 
-                type="button" 
-                role="tab" 
-                aria-controls="tabpanelArchived">
-                Archived
-                <span :class="selectedTab === 'Archived' 
-                    ? 'text-white bg-sky-900 ' 
-                    : 'bg-slate-500 text-white'" 
-                    class="text-xs font-medium px-1 rounded-full">0</span>
-            </button>
-        </div>
-    </div>
+<!-- Filtering Tab -->
+<div x-data="{
+    selectedTab: (new URL(window.location.href)).searchParams.get('type') || 'All',
+    checkAll: false,
+    init() {
+        // Update the selectedTab based on URL parameter when the component initializes
+        this.selectedTab = (new URL(window.location.href)).searchParams.get('type') || 'All';
+    }
+}" 
+x-init="init" 
+class="w-full p-5">
+<div @keydown.right.prevent="$focus.wrap().next()" 
+    @keydown.left.prevent="$focus.wrap().previous()" 
+    class="flex flex-row text-center gap-2 overflow-x-auto ps-8" 
+    role="tablist" 
+    aria-label="tab options">
+    
+    <!-- Tab 1: All -->
+    <button @click="selectedTab = 'All'; $dispatch('filter', { type: 'All' }); updateURL('All')"
+        :aria-selected="selectedTab === 'All'"
+        :tabindex="selectedTab === 'All' ? '0' : '-1'"
+        :class="selectedTab === 'All' 
+            ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg' 
+            : 'text-neutral-600 font-medium hover:text-sky-900'"
+        class="flex h-min items-center gap-2 px-4 py-2 text-sm"
+        type="button"
+        role="tab"
+        aria-controls="tabpanelAll">
+        All
+        <span :class="selectedTab === 'All'
+            ? 'text-white bg-sky-900'
+            : 'bg-slate-500 text-white'"
+            class="text-xs font-medium px-1 rounded-full">0</span>
+    </button>
+    
+    <!-- Tab 2: Sales -->
+    <button @click="selectedTab = 'Sales'; $dispatch('filter', { type: 'Sales' }); updateURL('Sales')"
+        :aria-selected="selectedTab === 'Sales'"
+        :tabindex="selectedTab === 'Sales' ? '0' : '-1'"
+        :class="selectedTab === 'Sales'
+            ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
+            : 'text-neutral-600 font-medium hover:text-sky-900'"
+        class="flex h-min items-center gap-2 px-4 py-2 text-sm"
+        type="button"
+        role="tab"
+        aria-controls="tabpanelSales">
+        Sales
+        <span :class="selectedTab === 'Sales'
+            ? 'text-white bg-sky-900'
+            : 'bg-slate-500 text-white'"
+            class="text-xs font-medium px-1 rounded-full">0</span>
+    </button>
+    
+    <!-- Tab 3: Purchases -->
+    <button @click="selectedTab = 'Purchases'; $dispatch('filter', { type: 'Purchases' }); updateURL('Purchases')"
+        :aria-selected="selectedTab === 'Purchases'"
+        :tabindex="selectedTab === 'Purchases' ? '0' : '-1'"
+        :class="selectedTab === 'Purchases'
+            ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
+            : 'text-neutral-600 font-medium hover:text-sky-900'"
+        class="flex h-min items-center gap-2 px-4 py-2 text-sm"
+        type="button"
+        role="tab"
+        aria-controls="tabpanelPurchases">
+        Purchases
+        <span :class="selectedTab === 'Purchases'
+            ? 'text-white bg-sky-900'
+            : 'bg-slate-500 text-white'"
+            class="text-xs font-medium px-1 rounded-full">0</span>
+    </button>
+    
+    <!-- Tab 4: Journal -->
+    <button @click="selectedTab = 'Journal'; $dispatch('filter', { type: 'Journal' }); updateURL('Journal')"
+        :aria-selected="selectedTab === 'Journal'"
+        :tabindex="selectedTab === 'Journal' ? '0' : '-1'"
+        :class="selectedTab === 'Journal'
+            ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
+            : 'text-neutral-600 font-medium hover:text-sky-900'"
+        class="flex h-min items-center gap-2 px-4 py-2 text-sm"
+        type="button"
+        role="tab"
+        aria-controls="tabpanelJournal">
+        Journal
+        <span :class="selectedTab === 'Journal'
+            ? 'text-white bg-sky-900'
+            : 'bg-slate-500 text-white'"
+            class="text-xs font-medium px-1 rounded-full">0</span>
+    </button>
+    
+    <!-- Tab 5: Archived -->
+    <button @click="selectedTab = 'Archived'; $dispatch('filter', { type: 'Archived' }); updateURL('Archived')"
+        :aria-selected="selectedTab === 'Archived'"
+        :tabindex="selectedTab === 'Archived' ? '0' : '-1'"
+        :class="selectedTab === 'Archived'
+            ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
+            : 'text-neutral-600 font-medium hover:text-sky-900'"
+        class="flex h-min items-center gap-2 px-4 py-2 text-sm"
+        type="button"
+        role="tab"
+        aria-controls="tabpanelArchived">
+        Archived
+        <span :class="selectedTab === 'Archived'
+            ? 'text-white bg-sky-900'
+            : 'bg-slate-500 text-white'"
+            class="text-xs font-medium px-1 rounded-full">0</span>
+    </button>
+</div>
+</div>
+
+
 
     <!-- Table -->
     <div x-data="{ checkAll: false, currentPage: 1, perPage: 5 }" class="mb-12 mx-12 overflow-hidden max-w-full border-neutral-300">
@@ -324,41 +335,64 @@
         </div>
     </div>
 </div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const dropdownButton = document.getElementById('dropdownDefaultButton');
-        const dropdown = document.getElementById('dropdown');
+    document.addEventListener('search', event => {
+         window.location.href = `?search=${event.detail.search}`;
+     });
 
-        dropdownButton.addEventListener('click', function () {
-            dropdown.classList.toggle('hidden');
-        });
-        document.addEventListener('click', function (event) {
-            if (!dropdownButton.contains(event.target) && !dropdown.contains(event.target)) {
-                dropdown.classList.add('hidden');
-            }
-        });
-    });
+     document.addEventListener('filter', event => {
+         const url = new URL(window.location.href);
+         url.searchParams.set('type', event.detail.type);
+      
+         window.location.href = url.toString();
+     });    
 
-    document.getElementById('sortButton').addEventListener('click', function() {
-        const dropdown = document.getElementById('dropdownMenu');
-        dropdown.classList.toggle('hidden');
-    });
+     // document.addEventListener('filter', event => {
+     //     window.location.href = `?type=${event.detail.type}`;
+     // });
 
-    function sortItems(option) {
-        document.getElementById('selectedOption').innerText = option;
-        console.log("Sorting by:", option);
-        // no sort yet, since no data
-        document.getElementById('dropdownMenu').classList.add('hidden');
-    }
+     function toggleCheckboxes() {
+         document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+             checkbox.checked = this.checkAll;
+         });
+     }
 
-    document.getElementById('dropdownMenuIconButton').addEventListener('click', function() {
-        const dropdown = document.getElementById('dropdownDots');
-        dropdown.classList.toggle('hidden');
-    });
+ document.addEventListener('DOMContentLoaded', function () {
+     const dropdownButton = document.getElementById('dropdownDefaultButton');
+     const dropdown = document.getElementById('dropdown');
 
-    function setEntries(entries) {
-        console.log(`Setting ${entries} entries per page`);
-        // no showing entries since no data yet
-        document.getElementById('dropdownDots').classList.add('hidden');
-    }
+     dropdownButton.addEventListener('click', function () {
+         dropdown.classList.toggle('hidden');
+     });
+     document.addEventListener('click', function (event) {
+         if (!dropdownButton.contains(event.target) && !dropdown.contains(event.target)) {
+             dropdown.classList.add('hidden');
+         }
+     });
+ });
+
+ document.getElementById('sortButton').addEventListener('click', function() {
+     const dropdown = document.getElementById('dropdownMenu');
+     dropdown.classList.toggle('hidden');
+ });
+
+ function sortItems(option) {
+     document.getElementById('selectedOption').innerText = option;
+     console.log("Sorting by:", option);
+     // no sort yet, since no data
+     document.getElementById('dropdownMenu').classList.add('hidden');
+ }
+
+ document.getElementById('dropdownMenuIconButton').addEventListener('click', function() {
+     const dropdown = document.getElementById('dropdownDots');
+     dropdown.classList.toggle('hidden');
+ });
+
+ function setEntries(entries) {
+     console.log(`Setting ${entries} entries per page`);
+     // no showing entries since no data yet
+     document.getElementById('dropdownDots').classList.add('hidden');
+ }
+ 
 </script>

@@ -36,7 +36,7 @@ class TransactionsController extends Controller
         }
     
         if ($type && $type !== 'All') {
-            $query->where('type', $type);
+            $query->where('transaction_type', $type);
         }
     
         $transactions = $query->paginate(4);
