@@ -72,7 +72,8 @@ Route::middleware([
     Route::get('/create-org', function(){
         return view('components/create-org');
     })->name('create-org');
-    Route::post('org-setup', [OrgSetupController::class, 'store'])->name('OrgSetup.store');
+    Route::get('/org-setup', [OrgSetupController::class, 'index'])->name('org-setup');
+    Route::post('/org-setup', [OrgSetupController::class, 'store'])->name('OrgSetup.store');
 
     //Charts of Accounts routings
      Route::get('/transactions', [TransactionsController::class, 'index'])->name('transactions');
@@ -87,10 +88,6 @@ Route::middleware([
     Route::get('/predictive-analytics', function () {
         return view('predictive-analytics');
     })->name('predictive-analytics');
-
-    Route::get('/org-setup', function () {
-        return view('org-setup');
-    })->name('org-setup');
     
     Route::get('/add-user', function () {
         return view('add-user');

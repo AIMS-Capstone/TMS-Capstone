@@ -50,8 +50,8 @@
 
         <!-- Tab Content -->
         {{-- naka-comment form dahil nagiging 404 error or 419 page expired --}}
-        {{-- <form action="{{'OrgSetup.store'}}" method="POST">
-            @csrf  --}}
+        <form action="{{ route ('OrgSetup.store')}}" method="POST">
+            @csrf 
             <div id="tab-content" class="container border border-gray-200 rounded-lg p-4 my-10 text-center max-w-full h-[500px] mx-auto flex flex-col">
                 <!-- Classification Content -->
                 <div class="tab-content-item classification-content">
@@ -242,7 +242,7 @@
                                 <x-field-label for="financial_year_end" value="{{ __('Financial Year End') }}" class="mb-2 text-left" />
                                 <select name="financial_year_end" id="financial_year_end" wire:model="financial_year_end" class="border rounded-xl px-4 py-2 w-full mb-4 border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
                                     <option value="">Select Financial Year End</option>
-                                    <option value="December 31">December 31</option>
+                                    <option value="12/31/2024">December 31</option>
                                     <!-- idk where to find other selections here-->
                                 </select>
                             </div>
@@ -296,7 +296,8 @@
                     </div>
                 </div>
             </div>
-        {{-- </form> --}}
+            <button type = "submit"></button>
+        </form>
     </div>
 
     {{-- Simple remedy muna nilagay ko kapag mag aappear na "Save" button sa Financial Settings. --}}

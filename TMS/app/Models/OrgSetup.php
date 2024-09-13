@@ -18,7 +18,6 @@ class OrgSetup extends Model
         'region',
         'city',
         'zip_code',
-        'address',
         'contact_number',
         'email',
         'tin',
