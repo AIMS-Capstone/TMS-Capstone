@@ -1,4 +1,3 @@
-
 <x-transaction-form-section>
     @php
     $type = request()->query('type', 'purchase'); // Default to 'purchase' if 'type' is not set
@@ -6,7 +5,8 @@
     <!-- Redirection Link -->
     <x-slot:redirection>
         <a href="/transactions" class="flex items-center space-x-2 text-blue-600">
-            <span>← Go back</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5" viewBox="0 0 24 24"><g fill="none" stroke="#52525b" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 12H8m4-4l-4 4l4 4"/></g></svg>
+            <span class="text-zinc-600 text-sm font-normal hover:text-zinc-700">Go back</span>
         </a>
     </x-slot:redirection>
 
@@ -17,10 +17,20 @@
 
     <!-- Form Fields (Customer, Date, etc.) -->
     <x-slot:form>
-        <div class="grid grid-cols-4 gap-4">
+        <div class="grid grid-cols-4 gap-6">
             <!-- Customer Select -->
             <div class="mt-4 ml-10">
-                <label for="select-contact" class="block font-medium text-sm text-gray-700">Vendor</label>
+                <label for="select-contact" class="block font-bold text-sm taxuri-color">
+                    Vendor
+                    <span class="relative group items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline-block ml-1 w-4 h-4 text-blue-900" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2"/>
+                        </svg>
+                        <div class="hidden group-hover:block absolute left-1/2 transform -translate-x-1/2 mt-2 w-64 bg-white text-zinc-700 font-normal text-sm rounded-lg shadow-lg p-2 overflow-hidden z-50">
+                            Enter your Vendor name here. If the Vendor is not a part of your contacts, add them by clicking Add as New Contact.
+                        </div>
+                    </span>
+                </label>
                 <div class="mt-1">
                     <livewire:select-input
                         name="select_contact"
@@ -34,14 +44,14 @@
             </div>
 
             <!-- Date Field -->
-            <div class="mt-5">
+            <div class="mt-5 mb-8">
                 <x-transaction-label for="date" :value="__('Date')" />
                 <x-transaction-input id="date" type="date" class="mt-1 block w-full" wire:model.defer="date" />
             </div>
 
 
             <!-- Reference Field -->
-            <div class="mt-5">
+            <div class="mt-5 mb-8">
                 <x-transaction-label for="reference" :value="__('Reference')" />
                 <x-transaction-input id="reference" type="text" class="mt-1 block w-full" wire:model.defer="reference" />
             </div>
@@ -55,8 +65,8 @@
 
         <!-- Table Section -->
         <div class="mt-0">
-            <table class="table-auto w-full text-left">
-                <thead class="bg-gray-100">
+            <table class="table-auto w-full text-left text-sm text-neutral-600">
+                <thead class="bg-gray-100 text-neutral-900">
                     <tr>
                         <th class="px-4 py-2">Description</th>
                         <th class="px-4 py-2">Tax Type</th>
@@ -79,10 +89,12 @@
         
         <x-slot name="after">
             <div class="mt-4">
-                <button type="button" wire:click="addTaxRow" class="flex items-center space-x-2 text-blue-600 hover:text-blue-800">
-                    <span>➕ Add New Line</span>
+                <button type="button" wire:click="addTaxRow" class="group flex items-center space-x-2 border rounded-lg px-3 py-2 text-zinc-600 hover:font-bold hover:text-blue-900">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 32 32">
+                        <path class="fill-[#949494] group-hover:fill-blue-900" d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5z"/>
+                    </svg>
+                    <span>Add New Line</span>
                 </button>
-                
             </div>
             <div class="mt-4">
                 <div class="flex justify-end">
@@ -90,71 +102,53 @@
                         <tbody>
                             @if($vatablePurchase > 0)
                             <tr>
-                                <td class="px-4 py-2">VATable Purchase</td>
-                                <td class="px-4 py-2 text-right">{{ number_format($vatablePurchase, 2) }}</td>
+                                <td class="px-4 py-2 taxuri-text">VATable Purchase</td>
+                                <td class="px-4 py-2 text-right taxuri-text">{{ number_format($vatablePurchase, 2) }}</td>
                             </tr>
                             @endif
     
                             @if($nonVatablePurchase > 0)
                             <tr>
-                                <td class="px-4 py-2">Non-VATable Purchase</td>
-                                <td class="px-4 py-2 text-right">{{ number_format($nonVatablePurchase, 2) }}</td>
+                                <td class="px-4 py-2 taxuri-text">Non-VATable Purchase</td>
+                                <td class="px-4 py-2 text-right taxuri-text">{{ number_format($nonVatablePurchase, 2) }}</td>
                             </tr>
                             @endif
     
                             @if($vatAmount > 0)
                             <tr>
-                                <td class="px-4 py-2">VAT Amount</td>
-                                <td class="px-4 py-2 text-right">{{ number_format($vatAmount, 2) }}</td>
+                                <td class="px-4 py-2 taxuri-text">VAT Amount</td>
+                                <td class="px-4 py-2 text-right taxuri-text">{{ number_format($vatAmount, 2) }}</td>
                             </tr>
                             @endif
                             @if(count($appliedATCs) > 0)
                             @foreach($appliedATCs as $atc)
                             <tr>
-                                <td class="px-4 py-2 font-bold">{{ $atc['code'] }} ({{ number_format($atc['rate'], 2) }}%)</td>
-                                <td class="px-4 py-2 text-right">{{ number_format($atc['tax_amount'], 2) }}</td>
+                                <td class="px-4 py-2 taxuri-text">{{ $atc['code'] }} ({{ number_format($atc['rate'], 2) }}%)</td>
+                                <td class="px-4 py-2 text-right ">{{ number_format($atc['tax_amount'], 2) }}</td>
                             @endforeach
                             </tr>
                             @endif
     
                             @if($totalAmount > 0)
                             <tr>
-                                <td class="px-4 py-2 font-bold">Total Amount Due</td>
-                                <td class="px-4 py-2 text-right font-bold">{{ number_format($totalAmount, 2) }}</td>
+                                <td class="px-4 py-2 font-bold taxuri-color">Total Amount Due</td>
+                                <td class="px-4 py-2 text-right font-bold taxuri-color">{{ number_format($totalAmount, 2) }}</td>
                             </tr>
-                       
                             @endif
                         </tbody>
                     </table>
                 </div>
             </div>
-          
-            
-            
         </x-slot>
-        
-
-    
-    
     </x-slot:form>
-
-
-    
-
     <!-- Save Button -->
     <x-slot:actions>
-        
-  
-        
-     
-        <div class="flex justify-end mt-4">
-            <x-button type="submit" class="ml-4 bg-blue-500 text-white px-4 py-2 rounded shadow-md">
+        <div class="flex justify-end mt-4 mb-10">
+            <x-button type="submit" class="ml-4 text-white px-4 py-2 rounded-lg shadow-md">
                 {{ __('Save Transaction') }}
             </x-button>
         </div>
     </x-slot:actions>
-
-
 </x-transaction-form-section>
 
 @assets

@@ -63,9 +63,6 @@
                 </div>
             </div>
     
-            <!-- Spacer -->
-            {{-- <div class="flex-grow"></div> --}}
-    
             <!-- Buttons and Show Entries -->
             <div class="flex space-x-4 ps-96 items-center">
                 <button type="button" @click="showCheckboxes = !showCheckboxes" class="border px-3 py-2 rounded-lg flex items-center">
@@ -204,16 +201,10 @@
     </div>
 
     <!-- Table -->
-    <div x-data="{ 
-        checkAll: false, 
-        currentPage: 1, 
-        totalPages: 5, 
-        data: ['Contact', 'Nigga', 'Chigga', 'Blassian', 'Nigga', 'Nigga', 'Nigga'], 
-        perPage: 5 
-    }" class="mb-12 mx-12 overflow-hidden max-w-full rounded-md border-neutral-300">
+    <div x-data="{ checkAll: false, currentPage: 1, perPage: 5 }" class="mb-12 mx-12 overflow-hidden max-w-full border-neutral-300">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-neutral-600 dark:text-neutral-300">
-                <thead class="border-b border-gray-200 bg-zinc-100 text-sm text-gray-600">
+            <table class="w-full text-left text-sm text-neutral-600">
+                <thead class="bg-neutral-100 text-sm text-neutral-900">
                     <tr>
                         <th scope="col" class="p-4">
                             <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
@@ -227,6 +218,7 @@
                         </th>
                         <th scope="col" class="p-4">Contact</th>
                         <th scope="col" class="p-2">Date</th>
+                        <th scope="col" class="p-2">Invoice Number</th>
                         <th scope="col" class="p-2">Reference No.</th>
                         <th scope="col" class="p-2">Gross Amount</th>
                         <th scope="col" class="p-2">Type</th>
@@ -234,7 +226,37 @@
                 </thead>
                 <tbody class="divide-y divide-neutral-300">
                     <!-- Check if there is any data for the current page -->
-                    <template x-if="data.slice((currentPage - 1) * perPage, currentPage * perPage).length > 0">
+                    {{-- @if (count($transactions) >0)
+                        @foreach ($transactions as $transaction)
+                            <tr>
+                                <td class="p-4">
+                                    <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
+                                        <div class="relative flex items-center">
+                                            <input type="checkbox" id="user2335" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-black checked:before:bg-black focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black active:outline-offset-0" :checked="checkAll" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                                            </svg>
+                                        </div>
+                                    </label>
+                                </td>
+                                <td class="py-4 px-2">{{$transaction ->contact}}</td>
+                                <td class="py-4 px-2">{{$transaction ->date}}</td>
+                                <td class="py-4 px-2">{{$transaction ->inv_number}}</td>
+                                <td class="py-4 px-2">{{$transaction ->reference}}</td>
+                                <td class="py-4 px-2">{{$transaction ->vat_amount}}</td>
+                                <td class="py-4 px-2">{{$transaction ->transaction_type}}</td>
+                            </tr>                             
+                        @endforeach
+                    @else
+                        <tr>
+                            <td colspan="6" class="text-center p-4">
+                                <img src="{{ asset('images/Wallet 02.png') }}" alt="No data available" class="mx-auto" />
+                                <h1 class="font-bold mt-2">No Charts of accounts yet</h1>
+                                <p class="text-sm text-neutral-500 mt-2">Start adding accounts with the <br> + button beside the import button.</p>
+                            </td>
+                        </tr>
+                    @endif --}}
+                    {{-- <template x-if="data.slice((currentPage - 1) * perPage, currentPage * perPage).length > 0">
                         <template x-for="(item, index) in data.slice((currentPage - 1) * perPage, currentPage * perPage)" :key="index">
                             <tr>
                                 <td class="p-4">
@@ -265,8 +287,9 @@
                                 <p class="text-sm text-neutral-500 mt-2">Start adding transactions with the <br> + button at the top.</p>
                             </td>
                         </tr>
-                    </template> 
+                    </template>  --}}
                 </tbody>
+                {{-- {{ $transaction->links() }} --}}
             </table>
             <nav aria-label="pagination">
                 <ul class="flex flex-shrink-0 items-center gap-2 text-sm font-medium mt-4">
@@ -282,7 +305,7 @@
                             <button @click="currentPage = page" :class="currentPage === page ? 'bg-sky-900 text-neutral-100' : 'text-neutral-600 hover:text-black'" class="flex size-6 items-center justify-center rounded-full p-1" :aria-current="currentPage === page" :aria-label="'page ' + page" x-text="page"></button>
                         </li>
                         <li x-show="page === currentPage - 2 || page === currentPage + 2">
-                            <span class="flex items-center justify-center rounded-md p-1 text-neutral-600 dark:text-neutral-300" aria-label="ellipsis">...</span>
+                            <span class="flex items-center justify-center rounded-md p-1 text-neutral-600" aria-label="ellipsis">...</span>
                         </li>
                     </template>
                     <li>

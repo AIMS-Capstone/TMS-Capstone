@@ -84,7 +84,6 @@ class PurchaseTransaction extends Component
 
     foreach ($this->taxRows as &$row) {  // Use reference (&) to modify array elements
         $amount = $row['amount'];
-        $taxAmount = $row['tax_amount'];
         $taxTypeId = $row['tax_type'];
 
         $taxType = TaxType::find($taxTypeId);
@@ -94,10 +93,12 @@ class PurchaseTransaction extends Component
         $atcRate = $atc ? $atc->tax_rate : 0;
 
         if ($vatRate > 0) {
+            // Handle vatable purchase
             $netAmount = $amount / (1 + ($vatRate / 100));
             $this->vatablePurchase += $netAmount;
             $this->vatAmount += $amount - $netAmount;
 
+            // Calculate ATC if applicable
             if ($atcRate > 0) {
                 $atcAmount = $netAmount * ($atcRate / 100);
                 $row['atc_amount'] = $atcAmount;  // Ensure atc_amount is set
@@ -108,20 +109,23 @@ class PurchaseTransaction extends Component
                     'tax_amount' => $atcAmount
                 ];
             } else {
-                // Ensure atc_amount is set to 0 if no ATC is applicable
-                $row['atc_amount'] = 0;
+                $row['atc_amount'] = 0; // Ensure atc_amount is set to 0 if no ATC
             }
         } else {
+            // Handle non-vatable purchase
             $this->nonVatablePurchase += $amount;
-            // Ensure atc_amount is set to 0 if there's no VAT
-            $row['atc_amount'] = 0;
+            $row['atc_amount'] = 0; // No ATC for non-vatable purchases
         }
     }
 
+    // Calculate the total amount
     $this->appliedATCsTotalAmount = collect($this->appliedATCs)->sum('tax_amount');
     $vatInclusiveAmount = $this->vatablePurchase + $this->vatAmount;
-    $this->totalAmount = $vatInclusiveAmount - $this->appliedATCsTotalAmount;
+
+    // Add both vatable and non-vatable purchases to the total amount
+    $this->totalAmount = $vatInclusiveAmount + $this->nonVatablePurchase - $this->appliedATCsTotalAmount;
 }
+
 
     
     

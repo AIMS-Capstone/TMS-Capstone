@@ -1,7 +1,7 @@
 <div {{ $attributes->merge(['class' => 'md:flex md:flex-col md:gap-6 px-12 py-4']) }}>
     <div class="mt-5 md:mt-0">
         <form wire:submit="saveTransaction">
-            <div class="px-4 py-5 bg-white sm:p-6 shadow {{ isset($actions) ? 'sm:rounded-tl-md sm:rounded-tr-md' : 'sm:rounded-md' }}">
+            <div class="px-4 py-5 bg-white sm:p-6 shadow {{ isset($actions) ? 'sm:rounded-t-lg sm:rounded-b-lg' : 'sm:rounded-lg' }}">
                 <div>
                     <x-transaction-section-title>
                         <x-slot name="redirection">{{ $redirection }}</x-slot>
