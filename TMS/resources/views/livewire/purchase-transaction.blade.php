@@ -208,7 +208,7 @@ $('#select_contact').on('change', function() {
         let body = `
           <form wire:submit.prevent="savePurchase">
     <!-- Contact Information -->
-    <h2 class="text-xl font-bold mb-4">Contact Information</h2>
+    <h2 class="text-xl taxuri-color font-bold mb-4">Contact Information</h2>
     
     <div class="grid grid-cols-2 gap-4">
         <!-- Type (Corporation/Individual) -->
@@ -265,7 +265,7 @@ $('#select_contact').on('change', function() {
     </div>
 
     <!-- Default Tax Information -->
-    <h2 class="text-xl font-bold mb-4">Default Tax Information</h2>
+    <h2 class="text-xl taxuri-color font-bold mb-4">Default Tax Information</h2>
     <div class="grid grid-cols-2 gap-4">
         <!-- Revenue Section -->
         <div>
@@ -316,8 +316,8 @@ $('#select_contact').on('change', function() {
 
     <!-- Save Button -->
     <div class="mt-6">
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save</button>
-        <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded ml-2">Cancel</button>
+        <button type="submit" class="bg-blue-900 text-white px-4 py-2 rounded-lg">Save</button>
+        <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded-lg ml-2">Cancel</button>
     </div>
 </form>
 

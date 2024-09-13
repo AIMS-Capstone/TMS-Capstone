@@ -58,8 +58,9 @@
                 <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden">
                     <div class="py-2 px-2">
                         <span class="block px-4 py-2 text-sm font-bold text-gray-700">Sort by</span>
-                        <div onclick="sortItems('Recently Added')" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
-                        <div onclick="sortItems('Alphabetical')" class="block px-4 py-2 w-full text-sm hover-dropdown">Alphabetical</div>
+                        <div data-sort="recently-added" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
+                        <div data-sort="ascending" class="block px-4 py-2 w-full text-sm hover-dropdown">Ascending</div>
+                        <div data-sort="descending" class="block px-4 py-2 w-full text-sm hover-dropdown">Descending</div>
                     </div>
                 </div>
             </div>
@@ -101,116 +102,110 @@
     </div>
     <hr>
 
-<!-- Filtering Tab -->
-<div x-data="{
-    selectedTab: (new URL(window.location.href)).searchParams.get('type') || 'All',
-    checkAll: false,
-    init() {
-        // Update the selectedTab based on URL parameter when the component initializes
-        this.selectedTab = (new URL(window.location.href)).searchParams.get('type') || 'All';
-    }
-}" 
-x-init="init" 
-class="w-full p-5">
-<div @keydown.right.prevent="$focus.wrap().next()" 
-    @keydown.left.prevent="$focus.wrap().previous()" 
-    class="flex flex-row text-center gap-2 overflow-x-auto ps-8" 
-    role="tablist" 
-    aria-label="tab options">
-    
-    <!-- Tab 1: All -->
-    <button @click="selectedTab = 'All'; $dispatch('filter', { type: 'All' }); updateURL('All')"
-        :aria-selected="selectedTab === 'All'"
-        :tabindex="selectedTab === 'All' ? '0' : '-1'"
-        :class="selectedTab === 'All' 
-            ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg' 
-            : 'text-neutral-600 font-medium hover:text-sky-900'"
-        class="flex h-min items-center gap-2 px-4 py-2 text-sm"
-        type="button"
-        role="tab"
-        aria-controls="tabpanelAll">
-        All
-        <span :class="selectedTab === 'All'
-            ? 'text-white bg-sky-900'
-            : 'bg-slate-500 text-white'"
-            class="text-xs font-medium px-1 rounded-full">0</span>
-    </button>
-    
-    <!-- Tab 2: Sales -->
-    <button @click="selectedTab = 'Sales'; $dispatch('filter', { type: 'Sales' }); updateURL('Sales')"
-        :aria-selected="selectedTab === 'Sales'"
-        :tabindex="selectedTab === 'Sales' ? '0' : '-1'"
-        :class="selectedTab === 'Sales'
-            ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
-            : 'text-neutral-600 font-medium hover:text-sky-900'"
-        class="flex h-min items-center gap-2 px-4 py-2 text-sm"
-        type="button"
-        role="tab"
-        aria-controls="tabpanelSales">
-        Sales
-        <span :class="selectedTab === 'Sales'
-            ? 'text-white bg-sky-900'
-            : 'bg-slate-500 text-white'"
-            class="text-xs font-medium px-1 rounded-full">0</span>
-    </button>
-    
-    <!-- Tab 3: Purchases -->
-    <button @click="selectedTab = 'Purchases'; $dispatch('filter', { type: 'Purchases' }); updateURL('Purchases')"
-        :aria-selected="selectedTab === 'Purchases'"
-        :tabindex="selectedTab === 'Purchases' ? '0' : '-1'"
-        :class="selectedTab === 'Purchases'
-            ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
-            : 'text-neutral-600 font-medium hover:text-sky-900'"
-        class="flex h-min items-center gap-2 px-4 py-2 text-sm"
-        type="button"
-        role="tab"
-        aria-controls="tabpanelPurchases">
-        Purchases
-        <span :class="selectedTab === 'Purchases'
-            ? 'text-white bg-sky-900'
-            : 'bg-slate-500 text-white'"
-            class="text-xs font-medium px-1 rounded-full">0</span>
-    </button>
-    
-    <!-- Tab 4: Journal -->
-    <button @click="selectedTab = 'Journal'; $dispatch('filter', { type: 'Journal' }); updateURL('Journal')"
-        :aria-selected="selectedTab === 'Journal'"
-        :tabindex="selectedTab === 'Journal' ? '0' : '-1'"
-        :class="selectedTab === 'Journal'
-            ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
-            : 'text-neutral-600 font-medium hover:text-sky-900'"
-        class="flex h-min items-center gap-2 px-4 py-2 text-sm"
-        type="button"
-        role="tab"
-        aria-controls="tabpanelJournal">
-        Journal
-        <span :class="selectedTab === 'Journal'
-            ? 'text-white bg-sky-900'
-            : 'bg-slate-500 text-white'"
-            class="text-xs font-medium px-1 rounded-full">0</span>
-    </button>
-    
-    <!-- Tab 5: Archived -->
-    <button @click="selectedTab = 'Archived'; $dispatch('filter', { type: 'Archived' }); updateURL('Archived')"
-        :aria-selected="selectedTab === 'Archived'"
-        :tabindex="selectedTab === 'Archived' ? '0' : '-1'"
-        :class="selectedTab === 'Archived'
-            ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
-            : 'text-neutral-600 font-medium hover:text-sky-900'"
-        class="flex h-min items-center gap-2 px-4 py-2 text-sm"
-        type="button"
-        role="tab"
-        aria-controls="tabpanelArchived">
-        Archived
-        <span :class="selectedTab === 'Archived'
-            ? 'text-white bg-sky-900'
-            : 'bg-slate-500 text-white'"
-            class="text-xs font-medium px-1 rounded-full">0</span>
-    </button>
-</div>
-</div>
-
-
+    <!-- Filtering Tab -->
+    <div x-data="{
+        selectedTab: (new URL(window.location.href)).searchParams.get('type') || 'All',
+        checkAll: false,
+        init() {this.selectedTab = (new URL(window.location.href)).searchParams.get('type') || 'All'; }}" 
+        x-init="init" 
+        class="w-full p-5">
+        <div @keydown.right.prevent="$focus.wrap().next()" 
+            @keydown.left.prevent="$focus.wrap().previous()" 
+            class="flex flex-row text-center gap-2 overflow-x-auto ps-8" 
+            role="tablist" 
+            aria-label="tab options">
+            
+            <!-- Tab 1: All -->
+            <button @click="selectedTab = 'All'; $dispatch('filter', { type: 'All' }); updateURL('All')"
+                :aria-selected="selectedTab === 'All'"
+                :tabindex="selectedTab === 'All' ? '0' : '-1'"
+                :class="selectedTab === 'All' 
+                    ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg' 
+                    : 'text-neutral-600 font-medium hover:text-sky-900'"
+                class="flex h-min items-center gap-2 px-4 py-2 text-sm"
+                type="button"
+                role="tab"
+                aria-controls="tabpanelAll">
+                All
+                <span :class="selectedTab === 'All'
+                    ? 'text-white bg-sky-900'
+                    : 'bg-slate-500 text-white'"
+                    class="text-xs font-medium px-1 rounded-full">0</span>
+            </button>
+            
+            <!-- Tab 2: Sales -->
+            <button @click="selectedTab = 'Sales'; $dispatch('filter', { type: 'Sales' }); updateURL('Sales')"
+                :aria-selected="selectedTab === 'Sales'"
+                :tabindex="selectedTab === 'Sales' ? '0' : '-1'"
+                :class="selectedTab === 'Sales'
+                    ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
+                    : 'text-neutral-600 font-medium hover:text-sky-900'"
+                class="flex h-min items-center gap-2 px-4 py-2 text-sm"
+                type="button"
+                role="tab"
+                aria-controls="tabpanelSales">
+                Sales
+                <span :class="selectedTab === 'Sales'
+                    ? 'text-white bg-sky-900'
+                    : 'bg-slate-500 text-white'"
+                    class="text-xs font-medium px-1 rounded-full">0</span>
+            </button>
+            
+            <!-- Tab 3: Purchases -->
+            <button @click="selectedTab = 'Purchases'; $dispatch('filter', { type: 'Purchases' }); updateURL('Purchases')"
+                :aria-selected="selectedTab === 'Purchases'"
+                :tabindex="selectedTab === 'Purchases' ? '0' : '-1'"
+                :class="selectedTab === 'Purchases'
+                    ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
+                    : 'text-neutral-600 font-medium hover:text-sky-900'"
+                class="flex h-min items-center gap-2 px-4 py-2 text-sm"
+                type="button"
+                role="tab"
+                aria-controls="tabpanelPurchases">
+                Purchases
+                <span :class="selectedTab === 'Purchases'
+                    ? 'text-white bg-sky-900'
+                    : 'bg-slate-500 text-white'"
+                    class="text-xs font-medium px-1 rounded-full">0</span>
+            </button>
+            
+            <!-- Tab 4: Journal -->
+            <button @click="selectedTab = 'Journal'; $dispatch('filter', { type: 'Journal' }); updateURL('Journal')"
+                :aria-selected="selectedTab === 'Journal'"
+                :tabindex="selectedTab === 'Journal' ? '0' : '-1'"
+                :class="selectedTab === 'Journal'
+                    ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
+                    : 'text-neutral-600 font-medium hover:text-sky-900'"
+                class="flex h-min items-center gap-2 px-4 py-2 text-sm"
+                type="button"
+                role="tab"
+                aria-controls="tabpanelJournal">
+                Journal
+                <span :class="selectedTab === 'Journal'
+                    ? 'text-white bg-sky-900'
+                    : 'bg-slate-500 text-white'"
+                    class="text-xs font-medium px-1 rounded-full">0</span>
+            </button>
+            
+            <!-- Tab 5: Archived -->
+            <button @click="selectedTab = 'Archived'; $dispatch('filter', { type: 'Archived' }); updateURL('Archived')"
+                :aria-selected="selectedTab === 'Archived'"
+                :tabindex="selectedTab === 'Archived' ? '0' : '-1'"
+                :class="selectedTab === 'Archived'
+                    ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
+                    : 'text-neutral-600 font-medium hover:text-sky-900'"
+                class="flex h-min items-center gap-2 px-4 py-2 text-sm"
+                type="button"
+                role="tab"
+                aria-controls="tabpanelArchived">
+                Archived
+                <span :class="selectedTab === 'Archived'
+                    ? 'text-white bg-sky-900'
+                    : 'bg-slate-500 text-white'"
+                    class="text-xs font-medium px-1 rounded-full">0</span>
+            </button>
+        </div>
+    </div>
 
     <!-- Table -->
     <div x-data="{ checkAll: false, currentPage: 1, perPage: 5 }" class="mb-12 mx-12 overflow-hidden max-w-full border-neutral-300">
@@ -238,9 +233,7 @@ class="w-full p-5">
                 </thead>
                 <tbody class="divide-y divide-neutral-300">
                     <!-- Check if there is any data for the current page -->
-                    
                     @if($transactions && $transactions->count() > 0)
-          
                         @foreach ($transactions as $transaction)
                             <tr>
                                 <td class="p-4">
@@ -253,12 +246,14 @@ class="w-full p-5">
                                         </div>
                                     </label>
                                 </td>
-                                <td class="py-4 px-2">{{ $transaction->contactDetails->bus_name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2">{{$transaction ->date}}</td>
-                                <td class="py-4 px-2">{{$transaction ->inv_number}}</td>
-                                <td class="py-4 px-2">{{$transaction ->reference}}</td>
-                                <td class="py-4 px-2">{{$transaction ->vat_amount}}</td>
-                                <td class="py-4 px-2">{{$transaction ->transaction_type}}</td>
+                                {{-- <a href="{{ route('transactions/show', ['id' => $transaction->id]) }}"> --}}
+                                    <td class="py-4 px-2">{{ $transaction->contactDetails->bus_name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2">{{$transaction ->date}}</td>
+                                    <td class="py-4 px-2">{{$transaction ->inv_number}}</td>
+                                    <td class="py-4 px-2">{{$transaction ->reference}}</td>
+                                    <td class="py-4 px-2">{{$transaction ->vat_amount}}</td>
+                                    <td class="py-4 px-2">{{$transaction ->transaction_type}}</td>
+                                {{-- </a> --}}
                             </tr>                             
                         @endforeach
                     @else
@@ -270,7 +265,7 @@ class="w-full p-5">
                             </td>
                         </tr>
                     @endif
-                    <template x-if="data.slice((currentPage - 1) * perPage, currentPage * perPage).length > 0">
+                    {{-- <template x-if="data.slice((currentPage - 1) * perPage, currentPage * perPage).length > 0">
                         <template x-for="(item, index) in data.slice((currentPage - 1) * perPage, currentPage * perPage)" :key="index">
                             <tr>
                                 <td class="p-4">
@@ -290,7 +285,7 @@ class="w-full p-5">
                                 <td x-text="item.type">Type</td>
                             </tr>
                         </template>
-                    </template>
+                    </template> --}}
                     
                     <!-- Placeholder Image -->
                     <template x-if="data.slice((currentPage - 1) * perPage, currentPage * perPage).length === 0">
@@ -358,41 +353,68 @@ class="w-full p-5">
          });
      }
 
- document.addEventListener('DOMContentLoaded', function () {
-     const dropdownButton = document.getElementById('dropdownDefaultButton');
-     const dropdown = document.getElementById('dropdown');
+    document.addEventListener('DOMContentLoaded', function () {
+        const dropdownButton = document.getElementById('dropdownDefaultButton');
+        const dropdown = document.getElementById('dropdown');
 
-     dropdownButton.addEventListener('click', function () {
-         dropdown.classList.toggle('hidden');
-     });
-     document.addEventListener('click', function (event) {
-         if (!dropdownButton.contains(event.target) && !dropdown.contains(event.target)) {
-             dropdown.classList.add('hidden');
-         }
-     });
- });
+        dropdownButton.addEventListener('click', function () {
+            dropdown.classList.toggle('hidden');
+        });
+        document.addEventListener('click', function (event) {
+            if (!dropdownButton.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    });
 
- document.getElementById('sortButton').addEventListener('click', function() {
-     const dropdown = document.getElementById('dropdownMenu');
-     dropdown.classList.toggle('hidden');
- });
+    // FOR SORT BUTTON
+    document.getElementById('sortButton').addEventListener('click', function() {
+        const dropdown = document.getElementById('dropdownMenu');
+        dropdown.classList.toggle('hidden');
+    });
 
- function sortItems(option) {
-     document.getElementById('selectedOption').innerText = option;
-     console.log("Sorting by:", option);
-     // no sort yet, since no data
-     document.getElementById('dropdownMenu').classList.add('hidden');
- }
+    // FOR SORT BY
+    function sortItems(criteria) {
+        const table = document.querySelector('table tbody');
+        const rows = Array.from(table.querySelectorAll('tr'));
+        let sortedRows;
+        if (criteria === 'recently-added') {
+            // Sort by the order of rows (assuming they are in the order of addition)
+            sortedRows = rows.reverse();
+        } else {
+            // Sort by text content of the first column
+            sortedRows = rows.sort((a, b) => {
+                const aText = a.querySelector('td').textContent.trim().toLowerCase();
+                const bText = b.querySelector('td').textContent.trim().toLowerCase();
 
- document.getElementById('dropdownMenuIconButton').addEventListener('click', function() {
-     const dropdown = document.getElementById('dropdownDots');
-     dropdown.classList.toggle('hidden');
- });
+                if (criteria === 'ascending') {
+                    return aText.localeCompare(bText);
+                } else if (criteria === 'descending') {
+                    return bText.localeCompare(aText);
+                }
+            });
+        }
+        // Append sorted rows back to the table body
+        table.innerHTML = '';
+        sortedRows.forEach(row => table.appendChild(row));
+    }
+    // to sort options
+    document.querySelectorAll('#dropdownMenu div[data-sort]').forEach(item => {
+        item.addEventListener('click', function() {
+            const criteria = this.getAttribute('data-sort');
+            sortItems(criteria);
+        });
+    });
 
- function setEntries(entries) {
-     console.log(`Setting ${entries} entries per page`);
-     // no showing entries since no data yet
-     document.getElementById('dropdownDots').classList.add('hidden');
- }
+    document.getElementById('dropdownMenuIconButton').addEventListener('click', function() {
+        const dropdown = document.getElementById('dropdownDots');
+        dropdown.classList.toggle('hidden');
+    });
+
+    function setEntries(entries) {
+        console.log(`Setting ${entries} entries per page`);
+        // no showing entries since no data yet
+        document.getElementById('dropdownDots').classList.add('hidden');
+    }
  
 </script>

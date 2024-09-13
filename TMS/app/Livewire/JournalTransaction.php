@@ -84,6 +84,7 @@ class JournalTransaction extends Component
             'transaction_type' => 'Journal',
             'date' => $this->date,
             'reference' => $this->reference,
+            'total_amount' => $this -> totalAmount,
             'total_amount_debit' => $this->totalAmountDebit,
             'total_amount_credit' => $this->totalAmountCredit,
             'contact' => $this->selectedContact, // Optionally link a contact

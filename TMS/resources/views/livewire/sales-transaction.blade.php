@@ -231,7 +231,7 @@ $('#select_contact').on('change', function() {
                             </div>
                         </div>
                         <div class="mb-4">
-                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Add</button>
+                            <button type="submit" class="bg-blue-900 text-white px-4 py-2 rounded">Add</button>
                         </div>
                     </form>
                 `;

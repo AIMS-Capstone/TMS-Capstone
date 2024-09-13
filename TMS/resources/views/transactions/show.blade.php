@@ -49,6 +49,14 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                            <div class="mb-20 mt-10">
+                                <div class="flex justify-end">
+                                    <div class="mb-4 taxuri-color">
+                                        <strong>Total Amount Due:</strong> {{ number_format($transaction->total_amount_credit, 2) }} | {{ number_format($transaction->total_amount_debit, 2) }} 
+                             
+                                    </div>
+                                </div>
+                            </div>
                         @else
                             <!-- Tax Rows Table -->
                             {{-- <h3 class="text-xl font-semibold mb-4">Tax Rows</h3> --}}
@@ -78,14 +86,15 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                        @endif
-                        <div class="mb-20 mt-10">
-                            <div class="flex justify-end">
-                                <div class="mb-4 taxuri-color">
-                                    <strong>Total Amount Due:</strong> {{ number_format($transaction->total_amount, 2) }}
+                            <div class="mb-20 mt-10">
+                                <div class="flex justify-end">
+                                    <div class="mb-4 taxuri-color">
+                                        <strong>Total Amount Due:</strong> {{ number_format($transaction->total_amount, 2) }}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
+                 
                     </div>
                 </div>
             </div>
