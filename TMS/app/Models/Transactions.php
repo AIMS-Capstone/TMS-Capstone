@@ -13,5 +13,9 @@ class Transactions extends Model
     {
         return $this->hasMany(TaxRow::class, 'transaction_id');
     }
+    public function contactDetails()
+    {
+        return $this->belongsTo(Contacts::class, 'contact');
+    }
 
 }

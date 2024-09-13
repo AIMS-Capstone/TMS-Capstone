@@ -1,4 +1,5 @@
 <!-- Page Header -->
+@props(['transactions'])
 <div class="container mx-auto my-4 pt-6">
     <div class="px-10">
         <div class="flex flex-row w-64 items-start space-x-2">
@@ -226,7 +227,9 @@
                 </thead>
                 <tbody class="divide-y divide-neutral-300">
                     <!-- Check if there is any data for the current page -->
-                    {{-- @if (count($transactions) >0)
+                    
+                    @if($transactions && $transactions->count() > 0)
+          
                         @foreach ($transactions as $transaction)
                             <tr>
                                 <td class="p-4">
@@ -239,7 +242,7 @@
                                         </div>
                                     </label>
                                 </td>
-                                <td class="py-4 px-2">{{$transaction ->contact}}</td>
+                                <td class="py-4 px-2">{{ $transaction->contactDetails->bus_name ?? 'N/A' }}</td>
                                 <td class="py-4 px-2">{{$transaction ->date}}</td>
                                 <td class="py-4 px-2">{{$transaction ->inv_number}}</td>
                                 <td class="py-4 px-2">{{$transaction ->reference}}</td>
@@ -255,8 +258,8 @@
                                 <p class="text-sm text-neutral-500 mt-2">Start adding accounts with the <br> + button beside the import button.</p>
                             </td>
                         </tr>
-                    @endif --}}
-                    {{-- <template x-if="data.slice((currentPage - 1) * perPage, currentPage * perPage).length > 0">
+                    @endif
+                    <template x-if="data.slice((currentPage - 1) * perPage, currentPage * perPage).length > 0">
                         <template x-for="(item, index) in data.slice((currentPage - 1) * perPage, currentPage * perPage)" :key="index">
                             <tr>
                                 <td class="p-4">
@@ -287,12 +290,12 @@
                                 <p class="text-sm text-neutral-500 mt-2">Start adding transactions with the <br> + button at the top.</p>
                             </td>
                         </tr>
-                    </template>  --}}
+                    </template> 
                 </tbody>
-                {{-- {{ $transaction->links() }} --}}
+             
             </table>
             <nav aria-label="pagination">
-                <ul class="flex flex-shrink-0 items-center gap-2 text-sm font-medium mt-4">
+                {{-- <ul class="flex flex-shrink-0 items-center gap-2 text-sm font-medium mt-4">
                     <li>
                         <button @click="currentPage = Math.max(currentPage - 1, 1)" :disabled="currentPage === 1" class="flex items-center rounded-md p-1 text-neutral-600 hover:text-black" aria-label="previous page">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="size-6">
@@ -315,7 +318,8 @@
                             </svg>
                         </button>
                     </li>
-                </ul>
+                </ul> --}}
+                {{ $transactions->links() }}
             </nav>
         </div>
     </div>

@@ -47,9 +47,7 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    Route::get('/transactions', function () {
-        return view('transactions');
-    })->name('transactions');
+
 
     Route::get('/general-ledger', function () {
         return view('general-ledger');
@@ -77,6 +75,8 @@ Route::middleware([
     Route::post('org-setup', [OrgSetupController::class, 'store'])->name('OrgSetup.store');
 
     //Charts of Accounts routings
+     Route::get('/transactions', [TransactionsController::class, 'index'])->name('transactions');
+     
     Route::get('/coa', [CoaController::class, 'index'])->name('coa');
     Route::post('coa', [CoaController::class, 'store'])->name('coa.store');
 
