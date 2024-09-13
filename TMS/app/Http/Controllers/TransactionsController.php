@@ -19,10 +19,32 @@ class TransactionsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        //
+    public function index(Request $request) {
+        $search = $request->input('search');
+        $type = $request->input('type');
+    
+        $query = Transactions::with('contactDetails'); // Use new relationship name
+    
+        if ($search) {
+            $query->where(function ($query) use ($search) {
+                $query->whereHas('contactDetails', function ($query) use ($search) {
+                    $query->where('bus_name', 'like', "%{$search}%");
+                })
+                ->orWhere('inv_number', 'like', "%{$search}%")
+                ->orWhere('transaction_type', 'like', "%{$search}%");
+            });
+        }
+    
+        if ($type && $type !== 'All') {
+            $query->where('type', $type);
+        }
+    
+        $transactions = $query->paginate(4);
+    
+        return view('transactions', compact('transactions'));
     }
+    
+    
 
     /**
      * Show the form for creating a new resource.

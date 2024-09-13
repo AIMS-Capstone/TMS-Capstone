@@ -17,4 +17,8 @@ class Contacts extends Model
         'contact_city',
         'contact_zip',
     ];
+    public function transactions()
+    {
+        return $this->hasMany(Transactions::class, 'contact'); // Adjust 'contact_id' if different
+    }
 }
