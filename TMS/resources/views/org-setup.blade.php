@@ -188,13 +188,13 @@
                     </thead>
                     <tbody class="divide-y divide-zinc-200 text-sm text-zinc-700">
                         @if (count($orgsetups) >0)
-                            @foreach ($orgsetups as $orgsetup)
+                            @foreach ($orgsetups as $organization)
                         <tr>
-                            <td>{{$orgsetup ->registration_name}}</td>
-                            <td>{{$orgsetup ->tax_type}}</td>
-                            <td>{{$orgsetup ->type}}</td>
+                            <td>{{$organization ->registration_name}}</td>
+                            <td>{{$organization ->tax_type}}</td>
+                            <td>{{$organization ->type}}</td>
                                 <td class="text-left py-2 px-3 text-blue-600 underline">
-                                    <a href="{{ route('dashboard') }}">
+                                    <a href="{{ route('dashboard', ['orgId' => $organization->id]) }}">
                                         Open Organization
                                         <span><svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5" viewBox="0 0 24 24">
                                             <path fill="#2563eb" d="M17.92 11.62a1 1 0 0 0-.21-.33l-5-5a1 1 0 0 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1 1 0 0 0 0 1.42a1 1 0 0 0 1.42 0l5-5a1 1 0 0 0 .21-.33a1 1 0 0 0 0-.76"/>

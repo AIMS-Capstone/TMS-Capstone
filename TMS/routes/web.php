@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomVerificationController;
 use App\Http\Controllers\sendPasswordReset;
 use App\Http\Controllers\OrgSetupController;
+use App\Http\Controllers\DashboardController;
+
 
 Route::get('/', function () {
     return view('auth/login');
@@ -43,9 +45,10 @@ Route::middleware([
         return view('recycle-bin');
     })->name('recycle-bin');
 
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    //url base, ayaw gumana undefined yung {orgID} kahit na defined ko yon sa controller. Hindi ko alam bakit, pero nakikita yung id# sa bawat url nung directory if nag hover dun sa select organization.
+    Route::get('/dashboard/{orgId}', [DashboardController::class, 'show'])->name('dashboard');
+    //session base
+    //Route::get('/dashboard', [DashboardController::class, 'show])->middleware(EnsureOrganizationSelected);
 
 
 
