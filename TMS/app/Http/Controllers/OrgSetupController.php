@@ -6,6 +6,7 @@ use App\Models\OrgSetup;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class OrgSetupController extends Controller
 {
@@ -33,6 +34,16 @@ class OrgSetupController extends Controller
      * Show the form for creating a new resource.
      */
 
+     public function setOrganization(Request $request)
+     {
+         $request->validate([
+             'organization_id' => 'required|exists:org_setups,id',
+         ]);
+     
+         Session::put('organization_id', $request->organization_id);
+     
+         return redirect()->route('view_dashboard'); // Redirect to the dashboard or the intended page
+     }
     public function create(Request $request)
     {
 

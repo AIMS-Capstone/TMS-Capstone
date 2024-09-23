@@ -187,146 +187,38 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-200 text-sm text-zinc-700">
-                        @if (count($orgsetups) >0)
-                            @foreach ($orgsetups as $organization)
-                        <tr>
-                            <td>{{$organization ->registration_name}}</td>
-                            <td>{{$organization ->tax_type}}</td>
-                            <td>{{$organization ->type}}</td>
-                                <td class="text-left py-2 px-3 text-blue-600 underline">
-                                    <a href="{{ route('dashboard', ['orgId' => $organization->id]) }}">
-                                        Open Organization
-                                        <span><svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5" viewBox="0 0 24 24">
-                                            <path fill="#2563eb" d="M17.92 11.62a1 1 0 0 0-.21-.33l-5-5a1 1 0 0 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1 1 0 0 0 0 1.42a1 1 0 0 0 1.42 0l5-5a1 1 0 0 0 .21-.33a1 1 0 0 0 0-.76"/>
-                                        </svg></span>
-                                    </a>
-                                </td>
+                        @if (count($orgsetups) > 0)
+                        @foreach ($orgsetups as $organization)
+                            <tr>
+                                <form action="{{ route('org-dashboard') }}" method="POST" id="form-{{ $organization->id }}">
+                                    @csrf
+                                    <input type="hidden" name="organization_id" value="{{ $organization->id }}">
+                                    <td class="cursor-pointer" onclick="document.getElementById('form-{{ $organization->id }}').submit();">
+                                        {{ $organization->registration_name }}
+                                    </td>
+                                    <td>{{ $organization->tax_type }}</td>
+                                    <td>{{ $organization->type }}</td>
+                                    <td class="text-left py-2 px-3 text-blue-600 underline">
+                                        <button type="submit" class="text-blue-600 underline">Open Organization</button>
+                                    </td>
+                                    <td class="relative text-left py-2 px-3">
+                                        <button type="button" id="dropdownMenuAction" class="text-gray-500 hover:text-gray-700">
+                                            <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
+                                                <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
+                                            </svg>
+                                        </button>
+                                        <div id="dropdownAction" class="absolute right-0 z-10 hidden bg-white divide-gray-100 rounded-lg shadow-lg w-40 origin-top-right">
+                                            <div class="py-2 px-2 text-sm text-gray-700" aria-labelledby="dropdownMenuAction">
+                                                <span class="block px-4 py-2 text-sm font-bold text-gray-700 text-left">Action</span>
+                                                <div onclick="deleteOrganization('{{ $organization->id }}')" class="block px-4 py-2 w-full text-left hover-dropdown">Delete</div>
+                                            </div>
+                                        </div>
+                                    </td> 
+                                </form>
+                            </tr>
+                  
  
-                            {{-- <td class="text-left py-2 px-3">
-                                <div class="font-bold">Green Leaf Cafe</div>
-                                <div>123-456-789-012</div>
-                            </td>
-                            <td class="text-left py-2 px-3">Value-Added T   ax</td>
-                            <td class="text-left py-2 px-3">Non-Individual</td>
-                            <td class="text-left py-2 px-3 text-blue-600 underline">
-                                <a href="#">Open Organization
-                                    <span><svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5" viewBox="0 0 24 24">
-                                        <path fill="#2563eb" d="M17.92 11.62a1 1 0 0 0-.21-.33l-5-5a1 1 0 0 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1 1 0 0 0 0 1.42a1 1 0 0 0 1.42 0l5-5a1 1 0 0 0 .21-.33a1 1 0 0 0 0-.76"/></svg>
-                                    </span>
-                                </a>
-                            </td>
-                            <td class="relative text-left py-2 px-3">
-                                <button id="dropdownMenuAction" class="text-gray-500 hover:text-gray-700">
-                                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
-                                        <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
-                                    </svg>
-                                </button>
-                                <div id="dropdownAction" class="absolute right-0 z-10 hidden bg-white divide-gray-100 rounded-lg shadow-lg w-40 origin-top-right">
-                                    <div class="py-2 px-2 text-sm text-gray-700" aria-labelledby="dropdownMenuAction">
-                                        <span class="block px-4 py-2 text-sm font-bold text-gray-700 text-left">Action</span>
-                                        <div onclick="action()" class="block px-4 py-2 w-full text-left hover-dropdown">Delete</div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="text-left py-2 px-3">
-                                <div class="font-bold">GreenTech Innovations</div>
-                                <div>987-654-321-098</div>
-                            </td>
-                            <td class="text-left py-2 px-3">Value-Added Tax</td>
-                            <td class="text-left py-2 px-3">Non-Individual</td>
-                            <td class="text-left py-2 px-3 text-blue-600 underline">
-                                <a href="#">Open Organization
-                                    <span><svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5" viewBox="0 0 24 24">
-                                        <path fill="#2563eb" d="M17.92 11.62a1 1 0 0 0-.21-.33l-5-5a1 1 0 0 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1 1 0 0 0 0 1.42a1 1 0 0 0 1.42 0l5-5a1 1 0 0 0 .21-.33a1 1 0 0 0 0-.76"/></svg>
-                                    </span>
-                                </a>
-                            </td>
-                            <td class="relative text-left py-2 px-3">
-                                <button id="dropdownMenuAction" class="text-gray-500 hover:text-gray-700">
-                                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
-                                        <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
-                                    </svg>
-                                </button>
-                                <div id="dropdownAction" class="absolute right-0 z-10 hidden bg-white divide-gray-100 rounded-lg shadow-lg w-40 origin-top-right">
-                                    <div class="py-2 px-2 text-sm text-gray-700" aria-labelledby="dropdownMenuAction">
-                                        <span class="block px-4 py-2 text-sm font-bold text-gray-700 text-left">Action</span>
-                                        <div onclick="action()" class="block px-4 py-2 w-full text-left hover-dropdown">Delete</div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="text-left py-2 px-3">
-                                <div class="font-bold">Luis Martinez</div>
-                                <div>345-678-901-222</div>
-                            </td>
-                            <td class="text-left py-2 px-3">Percentage Tax</td>
-                            <td class="text-left py-2 px-3">Individual</td>
-                            <td class="text-left py-2 px-3 text-blue-600 underline">
-                                <a href="#">Open Organization
-                                    <span><svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5" viewBox="0 0 24 24">
-                                        <path fill="#2563eb" d="M17.92 11.62a1 1 0 0 0-.21-.33l-5-5a1 1 0 0 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1 1 0 0 0 0 1.42a1 1 0 0 0 1.42 0l5-5a1 1 0 0 0 .21-.33a1 1 0 0 0 0-.76"/></svg>
-                                    </span>
-                                </a>
-                            </td>
-                            <td class="relative text-left py-2 px-3">
-                                <button id="dropdownMenuAction" class="text-gray-500 hover:text-gray-700">
-                                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
-                                        <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
-                                    </svg>
-                                </button>
-                                <div id="dropdownAction" class="absolute right-0 z-10 hidden bg-white divide-gray-100 rounded-lg shadow-lg w-40 origin-top-right">
-                                    <div class="py-2 px-2 text-sm text-gray-700" aria-labelledby="dropdownMenuAction">
-                                        <span class="block px-4 py-2 text-sm font-bold text-gray-700 text-left">Action</span>
-                                        <div onclick="action()" class="block px-4 py-2 w-full text-left hover-dropdown">Delete</div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="text-left py-2 px-3">
-                                <div class="font-bold">Urban Fashion Boutique</div>
-                                <div>567-890-123-999</div>
-                            </td>
-                            <td class="text-left py-2 px-3">Percentage Tax</td>
-                            <td class="text-left py-2 px-3">Non-Individual</td>
-                            <td class="text-left py-2 px-3 text-blue-600 underline">
-                                <a href="#">Open Organization
-                                    <span><svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5" viewBox="0 0 24 24">
-                                        <path fill="#2563eb" d="M17.92 11.62a1 1 0 0 0-.21-.33l-5-5a1 1 0 0 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1 1 0 0 0 0 1.42a1 1 0 0 0 1.42 0l5-5a1 1 0 0 0 .21-.33a1 1 0 0 0 0-.76"/></svg>
-                                    </span>
-                                </a>
-                            </td>
-                            <td class="relative text-left py-2 px-3">
-                                <button id="dropdownMenuAction" class="text-gray-500 hover:text-gray-700">
-                                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
-                                        <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
-                                    </svg>
-                                </button>
-                                <div id="dropdownAction" class="absolute right-0 z-10 hidden bg-white divide-gray-100 rounded-lg shadow-lg w-40 origin-top-right">
-                                    <div class="py-2 px-2 text-sm text-gray-700" aria-labelledby="dropdownMenuAction">
-                                        <span class="block px-4 py-2 text-sm font-bold text-gray-700 text-left">Action</span>
-                                        <div onclick="action()" class="block px-4 py-2 w-full text-left hover-dropdown">Delete</div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="text-left py-2 px-3">
-                                <div class="font-bold">Flower Fashion Boutique</div>
-                                <div>567-890-123-999</div>
-                            </td>
-                            <td class="text-left py-2 px-3">Percentage Tax</td>
-                            <td class="text-left py-2 px-3">Non-Individual</td>
-                            <td class="text-left py-2 px-3 text-blue-600 underline">
-                                <a href="#">Open Organization
-                                    <span><svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5" viewBox="0 0 24 24">
-                                        <path fill="#2563eb" d="M17.92 11.62a1 1 0 0 0-.21-.33l-5-5a1 1 0 0 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1 1 0 0 0 0 1.42a1 1 0 0 0 1.42 0l5-5a1 1 0 0 0 .21-.33a1 1 0 0 0 0-.76"/></svg>
-                                    </span>
-                                </a>
-                            </td> --}}
+                       
                             <td class="relative text-left py-2 px-3">
                                 <button id="dropdownMenuAction" class="text-gray-500 hover:text-gray-700">
                                     <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
