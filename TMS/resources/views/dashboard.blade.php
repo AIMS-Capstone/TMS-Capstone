@@ -1,4 +1,8 @@
 <x-app-layout>
+    @php
+    $organizationId = session('organization_id');
+    $organization = \App\Models\OrgSetup::find($organizationId);
+@endphp
     <div class="h-full bg-blue-900 p-10 mx-auto sm:px-6 lg:px-8">
     <div class="relative">
         <h1 class="text-amber-400 text-3xl font-bold">{{ $organization->registration_name }}</h1>
