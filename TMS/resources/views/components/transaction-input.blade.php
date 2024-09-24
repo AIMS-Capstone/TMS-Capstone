@@ -8,13 +8,15 @@
                     placeholder:text-gray-400 
                     placeholder:font-light 
                     placeholder:text-sm 
-                    focus:border-slate-500 
-                    focus:ring-slate-500 
+                    focus:outline-none
+                    focus:ring-0
+                    focus:border-blue-900 
+                    focus:ring-blue-900 
                     p-0
                     border-0
-                   border-b
+                    border-b
                    
-                   border-b-gray-200
+                    border-b-gray-200
                      ' . ($disabled ? 'bg-gray-200 cursor-not-allowed' : '')
     ]) !!}
     {{ $disabled ? 'disabled' : '' }}

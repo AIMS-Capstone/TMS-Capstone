@@ -127,10 +127,10 @@
                 role="tab"
                 aria-controls="tabpanelAll">
                 All
-                <span :class="selectedTab === 'All'
+                {{-- <span :class="selectedTab === 'All'
                     ? 'text-white bg-sky-900'
                     : 'bg-slate-500 text-white'"
-                    class="text-xs font-medium px-1 rounded-full">0</span>
+                    class="text-xs font-medium px-1 rounded-full"></span> --}}
             </button>
             
             <!-- Tab 2: Sales -->
@@ -145,17 +145,17 @@
                 role="tab"
                 aria-controls="tabpanelSales">
                 Sales
-                <span :class="selectedTab === 'Sales'
+                {{-- <span :class="selectedTab === 'Sales'
                     ? 'text-white bg-sky-900'
                     : 'bg-slate-500 text-white'"
-                    class="text-xs font-medium px-1 rounded-full">0</span>
+                    class="text-xs font-medium px-1 rounded-full"></span> --}}
             </button>
             
             <!-- Tab 3: Purchases -->
-            <button @click="selectedTab = 'Purchases'; $dispatch('filter', { type: 'Purchases' }); updateURL('Purchases')"
-                :aria-selected="selectedTab === 'Purchases'"
-                :tabindex="selectedTab === 'Purchases' ? '0' : '-1'"
-                :class="selectedTab === 'Purchases'
+            <button @click="selectedTab = 'Purchase'; $dispatch('filter', { type: 'Purchase' }); updateURL('Purchase')"
+                :aria-selected="selectedTab === 'Purchase'"
+                :tabindex="selectedTab === 'Purchase' ? '0' : '-1'"
+                :class="selectedTab === 'Purchase'
                     ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
                     : 'text-neutral-600 font-medium hover:text-sky-900'"
                 class="flex h-min items-center gap-2 px-4 py-2 text-sm"
@@ -163,10 +163,10 @@
                 role="tab"
                 aria-controls="tabpanelPurchases">
                 Purchases
-                <span :class="selectedTab === 'Purchases'
+                {{-- <span :class="selectedTab === 'Purchases'
                     ? 'text-white bg-sky-900'
                     : 'bg-slate-500 text-white'"
-                    class="text-xs font-medium px-1 rounded-full">0</span>
+                    class="text-xs font-medium px-1 rounded-full">0</span> --}}
             </button>
             
             <!-- Tab 4: Journal -->
@@ -181,28 +181,10 @@
                 role="tab"
                 aria-controls="tabpanelJournal">
                 Journal
-                <span :class="selectedTab === 'Journal'
+                {{-- <span :class="selectedTab === 'Journal'
                     ? 'text-white bg-sky-900'
                     : 'bg-slate-500 text-white'"
-                    class="text-xs font-medium px-1 rounded-full">0</span>
-            </button>
-            
-            <!-- Tab 5: Archived -->
-            <button @click="selectedTab = 'Archived'; $dispatch('filter', { type: 'Archived' }); updateURL('Archived')"
-                :aria-selected="selectedTab === 'Archived'"
-                :tabindex="selectedTab === 'Archived' ? '0' : '-1'"
-                :class="selectedTab === 'Archived'
-                    ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
-                    : 'text-neutral-600 font-medium hover:text-sky-900'"
-                class="flex h-min items-center gap-2 px-4 py-2 text-sm"
-                type="button"
-                role="tab"
-                aria-controls="tabpanelArchived">
-                Archived
-                <span :class="selectedTab === 'Archived'
-                    ? 'text-white bg-sky-900'
-                    : 'bg-slate-500 text-white'"
-                    class="text-xs font-medium px-1 rounded-full">0</span>
+                    class="text-xs font-medium px-1 rounded-full">0</span> --}}
             </button>
         </div>
     </div>
@@ -246,7 +228,7 @@
                                         </div>
                                     </label>
                                 </td>
-                                {{-- <a href="{{ route('transactions/show', ['id' => $transaction->id]) }}"> --}}
+                                {{-- <a href="{{ route('transactions/?', ['id' => $transaction->id]) }}"> --}}
                                     <td class="py-4 px-2">{{ $transaction->contactDetails->bus_name ?? 'N/A' }}</td>
                                     <td class="py-4 px-2">{{$transaction ->date}}</td>
                                     <td class="py-4 px-2">{{$transaction ->inv_number}}</td>
@@ -260,8 +242,8 @@
                         <tr>
                             <td colspan="6" class="text-center p-4">
                                 <img src="{{ asset('images/Wallet 02.png') }}" alt="No data available" class="mx-auto" />
-                                <h1 class="font-bold mt-2">No Charts of accounts yet</h1>
-                                <p class="text-sm text-neutral-500 mt-2">Start adding accounts with the <br> + button beside the import button.</p>
+                                <h1 class="font-bold mt-2">No Transactions yet</h1>
+                                <p class="text-sm text-neutral-500 mt-2">Start adding transactions with the <br> + Add Transaction button.</p>
                             </td>
                         </tr>
                     @endif

@@ -1,15 +1,13 @@
-
 <div class="form-group">
     <select 
- 
-
         name="{{ $name }}" 
         class="select2 {{ $class }} mr-2" 
         id="{{ $id }}"
-
-
         @if($isGrouped) data-grouped="true" @endif
     >
+        <!-- Default empty option -->
+        <option value="" disabled selected>Select Customer</option>
+
         @foreach($options as $option)
             @if($isGrouped && isset($option['label']))
                 <optgroup label="{{ $option['label'] }}">
@@ -35,4 +33,3 @@
         @endforeach
     </select>
 </div>
-

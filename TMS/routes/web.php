@@ -36,7 +36,6 @@ Route::get('/register-success-page', function () {
     return view('components/register-success-page');
 })->name('register-success-page');
 
-
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -47,6 +46,7 @@ Route::middleware([
     })->name('recycle-bin');
 
     //url base, ayaw gumana undefined yung {orgID} kahit na defined ko yon sa controller. Hindi ko alam bakit, pero nakikita yung id# sa bawat url nung directory if nag hover dun sa select organization.
+    Route::get('/dashboard/{orgId}', [DashboardController::class, 'show'])->name('dashboard');
     Route::get('/dashboard', [OrgSetupController::class, 'index'])->name('dashboard');
     Route::post('/org-dashboard', [OrgSetupController::class, 'setOrganization'])->name('org-dashboard');
     Route::get('/view_dashboard', function() {
@@ -86,7 +86,7 @@ Route::middleware([
 
     //Charts of Accounts routings
      Route::get('/transactions', [TransactionsController::class, 'index'])->name('transactions');
-     
+
     Route::get('/coa', [CoaController::class, 'index'])->name('coa');
     Route::post('coa', [CoaController::class, 'store'])->name('coa.store');
 
@@ -97,7 +97,7 @@ Route::middleware([
     Route::get('/predictive-analytics', function () {
         return view('predictive-analytics');
     })->name('predictive-analytics');
-    
+
     Route::get('/add-user', function () {
         return view('add-user');
     })->name('add-user');

@@ -22,7 +22,7 @@
                 <!-- Customer Select -->
                 <div class="mt-5 mb-8 ml-10">
                     <label for="select-contact" class="block font-bold text-sm text-blue-900">Customer</label>
-                    <div class="mt-1">
+                    <div class="mt-2">
                         <livewire:select-input
                             name="select_contact"
                             labelKey="name"
@@ -55,7 +55,7 @@
                 <!-- Total Amount Field -->
                 <div class="col-span-1 bg-blue-50 p-4 rounded-tr-sm">
                     <x-transaction-label for="total_amount" :value="__('Total Amount')" />
-                    <x-transaction-input id="total_amount" type="text" class="mt-1 block w-full bg-white border-0" value="{{ $totalAmount }}" wire:model.defer="total_amount" readonly />
+                    <x-transaction-input id="total_amount" type="text" class="font-bold text-blue-900 mt-1 block w-full" value="{{ $totalAmount }}" wire:model.defer="total_amount" readonly />
                 </div>
             </div>
     
@@ -193,51 +193,74 @@
 $('#select_contact').on('change', function() {
         $wire.set('selectedContact', $(this).val()); // Update Livewire component
     });
-
-    
-
-            // Add a click event listener for the "Use it anyway" button
-            $(document).on('click', '.use-anyway-btn', function(e) {
-                e.preventDefault(); // Prevent default action
-                let title = 'New Contact';
-                let body = `
-                    <form wire:submit.prevent="save">
-                        <div class="grid grid-cols-3">
-                            <div class="mb-4 col-span-1 mr-2">
-                                <label for="contact_type" class="block text-gray-700 ">Contact Type</label>
-                                <input type="text" id="contact_type" wire:model.defer="newContact.contact_type" name="contact_type" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-                            </div>
-                            <div class="mb-4 col-span-2">
-                                <label for="contact_tin" class="block text-gray-700">Tax Identification Number</label>
-                                <input type="text" id="contact_tin" wire:model.defer="newContact.contact_tin" name="contact_tin" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-                            </div>
+        // Add a click event listener for the "Use it anyway" button
+        $(document).on('click', '.use-anyway-btn', function(e) {
+            e.preventDefault(); // Prevent default action
+            let title = 'Add New Contact';
+            let body = `
+                <form wire:submit.prevent="save" class="p-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="mb-4">
+                            <label for="contact_type" class="block text-gray-700 font-semibold">Contact Type<span class="text-red-500">*</span></label>
+                            <select id="contact_type" wire:model.defer="newContact.contact_type" name="contact_type" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
+                                <option value="" class="text-gray-500"disabled selected>Contact Type</option>
+                                <option class="hover:bg-blue-100 hover:text-blue-950 hover:font-bold hover:rounded-full">Individual</option>
+                                <option class="hover:bg-blue-100 hover:text-blue-950 hover:font-bold hover:rounded-full">Non-Individual</option>
+                            </select>
                         </div>
-                        <div class="mb-4 col-span-2">
-                            <label for="bus_name" class="block text-gray-700">Name</label>
-                            <input type="text" id="bus_name" wire:model.defer="newContact.bus_name" name="bus_name" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
+
+                        <div class="mb-4">
+                            <label for="contact_tin" class="block text-gray-700 font-semibold">Tax Identification Number (TIN)<span class="text-red-500">*</span></label>
+                            <input type="text" id="contact_tin" wire:model.defer="newContact.contact_tin" name="contact_tin" class="block w-full py-2 px-0 text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" placeholder="000-000-000-000">
                         </div>
-                        <div class="grid grid-cols-3">
-                            <div class="mb-4 col-span-1 mr-2">
-                                <label for="contact_address" class="block text-gray-700">Address</label>
-                                <input type="text" id="contact_address" wire:model.defer="newContact.contact_address" name="contact_address" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-                            </div>
-                            <div class="mb-4 col-span-1 mr-2">
-                                <label for="contact_city" class="block text-gray-700">City</label>
-                                <input type="text" id="contact_city" wire:model.defer="newContact.contact_city" name="contact_city" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-                            </div>
-                            <div class="mb-4 col-span-1">
-                                <label for="contact_zip" class="block text-gray-700">Zip</label>
-                                <input type="text" id="contact_zip" wire:model.defer="newContact.contact_zip" name="contact_zip" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-                            </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="bus_name" class="block text-gray-700 font-semibold">Name<span class="text-red-500">*</span></label>
+                        <input type="text" id="bus_name" wire:model.defer="newContact.bus_name" name="bus_name" class="block w-full py-2 px-0 text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" placeholder="Customer Name">
+                    </div>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="mb-4">
+                            <label for="contact_address" class="block text-gray-700 font-semibold">Address<span class="text-red-500">*</span></label>
+                            <input type="text" id="contact_address" wire:model.defer="newContact.contact_address" name="contact_address" class="block w-full py-2 px-0 text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" placeholder="Address">
                         </div>
                         <div class="mb-4">
-                            <button type="submit" class="bg-blue-900 text-white px-4 py-2 rounded">Add</button>
+                            <label for="contact_city" class="block text-gray-700 font-semibold">City<span class="text-red-500">*</span></label>
+                            <input type="text" id="contact_city" wire:model.defer="newContact.contact_city" name="contact_city" class="block w-full py-2 px-0 text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" placeholder="City">
                         </div>
-                    </form>
-                `;
-                $wire.dispatch('triggerModal', { title, body }); // Trigger the modal from Livewire
-            });
+                        <div class="mb-4">
+                            <label for="contact_zip" class="block text-gray-700 font-semibold">Zip Code<span class="text-red-500">*</span></label>
+                            <input type="text" id="contact_zip" wire:model.defer="newContact.contact_zip" name="contact_zip" class="block w-full py-2 px-0 text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" placeholder="e.g 1446" maxlength="4">
+                        </div>
+                    </div>
+                    <div class="flex justify-end items-center mt-6 gap-4">
+                        <button type="button" class="text-gray-600 font-semibold" wire:click="closeModal">Cancel</button>
+                        <button type="submit" class="bg-blue-900 text-white py-2 px-6 font-bold text-md rounded-lg">Save</button>
+                    </div>
+                </form>
+            `;
+            $wire.dispatch('triggerModal', { title, body }); // Trigger the modal from Livewire
         });
+    });
 
     </script>
 @endscript
+{{-- <div x-data="{ open: false, selected: 'Non-Individual', options: ['Individual', 'Non-Individual'] }" class="relative mb-4">
+    <label for="contact_type" class="block text-gray-700 font-semibold">Contact Type<span class="text-red-500">*</span></label>
+    <!-- Dropdown button -->
+    <div @click="open = !open" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 cursor-pointer">
+        <span x-text="selected"></span>
+        <svg class="w-5 h-5 inline float-right" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+        </svg>
+    </div>
+    <!-- Dropdown options -->
+    <div x-show="open" @click.outside="open = false" class="absolute w-48 px-2 py-2 mt-4 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+        <template x-for="option in options" :key="option">
+            <div @click="selected = option; open = false"
+                class="block px-4 py-2 mt-1 text-sm text-neutral-700 cursor-pointer hover:bg-blue-100 hover:text-blue-950 hover:font-bold hover:rounded-full"
+                :class="selected === option ? 'bg-blue-100 text-blue-900 font-bold rounded-full' : ''">
+                <span x-text="option"></span>
+            </div>
+        </template>
+    </div>
+</div> --}}

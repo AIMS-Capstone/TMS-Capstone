@@ -204,7 +204,7 @@ $('#select_contact').on('change', function() {
     // Add a click event listener for the "Use it anyway" button
     $(document).on('click', '.use-anyway-btn', function(e) {
         e.preventDefault(); // Prevent default action
-        let title = 'New Contact';
+        let title = 'Add New Contact';
         let body = `
           <form wire:submit.prevent="savePurchase">
     <!-- Contact Information -->

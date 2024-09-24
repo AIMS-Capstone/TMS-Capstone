@@ -60,7 +60,7 @@
                             <button @click="open = !open" type="button"
                                 :class="{
                                     'flex items-center w-full p-2 text-[14px] ease-in transition-all duration-500 rounded-r-full hover:font-bold px-6 py-2 group': true,
-                                    'text-blue-950 bg-slate-100 border-l-[8px] border-blue-950 font-bold': open,
+                                    'text-blue-950 bg-slate-100 border-l-[8px] border-blue-900 font-bold': open,
                                     'text-gray-950 dark:text-white': !open
                                 }">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0 sidebar-icon ease-in transition-all"
@@ -68,9 +68,9 @@
                                 aria-hidden="true" viewBox="0 0 24 24"><g fill="#273C75"><path d="m12 2l.117.007a1 1 0 0 1 .876.876L13 3v4l.005.15a2 2 0 0 0 1.838 1.844L15 9h4l.117.007a1 1 0 0 1 .876.876L20 10v9a3 3 0 0 1-2.824 2.995L17 22H7a3 3 0 0 1-2.995-2.824L4 19V5a3 3 0 0 1 2.824-2.995L7 2z"/><path d="M19 7h-4l-.001-4.001z"/></g></svg>
                                 <span class="flex-1 ms-3 text-left rtl:text-right text-blue-950 whitespace-nowrap">Tax Return</span>
                                 <div class="flex justify-end pl-4">
-                                    <svg :class="open ? 'transform rotate-0' : 'transform rotate-[-90deg]'" class="w-2.5 h-2.5 border-blue-950 transition-transform duration-200"
+                                    <svg :class="open ? 'transform rotate-0' : 'transform rotate-[-90deg]'" class="w-2.5 h-2.5 border-blue-900 transition-transform duration-200"
                                         aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        <path stroke="#273C75" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="m1 1 4 4 4-4"/>
                                     </svg>
                                 </div>
@@ -107,7 +107,7 @@
                             <button @click="open = !open" type="button"
                                 :class="{
                                     'flex items-center w-full p-2 text-[14px] ease-in transition-all duration-500 rounded-r-full hover:font-bold px-6 py-2 group': true,
-                                    'text-blue-950 bg-slate-100 border-l-[8px] border-blue-950 font-bold': open,
+                                    'text-blue-950 bg-slate-100 border-l-[8px] border-blue-900 font-bold': open,
                                     'text-gray-950 dark:text-white': !open
                                 }">
                                 <svg xmlns="http://www.w3.org/2000/svg"class="flex-shrink-0 sidebar-icon ease-in transition-all"
@@ -115,9 +115,9 @@
                                 aria-hidden="true" viewBox="0 0 36 36"><path fill="#273C75" d="M10 5.2h18v1.55H10z" class="clr-i-solid clr-i-solid-path-1"/><path fill="#273C75" d="M29 8H9.86A1.89 1.89 0 0 1 8 6a2 2 0 0 1 1.86-2H29a1 1 0 1 0 0-2H9.86A4 4 0 0 0 6 6a4 4 0 0 0 0 .49a1 1 0 0 0 0 .24V30a4 4 0 0 0 3.86 4H29a1 1 0 0 0 1-1V9.07A1.07 1.07 0 0 0 29 8" class="clr-i-solid clr-i-solid-path-2"/><path fill="none" d="M0 0h36v36H0z"/></svg>
                                 <span class="flex-1 ms-3 text-left rtl:text-right text-blue-950 whitespace-nowrap">Books of Accounts</span>
                                 <div class="flex justify-end pl-4">
-                                    <svg :class="open ? 'transform rotate-0' : 'transform rotate-[-90deg]'" class="w-2.5 h-2.5 border-blue-950 transition-transform duration-200"
+                                    <svg :class="open ? 'transform rotate-0' : 'transform rotate-[-90deg]'" class="w-2.5 h-2.5 border-blue-900 transition-transform duration-200"
                                         aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        <path stroke="#273C75" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="m1 1 4 4 4-4"/>
                                     </svg>
                                 </div>

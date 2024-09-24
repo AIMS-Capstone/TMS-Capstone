@@ -2,10 +2,10 @@
     @if($showModal)
         <div class="fixed inset-0 flex items-center justify-center z-50">
             <div class="modal-overlay absolute inset-0 bg-gray-500 opacity-75"></div>
-            <div class="modal-container bg-white w-full max-w-3xl mx-auto rounded-lg shadow-lg z-50 overflow-y-auto">
-                <div class="modal-header bg-blue-900 text-white flex items-center justify-between p-4 border-b">
-                    <h2 class="text-lg font-semibold">{{ $title }}</h2>
-                    <button class="text-white" wire:click="closeModal">&times;</button>
+            <div class="modal-container bg-white w-full max-w-2xl mx-auto rounded-lg shadow-lg z-50 overflow-y-auto">
+                <div class="modal-header bg-blue-900 text-white flex items-center justify-center p-4 border-b relative">
+                    <h2 class="text-lg font-semibold mx-auto">{{ $title }}</h2>
+                    <button class="text-white absolute right-4 top-1/2 transform -translate-y-1/2" wire:click="closeModal">&times;</button>
                 </div>
                 <div class="modal-body p-4">
                     {!! $body !!}
