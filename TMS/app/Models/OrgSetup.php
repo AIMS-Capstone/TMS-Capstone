@@ -16,6 +16,7 @@ class OrgSetup extends Model
         'line_of_business',
         'address_line',
         'region',
+        'province',
         'city',
         'zip_code',
         'contact_number',
@@ -27,4 +28,9 @@ class OrgSetup extends Model
         'start_date',
         'financial_year_end'
     ];
+    
+    public function rdo()
+    {
+        return $this->belongsTo(RDO::class);
+    }
 }

@@ -3,7 +3,9 @@
     x-show="show"
     x-on:open-add-modal.window="show = true"
     x-on:close-modal.window="show = false"
-    class="fixed z-50 inset-0 flex items-center justify-center m-2">
+    class="fixed z-50 inset-0 flex items-center justify-center m-2"
+    x-cloak
+    >
     <!-- Modal background -->
     <div class="fixed inset-0 bg-gray-300 opacity-60"></div>
 

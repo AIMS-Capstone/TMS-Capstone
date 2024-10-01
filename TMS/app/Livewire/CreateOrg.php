@@ -24,12 +24,14 @@ public $title;
     {
             //  Validate the request data
         $validatedData = $this->validate([
-            'type' => 'required|in:non-individual,individual',
+            'type' => 'required|in:Non-individual,Individual',
             'registration_name' => 'required|string|max:255',
             'line_of_business' => 'required|string|max:255',
             'address_line' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            
+            'region' => 'required|string|max:255',
+            'province' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:10',
             'contact_number' => 'required|string|max:20',
             'email' => 'required|email|max:255',
             'tin' => 'required|string|max:20',

@@ -19,12 +19,13 @@ return new class extends Migration
             $table->string('line_of_business');
             $table->string('address_line');  
             $table->string('region');  
+            $table->string('province');
             $table->string('city');    
             $table->string('zip_code'); 
             $table->string('contact_number');
             $table->string('email');
             $table->string('tin');
-            $table->string('rdo');
+            $table->foreignId('rdo')->nullable()->constrained('rdos')->nullOnDelete();
             $table->string('tax_type');
             $table->date('registration_date');
             $table->date('start_date');

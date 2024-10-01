@@ -61,6 +61,7 @@ class OrgSetupController extends Controller
             'line_of_business' => 'required|string|max:255',
             'address_line' => 'required|string|max:255',
             'region' => 'required|string|max:255',
+            'province' => 'required|string|max:255',
             'city' => 'required|string|max:255',
             'zip_code' => 'required|string|max:10',
             'contact_number' => 'required|string|max:20',

@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             ContactsSeeder::class,
             TaxTypeSeeder::class,
             AtcSeeder::class,
+            RdoSeeder::class,
 
 
         ]);
