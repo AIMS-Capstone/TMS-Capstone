@@ -18,11 +18,12 @@
 
         <!-- Modal body -->
         <div class="pt-4 px-3 mx-10 space-y-3">
-            <form id="addAccountForm" action="{{ route('coa.store') }}" method="POST">
+            <form id="addAccountForm" action="{{ route('coa.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf   
 
                 <!-- Account Type -->
                 <div class="mb-3">
+                    <input type="hidden" name="submit_action" value="manual">
                     <label for="type" class="block font-semibold text-sm text-gray-700">
                         Account Type <span class="text-red-500">*</span>
                     </label>

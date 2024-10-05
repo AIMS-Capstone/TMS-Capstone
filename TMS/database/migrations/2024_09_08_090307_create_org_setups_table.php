@@ -14,7 +14,8 @@ return new class extends Migration
     {
         Schema::create('org_setups', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['non-individual', 'individual']);
+$table->enum('type', ['Non-individual', 'Individual']);
+
             $table->string('registration_name');
             $table->string('line_of_business');
             $table->string('address_line');  
@@ -26,7 +27,8 @@ return new class extends Migration
             $table->string('email');
             $table->string('tin');
             $table->foreignId('rdo')->nullable()->constrained('rdos')->nullOnDelete();
-            $table->string('tax_type');
+$table->enum('tax_type', ['Percentage Tax', 'Value-Added Tax', 'Tax Exempt']);
+
             $table->date('registration_date');
             $table->date('start_date');
             $table->date('financial_year_end');
