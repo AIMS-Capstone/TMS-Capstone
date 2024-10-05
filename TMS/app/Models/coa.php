@@ -13,8 +13,10 @@ class coa extends Model
 
     protected $fillable = [
         'type',
+        'sub-type',
         'code', 
         'name',
-        'description'
+        'description',
+        'status'
     ];
 }

@@ -89,6 +89,13 @@ Route::middleware([
 
     Route::get('/coa', [CoaController::class, 'index'])->name('coa');
     Route::post('coa', [CoaController::class, 'store'])->name('coa.store');
+    Route::post('/coa/delete', [CoaController::class, 'destroy'])->name('coa.delete'); 
+    Route::get('coa/archive', [CoaController::class, 'archive'])->name('archive');
+    Route::post('/coa/restore', [CoaController::class, 'restore'])->name('coa.restore');
+    Route::post('/coa/deactivate', [CoaController::class, 'deactivate'])->name('coa.deactivate');
+    Route::get('/download_coa', [CoaController::class, 'download_coa']);
+
+        
 
     Route::get('/financial-reports', function () {
         return view('financial-reports');

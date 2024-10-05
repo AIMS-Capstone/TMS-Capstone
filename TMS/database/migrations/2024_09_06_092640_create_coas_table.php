@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('coas', function (Blueprint $table) {
             $table->id();
             $table->string('type');
+            $table->string('sub_type')->nullable();
             $table->string('code');
             $table->string('name');
             $table->text('description')->nullable();
+            $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->timestamps();
         });
     }
