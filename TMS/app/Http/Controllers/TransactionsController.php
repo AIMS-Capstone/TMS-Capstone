@@ -13,6 +13,8 @@ use App\Models\TaxRow as ModelsTaxRow;
 use App\Models\TaxType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use thiagoalessio\TesseractOCR\TesseractOCR;
+
 
 class TransactionsController extends Controller
 {
@@ -61,10 +63,51 @@ class TransactionsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    public function showUploadForm()
+    {
+        return view('transactions.upload');
+    }
     public function store(StoreTransactionsRequest $request)
     {
         //
     }
+    public function upload(Request $request)
+    {
+        // Validate the uploaded file
+        $request->validate([
+            'receipt' => 'required|mimes:jpg,jpeg,png,pdf|max:5120',
+        ]);
+
+        // Store the uploaded file
+        $path = $request->file('receipt')->store('transactions');
+
+        // Extract text using Tesseract OCR
+        $extractedText = $this->extractTextFromReceipt(storage_path("app/$path"));
+
+        // Process and return extracted text (or save to the database)
+        return back()->with([
+            'success' => 'Receipt uploaded successfully!',
+            'extractedText' => $extractedText,
+            'file_path' => $path // Optional, if you want to display the uploaded image
+        ]);
+    }
+    private function extractTextFromReceipt($filePath)
+    {
+        // Use TesseractOCR PHP wrapper to process the image
+        $text = (new TesseractOCR($filePath))
+                ->lang('eng') // Specify language (e.g., English)
+                ->run();
+
+        return $text;
+    }
+    private function extractTotalAmount($text)
+{
+    // Regex pattern to match the total amount, assuming it’s in the format like 'Total: $123.45'
+    preg_match('/Total:\s*\$?([\d,]+\.\d{2})/', $text, $matches);
+
+    return $matches[1] ?? 'Total not found';
+}
+
 
     /**
      * Display the specified resource.

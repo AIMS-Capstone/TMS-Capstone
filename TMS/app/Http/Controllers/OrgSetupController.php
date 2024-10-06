@@ -42,7 +42,7 @@ class OrgSetupController extends Controller
      
          Session::put('organization_id', $request->organization_id);
      
-         return redirect()->route('view_dashboard'); // Redirect to the dashboard or the intended page
+         return redirect()->route('dashboard'); // Redirect to the dashboard or the intended page
      }
     public function create(Request $request)
     {

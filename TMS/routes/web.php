@@ -8,11 +8,15 @@ use App\Http\Controllers\CustomVerificationController;
 use App\Http\Controllers\sendPasswordReset;
 use App\Http\Controllers\OrgSetupController;
 use App\Http\Controllers\DashboardController;
-
+use App\Models\rdo;
 
 Route::get('/', function () {
     return view('auth/login');
 });
+Route::get('/transactions/upload', [TransactionsController::class, 'showUploadForm'])->name('receipts.uploadForm');
+
+Route::post('/transactions/upload', [TransactionsController::class, 'upload'])->name('transactions.upload');
+
 
 Route::get('/reset-password', function () {
     return view('auth/reset-password');
@@ -49,9 +53,9 @@ Route::middleware([
     Route::get('/dashboard/{orgId}', [DashboardController::class, 'show'])->name('dashboard');
     Route::get('/dashboard', [OrgSetupController::class, 'index'])->name('dashboard');
     Route::post('/org-dashboard', [OrgSetupController::class, 'setOrganization'])->name('org-dashboard');
-    Route::get('/view_dashboard', function() {
+    Route::get('/dashboard', function() {
         return view('dashboard');
-    })->name('view_dashboard');
+    })->name('dashboard');
     
     //session base
     //Route::get('/dashboard', [DashboardController::class, 'show])->middleware(EnsureOrganizationSelected);
@@ -78,8 +82,12 @@ Route::middleware([
     })->name('general-journal');
 
     //Org Setup Routes
-    Route::get('/create-org', function(){
-        return view('components/create-org');
+    Route::get('/create-org', function() {
+        $rdos = rdo::all(); // Fetch all Rdo records
+        $regions = json_decode(file_get_contents(public_path('json/regions.json')), true);
+        $provinces = json_decode(file_get_contents(public_path('json/provinces.json')), true);
+        $municipalities = json_decode(file_get_contents(public_path('json/municipalities.json')), true);
+        return view('components.create-org', compact('rdos', 'regions', 'provinces', 'municipalities')); // Pass the $rdos variable to the view
     })->name('create-org');
     Route::get('/org-setup', [OrgSetupController::class, 'index'])->name('org-setup');
     Route::post('/org-setup', [OrgSetupController::class, 'store'])->name('OrgSetup.store');
