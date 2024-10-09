@@ -167,12 +167,13 @@
                                             } else {
                                                 this.selectedRows.push(id);
                                             }
+                                            this.checkAll = this.selectedRows.length === {{ json_encode($inactiveCoas->count()) }}; // Update checkAll state
                                         },
                                         toggleAll() {
                                             if (this.checkAll) {
                                                 this.selectedRows = {{ json_encode($inactiveCoas->pluck('id')->toArray()) }}; 
                                             } else {
-                                                this.selectedRows = []; // unselect all
+                                                this.selectedRows = []; // Unselect all
                                             }
                                         },
                                         deleteRows() {
@@ -182,7 +183,7 @@
                                             }
 
                                             if (confirm('Are you sure you want to delete the selected row/s?')) {
-                                                fetch('{{ route('coa.delete') }}', { // Update the URL to your delete route
+                                                fetch('{{ route('coa.delete') }}', {
                                                     method: 'POST',
                                                     headers: {
                                                         'Content-Type': 'application/json',
@@ -206,7 +207,7 @@
                                             }
 
                                             if (confirm('Are you sure you want to restore the selected row/s?')) {
-                                                fetch('{{ route('coa.restore') }}', { // Create a new route for restoring CoAs
+                                                fetch('{{ route('coa.restore') }}', {
                                                     method: 'POST',
                                                     headers: {
                                                         'Content-Type': 'application/json',
@@ -229,6 +230,9 @@
                                             this.showCheckboxes = false; 
                                             this.showDeleteCancelButtons = false;
                                             this.showRestoreCancelButtons = false;
+                                        },
+                                        get selectedCount() {
+                                            return this.selectedRows.length; 
                                         }
                                     }"
                                     class="mb-12 mx-12 overflow-hidden max-w-full rounded-md border-neutral-300 dark:border-neutral-700"
@@ -255,17 +259,17 @@
                                                 <button 
                                                     type="button" 
                                                     @click="showCheckboxes = !showCheckboxes; showDeleteCancelButtons = !showDeleteCancelButtons" 
-                                                    class="border px-3 py-2 rounded-lg text-sm"
+                                                    class="border px-3 py-2 rounded-lg text-sm hover:border-red-500 hover:text-red-500 transition"
                                                 >
-                                                    <i class="fa fa-trash"></i> Delete
+                                                    <i class="fa fa-trash"></i> Delete 
                                                 </button>
                                                 <!-- Restore button -->
                                                 <button 
                                                     type="button" 
                                                     @click="showCheckboxes = !showCheckboxes; showRestoreCancelButtons = !showRestoreCancelButtons" 
-                                                    class="border px-3 py-2 rounded-lg text-sm"
+                                                    class="border px-3 py-2 rounded-lg text-sm hover:border-blue-900 hover:text-blue-900 transition"
                                                 >
-                                                    <i class="fas fa-trash-restore"></i> Restore
+                                                    <i class="fas fa-trash-restore"></i> Restore 
                                                 </button>
                                             </div>
                                         </div>
@@ -279,14 +283,17 @@
                                                     <th scope="col" class="p-4">
                                                         <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600 dark:text-neutral-300">
                                                             <div class="relative flex items-center">
-                                                                <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="cursor-pointer" />
+                                                                <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="before:content-none peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-black checked:before:bg-black focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
+                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                                                </svg>
                                                             </div>
                                                         </label>
                                                     </th>
                                                     <th scope="col" class="py-4 px-2">Code</th>
-                                                    <th scope="col" class="py-4 px-2">Name</th>
-                                                    <th scope="col" class="py-4 px-4">Type</th>
-                                                    <th scope="col" class="py-4 px-3">Date Created</th>
+                                                    <th scope="col" class="py-4 px-3">Name</th>
+                                                    <th scope="col" class="py-4 px-3">Type</th>
+                                                    <th scope="col" class="py-4 px-4">Date Created</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
@@ -295,61 +302,55 @@
                                                         <td class="p-4">
                                                             <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600 dark:text-neutral-300">
                                                                 <div class="relative flex items-center">
-                                                                    <input type="checkbox" @click="toggleCheckbox({{ $coa->id }})" id="coa{{ $coa->id }}" class="cursor-pointer" :checked="selectedRows.includes({{ $coa->id }})" />
+                                                                    <input type="checkbox" x-model="SelectedRows" @click="toggleCheckbox('{{ $coa->id }}')" id="coa{{ $coa->id }}" class="before:content-none peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-black checked:before:bg-black focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" :checked="selectedRows.includes('{{ $coa->id }}')" />
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                                                    </svg>
                                                                 </div>
                                                             </label>
                                                         </td>
                                                         <td>{{ $coa->type }}</td>
                                                         <td>{{ $coa->code }}</td>
                                                         <td>{{ $coa->name }}</td>
-                                                        <td>{{ $coa->created_at}}</td>
+                                                        <td>{{ $coa->created_at }}</td>
                                                     </tr>
                                                 @endforeach
+                                                    @if ($inactiveCoas->isEmpty())
+                                                            <td colspan="6" class="text-center p-4">
+                                                                <img src="{{ asset('images/Wallet 02.png') }}" alt="No data available" class="mx-auto" />
+                                                                <h1 class="font-bold mt-2">No Archived Charts of Accounts yet</h1>
+                                                            </td>
+                                                    @endif
                                             </tbody>
                                         </table>
-                                        @if ($inactiveCoas->isEmpty())
-                                            <p class="text-center py-4">No archive Charts of Accounts found.</p>
-                                        @endif
+                                    </div>
 
-                                        <!-- Delete and Cancel buttons -->
-                                        <div class="mt-4" x-show="showDeleteCancelButtons" x-cloak>
-                                            <button 
-                                                @click="deleteRows" 
-                                                class="bg-red-600 text-white px-4 py-2 rounded-lg mr-2 hover:bg-red-700 transition"
-                                            >
-                                                Delete
-                                            </button>
-                                            <button 
-                                                @click="cancelSelection" 
-                                                class="bg-gray-300 text-black px-4 py-2 rounded-lg hover:bg-gray-400 transition"
-                                            >
-                                                Cancel
-                                            </button>
+                                        <div class="flex justify-center py-4" x-cloak>
+                                            <!-- Delete and Cancel buttons -->
+                                            <div class="mt-4" x-show="showDeleteCancelButtons">
+                                                <button @click="deleteRows()" class="border px-3 py-2 mx-2 rounded-lg text-sm text-red-600 hover:bg-red-100 transition">
+                                                    <i class="fa fa-trash"></i> Confirm Delete <span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
+                                                </button>
+                                                <button @click="cancelSelection()" class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition">
+                                                    <i class="fa fa-times"></i> Cancel
+                                                </button>
+                                            </div>
+                                            <!-- Restore and Cancel buttons -->
+                                            <div class="mt-4" x-show="showRestoreCancelButtons">
+                                                <button @click="restoreRows()" class="border px-3 py-2 mx-2 rounded-lg text-sm text-green-500 hover:bg-red-100 transition">
+                                                    <i class="fas fa-trash-restore"></i>Confirm Restore <span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
+                                                </button>
+                                                <button @click="cancelSelection()" class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition">
+                                                    <i class="fa fa-times"></i> Cancel
+                                                </button>
+                                            </div>
                                         </div>
-
-                                        <!-- Restore and Cancel buttons -->
-                                        <div class="mt-4" x-show="showRestoreCancelButtons" x-cloak>
-                                            <button 
-                                                @click="restoreRows" 
-                                                class="bg-green-600 text-white px-4 py-2 rounded-lg mr-2 hover:bg-green-700 transition"
-                                            >
-                                                Restore
-                                            </button>
-                                            <button 
-                                                @click="cancelSelection" 
-                                                class="bg-gray-300 text-black px-4 py-2 rounded-lg hover:bg-gray-400 transition"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
-
-                                        {{ $inactiveCoas->links() }}        
+                                    {{ $inactiveCoas ->links()}}
                                     </div>
                                 </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
                 <script>
                 document.addEventListener('search', event => {

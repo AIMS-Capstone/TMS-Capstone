@@ -51,10 +51,10 @@
                                     <h3 class="font-semibold text-gray-600 text-sm">Preparing your CSV Files</h3> <!-- Reduced font size -->
                                     <ul class="list-disc pl-5 text-gray-600 text-xs mt-2 space-y-1"> <!-- Reduced font size -->
                                         <li>A CSV file containing chart of accounts information (You can
-                                            <a href="#" class="text-sky-500 hover:underline">download</a> this template for importing Chart of Accounts).
+                                            <a href="{{ url('coa/import_template')}}" class="text-sky-500 hover:underline">download</a> this template for importing Chart of Accounts).
                                         </li>
                                         <li>Make sure to enter a valid <strong>Account Type</strong>
-                                            (<a href="#" class="text-sky-500 hover:underline">download list</a>).
+                                            (<a href="{{ url('coa/account_type_template')}}" class="text-sky-500 hover:underline">download list</a>).
                                         </li>
                                         <li>Fill Sub Category if the Account Type is
                                             <strong>Ordinary Allowance Itemized Deductions, Assets, or Liabilities</strong>
