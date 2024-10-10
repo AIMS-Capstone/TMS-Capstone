@@ -83,9 +83,11 @@ Route::middleware([
     })->name('create-org');
     Route::get('/org-setup', [OrgSetupController::class, 'index'])->name('org-setup');
     Route::post('/org-setup', [OrgSetupController::class, 'store'])->name('OrgSetup.store');
+    
+Route::get('/transactions', [TransactionsController::class, 'index'])->name('transactions');
 
-    //Charts of Accounts routings
-     Route::get('/transactions', [TransactionsController::class, 'index'])->name('transactions');
+
+//Charts of Accounts routings
 
     Route::get('/coa', [CoaController::class, 'index'])->name('coa');
     Route::post('coa', [CoaController::class, 'store'])->name('coa.store');
@@ -94,8 +96,10 @@ Route::middleware([
     Route::post('/coa/restore', [CoaController::class, 'restore'])->name('coa.restore');
     Route::post('/coa/deactivate', [CoaController::class, 'deactivate'])->name('coa.deactivate');
     Route::get('/download_coa', [CoaController::class, 'download_coa']);
+Route::get('coa/import_template', [CoaController::class, 'import_template']);
+Route::get('coa/account_type_template', [CoaController::class, 'account_type_template']);
+Route::put('/coa/{coa}', [CoaController::class, 'update'])->name('coa.update');
 
-        
 
     Route::get('/financial-reports', function () {
         return view('financial-reports');
