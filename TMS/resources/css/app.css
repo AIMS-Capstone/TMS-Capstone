@@ -1,7 +1,75 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.select2-container--default .select2-selection--single {
+    border: none !important; /* Tailwind: border-none */
+    border-radius: 0.75rem; /* Tailwind: rounded-xl */
+    z-index: 0 !important; /* Retain the original z-index styling */
+    padding-top: 1 !important;
+ 
+}
+.select2-selection.select2-selection--single:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important; /* optional, depending on your styling */
+}
 
+.select2-container .select2-selection--single .select2-selection__rendered{
+    padding: 0 !important;
+    border-bottom: 1px solid #64748b !important;
+}
+
+.select2-container--default .select2-selection--single::placeholder {
+    color: #9ca3af; /* Tailwind: placeholder:text-gray-400 */
+    font-weight: 300; /* Tailwind: placeholder:font-light */
+    font-size: 0.875rem; /* Tailwind: placeholder:text-sm */
+}
+
+.select2-container--default .select2-selection--single:focus {
+    border-color: #64748b; /* Tailwind: focus:border-slate-500 */
+    outline: 2px solid #64748b; /* Tailwind: focus:ring-slate-500 */
+    box-shadow: 0 0 0 2px #64748b; /* Alternative focus ring */
+}
+
+/* If disabled, apply these styles */
+.select2-container--default .select2-selection--single.disabled,
+.select2-container--default .select2-selection--single[disabled] {
+    background-color: #e5e7eb; /* Tailwind: bg-gray-200 */
+    cursor: not-allowed; /* Tailwind: cursor-not-allowed */
+}
+
+.select2-input{
+    z-index: 0 !important;
+}
+.select2-dropdown{
+    padding-top: 0.5rem !important; /* 8px */;
+    padding-bottom: 0.5rem !important; /* 8px */;
+    padding-top: 0.5rem !important; /* 8px */;
+    padding-bottom: 0.5rem !important; /* 8px */;
+    font-size: 0.875rem !important/* 14px */;
+    line-height: 1.25rem !important/* 20px */;
+    z-index:10 !important;
+}
 [x-cloak] {
     display: none;
+}
+
+/* Custom hover for select2 options  */
+/* USED FOR SELECT CUSTOMER/VENDOR */
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #dbeafe !important;  /* Change background color on hover */
+    color: #1e3a8a !important;  /* Change text color on hover */
+    font-weight: bold !important;  /* Make text bold */
+    border-radius: 0.5rem !important/* 8px */; 
+}
+
+/* Optional: Change the dropdown background and other styles */
+.select2-container--default .select2-results__options {
+    background-color: #ffffff; /* Change dropdown background */
+    border-radius: 0.5rem !important/* 8px */;
+    padding-left: 1rem !important/* 16px */;
+    padding-right: 1rem !important/* 16px */;
+    padding-top: 0.5rem !important/* 8px */;
+    padding-bottom: 0.5rem !important/* 8px */;
+
 }

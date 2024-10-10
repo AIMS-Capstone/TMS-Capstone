@@ -223,7 +223,7 @@
 </nav>
 
 <script type="text/javascript">
-    function updateClock(){
+    function updateClock() {
         var now = new Date();
         var dname = now.getDay(), 
             mo = now.getMonth(), 
@@ -233,30 +233,34 @@
             min = now.getMinutes(), 
             pe = "AM";
 
-        if(hou == 0){
+        if (hou == 0) {
             hou = 12;
-        }
-        if(hou > 12){
+        } else if (hou == 12) {
+            pe = "PM";
+        } else if (hou > 12) {
             hou = hou - 12;
             pe = "PM";
         }
 
-        Number.prototype.pad = function(digits){
+        Number.prototype.pad = function(digits) {
             return this.toString().padStart(digits, '0');
-        }
+        };
+
         var months = ["January", "February", "March", "April", "May", "June", 
                     "July", "August", "September", "October", "November", "December"];
         var week = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         var ids = ["dayname", "month", "daynum", "year", "hour", "minutes", "period"];
         var values = [week[dname], months[mo], dnum.pad(2), yr, hou.pad(2), min.pad(2), pe];
 
-        for(var i = 0; i < ids.length; i++){
+        for (var i = 0; i < ids.length; i++) {
             document.getElementById(ids[i]).textContent = values[i];
         }
     }
-    function initClock(){
+
+    function initClock() {
         updateClock();
         window.setInterval(updateClock, 60000);
     }
+
     window.onload = initClock;
 </script>

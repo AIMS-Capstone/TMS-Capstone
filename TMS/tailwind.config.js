@@ -19,5 +19,11 @@ export default {
         },
     },
 
+    variants: {
+        extend: {
+            fill: ['peer-checked'], // Enable peer-checked variant for fill
+        },
+    },
+
     plugins: [forms, typography],
 };

@@ -4,11 +4,15 @@ input, label, button, div, form, main, nav,
 li, ul {
     font-family: 'Inter var', sans-serif;
 }
+
+/* Use these styles for TITLES, HEADINGS */
 .auth-color, .taxuri-color{
-    color: rgb(29 30 78);
+    color: #1e3a8a;
 }
+
+/* Use taxuri-text for all subheadings or normal text/body */
 .taxuri-text{
-    color: rgb(61 64 62);
+    color: #3f3f46;
 }
 .indicator {
     transition: all 0.3s ease;
@@ -41,15 +45,35 @@ li, ul {
     @apply hidden;
 }
 .sidebar-active {
-    @apply border-l-[8px] bg-slate-100 border-blue-950 text-blue-950 px-6 py-2 font-bold;
+    @apply border-l-[8px] bg-slate-100 border-blue-900 text-blue-900 px-6 py-2 font-bold;
+ /* place all shared classes */
+}
+.sidebar-submenu-active {
+    @apply text-blue-950 px-6 py-2 font-bold;
  /* place all shared classes */
 }
 .sidebar-text {
     @apply text-blue-950 hover:text-blue-950 text-[14px] hover:font-bold;
 }
 .sidebar-icon {
-    @apply w-6 h-6;
+    @apply w-5 h-5;
 }
 .datetime-navbar{
     color: rgb(29 30 78);
+}
+.hover-dropdown{
+    @apply hover:bg-blue-100 hover:text-blue-950 hover:font-bold hover:rounded-full cursor-pointer;
+}
+.breadcumb-active{
+    @apply text-blue-950 font-bold;
+}
+.active-tab {
+    background-color: #f3f4f6;
+    color: #172554;
+}
+.active-tab-dashboard {
+    background-color: #1e3a8a; /* Blue background */
+    color: #ffffff; /* White text */
+    font-weight: bold; /* Bold text */
+    border-radius: 9999px; /* Fully rounded background */
 }
