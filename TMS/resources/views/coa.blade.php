@@ -146,10 +146,10 @@
                                     </button>
 
                                     <!-- Tab 7: Expenses -->
-                                    <button @click="selectedTab = 'Expenses'; $dispatch('filter', { type: 'Expenses' })"
+                                    <button @click="selectedTab = 'Expenses'; $dispatch('filter', { type: 'Expense' })"
                                         :aria-selected="selectedTab === 'Expenses'" 
                                         :tabindex="selectedTab === 'Expenses' ? '0' : '-1'" 
-                                        :class="selectedTab === 'Expenses' 
+                                        :class="selectedTab === 'Expense' 
                                             ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
                                             : 'text-zinc-600 font-medium hover:text-blue-900'" 
                                         class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
@@ -168,7 +168,9 @@
                                         showCheckboxes: false, 
                                         checkAll: false, 
                                         selectedRows: [],
-                                        showDeleteCancelButtons: false,     
+                                        showDeleteCancelButtons: false,
+                                        
+                                        // Toggle a single row
                                         toggleCheckbox(id) {
                                             if (this.selectedRows.includes(id)) {
                                                 this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
@@ -176,13 +178,18 @@
                                                 this.selectedRows.push(id);
                                             }
                                         },
+                                        
+                                        // Toggle all rows
                                         toggleAll() {
                                             if (this.checkAll) {
                                                 this.selectedRows = {{ json_encode($coas->pluck('id')->toArray()) }}; 
                                             } else {
                                                 this.selectedRows = []; 
                                             }
+                                            console.log(this.selectedRows); // For debugging
                                         },
+                                        
+                                        // Handle deletion
                                         deleteRows() {
                                             if (this.selectedRows.length === 0) {
                                                 alert('No rows selected for deletion.');
@@ -207,11 +214,16 @@
                                                 });
                                             }
                                         },
+                                        
+                                        // Cancel selection
                                         cancelSelection() {
                                             this.selectedRows = []; 
                                             this.checkAll = false;
                                             this.showCheckboxes = false; 
                                             this.showDeleteCancelButtons = false;
+                                        },
+                                        get selectedCount(){
+                                            return this.selectedRows.length;
                                         }
                                     }"
                                     class="mb-12 mx-12 overflow-hidden max-w-full rounded-md border-neutral-300 dark:border-neutral-700"
@@ -265,7 +277,7 @@
                                                 <button 
                                                     type="button" 
                                                     @click="showCheckboxes = !showCheckboxes; showDeleteCancelButtons = !showDeleteCancelButtons" 
-                                                    class="border px-3 py-2 rounded-lg text-sm"
+                                                    class="border px-3 py-2 rounded-lg text-sm hover:border-red-500 hover:text-red-500 transition"
                                                 >
                                                     <i class="fa fa-trash"></i> Delete
                                                 </button>
@@ -284,7 +296,7 @@
                                                     <th scope="col" class="p-4">
                                                         <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                                             <div class="relative flex items-center">
-                                                                <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-black checked:before:bg-black focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
+                                                                <input type="checkbox" x-model="checkAll" id="checkAll" @change="toggleAll()" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-black checked:before:bg-black focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
                                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                                                 </svg>
@@ -305,7 +317,7 @@
                                                             <td class="p-4">
                                                                 <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                                                     <div class="relative flex items-center">
-                                                                        <input type="checkbox" @click="toggleCheckbox(@{{ $coa->id }})" id="coa{{ $coa->id }}" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-black checked:before:bg-black focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" :checked="selectedRows.includes(@{{ $coa->id }})" />
+                                                                        <input type="checkbox" @change="toggleCheckbox('{{ $coa->id }}')" id="coa{{ $coa->id }}"  class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-black checked:before:bg-black focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" :checked="selectedRows.includes('{{ $coa->id }}')" />
                                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                                                         </svg>
@@ -316,8 +328,22 @@
                                                             <td>{{ $coa->name }}</td>
                                                             <td>{{ $coa->type }}</td>
                                                             <td>{{ $coa->created_at }}</td>
-                                                            <td><p>edit</p></td>
-                                                        </tr>                             
+                                                            <td class="py-4 px-2">
+                                                                <x-edit-coa />
+                                                                <button 
+                                                                    @click="$dispatch('open-edit-modal', {
+                                                                        id: '{{ $coa->id }}',
+                                                                        code: '{{ $coa->code }}',
+                                                                        name: '{{ $coa->name }}',
+                                                                        type: '{{ $coa->type }}'
+                                                                    })"
+                                                                    type="button" 
+                                                                    class="hover:border-slate-600 hover:text-slate-600 border px-3 py-2 rounded-lg text-sm"
+                                                                >
+                                                                    Edit
+                                                                </button>
+                                                            </td>
+                                                        </tr>
                                                     @endforeach
                                                 @else
                                                     <tr>
@@ -330,36 +356,38 @@
                                                 @endif
                                             </tbody>
                                         </table>
-
-                                           <div class="mt-4" x-show="showDeleteCancelButtons" x-cloak>
-                                                <button 
-                                                    @click="deleteRows" 
-                                                    class="bg-red-600 text-white px-4 py-2 rounded-lg mr-2 hover:bg-red-700 transition"
-                                                >
-                                                    Delete
-                                                </button>
-                                                <button 
-                                                    @click="cancelSelection" 
-                                                    class="bg-gray-300 text-black px-4 py-2 rounded-lg hover:bg-gray-400 transition"
-                                                >
-                                                    Cancel
-                                                </button>
-                                            </div>
-
-                                            {{ $coas->links() }}        
-                                        </div>
                                     </div>
+
+                                    <!-- Action Buttons -->
+                                    <div x-show="showDeleteCancelButtons" class="flex justify-center py-4" x-cloak>
+                                        <button 
+                                            @click="deleteRows" 
+                                            class="border px-3 py-2 mx-2 rounded-lg text-sm text-red-600 hover:bg-red-100 transition"
+                                        >
+                                            <i class="fa fa-trash"></i> Archive Selected <span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
+                                        </button>
+                                        <button 
+                                            @click="cancelSelection" 
+                                            class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
+                                        >
+                                            <i class="fa fa-times"></i> Cancel
+                                        </button>
+                                    </div>
+                                    
+                                    {{ $coas->links() }} 
+                                </div>
+
                             </div>
                         </div>
                         <!-- End of Main Content -->
         </div>
     </div>
 
-            <!-- Script -->
-            <script>
-                document.addEventListener('search', event => {
-                    window.location.href = `?search=${event.detail.search}`;
-                });
+    <!-- Script -->
+    <script>
+        document.addEventListener('search', event => {
+            window.location.href = `?search=${event.detail.search}`;
+        });
 
         document.addEventListener('filter', event => {
             const url = new URL(window.location.href);
