@@ -1,3 +1,7 @@
+@php
+$organizationId = session('organization_id');
+$organization = \App\Models\OrgSetup::find($organizationId);
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -20,10 +24,24 @@
         @vite(['resources/css/app.css', 'resources/css/custom.css', 'resources/js/app.js'])
         <!-- Styles -->
         @livewireStyles
+     
+        
         
     </head>
 
     <body class="font-sans antialiased">
+        @php
+        $organizationId = session('organization_id');
+        $organization = \App\Models\OrgSetup::find($organizationId);
+    @endphp
+
+    <header>
+        @if ($organization)
+            <h1>Welcome, {{ $organization->registration_name }}</h1>
+        @else
+            <h1>Welcome to our application!</h1>
+        @endif
+    </header>
         <x-banner />
         <div class="w-full flex">
             {{-- Sidebar --}}

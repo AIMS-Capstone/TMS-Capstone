@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\OrgSetup;
+use App\Models\rdo;
 
 class CreateOrg extends Component
 {
@@ -13,11 +14,13 @@ public $title;
     public $id;
     public $showModal = false;
     public $type;
+    public $rdos;
     
     
     public function render()
     {
-        return view('livewire.create-org');
+        $rdos = rdo::all();
+        return view('livewire.create-org', compact('rdos'));
     }
 
     public function save()

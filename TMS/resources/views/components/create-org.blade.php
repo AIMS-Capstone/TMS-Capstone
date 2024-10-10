@@ -101,79 +101,55 @@
                     </div>
                 </div>
             
-                <!-- Address Content -->
-                <div class="tab-content-item">
-                    <p class="p-10 text-zinc-600 font-medium text-lg">Organization Address Information</p>
-                    <div class="flex flex-col items-center h-full">
-                        <div class="flex flex-col mb-4 w-full max-w-md">
-                            <div class="flex flex-col">
-                                <x-field-label for="address_line" value="{{ __('Address Line') }}" class="mb-2 text-left" />
-                                <x-input type="text" name="address_line" id="address_line" wire:model="address_line" placeholder="e.g. ESI Bldg 124 Yakal Street" />
-                            </div>
-                        </div>
-                
-                        <div class="flex flex-col mb-4 w-full max-w-md">
-                            <div class="flex flex-col">
-                                <x-field-label for="region" value="{{ __('Region') }}" class="mb-2 text-left" />
-                                <select wire:model="region" name="region" id="region" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
-                                    <option value="" disabled selected>Select Region</option>
-                                    <!-- Add na lang siguro ng parang plugin na laravel (may need na migration ata)-->
-                                    <option value="Region I – Ilocos Region">Region I – Ilocos Region</option>
-                                    <option value="Region II – Cagayan Valley">Region II – Cagayan Valley</option>
-                                    <option value="Region III – Central Luzon">Region III – Central Luzon</option>
-                                    <option value="Region IV‑A – CALABARZON">Region IV‑A – CALABARZON</option>
-                                    <option value="Region IV‑B – MIMAROPA">Region IV‑B – MIMAROPA</option>
-                                    <option value="Region V – Bicol Region">Region V – Bicol Region</option>
-                                    <option value="Region VI – Western Visayas">Region VI – Western Visayas</option>
-                                    <option value="Region VII – Central Visayas">Region VII – Central Visayas</option>
-                                    <option value="Region VIII – Eastern Visayas">Region VIII – Eastern Visayas</option>
-                                    <option value="Region IX – Zamboanga Peninsula">Region IX – Zamboanga Peninsula</option>
-                                    <option value="Region X – Northern Mindanao">Region X – Northern Mindanao</option>
-                                    <option value="Region XI – Davao Region">Region XI – Davao Region</option>
-                                    <option value="Region XII – SOCCSKSARGEN">Region XII – SOCCSKSARGEN</option>
-                                    <option value="Region XIII – Caraga">Region XIII – Caraga</option>
-                                    <option value="NCR – National Capital Region">NCR – National Capital Region</option>
-                                    <option value="CAR – Cordillera Administrative Region">CAR – Cordillera Administrative Region</option>
-                                    <option value="BARMM – Bangsamoro Autonomous Region in Muslim Mindanao">BARMM – Bangsamoro Autonomous Region in Muslim Mindanao</option>
-                                </select>
-                            </div>
-                        </div>
+            <!-- Address Content -->
+<div class="tab-content-item">
+    <p class="p-10 text-zinc-600 font-medium text-lg">Organization Address Information</p>
+    <div class="flex flex-col items-center h-full">
+        <div class="flex flex-col mb-4 w-full max-w-md">
+            <div class="flex flex-col">
+                <x-field-label for="address_line" value="{{ __('Address Line') }}" class="mb-2 text-left" />
+                <x-input type="text" name="address_line" id="address_line" wire:model="address_line" placeholder="e.g. ESI Bldg 124 Yakal Street" />
+            </div>
+        </div>
 
-                        <div class="flex flex-col mb-4 w-full max-w-md">
-                            <div class="flex flex-col">
-                                {{-- this will be dependent on the selected region --}}
-                                <x-field-label for="province" value="{{ __('Province') }}" class="mb-2 text-left" />
-                                <select wire:model="province" name="province" id="province" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
-                                    <option value="" disabled selected>Select Province</option>
-                                    <!-- Add na lang siguro ng parang plugin na laravel (may need na migration ata)-->
-                                    <option value="Cavite">Cavite</option>
-                                    <option value="Laguna">Laguna</option>
-                                    <option value="Batangas">Batangas</option>
-                                    <option value="Rizal">Rizal</option>
-                                    <option value="Quezon">Quezon</option>
-                                </select>
-                            </div>
-                        </div>
-                
-                        <div class="flex flex-row space-x-4 w-full max-w-md">
-                            <div class="flex flex-col w-full">
-                                <x-field-label for="city" value="{{ __('City') }}" class="mb-2 text-left" />
-                                <select wire:model="city" name="city" id="city" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
-                                    <option value="" disabled selected>Select City</option>
-                                    <option value="Santa Rosa">Santa Rosa</option>
-                                    <!-- Add na lang siguro ng parang plugin na laravel (may need na migration ata)-->
-                                    <!-- Need siya na naka based don sa province and/or region na maseselect-->
-                                </select>
-                            </div>
-                            <div class="flex flex-col w-32">
-                                {{-- if possible, maging autofill siya based sa city na maseselect --}}
-                                <x-field-label for="zip_code" value="{{ __('Zip Code') }}" class="mb-2 text-left" />
-                                <x-input type="text" name="zip_code" id="zip_code" wire:model="zip_code" placeholder="1203" class="border rounded-xl px-4 py-2 w-full" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            
+        <div class="flex flex-col mb-4 w-full max-w-md">
+            <div class="flex flex-col">
+                <x-field-label for="region" value="{{ __('Region') }}" class="mb-2 text-left" />
+                <select wire:model="region" name="region" id="region" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                    <option value="" disabled selected>Select Region</option>
+                    @foreach($regions as $region)
+                    <option value="{{ $region['designation'] }}">{{ $region['name'] }}</option>
+                @endforeach
+                </select>
+            </div>
+        </div>
+
+        <div class="flex flex-col mb-4 w-full max-w-md">
+            <div class="flex flex-col">
+                <x-field-label for="province" value="{{ __('Province') }}" class="mb-2 text-left" />
+                <select wire:model="province" name="province" id="province" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm" {{ !$region ? 'disabled' : '' }}>
+                    <option value="" disabled selected>Select Province</option>
+                   
+                </select>
+            </div>
+        </div>
+
+        <div class="flex flex-row space-x-4 w-full max-w-md">
+            <div class="flex flex-col w-full">
+                <x-field-label for="city" value="{{ __('City') }}" class="mb-2 text-left" />
+                <select wire:model="city" name="city" id="city" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                    <option value="" disabled selected>Select City</option>
+                  
+                </select>
+            </div>
+            <div class="flex flex-col w-32">
+                <x-field-label for="zip_code" value="{{ __('Zip Code') }}" class="mb-2 text-left" />
+                <x-input type="text" name="zip_code" id="zip_code" wire:model="zip_code" placeholder="1203" class="border rounded-xl px-4 py-2 w-full" />
+            </div>
+        </div>
+    </div>
+</div>
+           
                 <!-- Contact Content -->
                 <div class="tab-content-item">
                     <p class="p-10 text-zinc-600 font-medium text-lg">Contact Information</p>
@@ -209,132 +185,10 @@
                             <div class="flex flex-col items-center">
                                 <div class="flex flex-col 80">
                                     <x-field-label for="rdo" value="{{ __('Revenue District Office (RDO)') }}" class="mb-2 text-left" />
-                                    <select wire:model="rdo" name="rdo" id="rdo" class="border rounded-xl px-4 py-2 w-80 text-sm truncate border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm cursor-pointer">
-                                        <option value="" disabled selected>Select Revenue District Office (RDO)</option>
-                                        <option value="RDO Code - 001 (Laoag City, Ilocos Norte)">RDO Code - 001 (Laoag City, Ilocos Norte)</option>
-                                        <option value="RDO Code - 002 (Vigan, Ilocos Sur)">RDO Code - 002 (Vigan, Ilocos Sur)</option>
-                                        <option value="RDO Code - 003 (San Fernando, La Union)">RDO Code - 003 (San Fernando, La Union)</option>
-                                        <option value="RDO Code - 004 (Calasiao, West Pangasinan)">RDO Code - 004 (Calasiao, West Pangasinan)</option>
-                                        <option value="RDO Code - 005 (Alaminos, Pangasinan)">RDO Code - 005 (Alaminos, Pangasinan)</option>
-                                        <option value="RDO Code - 006 (Urdaneta, Pangasinan)">RDO Code - 006 (Urdaneta, Pangasinan)</option>
-                                        <option value="RDO Code - 007 (Bangued, Abra)">RDO Code - 007 (Bangued, Abra)</option>
-                                        <option value="RDO Code - 008 (Baguio City)">RDO Code - 008 (Baguio City)</option>
-                                        <option value="RDO Code - 009 (La Trinidad, Benguet)">RDO Code - 009 (La Trinidad, Benguet)</option>
-                                        <option value="RDO Code - 010 (Bontoc, Mt. Province)">RDO Code - 010 (Bontoc, Mt. Province)</option>
-                                        <option value="RDO Code - 011 (Tabuk City, Kalinga)">RDO Code - 011 (Tabuk City, Kalinga)</option>
-                                        <option value="RDO Code - 012 (Lagawe, Ifugao)">RDO Code - 012 (Lagawe, Ifugao)</option>
-                                        <option value="RDO Code - 013 (Tuguegarao, Cagayan)">RDO Code - 013 (Tuguegarao, Cagayan)</option>
-                                        <option value="RDO Code - 014 (Bayombong, Nueva Vizcaya)">RDO Code - 014 (Bayombong, Nueva Vizcaya)</option>
-                                        <option value="RDO Code - 015 (Naguilian, Isabela)">RDO Code - 015 (Naguilian, Isabela)</option>
-                                        <option value="RDO Code - 016 (Cabarroguis, Quirino)">RDO Code - 016 (Cabarroguis, Quirino)</option>
-                                        <option value="RDO Code - 017A (Tarlac City, Tarlac)">RDO Code - 017A (Tarlac City, Tarlac)</option>
-                                        <option value="RDO Code - 017B (Paniqui, Tarlac)">RDO Code - 017B (Paniqui, Tarlac)</option>
-                                        <option value="RDO Code - 018 (Olongapo City)">RDO Code - 018 (Olongapo City)</option>
-                                        <option value="RDO Code - 019 (Subic Bay Freeport Zone)">RDO Code - 019 (Subic Bay Freeport Zone)</option>
-                                        <option value="RDO Code - 020 (Balanga, Bataan)">RDO Code - 020 (Balanga, Bataan)</option>
-                                        <option value="RDO Code - 21A (North Pampanga)">RDO Code - 21A (North Pampanga)</option>
-                                        <option value="RDO Code - 21B (South Pampanga)">RDO Code - 21B (South Pampanga)</option>
-                                        <option value="RDO Code - 21C (Clark Freeport Zone)">RDO Code - 21C (Clark Freeport Zone)</option>
-                                        <option value="RDO Code - 022 (Baler, Aurora)">RDO Code - 022 (Baler, Aurora)</option>
-                                        <option value="RDO Code - 23A (North Nueva Ecija)">RDO Code - 23A (North Nueva Ecija)</option>
-                                        <option value="RDO Code - 23B (South Nueva Ecija)">RDO Code - 23B (South Nueva Ecija)</option>
-                                        <option value="RDO Code - 024 (Valenzuela City)">RDO Code - 024 (Valenzuela City)</option>
-                                        <option value="RDO Code - 25A (Plaridel, Bulacan)">RDO Code - 25A (Plaridel, Bulacan)</option>
-                                        <option value="RDO Code - 25B (Sta. Maria, Bulacan)">RDO Code - 25B (Sta. Maria, Bulacan)</option>
-                                        <option value="RDO Code - 026 (Malabon-Navotas)">RDO Code - 026 (Malabon-Navotas)</option>
-                                        <option value="RDO Code - 027 (Caloocan City)">RDO Code - 027 (Caloocan City)</option>
-                                        <option value="RDO Code - 028 (Novaliches)">RDO Code - 028 (Novaliches)</option>
-                                        <option value="RDO Code - 029 (Tondo – San Nicolas)">RDO Code - 029 (Tondo – San Nicolas)</option>
-                                        <option value="RDO Code - 030 (Binondo)">RDO Code - 030 (Binondo)</option>
-                                        <option value="RDO Code - 031 (Sta. Cruz)">RDO Code - 031 (Sta. Cruz)</option>
-                                        <option value="RDO Code - 032 (Quiapo-Sampaloc-San Miguel-Sta. Mesa)">RDO Code - 032 (Quiapo-Sampaloc-San Miguel-Sta. Mesa)</option>
-                                        <option value="RDO Code - 033 (Intramuros-Ermita-Malate)">RDO Code - 033 (Intramuros-Ermita-Malate)</option>
-                                        <option value="RDO Code - 034 (Paco-Pandacan-Sta. Ana-San Andres)">RDO Code - 034 (Paco-Pandacan-Sta. Ana-San Andres)</option>
-                                        <option value="RDO Code - 035 (Romblon)">RDO Code - 035 (Romblon)</option>
-                                        <option value="RDO Code - 036 (Puerto Princesa)">RDO Code - 036 (Puerto Princesa)</option>
-                                        <option value="RDO Code - 037 (San Jose, Occidental Mindoro)">RDO Code - 037 (San Jose, Occidental Mindoro)</option>
-                                        <option value="RDO Code - 038 (North Quezon City)">RDO Code - 038 (North Quezon City)</option>
-                                        <option value="RDO Code - 039 (South Quezon City)">RDO Code - 039 (South Quezon City)</option>
-                                        <option value="RDO Code - 040 (Cubao)">RDO Code - 040 (Cubao)</option>
-                                        <option value="RDO Code - 041 (Mandaluyong City)">RDO Code - 041 (Mandaluyong City)</option>
-                                        <option value="RDO Code - 042 (San Juan)">RDO Code - 042 (San Juan)</option>
-                                        <option value="RDO Code - 043 (Pasig)">RDO Code - 043 (Pasig)</option>
-                                        <option value="RDO Code - 044 (Taguig-Pateros)">RDO Code - 044 (Taguig-Pateros)</option>
-                                        <option value="RDO Code - 045 (Marikina)">RDO Code - 045 (Marikina)</option>
-                                        <option value="RDO Code - 046 (Cainta-Taytay)">RDO Code - 046 (Cainta-Taytay)</option>
-                                        <option value="RDO Code - 047 (East Makati)">RDO Code - 047 (East Makati)</option>
-                                        <option value="RDO Code - 048 (West Makati)">RDO Code - 048 (West Makati)</option>
-                                        <option value="RDO Code - 049 (North Makati)">RDO Code - 049 (North Makati)</option>
-                                        <option value="RDO Code - 050 (South Makati)">RDO Code - 050 (South Makati)</option>
-                                        <option value="RDO Code - 051 (Pasay City)">RDO Code - 051 (Pasay City)</option>
-                                        <option value="RDO Code - 052 (Parañaque)">RDO Code - 052 (Parañaque)</option>
-                                        <option value="RDO Code - 53A (Las Piñas City)">RDO Code - 53A (Las Piñas City)</option>
-                                        <option value="RDO Code - 53B (Muntinlupa City)">RDO Code - 53B (Muntinlupa City)</option>
-                                        <option value="RDO Code - 54A (Trece Martirez City, East Cavite)">RDO Code - 54A (Trece Martirez City, East Cavite)</option>
-                                        <option value="RDO Code - 54B (Kawit, West Cavite)">RDO Code - 54B (Kawit, West Cavite)</option>
-                                        <option value="RDO Code - 055 (San Pablo City)">RDO Code - 055 (San Pablo City)</option>
-                                        <option value="RDO Code - 056 (Calamba, Laguna)">RDO Code - 056 (Calamba, Laguna)</option>
-                                        <option value="RDO Code - 057 (Biñan, Laguna)">RDO Code - 057 (Biñan, Laguna)</option>
-                                        <option value="RDO Code - 058 (Batangas City)">RDO Code - 058 (Batangas City)</option>
-                                        <option value="RDO Code - 059 (Lipa City)">RDO Code - 059 (Lipa City)</option>
-                                        <option value="RDO Code - 060 (Lucena City)">RDO Code - 060 (Lucena City)</option>
-                                        <option value="RDO Code - 061 (Gumaca, Quezon)">RDO Code - 061 (Gumaca, Quezon)</option>
-                                        <option value="RDO Code - 062 (Boac, Marinduque)">RDO Code - 062 (Boac, Marinduque)</option>
-                                        <option value="RDO Code - 063 (Calapan, Oriental Mindoro)">RDO Code - 063 (Calapan, Oriental Mindoro)</option>
-                                        <option value="RDO Code - 064 (Talisay, Camarines Norte)">RDO Code - 064 (Talisay, Camarines Norte)</option>
-                                        <option value="RDO Code - 065 (Naga City)">RDO Code - 065 (Naga City)</option>
-                                        <option value="RDO Code - 066 (Iriga City)">RDO Code - 066 (Iriga City)</option>
-                                        <option value="RDO Code - 067 (Legazpi City, Albay)">RDO Code - 067 (Legazpi City, Albay)</option>
-                                        <option value="RDO Code - 068 (Sorsogon, Sorsogon)">RDO Code - 068 (Sorsogon, Sorsogon)</option>
-                                        <option value="RDO Code - 069 (Virac, Catanduanes)">RDO Code - 069 (Virac, Catanduanes)</option>
-                                        <option value="RDO Code - 070 (Masbate, Masbate)">RDO Code - 070 (Masbate, Masbate)</option>
-                                        <option value="RDO Code - 071 (Kalibo, Aklan)">RDO Code - 071 (Kalibo, Aklan)</option>
-                                        <option value="RDO Code - 072 (Roxas City)">RDO Code - 072 (Roxas City)</option>
-                                        <option value="RDO Code - 073 (San Jose, Antique)">RDO Code - 073 (San Jose, Antique)</option>
-                                        <option value="RDO Code - 074 (Iloilo City)">RDO Code - 074 (Iloilo City)</option>
-                                        <option value="RDO Code - 075 (Zarraga, Iloilo City)">RDO Code - 075 (Zarraga, Iloilo City)</option>
-                                        <option value="RDO Code - 076 (Victorias City, Negros Occidental)">RDO Code - 076 (Victorias City, Negros Occidental)</option>
-                                        <option value="RDO Code - 077 (Bacolod City)">RDO Code - 077 (Bacolod City)</option>
-                                        <option value="RDO Code - 078 (Binalbagan, Negros Occidental)">RDO Code - 078 (Binalbagan, Negros Occidental)</option>
-                                        <option value="RDO Code - 079 (Dumaguete City)">RDO Code - 079 (Dumaguete City)</option>
-                                        <option value="RDO Code - 080 (Mandaue City)">RDO Code - 080 (Mandaue City)</option>
-                                        <option value="RDO Code - 081 (Cebu City North)">RDO Code - 081 (Cebu City North)</option>
-                                        <option value="RDO Code - 082 (Cebu City South)">RDO Code - 082 (Cebu City South)</option>
-                                        <option value="RDO Code - 083 (Talisay City, Cebu)">RDO Code - 083 (Talisay City, Cebu)</option>
-                                        <option value="RDO Code - 084 (Tagbilaran City)">RDO Code - 084 (Tagbilaran City)</option>
-                                        <option value="RDO Code - 085 (Catarman, Northern Samar)">RDO Code - 085 (Catarman, Northern Samar)</option>
-                                        <option value="RDO Code - 086 (Borongan, Eastern Samar)">RDO Code - 086 (Borongan, Eastern Samar)</option>
-                                        <option value="RDO Code - 087 (Calbayog City, Samar)">RDO Code - 087 (Calbayog City, Samar)</option>
-                                        <option value="RDO Code - 088 (Tacloban City)">RDO Code - 088 (Tacloban City)</option>
-                                        <option value="RDO Code - 089 (Ormoc City)">RDO Code - 089 (Ormoc City)</option>
-                                        <option value="RDO Code - 090 (Maasin, Southern Leyte)">RDO Code - 090 (Maasin, Southern Leyte)</option>
-                                        <option value="RDO Code - 091 (Dipolog City)">RDO Code - 091 (Dipolog City)</option>
-                                        <option value="RDO Code - 092 (Pagadian City, Zamboanga del Sur)">RDO Code - 092 (Pagadian City, Zamboanga del Sur)</option>
-                                        <option value="RDO Code - 093A (Zamboanga City, Zamboanga del Sur)">RDO Code - 093A (Zamboanga City, Zamboanga del Sur)</option>
-                                        <option value="RDO Code - 093B (Ipil, Zamboanga Sibugay)">RDO Code - 093B (Ipil, Zamboanga Sibugay)</option>
-                                        <option value="RDO Code - 094 (Isabela, Basilan)">RDO Code - 094 (Isabela, Basilan)</option>
-                                        <option value="RDO Code - 095 (Jolo, Sulu)">RDO Code - 095 (Jolo, Sulu)</option>
-                                        <option value="RDO Code - 096 (Bongao, Tawi-Tawi)">RDO Code - 096 (Bongao, Tawi-Tawi)</option>
-                                        <option value="RDO Code - 097 (Gingoog City)">RDO Code - 097 (Gingoog City)</option>
-                                        <option value="RDO Code - 098 (Cagayan de Oro City)">RDO Code - 098 (Cagayan de Oro City)</option>
-                                        <option value="RDO Code - 099 (Malaybalay City, Bukidnon)">RDO Code - 099 (Malaybalay City, Bukidnon)</option>
-                                        <option value="RDO Code - 100 (Ozamis City)">RDO Code - 100 (Ozamis City)</option>
-                                        <option value="RDO Code - 101 (Iligan City)">RDO Code - 101 (Iligan City)</option>
-                                        <option value="RDO Code - 102 (Marawi City)">RDO Code - 102 (Marawi City)</option>
-                                        <option value="RDO Code - 103 (Butuan City)">RDO Code - 103 (Butuan City)</option>
-                                        <option value="RDO Code - 104 (Bayugan City, Agusan del Sur)">RDO Code - 104 (Bayugan City, Agusan del Sur)</option>
-                                        <option value="RDO Code - 105 (Surigao City)">RDO Code - 105 (Surigao City)</option>
-                                        <option value="RDO Code - 106 (Tandag, Surigao del Sur)">RDO Code - 106 (Tandag, Surigao del Sur)</option>
-                                        <option value="RDO Code - 107 (Cotabato City)">RDO Code - 107 (Cotabato City)</option>
-                                        <option value="RDO Code - 108 (Kidapawan, North Cotabato)">RDO Code - 108 (Kidapawan, North Cotabato)</option>
-                                        <option value="RDO Code - 109 (Tacurong, Sultan Kudarat)">RDO Code - 109 (Tacurong, Sultan Kudarat)</option>
-                                        <option value="RDO Code - 110 (General Santos City)">RDO Code - 110 (General Santos City)</option>
-                                        <option value="RDO Code - 111 (Koronadal City, South Cotabato)">RDO Code - 111 (Koronadal City, South Cotabato)</option>
-                                        <option value="RDO Code - 112 (Tagum, Davao del Norte)">RDO Code - 112 (Tagum, Davao del Norte)</option>
-                                        <option value="RDO Code - 113A (West Davao City)">RDO Code - 113A (West Davao City)</option>
-                                        <option value="RDO Code - 113B (East Davao City)">RDO Code - 113B (East Davao City)</option>
-                                        <option value="RDO Code - 114 (Mati, Davao Oriental)">RDO Code - 114 (Mati, Davao Oriental)</option>
-                                        <option value="RDO Code - 115 (Digos, Davao del Sur)">RDO Code - 115 (Digos, Davao del Sur)</option>
+                                    <select wire:model="selectedRDO" name="rdo" id="rdo" class="border rounded-xl px-4 py-2 w-80 text-sm truncate border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm cursor-pointer">
+                                        @foreach($rdos as $rdo)
+                <option value="{{ $rdo->id }}">{{ $rdo->rdo_code }} - {{ $rdo->location }}</option>
+            @endforeach
                                     </select>
                                     {{-- <small class="text-gray-500 absolute left-0 mt-2">
                                         Businesses with RDO Nos. 116, 125, 126, 121, 124, 123, 127, etc., are considered large taxpayers. <br/> As such, they will be monitored by the National Office, specifically by the Large Taxpayer’s Division.
@@ -462,6 +316,7 @@
     {{-- Simple remedy muna nilagay ko kapag mag aappear na "Save" button sa Financial Settings. --}}
     {{-- kasi nag search ako, puro pang controller pinakita --}}
     <script>
+  
         document.addEventListener('DOMContentLoaded', function() {
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content-item');
@@ -567,6 +422,52 @@
         updateTabs();
     });
         
+    document.addEventListener('DOMContentLoaded', function() {
+        const provinces = @json($provinces); // Pass provinces to JavaScript
+        const municipalities = @json($municipalities); // Pass municipalities to JavaScript
+
+        // Handle region change
+        document.getElementById('region').addEventListener('change', function() {
+            const selectedRegion = this.value;
+
+            // Clear and disable province dropdown
+            const provinceSelect = document.getElementById('province');
+            provinceSelect.innerHTML = '<option value="" disabled selected>Select Province</option>';
+            provinceSelect.disabled = true;
+
+            // Load provinces based on selected region
+            provinces.forEach(province => {
+                if (province.region === selectedRegion) {
+                    const option = document.createElement('option');
+                    option.value = province.name;
+                    option.textContent = province.name;
+                    provinceSelect.appendChild(option);
+                }
+            });
+            provinceSelect.disabled = false; // Enable the province dropdown
+        });
+
+        // Handle province change
+        document.getElementById('province').addEventListener('change', function() {
+            const selectedProvince = this.value;
+
+            // Clear and disable city dropdown
+            const citySelect = document.getElementById('city');
+            citySelect.innerHTML = '<option value="" disabled selected>Select City</option>';
+            citySelect.disabled = true;
+
+            // Load municipalities based on selected province
+            municipalities.forEach(municipality => {
+                if (municipality.province === selectedProvince) {
+                    const option = document.createElement('option');
+                    option.value = municipality.name;
+                    option.textContent = municipality.name;
+                    citySelect.appendChild(option);
+                }
+            });
+            citySelect.disabled = false; // Enable the city dropdown
+        });
+    });
     </script>
 
 </x-organization-layout>
