@@ -11,7 +11,7 @@
             You will find a<br />comprehensive overview of the organization’s financial activities and 
             tax-related information here.
         </p>
-    </div>
+    </div>  
 </div>
 
 <div class="py-6 h-full">

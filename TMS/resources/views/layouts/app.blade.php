@@ -1,3 +1,7 @@
+@php
+$organizationId = session('organization_id');
+$organization = \App\Models\OrgSetup::find($organizationId);
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -20,17 +24,31 @@
         @vite(['resources/css/app.css', 'resources/css/custom.css', 'resources/js/app.js'])
         <!-- Styles -->
         @livewireStyles
+     
+        
         
     </head>
 
     <body class="font-sans antialiased">
+        @php
+        $organizationId = session('organization_id');
+        $organization = \App\Models\OrgSetup::find($organizationId);
+    @endphp
+
+    <header>
+        @if ($organization)
+            <h1>Welcome, {{ $organization->registration_name }}</h1>
+        @else
+            <h1>Welcome to our application!</h1>
+        @endif
+    </header>
         <x-banner />
         <div class="w-full flex">
             {{-- Sidebar --}}
             <nav id="sidebar" class="bg-white h-screen 
             sticky top-0 sidebar-open py-6 pr-4 border-r-2 shadow-sm overfow-hidden transition-all duration-500">
                 <div class="relative flex justify-center items-center">
-                    <a href="{{ route('view_dashboard') }}" class="text-center content">
+                    <a href="{{ route('dashboard') }}" class="text-center content">
                         <img src="{{ asset('images/Taxuri Logo-name.png') }}" alt="logo" class='w-[160px]' />
                     </a>
                     <button id="toggleSidebar" class="absolute -right-8 -top-2 h-8 w-8 p-[6px] border-gray-300 cursor-pointer bg-slate-50 flex items-center justify-center transition-all rounded-full drop-shadow-md">
@@ -42,9 +60,9 @@
                 <div class="content overflow-auto py-2 h-full">
                     <ul class="space-y-1 my-8 flex-1">
                         <li class="pl-0">
-                            <a href="{{ route('view_dashboard') }}"
+                            <a href="{{ route('dashboard') }}"
                             class="flex items-center rounded-r-full px-6 py-2 ease-in duration-500 transition-all 
-                            {{ request()->routeIs('view_dashboard') ? 'sidebar-active' : '' }}">
+                            {{ request()->routeIs('dashboard') ? 'sidebar-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon mr-2" viewBox="0 0 1024 1024"><path fill="#273C75" d="M946.5 505L534.6 93.4a31.93 31.93 0 0 0-45.2 0L77.5 505c-12 12-18.8 28.3-18.8 45.3c0 35.3 28.7 64 64 64h43.4V908c0 17.7 14.3 32 32 32H448V716h112v224h265.9c17.7 0 32-14.3 32-32V614.3h43.4c17 0 33.3-6.7 45.3-18.8c24.9-25 24.9-65.5-.1-90.5"/></svg>                                <span class="sidebar-text">Home</span>
                             </a>
                         </li>
