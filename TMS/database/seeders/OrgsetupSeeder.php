@@ -6,7 +6,7 @@ use App\Models\OrgSetup as Orgsetups;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
-class Orgsetup extends Seeder
+class OrgsetupSeeder extends Seeder
 {
     /**
      * Run the database seeds.

@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             TaxTypeSeeder::class,
             AtcSeeder::class,
             RdoSeeder::class,
+            OrgsetupSeeder::class
 
 
         ]);
