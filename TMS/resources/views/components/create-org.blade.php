@@ -101,54 +101,54 @@
                     </div>
                 </div>
             
-            <!-- Address Content -->
-<div class="tab-content-item">
-    <p class="p-10 text-zinc-600 font-medium text-lg">Organization Address Information</p>
-    <div class="flex flex-col items-center h-full">
-        <div class="flex flex-col mb-4 w-full max-w-md">
-            <div class="flex flex-col">
-                <x-field-label for="address_line" value="{{ __('Address Line') }}" class="mb-2 text-left" />
-                <x-input type="text" name="address_line" id="address_line" wire:model="address_line" placeholder="e.g. ESI Bldg 124 Yakal Street" />
-            </div>
-        </div>
+                <!-- Address Content -->
+                <div class="tab-content-item">
+                    <p class="p-10 text-zinc-600 font-medium text-lg">Organization Address Information</p>
+                    <div class="flex flex-col items-center h-full">
+                        <div class="flex flex-col mb-4 w-full max-w-md">
+                            <div class="flex flex-col">
+                                <x-field-label for="address_line" value="{{ __('Address Line') }}" class="mb-2 text-left" />
+                                <x-input type="text" name="address_line" id="address_line" wire:model="address_line" placeholder="e.g. ESI Bldg 124 Yakal Street" />
+                            </div>
+                        </div>
 
-        <div class="flex flex-col mb-4 w-full max-w-md">
-            <div class="flex flex-col">
-                <x-field-label for="region" value="{{ __('Region') }}" class="mb-2 text-left" />
-                <select wire:model="region" name="region" id="region" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
-                    <option value="" disabled selected>Select Region</option>
-                    @foreach($regions as $region)
-                    <option value="{{ $region['designation'] }}">{{ $region['name'] }}</option>
-                @endforeach
-                </select>
-            </div>
-        </div>
+                        <div class="flex flex-col mb-4 w-full max-w-md">
+                            <div class="flex flex-col">
+                                <x-field-label for="region" value="{{ __('Region') }}" class="mb-2 text-left" />
+                                <select wire:model="region" name="region" id="region" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                                    <option value="" disabled selected>Select Region</option>
+                                    @foreach($regions as $region)
+                                    <option value="{{ $region['designation'] }}">{{ $region['name'] }}</option>
+                                @endforeach
+                                </select>
+                            </div>
+                        </div>
 
-        <div class="flex flex-col mb-4 w-full max-w-md">
-            <div class="flex flex-col">
-                <x-field-label for="province" value="{{ __('Province') }}" class="mb-2 text-left" />
-                <select wire:model="province" name="province" id="province" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm" {{ !$region ? 'disabled' : '' }}>
-                    <option value="" disabled selected>Select Province</option>
-                   
-                </select>
-            </div>
-        </div>
+                        <div class="flex flex-col mb-4 w-full max-w-md">
+                            <div class="flex flex-col">
+                                <x-field-label for="province" value="{{ __('Province') }}" class="mb-2 text-left" />
+                                <select wire:model="province" name="province" id="province" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm" {{ !$region ? 'disabled' : '' }}>
+                                    <option value="" disabled selected>Select Province</option>
+                                
+                                </select>
+                            </div>
+                        </div>
 
-        <div class="flex flex-row space-x-4 w-full max-w-md">
-            <div class="flex flex-col w-full">
-                <x-field-label for="city" value="{{ __('City') }}" class="mb-2 text-left" />
-                <select wire:model="city" name="city" id="city" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
-                    <option value="" disabled selected>Select City</option>
-                  
-                </select>
-            </div>
-            <div class="flex flex-col w-32">
-                <x-field-label for="zip_code" value="{{ __('Zip Code') }}" class="mb-2 text-left" />
-                <x-input type="text" name="zip_code" id="zip_code" wire:model="zip_code" placeholder="1203" class="border rounded-xl px-4 py-2 w-full" />
-            </div>
-        </div>
-    </div>
-</div>
+                        <div class="flex flex-row space-x-4 w-full max-w-md">
+                            <div class="flex flex-col w-full">
+                                <x-field-label for="city" value="{{ __('City') }}" class="mb-2 text-left" />
+                                <select wire:model="city" name="city" id="city" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                                    <option value="" disabled selected>Select City</option>
+                                
+                                </select>
+                            </div>
+                            <div class="flex flex-col w-32">
+                                <x-field-label for="zip_code" value="{{ __('Zip Code') }}" class="mb-2 text-left" />
+                                <x-input type="text" name="zip_code" id="zip_code" wire:model="zip_code" placeholder="1203" class="border rounded-xl px-4 py-2 w-full" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
            
                 <!-- Contact Content -->
                 <div class="tab-content-item">
@@ -178,7 +178,7 @@
                             <div class="flex flex-col mb-4 items-center">
                                 <div class="flex flex-col w-80">
                                     <x-field-label for="tin" value="{{ __('Tax Identification Number (TIN)') }}" class="mb-2 text-left" />
-                                    <x-input type="text" name="tin" id="tin" wire:model="tin" placeholder="e.g. 000-000-000-000" class="w-80" />
+                                    <x-input type="text" name="tin" id="tin" wire:model="tin" placeholder="e.g. 000-000-000-00000" class="w-80" />
                                 </div>
                             </div>
                         
@@ -186,9 +186,10 @@
                                 <div class="flex flex-col 80">
                                     <x-field-label for="rdo" value="{{ __('Revenue District Office (RDO)') }}" class="mb-2 text-left" />
                                     <select wire:model="selectedRDO" name="rdo" id="rdo" class="border rounded-xl px-4 py-2 w-80 text-sm truncate border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm cursor-pointer">
+                                        <option value="" disabled selected>Select RDO</option>
                                         @foreach($rdos as $rdo)
-                <option value="{{ $rdo->id }}">{{ $rdo->rdo_code }} - {{ $rdo->location }}</option>
-            @endforeach
+                                            <option value="{{ $rdo->id }}">{{ $rdo->rdo_code }} - {{ $rdo->location }}</option>
+                                        @endforeach
                                     </select>
                                     {{-- <small class="text-gray-500 absolute left-0 mt-2">
                                         Businesses with RDO Nos. 116, 125, 126, 121, 124, 123, 127, etc., are considered large taxpayers. <br/> As such, they will be monitored by the National Office, specifically by the Large Taxpayer’s Division.

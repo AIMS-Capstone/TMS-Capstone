@@ -16,6 +16,7 @@ class OrgSetupController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $perPage = $request->input('perPage', 5); 
         
         $query = OrgSetup::query();
         
@@ -25,7 +26,7 @@ class OrgSetupController extends Controller
                 ->orWhere('type', 'like', "%{$search}%");
         }
 
-        $orgsetups = $query->paginate(4);
+        $orgsetups = $query->paginate($perPage);
 
         return view('org-setup', compact('orgsetups'));
     }

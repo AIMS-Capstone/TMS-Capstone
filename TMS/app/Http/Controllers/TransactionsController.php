@@ -41,7 +41,7 @@ class TransactionsController extends Controller
             $query->where('transaction_type', $type);
         }
     
-        $transactions = $query->paginate(4);
+        $transactions = $query->paginate(5);
     
         return view('transactions', compact('transactions'));
     }

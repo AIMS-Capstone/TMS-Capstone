@@ -45,9 +45,13 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
+    Route::get('/user-management', function () {
+        return view('user-management');
+    })->name('user-management');
     Route::get('/recycle-bin', function () {
         return view('recycle-bin');
     })->name('recycle-bin');
+    
 
     //url base, ayaw gumana undefined yung {orgID} kahit na defined ko yon sa controller. Hindi ko alam bakit, pero nakikita yung id# sa bawat url nung directory if nag hover dun sa select organization.
     Route::get('/dashboard/{orgId}', [DashboardController::class, 'show'])->name('dashboard');

@@ -37,9 +37,9 @@ $organization = \App\Models\OrgSetup::find($organizationId);
 
     <header>
         @if ($organization)
-            <h1>Welcome, {{ $organization->registration_name }}</h1>
+            {{-- <h1>Welcome, {{ $organization->registration_name }}</h1> --}}
         @else
-            <h1>Welcome to our application!</h1>
+            {{-- <h1>Welcome to our application!</h1> --}}
         @endif
     </header>
         <x-banner />
