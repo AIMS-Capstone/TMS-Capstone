@@ -112,43 +112,42 @@
                             </div>
                         </div>
 
-                        <div class="flex flex-col mb-4 w-full max-w-md">
-                            <div class="flex flex-col">
-                                <x-field-label for="region" value="{{ __('Region') }}" class="mb-2 text-left" />
-                                <select wire:model="region" name="region" id="region" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
-                                    <option value="" disabled selected>Select Region</option>
-                                    @foreach($regions as $region)
-                                    <option value="{{ $region['designation'] }}">{{ $region['name'] }}</option>
-                                @endforeach
-                                </select>
-                            </div>
-                        </div>
+        <div class="flex flex-col mb-4 w-full max-w-md">
+            <div class="flex flex-col">
+                <x-field-label for="region" value="{{ __('Region') }}" class="mb-2 text-left" />
+                <select wire:model="region" name="region" id="region" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                    <option value="" disabled selected>Select Region</option>
+                    @foreach($regions as $region)
+                        <option value="{{ $region['designation'] }}">{{ $region['name'] }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
 
-                        <div class="flex flex-col mb-4 w-full max-w-md">
-                            <div class="flex flex-col">
-                                <x-field-label for="province" value="{{ __('Province') }}" class="mb-2 text-left" />
-                                <select wire:model="province" name="province" id="province" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm" {{ !$region ? 'disabled' : '' }}>
-                                    <option value="" disabled selected>Select Province</option>
-                                
-                                </select>
-                            </div>
-                        </div>
+        <div class="flex flex-col mb-4 w-full max-w-md">
+            <div class="flex flex-col">
+                <x-field-label for="province" value="{{ __('Province') }}" class="mb-2 text-left" />
+                <select wire:model="province" name="province" id="province" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm" {{ !$region ? 'disabled' : '' }}>
+                    <option value="" disabled selected>Select Province</option>
+                </select>
+            </div>
+        </div>
 
-                        <div class="flex flex-row space-x-4 w-full max-w-md">
-                            <div class="flex flex-col w-full">
-                                <x-field-label for="city" value="{{ __('City') }}" class="mb-2 text-left" />
-                                <select wire:model="city" name="city" id="city" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
-                                    <option value="" disabled selected>Select City</option>
-                                
-                                </select>
-                            </div>
-                            <div class="flex flex-col w-32">
-                                <x-field-label for="zip_code" value="{{ __('Zip Code') }}" class="mb-2 text-left" />
-                                <x-input type="text" name="zip_code" id="zip_code" wire:model="zip_code" placeholder="1203" class="border rounded-xl px-4 py-2 w-full" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="flex flex-row space-x-4 w-full max-w-md">
+            <div class="flex flex-col w-full">
+                <x-field-label for="city" value="{{ __('City') }}" class="mb-2 text-left" />
+                <select wire:model="city" name="city" id="city" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                    <option value="" disabled selected>Select City</option>
+                </select>
+            </div>
+            <div class="flex flex-col w-32">
+                <x-field-label for="zip_code" value="{{ __('Zip Code') }}" class="mb-2 text-left" />
+                <x-input type="text" name="zip_code" id="zip_code" wire:model="zip_code" placeholder="1203" class="border rounded-xl px-4 py-2 w-full" />
+            </div>
+        </div>
+    </div>
+</div>
+
            
                 <!-- Contact Content -->
                 <div class="tab-content-item">
@@ -275,7 +274,7 @@
                         </span>
                         Go back
                     </button>
-                    <button id="nextBtn" class="bg-blue-900 text-white font-semibold px-4 py-2 rounded-xl">
+                    <button id="nextBtn" disabled class="bg-blue-900 text-white font-semibold px-4 py-2 rounded-xl">
                         Next
                         <span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 24 24">
@@ -288,7 +287,7 @@
                     </button>
                 </div>
 
-                <div x-show="showModal" x-data="{ showModal: false }" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30">
+                <div x-show="showModal" x-data="{ showModal: false }" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30" x-cloak>
                     <div class="bg-white rounded-lg shadow-lg p-6 text-center max-w-lg w-full">
                         <!-- Centered Image -->
                         <div class="flex justify-center mb-4">
@@ -316,159 +315,211 @@
 
     {{-- Simple remedy muna nilagay ko kapag mag aappear na "Save" button sa Financial Settings. --}}
     {{-- kasi nag search ako, puro pang controller pinakita --}}
-    <script>
+    <script>    
   
-        document.addEventListener('DOMContentLoaded', function() {
-        const tabs = document.querySelectorAll('.tab');
-        const tabContents = document.querySelectorAll('.tab-content-item');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const saveBtnHtml = `
-            <button type="submit" id="saveBtn" class="bg-blue-900 text-white font-semibold px-4 py-2 rounded-xl" @click="showModal = true">
-                Save
-                <span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 24 24">
-                        <g fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M8 12h8m-4 4l4-4l-4-4"/>
-                        </g>
-                    </svg>
-                </span>
-            </button>
-        `;
-        let currentTab = 0;
+document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content-item');
+    let prevBtn = document.getElementById('prevBtn');
+    let nextBtn = document.getElementById('nextBtn');
+    const saveBtnHtml = `
+        <button type="submit" id="saveBtn" class="bg-blue-900 text-white font-semibold px-4 py-2 rounded-xl">
+            Save
+            <span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 24 24">
+                    <g fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M8 12h8m-4 4l4-4l-4-4"/>
+                    </g>
+                </svg>
+            </span>
+        </button>
+    `;
+    let currentTab = 0;
 
-        function updateButtonsVisibility() {
-            const activeTabId = tabs[currentTab].id;
-            if (activeTabId === 'tab-financial') {
-                nextBtn.outerHTML = saveBtnHtml;
-            } else {
-                if (!document.getElementById('nextBtn')) {
-                    document.querySelector('.flex.justify-between').insertAdjacentHTML('beforeend', `
-                        <button id="nextBtn" class="bg-blue-900 text-white font-semibold px-4 py-2 rounded-xl">
-                            Next
-                            <span>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 24 24">
-                                    <g fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <path d="M8 12h8m-4 4l4-4l-4-4"/>
-                                    </g>
-                                </svg>
-                            </span>
-                        </button>
-                    `);
-                }
+    function updateButtonStyles(button) {
+        if (button.disabled) {
+            button.classList.remove('bg-blue-900', 'text-white');
+            button.classList.add('bg-gray-400', 'text-gray-700', 'cursor-not-allowed');
+        } else {
+            button.classList.remove('bg-gray-400', 'text-gray-700', 'cursor-not-allowed');
+            button.classList.add('bg-blue-900', 'text-white');
+        }
+    }
+
+    function updateButtonsVisibility() {
+        const activeTabId = tabs[currentTab].id;
+        if (activeTabId === 'tab-financial') {
+            nextBtn.outerHTML = saveBtnHtml;
+            nextBtn = document.getElementById('saveBtn');
+            nextBtn.addEventListener('click', handleSubmit); // Add form submission handling
+        } else {
+            if (!document.getElementById('nextBtn')) {
+                document.querySelector('.flex.justify-between').insertAdjacentHTML('beforeend', `
+                    <button id="nextBtn" class="bg-blue-900 text-white font-semibold px-4 py-2 rounded-xl">
+                        Next
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 24 24">
+                                <g fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M8 12h8m-4 4l4-4l-4-4"/>
+                                </g>
+                            </svg>
+                        </span>
+                    </button>
+                `);
+                nextBtn = document.getElementById('nextBtn');
+                nextBtn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    if (currentTab < tabs.length - 1) {
+                        currentTab++;
+                        updateTabs();
+                    }
+                });
             }
         }
+        checkTabFields(); 
+    }
 
-        function activateTab(tabId) {
-            tabContents.forEach(item => item.classList.add('hidden'));
-            switch (tabId) {
-                case 'tab-class':
-                    tabContents[0].classList.remove('hidden');
-                    break;
-                case 'tab-bg':
-                    tabContents[1].classList.remove('hidden');
-                    break;
-                case 'tab-add':
-                    tabContents[2].classList.remove('hidden');
-                    break;
-                case 'tab-contact':
-                    tabContents[3].classList.remove('hidden');
-                    break;
-                case 'tab-tax':
-                    tabContents[4].classList.remove('hidden');
-                    break;
-                case 'tab-financial':
-                    tabContents[5].classList.remove('hidden');
-                    break;
-            }
-            updateButtonsVisibility();
+    function activateTab(tabId) {
+        tabContents.forEach(item => item.classList.add('hidden'));
+        const tabIndex = Array.from(tabs).findIndex(tab => tab.id === tabId);
+        if (tabIndex !== -1) {
+            tabContents[tabIndex].classList.remove('hidden');
         }
+        updateButtonsVisibility();
+    }
 
-        function updateTabs() {
-            tabs.forEach((tab, index) => {
-                tab.classList.remove('text-blue-900', 'font-semibold', 'border-b-4', 'border-blue-900', 'rounded-t-lg');
-                tab.classList.add('text-gray-500');
-                tabContents[index].classList.add('hidden');
-                
-                if (index === currentTab) {
-                    tab.classList.add('text-blue-900', 'font-semibold', 'border-b-4', 'border-blue-900', 'rounded-t-lg');
-                    tab.classList.remove('text-gray-500');
-                    tabContents[index].classList.remove('hidden');
-                }
-            });
-            prevBtn.disabled = currentTab === 0;
-            nextBtn.disabled = currentTab === tabs.length - 1;
-            updateButtonsVisibility(); 
-        }
-        prevBtn.addEventListener('click', () => {
-            if (currentTab > 0) {
-                currentTab--;
-                updateTabs();
-            }
-        });
-        nextBtn.addEventListener('click', () => {
-            if (currentTab < tabs.length - 1) {
-                currentTab++;
-                updateTabs();
-            }
-        });
+    function updateTabs() {
         tabs.forEach((tab, index) => {
-            tab.addEventListener('click', () => {
-                currentTab = index;
-                updateTabs();
-            });
+            tab.classList.toggle('text-blue-900', index === currentTab);
+            tab.classList.toggle('font-semibold', index === currentTab);
+            tab.classList.toggle('border-b-4', index === currentTab);
+            tab.classList.toggle('border-blue-900', index === currentTab);
+            tab.classList.toggle('rounded-t-lg', index === currentTab);
+            tab.classList.toggle('text-gray-500', index !== currentTab);
+            tabContents[index].classList.toggle('hidden', index !== currentTab);
         });
-        updateTabs();
+        prevBtn.disabled = currentTab === 0;
+        nextBtn.disabled = currentTab === tabs.length - 1;
+        updateButtonsVisibility();
+    }
+
+    function checkTabFields() {
+        const activeTabContent = tabContents[currentTab];
+        const inputs = activeTabContent.querySelectorAll('input');
+        const selects = activeTabContent.querySelectorAll('select');
+        let allFilled = Array.from(inputs).every(input => input.value.trim() !== '') &&
+                        Array.from(selects).every(select => select.value !== '');
+
+        nextBtn.disabled = !allFilled;
+        if (document.getElementById('saveBtn')) {
+            document.getElementById('saveBtn').disabled = !allFilled;
+        }
+    }
+
+    function handleSubmit(event) {
+        const saveBtn = document.getElementById('saveBtn');
+        if (saveBtn && saveBtn.disabled) {
+            event.preventDefault(); // Prevent submission if Save button is disabled
+        }
+    }
+
+    prevBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        if (currentTab > 0) {
+            currentTab--;
+            updateTabs();
+        }
     });
+
+    nextBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        if (currentTab < tabs.length - 1) {
+            currentTab++;
+            updateTabs();
+        }
+    });
+
+    tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+            currentTab = index;
+            updateTabs();
+        });
+    });
+
+    tabContents.forEach(tabContent => {
+        tabContent.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('input', checkTabFields);
+            element.addEventListener('change', checkTabFields);
+        });
+    });
+
+    updateTabs(); // Initial setup
+});
+
+
         
-    document.addEventListener('DOMContentLoaded', function() {
-        const provinces = @json($provinces); // Pass provinces to JavaScript
-        const municipalities = @json($municipalities); // Pass municipalities to JavaScript
+   document.addEventListener('DOMContentLoaded', function() {
+    const provinces = @json($provinces);
+    const municipalities = @json($municipalities); // Pass municipalities with zip codes to JavaScript
 
-        // Handle region change
-        document.getElementById('region').addEventListener('change', function() {
-            const selectedRegion = this.value;
+    // Handle region change
+    document.getElementById('region').addEventListener('change', function() {
+        const selectedRegion = this.value;
 
-            // Clear and disable province dropdown
-            const provinceSelect = document.getElementById('province');
-            provinceSelect.innerHTML = '<option value="" disabled selected>Select Province</option>';
-            provinceSelect.disabled = true;
+        // Clear and disable province dropdown
+        const provinceSelect = document.getElementById('province');
+        provinceSelect.innerHTML = '<option value="" disabled selected>Select Province</option>';
+        provinceSelect.disabled = true;
 
-            // Load provinces based on selected region
-            provinces.forEach(province => {
-                if (province.region === selectedRegion) {
-                    const option = document.createElement('option');
-                    option.value = province.name;
-                    option.textContent = province.name;
-                    provinceSelect.appendChild(option);
-                }
-            });
-            provinceSelect.disabled = false; // Enable the province dropdown
+        // Load provinces based on selected region
+        provinces.forEach(province => {
+            if (province.region === selectedRegion) {
+                const option = document.createElement('option');
+                option.value = province.name;
+                option.textContent = province.name;
+                provinceSelect.appendChild(option);
+            }
         });
-
-        // Handle province change
-        document.getElementById('province').addEventListener('change', function() {
-            const selectedProvince = this.value;
-
-            // Clear and disable city dropdown
-            const citySelect = document.getElementById('city');
-            citySelect.innerHTML = '<option value="" disabled selected>Select City</option>';
-            citySelect.disabled = true;
-
-            // Load municipalities based on selected province
-            municipalities.forEach(municipality => {
-                if (municipality.province === selectedProvince) {
-                    const option = document.createElement('option');
-                    option.value = municipality.name;
-                    option.textContent = municipality.name;
-                    citySelect.appendChild(option);
-                }
-            });
-            citySelect.disabled = false; // Enable the city dropdown
-        });
+        provinceSelect.disabled = false; // Enable the province dropdown
     });
+
+    // Handle province change
+    document.getElementById('province').addEventListener('change', function() {
+        const selectedProvince = this.value;
+
+        // Clear and disable city dropdown
+        const citySelect = document.getElementById('city');
+        citySelect.innerHTML = '<option value="" disabled selected>Select City</option>';
+        citySelect.disabled = true;
+
+        // Load municipalities based on selected province
+        municipalities.forEach(municipality => {
+            if (municipality.province === selectedProvince) {
+                const option = document.createElement('option');
+                option.value = municipality.name;
+                option.textContent = municipality.name;
+                citySelect.appendChild(option);
+            }
+        });
+        citySelect.disabled = false; // Enable the city dropdown
+    });
+
+    // Handle city change and set ZIP code
+    document.getElementById('city').addEventListener('change', function() {
+        const selectedCity = this.value;
+
+        // Find and set ZIP code based on selected city
+        const zipCodeInput = document.getElementById('zip_code');
+        const selectedMunicipality = municipalities.find(municipality => municipality.name === selectedCity);
+        if (selectedMunicipality) {
+            zipCodeInput.value = selectedMunicipality.zip_code || '';
+        } else {
+            zipCodeInput.value = '';
+        }
+    });
+});
     </script>
 
 </x-organization-layout>
