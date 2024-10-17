@@ -81,8 +81,8 @@
                 @endif
                 <div class="h-8 border-l border-gray-200"></div>
                 <!-- Settings Dropdown -->
-                <div class="ms-3 relative">
-                    <x-dropdown align="right" width="48">
+                <div class="ms-3 relative py-2 px-2">
+                    <x-dropdown align="right" class="w-44 py-2 px-2">
                         <x-slot name="trigger">
                             @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
                                 <button class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition">
@@ -103,40 +103,52 @@
                         
                         <x-slot name="content">
                             <!-- Account Management -->
-                            <div class="block px-4 py-2 text-xs text-gray-400">
-                                {{ __('Manage Account') }}
-                            </div>
-
-                            <x-dropdown-link href="{{ route('profile.show') }}">
-                                {{ __('Profile') }}
-                            </x-dropdown-link>
+                            <x-dropdown-nav href="{{ route('profile.show') }}" class="mt-1 group">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-4 w-4 me-2" viewBox="0 0 24 24">
+                                    <g fill="none">
+                                        <path class="group-hover:fill-blue-950" d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/>
+                                        <path class="fill-zinc-600 group-hover:fill-blue-950" d="M16 14a5 5 0 0 1 4.995 4.783L21 19v1a2 2 0 0 1-1.85 1.995L19 22H5a2 2 0 0 1-1.995-1.85L3 20v-1a5 5 0 0 1 4.783-4.995L8 14zM12 2a5 5 0 1 1 0 10a5 5 0 0 1 0-10"/>
+                                    </g>
+                                </svg>
+                                <span>{{ __('My Profile') }}</span>
+                            </x-dropdown-nav>
 
                             @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
-                                <x-dropdown-link href="{{ route('api-tokens.index') }}">
+                                <x-dropdown-nav href="{{ route('api-tokens.index') }}">
                                     {{ __('API Tokens') }}
-                                </x-dropdown-link>
+                                </x-dropdown-nav>
                             @endif
 
-                            <x-dropdown-link href="{{ route('recycle-bin') }}">
-                                {{ __('Recycle Bin') }}
-                            </x-dropdown-link>
+                            <x-dropdown-nav href="{{ route('user-management') }}" class="group">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-4 w-4 me-2" viewBox="0 0 16 16">
+                                    <path class="fill-zinc-600 group-hover:fill-blue-950" d="M8.5 4.5a2.5 2.5 0 1 1-5 0a2.5 2.5 0 0 1 5 0m2.4 7.506c.11.542-.348.994-.9.994H2c-.553 0-1.01-.452-.902-.994a5.002 5.002 0 0 1 9.803 0M14.002 12h-1.59a3 3 0 0 0-.04-.29a6.5 6.5 0 0 0-1.167-2.603a3 3 0 0 1 3.633 1.911c.18.522-.283.982-.836.982M12 8a2 2 0 1 0 0-4a2 2 0 0 0 0 4"/>
+                                </svg>
+                                <span>{{ __('User Management') }}</span>
+                            </x-dropdown-nav>
 
-                            <div class="border-t border-gray-200"></div>
+                            <x-dropdown-nav href="{{ route('recycle-bin') }}" class="group">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-4 w-4 me-2" viewBox="0 0 24 24">
+                                    <path class="fill-zinc-600 group-hover:fill-blue-950" d="M20 6a1 1 0 0 1 .117 1.993L20 8h-.081L19 19a3 3 0 0 1-2.824 2.995L16 22H8c-1.598 0-2.904-1.249-2.992-2.75l-.005-.167L4.08 8H4a1 1 0 0 1-.117-1.993L4 6zm-6-4a2 2 0 0 1 2 2a1 1 0 0 1-1.993.117L14 4h-4l-.007.117A1 1 0 0 1 8 4a2 2 0 0 1 1.85-1.995L10 2z"/>
+                                </svg>
+                                <span>{{ __('Recycle Bin') }}</span>
+                            </x-dropdown-nav>
+
+                            <div class="border-t border-gray-200 mx-8 my-2"></div>
 
                             <!-- Authentication -->
                             <form method="POST" action="{{ route('logout') }}" x-data>
                                 @csrf
-
-                                <x-dropdown-link href="{{ route('logout') }}"
-                                         @click.prevent="$root.submit();">
-                                    {{ __('Log Out') }}
-                                </x-dropdown-link>
+                                <x-dropdown-nav href="{{ route('logout') }}" @click.prevent="$root.submit();" class="group mb-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-4 w-4 me-2" viewBox="0 0 24 24">
+                                        <path class="fill-zinc-600 group-hover:fill-blue-950" fill-rule="evenodd" d="M6 2a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V5a3 3 0 0 0-3-3zm10.293 5.293a1 1 0 0 1 1.414 0l4 4a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-1.414-1.414L18.586 13H10a1 1 0 1 1 0-2h8.586l-2.293-2.293a1 1 0 0 1 0-1.414" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>{{ __('Log Out') }}</span>
+                                </x-dropdown-nav>
                             </form>
                         </x-slot>
                     </x-dropdown>
                 </div>
             </div>
-
         </div>
     </div>
 
