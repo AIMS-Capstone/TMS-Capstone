@@ -5,8 +5,8 @@
         </x-slot>
 
         
-        <p class="font-extrabold text-4xl text-center auth-color mt-20">Log In</p>
-        <p class="font-normal mt-2 text-base text-center taxuri-text mb-6">Enter your details to sign in to your account</p>
+        <p class="font-extrabold text-2xl sm:text-4xl text-center auth-color mt-10 sm:mt-20">Log In</p>
+        <p class="font-normal mt-2 text-sm sm:text-base text-center taxuri-text mb-4 sm:mb-6">Enter your details to sign in to your account</p>
         <x-validation-errors class="mb-2" />
 
         @session('status')

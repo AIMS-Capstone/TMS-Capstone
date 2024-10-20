@@ -118,7 +118,7 @@
                                         <span id="selectedOption" class="font-normal text-md text-zinc-700 truncate">Sort by</span>
                                     </button>
                         
-                                    <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden">
+                                    <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
                                         <div class="py-2 px-2">
                                             <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
                                             <div data-sort="recently-added" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
@@ -160,9 +160,8 @@
                             </div>
                     
                             <hr class="border-zinc-300 w-[calc(100%+2rem)] mx-[-1rem]">
-{{--                     
-                            <div class="my-4 overflow-y-auto max-h-[500px]"> --}}
-                            <div class="my-4 overflow-x-auto max-h-[500px]">
+                        
+                            <div class="my-4 overflow-y-auto max-h-[500px]">
                                 <table class="min-w-full bg-white" id="tableid">
                                     <thead class="bg-zinc-100 text-zinc-700 font-extrabold sticky top-0">
                                         <tr>

@@ -49,7 +49,6 @@
         </div>
 
         <!-- Tab Content -->
-        {{-- naka-comment form dahil nagiging 404 error or 419 page expired --}}
         <form action="{{ route ('OrgSetup.store')}}" method="POST">
             @csrf 
             <div id="tab-content" class="container border border-gray-200 rounded-lg p-4 my-10 text-center max-w-full h-[500px] mx-auto flex flex-col">
@@ -112,42 +111,41 @@
                             </div>
                         </div>
 
-        <div class="flex flex-col mb-4 w-full max-w-md">
-            <div class="flex flex-col">
-                <x-field-label for="region" value="{{ __('Region') }}" class="mb-2 text-left" />
-                <select wire:model="region" name="region" id="region" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
-                    <option value="" disabled selected>Select Region</option>
-                    @foreach($regions as $region)
-                        <option value="{{ $region['designation'] }}">{{ $region['name'] }}</option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
+                        <div class="flex flex-col mb-4 w-full max-w-md">
+                            <div class="flex flex-col">
+                                <x-field-label for="region" value="{{ __('Region') }}" class="mb-2 text-left" />
+                                <select wire:model="region" name="region" id="region" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                                    <option value="" disabled selected>Select Region</option>
+                                    @foreach($regions as $region)
+                                        <option value="{{ $region['designation'] }}">{{ $region['name'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
 
-        <div class="flex flex-col mb-4 w-full max-w-md">
-            <div class="flex flex-col">
-                <x-field-label for="province" value="{{ __('Province') }}" class="mb-2 text-left" />
-                <select wire:model="province" name="province" id="province" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm" {{ !$region ? 'disabled' : '' }}>
-                    <option value="" disabled selected>Select Province</option>
-                </select>
-            </div>
-        </div>
+                        <div class="flex flex-col mb-4 w-full max-w-md">
+                            <div class="flex flex-col">
+                                <x-field-label for="province" value="{{ __('Province') }}" class="mb-2 text-left" />
+                                <select wire:model="province" name="province" id="province" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm" {{ !$region ? 'disabled' : '' }}>
+                                    <option value="" disabled selected>Select Province</option>
+                                </select>
+                            </div>
+                        </div>
 
-        <div class="flex flex-row space-x-4 w-full max-w-md">
-            <div class="flex flex-col w-full">
-                <x-field-label for="city" value="{{ __('City') }}" class="mb-2 text-left" />
-                <select wire:model="city" name="city" id="city" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
-                    <option value="" disabled selected>Select City</option>
-                </select>
-            </div>
-            <div class="flex flex-col w-32">
-                <x-field-label for="zip_code" value="{{ __('Zip Code') }}" class="mb-2 text-left" />
-                <x-input type="text" name="zip_code" id="zip_code" wire:model="zip_code" placeholder="1203" class="border rounded-xl px-4 py-2 w-full" />
-            </div>
-        </div>
-    </div>
-</div>
-
+                        <div class="flex flex-row space-x-4 w-full max-w-md">
+                            <div class="flex flex-col w-full">
+                                <x-field-label for="city" value="{{ __('City') }}" class="mb-2 text-left" />
+                                <select wire:model="city" name="city" id="city" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                                    <option value="" disabled selected>Select City</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col w-32">
+                                <x-field-label for="zip_code" value="{{ __('Zip Code') }}" class="mb-2 text-left" />
+                                <x-input type="text" name="zip_code" id="zip_code" wire:model="zip_code" placeholder="1203" class="border rounded-xl px-4 py-2 w-full" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
            
                 <!-- Contact Content -->
                 <div class="tab-content-item">
@@ -190,9 +188,6 @@
                                             <option value="{{ $rdo->id }}">{{ $rdo->rdo_code }} - {{ $rdo->location }}</option>
                                         @endforeach
                                     </select>
-                                    {{-- <small class="text-gray-500 absolute left-0 mt-2">
-                                        Businesses with RDO Nos. 116, 125, 126, 121, 124, 123, 127, etc., are considered large taxpayers. <br/> As such, they will be monitored by the National Office, specifically by the Large Taxpayer’s Division.
-                                    </small> --}}
                                 </div>
                             </div>
                         </div>
@@ -265,7 +260,7 @@
                 </div>
             
                 <!-- Back and Next Buttons -->
-                <div class="absolute inset-x-20 bottom-1 flex justify-between px-4">
+                <div class="inset-x-20 bottom-auto flex justify-between mt-auto px-4">
                     <button id="prevBtn" class="border border-blue-900 bg-white text-blue-900 font-bold px-4 py-2 rounded-xl disabled:opacity-50">
                         <span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 16 16">
@@ -313,9 +308,7 @@
         </form>
     </div>
 
-    {{-- Simple remedy muna nilagay ko kapag mag aappear na "Save" button sa Financial Settings. --}}
-    {{-- kasi nag search ako, puro pang controller pinakita --}}
-    <script>    
+<script>    
   
 document.addEventListener('DOMContentLoaded', function() {
     const tabs = document.querySelectorAll('.tab');
