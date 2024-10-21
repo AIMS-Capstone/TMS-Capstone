@@ -42,9 +42,9 @@ public $title;
             'tax_type' => 'required|string|max:255',
             'registration_date' => 'required|date',
             'start_date' => 'required|date',
-            'financial_year_end' => 'required|date',
+            'financial_year_end' => 'required|string|max:255',
         ]);
-
+        
         $createOrg = OrgSetup::create($validatedData);
     }
 }

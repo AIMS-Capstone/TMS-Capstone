@@ -105,7 +105,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group">
+                                    <a href="{{ route('vat_return') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group">
                                         Value Added Tax Return
                                     </a>
                                 </li>

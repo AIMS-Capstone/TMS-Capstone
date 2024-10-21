@@ -8,7 +8,9 @@ use App\Http\Controllers\CustomVerificationController;
 use App\Http\Controllers\sendPasswordReset;
 use App\Http\Controllers\OrgSetupController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TaxReturnController;
 use App\Models\rdo;
+use App\Models\TaxReturn;
 
 Route::get('/', function () {
     return view('auth/login');
@@ -97,8 +99,19 @@ Route::middleware([
     Route::post('/org-setup', [OrgSetupController::class, 'store'])->name('OrgSetup.store');
     
 Route::get('/transactions', [TransactionsController::class, 'index'])->name('transactions');
+Route::get('/vat_return', function () {
+    // Get the organization ID from the session
+    $organizationId = session('organization_id');
+
+    // Fetch tax returns for the specific organization
+    $taxReturns = TaxReturn::with('user')->where('organization_id', $organizationId)->get();
 
 
+    // Pass the tax returns to the view
+    return view('vat_return', compact('taxReturns'));
+})->name('vat_return');
+
+Route::post('/vat_return', [TaxReturnController::class, 'store']);
 //Charts of Accounts routings
 
     Route::get('/coa', [CoaController::class, 'index'])->name('coa');
