@@ -31,7 +31,7 @@ $table->enum('tax_type', ['Percentage Tax', 'Value-Added Tax', 'Tax Exempt']);
 
             $table->date('registration_date');
             $table->date('start_date');
-            $table->date('financial_year_end');
+            $table->string('financial_year_end');
             $table->timestamps();
         });
     }
