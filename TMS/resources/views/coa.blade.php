@@ -169,6 +169,7 @@
                                         checkAll: false, 
                                         selectedRows: [],
                                         showDeleteCancelButtons: false,
+                                        showConfirmArchiveModal: false,
                                         
                                         // Toggle a single row
                                         toggleCheckbox(id) {
@@ -177,42 +178,42 @@
                                             } else {
                                                 this.selectedRows.push(id);
                                             }
+                                            console.log(this.selectedRows); // Debugging line
                                         },
                                         
                                         // Toggle all rows
                                         toggleAll() {
+                                            this.checkAll = !this.checkAll;
                                             if (this.checkAll) {
                                                 this.selectedRows = {{ json_encode($coas->pluck('id')->toArray()) }}; 
                                             } else {
                                                 this.selectedRows = []; 
                                             }
-                                            console.log(this.selectedRows); // For debugging
+                                            console.log(this.selectedRows); // Debugging line
                                         },
                                         
-                                        // Handle deletion
+                                        // Handle archiving
                                         deleteRows() {
                                             if (this.selectedRows.length === 0) {
                                                 alert('No rows selected for deletion.');
                                                 return;
                                             }
 
-                                            if (confirm('Are you sure you want to archive the selected row/s?')) {
-                                                fetch('/coa/deactivate', {
-                                                    method: 'POST',
-                                                    headers: {
-                                                        'Content-Type': 'application/json',
-                                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                                    },
-                                                    body: JSON.stringify({ ids: this.selectedRows })
-                                                })
-                                                .then(response => {
-                                                    if (response.ok) {
-                                                        location.reload();  
-                                                    } else {
-                                                        alert('Error deleting rows.');
-                                                    }
-                                                });
-                                            }
+                                            fetch('/coa/deactivate', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                },
+                                                body: JSON.stringify({ ids: this.selectedRows })
+                                            })
+                                            .then(response => {
+                                                if (response.ok) {
+                                                    location.reload();  
+                                                } else {
+                                                    alert('Error archiving rows.');
+                                                }
+                                            });
                                         },
                                         
                                         // Cancel selection
@@ -221,13 +222,16 @@
                                             this.checkAll = false;
                                             this.showCheckboxes = false; 
                                             this.showDeleteCancelButtons = false;
+                                            this.showConfirmArchiveModal = false;
                                         },
-                                        get selectedCount(){
+                                        
+                                        get selectedCount() {
                                             return this.selectedRows.length;
                                         }
                                     }"
                                     class="mb-12 mx-12 overflow-hidden max-w-full rounded-md border-neutral-300 dark:border-neutral-700"
                                 >
+
                                     <!-- Fourth Header -->
                                     <div class="container mx-auto">
                                         <div class="flex flex-row space-x-2 items-center justify-between">
@@ -269,17 +273,18 @@
                                                 <a href="{{ url('download_coa')}}">
                                                     <button
                                                         type="button"
-                                                        class="border px-3 py-2 rounded-lg text-sm"
+                                                        class="border px-3 py-2 rounded-lg text-sm hover:border-green-500 hover:text-green-500 transition"
                                                     > 
                                                         <i class="fa fa-download"></i> Download
                                                     </button>
                                                 </a>
                                                 <button 
                                                     type="button" 
-                                                    @click="showCheckboxes = !showCheckboxes; showDeleteCancelButtons = !showDeleteCancelButtons" 
-                                                    class="border px-3 py-2 rounded-lg text-sm hover:border-red-500 hover:text-red-500 transition"
+                                                    @click="showCheckboxes = !showCheckboxes; showDeleteCancelButtons = !showDeleteCancelButtons; $el.disabled = true;" 
+                                                    :disabled="selectedRows.length === 1"
+                                                    class="border px-3 py-2 rounded-lg text-sm text-gray-600 hover:border-gray-800 hover:text-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
                                                 >
-                                                    <i class="fa fa-trash"></i> Delete
+                                                    <i class="fa fa-trash"></i> Archive
                                                 </button>
                                                 <button type="button">
                                                     <i class="fa-solid fa-ellipsis-vertical"></i>
@@ -325,23 +330,27 @@
                                                                 </label>
                                                             </td>
                                                             <td>{{ $coa->code }}</td>
-                                                            <td>{{ $coa->name }}</td>
+                                                            <td>
+                                                                <x-view-coa />
+                                                                <button @click="$dispatch('open-view-modal', {{ json_encode($coa) }})" class="underline hover:text-blue-500">
+                                                                    {{ $coa->name }}
+                                                                </button>
+                                                            </td>
                                                             <td>{{ $coa->type }}</td>
                                                             <td>{{ $coa->created_at }}</td>
                                                             <td class="py-4 px-2">
                                                                 <x-edit-coa />
-                                                                <button 
+                                                                <p
                                                                     @click="$dispatch('open-edit-modal', {
                                                                         id: '{{ $coa->id }}',
                                                                         code: '{{ $coa->code }}',
                                                                         name: '{{ $coa->name }}',
                                                                         type: '{{ $coa->type }}'
                                                                     })"
-                                                                    type="button" 
-                                                                    class="hover:border-slate-600 hover:text-slate-600 border px-3 py-2 rounded-lg text-sm"
+                                                                    class="underline hover:border-sky-900 hover:text-sky-900 hover:cursor-pointer px-3 py-y text-sm"
                                                                 >
                                                                     Edit
-                                                                </button>
+                                                                </p>
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -358,13 +367,57 @@
                                         </table>
                                     </div>
 
+                                    <!-- Modal -->
+
+                                    <!-- Archive Confirmation Modal -->
+                                    <div 
+                                        x-show="showConfirmArchiveModal" 
+                                        x-cloak 
+                                        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                        @click.away="showConfirmArchiveModal = false"
+                                    >
+                                        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                            <div class="flex flex-col items-center">
+                                                <!-- Icon -->
+                                                <div class="mb-4">
+                                                    <i class="fas fa-exclamation-triangle text-gray-500 text-8xl"></i>
+                                                </div>
+
+                                                <!-- Title -->
+                                                <h2 class="text-xl font-bold text-gray-800 mb-2">Archive Item/s</h2>
+
+                                                <!-- Description -->
+                                                <p class="text-sm text-gray-600 text-center">
+                                                    You're going to Archive the selected item/s in the Charts of Account table. Are you sure?
+                                                </p>
+
+                                                <!-- Actions -->
+                                                <div class="flex justify-center space-x-8 mt-6 w-full">
+                                                    <button 
+                                                        @click="showConfirmArchiveModal = false; showDeleteCancelButtons = true;" 
+                                                        class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded-lg text-sm text-gray-700 transition"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                    <button 
+                                                        @click="deleteRows(); showConfirmArchiveModal = false;" 
+                                                        class="px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-lg text-sm transition"
+                                                    >
+                                                        Archive
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <!-- Action Buttons -->
                                     <div x-show="showDeleteCancelButtons" class="flex justify-center py-4" x-cloak>
                                         <button 
-                                            @click="deleteRows" 
-                                            class="border px-3 py-2 mx-2 rounded-lg text-sm text-red-600 hover:bg-red-100 transition"
+                                            @click="showConfirmArchiveModal = true; showDeleteCancelButtons = true;" 
+                                            :disabled="selectedRows.length === 0"
+                                            class="border px-3 py-2 mx-2 rounded-lg text-sm text-gray-700 bg-gray-200 hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            <i class="fa fa-trash"></i> Archive Selected <span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
+                                            <i class="fa fa-box"></i> Archive Selected <span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
                                         </button>
                                         <button 
                                             @click="cancelSelection" 
@@ -374,7 +427,7 @@
                                         </button>
                                     </div>
                                     
-                                    {{ $coas->links() }} 
+                                    {{ $coas->links('vendor.pagination.custom') }}
                                 </div>
 
                             </div>

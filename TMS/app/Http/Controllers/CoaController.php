@@ -176,7 +176,7 @@ class CoaController extends Controller
             $query->where('type', $type);
         }
 
-        $inactiveCoas = $query->paginate(5);
+        $inactiveCoas = $query->paginate(4);
 
         return view('components.coa-archive', compact('inactiveCoas'));
     }
