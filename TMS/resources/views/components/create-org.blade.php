@@ -250,9 +250,8 @@
                                 <x-field-label for="financial_year_end" value="{{ __('Financial Year End') }}" class="mb-2 text-left" />
                                 <select name="financial_year_end" id="financial_year_end" wire:model="financial_year_end" class="cursor-pointer border rounded-xl px-4 py-2 w-full mb-4 border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
                                     <option value="">Select Financial Year End</option>
-                                    <option value="12/31/2024">December 31</option>
-                                    {{-- Jan-Dec or March- ??--}}
-                                    <!-- idk where to find other selections here-->
+                                    <option value="Calendar Year">Calendar Year</option>
+                                    <option value="Fiscal Year">Fiscal Year</option>
                                 </select>
                             </div>
                         </div>
