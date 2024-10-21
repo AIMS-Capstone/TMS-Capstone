@@ -72,14 +72,14 @@ class OrgSetupController extends Controller
             'tax_type' => 'required|string|max:255',
             'registration_date' => 'required|date_format:m/d/Y',
             'start_date' => 'required|date_format:m/d/Y',
-            'financial_year_end' => 'required|date_format:m/d/Y',
+            'financial_year_end' => 'required|string|max:255',
         ]);
 
 
         // pang bago nung format sa db para tumangan ng date
         $validatedData['start_date'] = Carbon::createFromFormat('m/d/Y', $validatedData['start_date'])->format('Y-m-d');
         $validatedData['registration_date'] = Carbon::createFromFormat('m/d/Y', $validatedData['registration_date'])->format('Y-m-d');
-        $validatedData['financial_year_end'] = Carbon::createFromFormat('m/d/Y', $validatedData['financial_year_end'])->format('Y-m-d');
+      
 
 
         // Create new OrgSetup record
