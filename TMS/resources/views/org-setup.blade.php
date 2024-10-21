@@ -210,8 +210,8 @@
                                         @else
                                             <tr>
                                                 <td colspan="6" class="text-center p-2">
-                                                    <img src="{{ asset('images/Wallet 02.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
-                                                    <h1 class="font-bold">No Organization yet</h1>
+                                                    <img src="{{ asset('images/no-account.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                                    <h1 class="font-extrabold">No Organization yet</h1>
                                                     <p class="text-sm text-neutral-500 mt-2">Start creating organizations with the <br> + Create Organization button.</p>
                                                 </td>
                                             </tr>

@@ -241,8 +241,8 @@
                     @else
                         <tr>
                             <td colspan="6" class="text-center p-4">
-                                <img src="{{ asset('images/Wallet 02.png') }}" alt="No data available" class="mx-auto" />
-                                <h1 class="font-bold mt-2">No Transactions yet</h1>
+                                <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                <h1 class="font-extrabold text-lg mt-2">No Transactions yet</h1>
                                 <p class="text-sm text-neutral-500 mt-2">Start adding transactions with the <br> + Add Transaction button.</p>
                             </td>
                         </tr>
@@ -270,15 +270,15 @@
                     </template> --}}
                     
                     <!-- Placeholder Image -->
-                    <template x-if="data.slice((currentPage - 1) * perPage, currentPage * perPage).length === 0">
+                    {{-- <template x-if="data.slice((currentPage - 1) * perPage, currentPage * perPage).length === 0">
                         <tr>
                             <td colspan="6" class="text-center p-4">
-                                <img src="{{ asset('images/Wallet 02.png') }}" alt="No data available" class="mx-auto" />
+                                <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-48 h-48" />
                                 <h1 class="font-bold mt-2">No Transactions yet</h1>
                                 <p class="text-sm text-neutral-500 mt-2">Start adding transactions with the <br> + button at the top.</p>
                             </td>
                         </tr>
-                    </template> 
+                    </template>  --}}
                 </tbody>
              
             </table>

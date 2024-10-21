@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <!-- Page Main -->
                         <div class="container mx-auto my-auto pt-6">
                             <div class="px-10">
@@ -317,8 +317,8 @@
                                                 @endforeach
                                                     @if ($inactiveCoas->isEmpty())
                                                             <td colspan="6" class="text-center p-4">
-                                                                <img src="{{ asset('images/Wallet 02.png') }}" alt="No data available" class="mx-auto" />
-                                                                <h1 class="font-bold mt-2">No Archived Charts of Accounts yet</h1>
+                                                                <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                                                <h1 class="font-extrabold text-lg mt-2">No Archived Chart of Accounts yet</h1>
                                                             </td>
                                                     @endif
                                             </tbody>

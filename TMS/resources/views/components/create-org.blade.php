@@ -114,7 +114,7 @@
                         <div class="flex flex-col mb-4 w-full max-w-md">
                             <div class="flex flex-col">
                                 <x-field-label for="region" value="{{ __('Region') }}" class="mb-2 text-left" />
-                                <select wire:model="region" name="region" id="region" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                                <select wire:model="region" name="region" id="region" class="cursor-pointer border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
                                     <option value="" disabled selected>Select Region</option>
                                     @foreach($regions as $region)
                                         <option value="{{ $region['designation'] }}">{{ $region['name'] }}</option>
@@ -126,7 +126,7 @@
                         <div class="flex flex-col mb-4 w-full max-w-md">
                             <div class="flex flex-col">
                                 <x-field-label for="province" value="{{ __('Province') }}" class="mb-2 text-left" />
-                                <select wire:model="province" name="province" id="province" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm" {{ !$region ? 'disabled' : '' }}>
+                                <select wire:model="province" name="province" id="province" class="cursor-pointer border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm" {{ !$region ? 'disabled' : '' }}>
                                     <option value="" disabled selected>Select Province</option>
                                 </select>
                             </div>
@@ -135,7 +135,7 @@
                         <div class="flex flex-row space-x-4 w-full max-w-md">
                             <div class="flex flex-col w-full">
                                 <x-field-label for="city" value="{{ __('City') }}" class="mb-2 text-left" />
-                                <select wire:model="city" name="city" id="city" class="border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                                <select wire:model="city" name="city" id="city" class="cursor-pointer border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
                                     <option value="" disabled selected>Select City</option>
                                 </select>
                             </div>
@@ -182,7 +182,7 @@
                             <div class="flex flex-col items-center">
                                 <div class="flex flex-col 80">
                                     <x-field-label for="rdo" value="{{ __('Revenue District Office (RDO)') }}" class="mb-2 text-left" />
-                                    <select wire:model="selectedRDO" name="rdo" id="rdo" class="border rounded-xl px-4 py-2 w-80 text-sm truncate border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm cursor-pointer">
+                                    <select wire:model="selectedRDO" name="rdo" id="rdo" class="select2 border appearance-none rounded-xl px-4 py-2 w-80 text-sm truncate border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm cursor-pointer">
                                         <option value="" disabled selected>Select RDO</option>
                                         @foreach($rdos as $rdo)
                                             <option value="{{ $rdo->id }}">{{ $rdo->rdo_code }} - {{ $rdo->location }}</option>
@@ -248,9 +248,10 @@
                         <div class="flex flex-col mb-2 w-80">
                             <div class="flex flex-col">
                                 <x-field-label for="financial_year_end" value="{{ __('Financial Year End') }}" class="mb-2 text-left" />
-                                <select name="financial_year_end" id="financial_year_end" wire:model="financial_year_end" class="border rounded-xl px-4 py-2 w-full mb-4 border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                                <select name="financial_year_end" id="financial_year_end" wire:model="financial_year_end" class="cursor-pointer border rounded-xl px-4 py-2 w-full mb-4 border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
                                     <option value="">Select Financial Year End</option>
                                     <option value="12/31/2024">December 31</option>
+                                    {{-- Jan-Dec or March- ??--}}
                                     <!-- idk where to find other selections here-->
                                 </select>
                             </div>

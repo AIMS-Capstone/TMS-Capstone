@@ -7,7 +7,7 @@
                             <div class="px-10">
                                 <div class="flex flex-row w-full items-center space-x-2">
                                     <svg xmlns="http://www.w3.org/2000/svg"  class="w-8 h-8" viewBox="0 0 512 512"><path fill="none" stroke="#1e3a8a" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M160 144h288M160 256h288M160 368h288"/><circle cx="80" cy="144" r="16" fill="none" stroke="#1e3a8a" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><circle cx="80" cy="256" r="16" fill="none" stroke="#1e3a8a" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><circle cx="80" cy="368" r="16" fill="none" stroke="#1e3a8a" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
-                                    <p class="font-bold text-3xl auth-color">Charts of Accounts</p>
+                                    <p class="font-bold text-3xl auth-color">Chart of Accounts</p>
                                 </div>
                             </div>
                             <div class="flex items-center px-10">
@@ -348,9 +348,9 @@
                                                 @else
                                                     <tr>
                                                         <td colspan="6" class="text-center p-4">
-                                                            <img src="{{ asset('images/Wallet 02.png') }}" alt="No data available" class="mx-auto" />
-                                                            <h1 class="font-bold mt-2">No Charts of accounts yet</h1>
-                                                            <p class="text-sm text-neutral-500 mt-2">Start adding accounts with the <br> + button beside the import button.</p>
+                                                            <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                                            <h1 class="font-extrabold text-lg mt-2">No Chart of Accounts yet</h1>
+                                                            <p class="text-sm text-neutral-500 mt-2">Start adding accounts with the <br> + Add button.</p>
                                                         </td>
                                                     </tr>
                                                 @endif

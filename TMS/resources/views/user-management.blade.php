@@ -13,12 +13,14 @@
                         </div>
                         <div class="items-end float-end">
                             <!-- routing for add account modal -->
-                            <a href = "">
-                            <button type="button" class= "text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
-                                <i class="fas fa-plus-circle mr-1"></i>
-                                    Add Account
-                            </button>   
-                            </a> 
+                            @if (request('active_tab', 'acc') === 'acc')
+                                <a href="#">
+                                    <button id="add-account-button" type="button" class="text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
+                                        <i class="fas fa-plus-circle mr-1"></i>
+                                        Add Account
+                                    </button>   
+                                </a> 
+                            @endif
                         </div>
                     </div> 
 
@@ -147,8 +149,8 @@
                                         </tr>
                                             <tr>
                                                 <td colspan="6" class="text-center p-2">
-                                                    <img src="{{ asset('images/Wallet 02.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
-                                                    <h1 class="font-bold">No Account yet</h1>
+                                                    <img src="{{ asset('images/no-account.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                                    <h1 class="font-extrabold">No Account yet</h1>
                                                     <p class="text-sm text-neutral-500 mt-2">Start creating accounts with the <br> + Add Account button.</p>
                                                 </td>
                                             </tr>
@@ -264,8 +266,8 @@
                                         </tr>
                                             <tr>
                                                 <td colspan="6" class="text-center p-2">
-                                                    <img src="{{ asset('images/Wallet 02.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
-                                                    <h1 class="font-bold">No Account yet</h1>
+                                                    <img src="{{ asset('images/no-account.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                                    <h1 class="font-extrabold">No Account yet</h1>
                                                     <p class="text-sm text-neutral-500 mt-2">Start creating accounts with the <br> + Add Account button.</p>
                                                 </td>
                                             </tr>
@@ -287,18 +289,26 @@
                 panel.classList.add('hidden');
             });
             document.querySelectorAll('button[role="tab"]').forEach(function(tab) {
-                tab.classList.remove('font-extrabold', 'text-blue-900', 'border-b-4', 'active-tab'); // Remove 
+                tab.classList.remove('font-extrabold', 'text-blue-900', 'border-b-4', 'active-tab');
                 tab.classList.add('text-gray-500');
                 tab.setAttribute('aria-selected', 'false');
             });
             document.getElementById(tabId + '-content').classList.remove('hidden');
+            
             const activeTab = document.getElementById(tabId);
-            activeTab.classList.add('font-extrabold', 'text-blue-900', 'border-b-4', 'border-blue-900'); // Add 
+            activeTab.classList.add('font-extrabold', 'text-blue-900', 'border-b-4', 'border-blue-900');
             activeTab.classList.remove('text-gray-500');
             activeTab.setAttribute('aria-selected', 'true');
-        }
 
-        activateTab('tab-acc');
+            // Handle the visibility of the Add Account button via JavaScript
+            const addAccountButton = document.getElementById('add-account-button');
+            if (tabId === 'tab-acc') {
+                addAccountButton?.classList.remove('hidden');
+            } else {
+                addAccountButton?.classList.add('hidden');
+            }
+        }
+        activateTab('tab-acc'); 
 
 
         // FOR SORT BUTTON - Accountant TAB
