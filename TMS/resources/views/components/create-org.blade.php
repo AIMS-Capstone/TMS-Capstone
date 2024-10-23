@@ -1,4 +1,3 @@
-{{-- Previous look nasa "sample.blade.php" --}}
 <x-organization-layout>
     <div class="bg-white px-20">
         <div class="py-8">
@@ -8,7 +7,7 @@
                         <a href="{{ route('org-setup') }}">
                             <button class="text-zinc-600 hover:text-zinc-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5" viewBox="0 0 24 24"><g fill="none" stroke="#52525b" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 12H8m4-4l-4 4l4 4"/></g></svg>
-                                <span class="text-zinc-600 text-sm font-normal hover:text-zinc-700">Go back to portal</span>
+                                <span class="text-zinc-600 text-sm font-normal hover:text-zinc-700">Go back to Organizations</span>
                             </button>
                         </a>
                     </div>
@@ -58,7 +57,7 @@
                     <div class="flex justify-center space-x-8">
                         <!-- Non-Individual Option -->
                         <label for="non_individual" class="flex flex-col items-center">
-                            <input type="radio" name="type" id="non_individual" wire:model="type" value="non-individual" class="hidden peer">
+                            <input type="radio" name="type" id="non_individual" wire:model="type" value="{{ __('Non-Individual') }}" class="hidden peer">
                             <div class="group flex items-center justify-center w-44 h-44 rounded-full bg-gray-100 border-2 border-transparent peer-checked:bg-blue-900 peer-checked:border-blue-900">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20" viewBox="0 0 36 36">
                                     <path d="M31 8h-9v25h11V10a2 2 0 0 0-2-2m-5 17h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Zm4 10h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Z" class="group-peer-checked:fill-yellow-500 fill-gray-400"/>
@@ -67,10 +66,9 @@
                             </div>
                             <span class="text-blue-900 font-semibold mt-2">Non-Individual</span>
                         </label>
-                
                         <!-- Individual Option -->
                         <label for="individual" class="flex flex-col items-center">
-                            <input type="radio" name="type" id="individual" wire:model="type" value="individual" class="hidden peer">
+                            <input type="radio" name="type" id="individual" wire:model="type" value="{{ __('Individual') }}" class="hidden peer">
                             <div class="group flex items-center justify-center w-44 h-44 rounded-full bg-gray-100 border-2 border-transparent peer-checked:bg-blue-900 peer-checked:border-blue-900">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20" viewBox="0 0 16 16">
                                     <path d="M8 8a3 3 0 1 0 0-6a3 3 0 0 0 0 6m4.735 6c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139z" class="group-peer-checked:fill-yellow-500 fill-gray-400"/>
@@ -94,7 +92,7 @@
                         <div class="flex flex-col w-80">
                             <div class="flex flex-col">
                                 <x-field-label for="line_of_business" value="{{ __('Line of Business') }}" class="mb-2 text-left" />
-                                <x-input type="text" name="line_of_business" id="line_of_business" wire:model="line_of_business" placeholder="Line of Business" />
+                                <x-input type="text" name="line_of_business" id="line_of_business" wire:model="line_of_business" placeholder="Line of Business" maxlength="50"/>
                             </div>
                         </div>
                     </div>
@@ -140,8 +138,8 @@
                                 </select>
                             </div>
                             <div class="flex flex-col w-32">
-                                <x-field-label for="zip_code" value="{{ __('Zip Code') }}" class="mb-2 text-left" />
-                                <x-input type="text" name="zip_code" id="zip_code" wire:model="zip_code" placeholder="1203" class="border rounded-xl px-4 py-2 w-full" />
+                                <x-field-label for="zip_code" value="{{ __('Zip Code') }}" class="mb-2 text-left readonly" />
+                                <x-input type="text" name="zip_code" id="zip_code" wire:model="zip_code" placeholder="1203" class="border rounded-xl px-4 py-2 w-full readonly" maxlength="4"/>
                             </div>
                         </div>
                     </div>
@@ -154,14 +152,20 @@
                         <div class="flex flex-col mb-4 w-80">
                             <div class="flex flex-col">
                                 <x-field-label for="contact_number" value="{{ __('Contact Number') }}" class="mb-2 text-left" />
-                                <x-input type="text" name="contact_number" id="contact_number" wire:model="contact_number" placeholder="e.g. 09123456789" />
+                                <x-input type="text" name="contact_number" id="contact_number" 
+                                wire:model="contact_number" 
+                                placeholder="e.g. 09123456789" 
+                                maxlength="11"
+                                pattern="^09\d{9}$" 
+                                class="border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-900 focus:border-blue-900 block w-full p-2.5"/>
                             </div>
                         </div>
                         <div class="flex flex-col w-80">
                             <div class="flex flex-col">
                                 <x-field-label for="email" value="{{ __('Email Address') }}" class="mb-2 text-left" />
-                                <x-input type="email" name="email" id="email" x-model="email" placeholder="Enter Email Address" />
+                                <x-input type="email" name="email" id="email" x-model="email" placeholder="Enter Email Address" onblur="validateEmail()"/>
                             </div>
+                            <p id="validationMessage" class="text-red-600 text-sm"></p> 
                         </div>
                     </div>
                 </div>
@@ -175,7 +179,7 @@
                             <div class="flex flex-col mb-4 items-center">
                                 <div class="flex flex-col w-80">
                                     <x-field-label for="tin" value="{{ __('Tax Identification Number (TIN)') }}" class="mb-2 text-left" />
-                                    <x-input type="text" name="tin" id="tin" wire:model="tin" placeholder="e.g. 000-000-000-00000" class="w-80" />
+                                    <x-input type="text" name="tin" id="tin" wire:model="tin" placeholder="e.g. 000-000-000-00000" class="w-80" maxlength="20"/>
                                 </div>
                             </div>
                         
@@ -197,15 +201,15 @@
                             <p class="p-10 text-zinc-600 font-medium text-lg mb-4">Tax type organization complies with?</p>
                             <div class="flex flex-col gap-2 justify-center items-center">
                                 <label for="percentage_tax" class="flex w-80 min-w-[14rem] cursor-pointer items-center justify-start gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2 font-medium text-slate-700">
-                                    <input type="radio" name="tax_type" id="percentage_tax" wire:model="tax_type" value="Percentage Tax" class="relative h-4 w-4 appearance-none rounded-full border border-gray-200 bg-white checked:border-blue-900 checked:bg-blue-900 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-slate-800">
+                                    <input type="radio" name="tax_type" id="percentage_tax" wire:model="tax_type" value="{{ __('Percentage Tax') }}" class="relative h-4 w-4 appearance-none rounded-full border border-gray-200 bg-white checked:border-blue-900 checked:bg-blue-900 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-slate-800">
                                     <span class="text-sm">Percentage Tax</span>
                                 </label>
                                 <label for="value_added_tax" class="flex w-80 min-w-[14rem] cursor-pointer items-center justify-start gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2 font-medium text-slate-700">
-                                    <input type="radio" name="tax_type" id="value_added_tax" wire:model="tax_type" value="Value-Added Tax" class="relative h-4 w-4 appearance-none rounded-full border border-gray-200 bg-white checked:border-blue-900 checked:bg-blue-900 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-slate-800">
+                                    <input type="radio" name="tax_type" id="value_added_tax" wire:model="tax_type" value="{{ __('Value-Added Tax') }}" class="relative h-4 w-4 appearance-none rounded-full border border-gray-200 bg-white checked:border-blue-900 checked:bg-blue-900 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-slate-800">
                                     <span class="text-sm">Value-Added Tax</span>
                                 </label>
                                 <label for="tax_exempt" class="flex w-80 min-w-[14rem] cursor-pointer items-center justify-start gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2 font-medium text-slate-700">
-                                    <input type="radio" name="tax_type" id="tax_exempt" wire:model="tax_type" value="Tax Exempt" class="relative h-4 w-4 appearance-none rounded-full border border-gray-200 bg-white checked:border-blue-900 checked:bg-blue-900 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-slate-800">
+                                    <input type="radio" name="tax_type" id="tax_exempt" wire:model="tax_type" value="{{ __('Tax Exempt') }}" class="relative h-4 w-4 appearance-none rounded-full border border-gray-200 bg-white checked:border-blue-900 checked:bg-blue-900 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-slate-800">
                                     <span class="text-sm">Tax Exempt</span>
                                 </label>
                             </div>
@@ -220,36 +224,26 @@
                         <div class="flex flex-col mb-2 w-80">
                             <div class="flex flex-col">
                                 <x-field-label for="start_date" value="{{ __('Start Date') }}" class="mb-2 text-left" />
-                                <div class="relative max-w-sm">
-                                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
-                                        </svg>
-                                    </div>
-                                    <input name="start_date" id="start_date" wire:model="start_date" id="datepicker-format" datepicker datepicker-min-date="06/04/2024" datepicker-max-date="05/05/2025" class="border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-900 focus:border-blue-900 block w-full ps-10 p-2.5" placeholder="Enter Start Date">
-                                </div>
+                                <input name="start_date" id="start_date" wire:model="start_date" type="date"
+                                min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" 
+                                max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" 
+                                class="border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-900 focus:border-blue-900 block w-full" placeholder="Enter Start Date">
                             </div>
                         </div>
 
                         <div class="flex flex-col mb-2 w-80">
                             <div class="flex flex-col">
                                 <x-field-label for="registration_date" value="{{ __('Registration Date') }}" class="mb-2 text-left" />
-                                <div class="relative max-w-sm">
-                                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
-                                        </svg>
-                                    </div>
-                                    <input name="registration_date" id="registration_date" wire:model="registration_date" id="datepicker-format" datepicker datepicker-min-date="06/04/2024" datepicker-max-date="05/05/2025" class="border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-900 focus:border-blue-900 block w-full ps-10 p-2.5" placeholder="Enter Registration Date">
-                                </div>
+                                <input name="registration_date" id="registration_date" wire:model="registration_date" type="date" max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" class="border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-900 focus:border-blue-900 block w-full" 
+                                placeholder="Enter Registration Date">
                             </div>
                         </div>
 
                         <div class="flex flex-col mb-2 w-80">
                             <div class="flex flex-col">
                                 <x-field-label for="financial_year_end" value="{{ __('Financial Year End') }}" class="mb-2 text-left" />
-                                <select name="financial_year_end" id="financial_year_end" wire:model="financial_year_end" class="cursor-pointer border rounded-xl px-4 py-2 w-full mb-4 border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
-                                    <option value="">Select Financial Year End</option>
+                                <select name="financial_year_end" id="financial_year_end" wire:model="financial_year_end" class="cursor-pointer border rounded-xl px-4 py-2 w-full mb-4 text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                                    <option value="" disabled selected>Select Financial Year End</option>
                                     <option value="Calendar Year">Calendar Year</option>
                                     <option value="Fiscal Year">Fiscal Year</option>
                                 </select>
@@ -267,9 +261,9 @@
                                 <path fill="#1e3a8a" fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m10.25.75a.75.75 0 0 0 0-1.5H6.56l1.22-1.22a.75.75 0 0 0-1.06-1.06l-2.5 2.5a.75.75 0 0 0 0 1.06l2.5 2.5a.75.75 0 1 0 1.06-1.06L6.56 8.75z" clip-rule="evenodd"/>
                             </svg>
                         </span>
-                        Go back
+                        Previous
                     </button>
-                    <button id="nextBtn" disabled class="bg-blue-900 text-white font-semibold px-4 py-2 rounded-xl">
+                    <button id="nextBtn" disabled class="bg-blue-900 text-white font-semibold px-4 py-2 w-28 rounded-xl disabled:opacity-50">
                         Next
                         <span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 24 24">
@@ -286,14 +280,14 @@
                     <div class="bg-white rounded-lg shadow-lg p-6 text-center max-w-lg w-full">
                         <!-- Centered Image -->
                         <div class="flex justify-center mb-4">
-                            <img src="{{ asset('images/Ok-amico.png') }}" alt="Organization Created" class="w-40 h-40 mr-6">
+                            <img src="{{ asset('images/Ok-amico.png') }}" alt="Organization Added" class="w-40 h-40 mr-6">
                         </div>
                         <h2 class="text-emerald-500 font-bold text-3xl whitespace-normal mb-4">Organization Added</h2>
-                        <p class="font-normal text-sm mb-4">The organization has been successfully<br>added! Go back to the portal to open<br/> and start the session.</p>
+                        <p class="font-normal text-sm mb-4">The organization has been successfully<br>added! Go back to the Organizxations to open<br/> and start the session.</p>
                         <div class="flex items-center justify-center mt-4 mb-4">
                             <button type="button" onclick="window.location.href='{{ route('org-setup') }}'" @click="showModal = false" class="inline-flex items-center w-48 justify-center py-2 bg-emerald-500 border border-transparent rounded-xl 
                             font-bold text-sm text-white tracking-widest hover:bg-emerald-600 focus:bg-emerald-700 active:bg-emerald-700 focus:outline-none disabled:opacity-50 transition ease-in-out duration-150">
-                                {{ __('Go Back to Portal') }} 
+                                {{ __('Go Back to Organizations') }} 
                                 <div class="ms-2 w-5 h-5 flex items-center justify-center border-2 border-white rounded-full">
                                     <svg class="rtl:rotate-180 w-3.5 h-3.5 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
@@ -451,7 +445,95 @@ document.addEventListener('DOMContentLoaded', function() {
     updateTabs(); // Initial setup
 });
 
+    // Contact Number
+    document.addEventListener('DOMContentLoaded', function () {
+        const contactNumberInput = document.getElementById('contact_number');
 
+        contactNumberInput.addEventListener('input', function () {
+            // Allow typing digits only, and remove any non-numeric characters
+            this.value = this.value.replace(/[^\d]/g, '');
+            // Allow typing only up to 11 digits
+            if (this.value.length > 11) {
+                this.value = this.value.slice(0, 11);
+            }
+            // Ensure the number starts with "09"
+            if (this.value.length >= 2 && !this.value.startsWith('09')) {
+                this.value = ''; // Clear input if it doesn't start with "09"
+            }
+        });
+    });
+
+    // Email Address
+    function validateEmail() {
+        const email = document.getElementById("email");
+        const validationMessage = document.getElementById("validationMessage");
+        const emailInput = email.value.trim();
+        // Check if email is empty
+        if (emailInput === "") {
+            validationMessage.innerText = "Please enter an email address";
+            return false;
+        }
+        // Split email into local part and domain part
+        const emailParts = emailInput.split("@");
+        if (emailParts.length !== 2) {
+            validationMessage.innerText = "Please enter a valid email address - missing or too many '@' symbols";
+            return false;
+        }
+        const localPart = emailParts[0];
+        const domainPart = emailParts[1];
+        // Validate local part
+        const localPartRegex = /^[a-zA-Z0-9!#$%&'*+\-/=?^_`{|}~]+(\.[a-zA-Z0-9!#$%&'*+\-/=?^_`{|}~]+)*$/;
+        if (!localPartRegex.test(localPart)) {
+            validationMessage.innerText = "Invalid characters";
+            return false;
+        }
+        if (localPart.includes("..") || localPart.startsWith(".") || localPart.endsWith(".")) {
+            validationMessage.innerText = "Invalid use of periods";
+            return false;
+        }
+        // Validate domain part
+        const domainPartRegex = /^[a-zA-Z0-9.-]+$/;
+        if (!domainPartRegex.test(domainPart)) {
+            validationMessage.innerText = "Invalid characters";
+            return false;
+        }
+        if (domainPart.includes("--") || domainPart.startsWith("-") || domainPart.endsWith("-")) {
+            validationMessage.innerText = "Invalid use of hyphens";
+            return false;
+        }
+        // Validate top-level domain (TLD)
+        const tldRegex = /^[a-zA-Z]{2,}$/;
+        const domainParts = domainPart.split(".");
+        if (domainParts.length < 2 || !tldRegex.test(domainParts[domainParts.length - 1])) {
+            validationMessage.innerText = "Invalid email";
+            return false;
+        }
+        // If all checks pass, email is valid
+        // validationMessage.innerText = "Email is valid!";
+        return true;
+    }
+
+    //Date
+    // Start Date
+    document.addEventListener('DOMContentLoaded', function () {
+        const startDateInput = document.getElementById('start_date');
+        
+        // Ensure the selected date is exactly today
+        startDateInput.addEventListener('change', function () {
+            const selectedDate = new Date(this.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time to avoid comparison issues
+        });
+    });
+    // Registration Date
+    document.addEventListener('DOMContentLoaded', function () {
+        const registrationDateInput = document.getElementById('registration_date');
+        registrationDateInput.addEventListener('change', function () {
+            const selectedDate = new Date(this.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time to compare only dates
+        });
+    });
         
    document.addEventListener('DOMContentLoaded', function() {
     const provinces = @json($provinces);

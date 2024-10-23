@@ -134,7 +134,4 @@ Route::put('/coa/{coa}', [CoaController::class, 'update'])->name('coa.update');
         return view('predictive-analytics');
     })->name('predictive-analytics');
 
-    Route::get('/add-user', function () {
-        return view('add-user');
-    })->name('add-user');
 });

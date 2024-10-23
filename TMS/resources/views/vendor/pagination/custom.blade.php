@@ -6,7 +6,7 @@
             @if ($paginator->onFirstPage())
                 <span class="inline-flex items-center text-xs justify-center w-6 h-6 rounded-full text-gray-600">&lt;</span>
             @else
-                <a class="inline-flex items-center justify-center w-6 h-6 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300 text-xs" href="{{ $paginator->previousPageUrl() }}" rel="prev">&lt;</a>
+                <a class="inline-flex items-center justify-center w-6 h-6 text-gray-800 font-bold rounded-full hover:bg-gray-300 text-xs" href="{{ $paginator->previousPageUrl() }}" rel="prev">&lt;</a>
             @endif
         </li>
 
@@ -41,7 +41,7 @@
                     )
                         {{-- Display the first few pages, last page, or pages close to the current page --}}
                         <li>
-                            <a class="inline-flex items-center justify-center w-6 h-6 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300 text-xs" href="{{ $url }}">{{ $page }}</a>
+                            <a class="inline-flex items-center justify-center w-6 h-6 text-gray-800 rounded-full hover:bg-gray-300 text-xs" href="{{ $url }}">{{ $page }}</a>
                         </li>
                     @elseif ($page == $maxPagesToShow + 1 && $currentPage < $lastPage - $maxPagesToShow)
                         {{-- Show Ellipsis after the first few pages if not close to the last page --}}
@@ -56,7 +56,7 @@
         {{-- Next Page Link --}}
         <li class="{{ $paginator->hasMorePages() ? '' : 'opacity-50 cursor-not-allowed' }}">
             @if ($paginator->hasMorePages())
-                <a class="inline-flex items-center justify-center w-6 h-6 text-gray-800 rounded-full hover:bg-gray-300 text-xs" href="{{ $paginator->nextPageUrl() }}" rel="next">&gt;</a>
+                <a class="inline-flex items-center justify-center w-6 h-6 text-gray-800 rounded-full font-bold hover:bg-gray-300 text-xs" href="{{ $paginator->nextPageUrl() }}" rel="next">&gt;</a>
             @else
                 <span class="inline-flex items-center justify-center w-6 h-6 text-gray-600 rounded-full text-xs">&gt;</span>
             @endif
