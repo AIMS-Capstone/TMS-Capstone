@@ -165,7 +165,7 @@
                                 <x-field-label for="email" value="{{ __('Email Address') }}" class="mb-2 text-left" />
                                 <x-input type="email" name="email" id="email" x-model="email" placeholder="Enter Email Address" onblur="validateEmail()"/>
                             </div>
-                            <p id="validationMessage" class="text-red-600 text-sm"></p> 
+                            <small id="validationMessage" class="text-red-600 text-sm"></small>
                         </div>
                     </div>
                 </div>
