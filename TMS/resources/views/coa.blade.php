@@ -295,8 +295,8 @@
 
                                     <!-- Table -->
                                     <div class="overflow-x-auto">
-                                        <table class="w-full text-left text-sm text-neutral-600 dark:text-neutral-300" id="tableid">
-                                            <thead class="border-b border-neutral-300 bg-slate-200 text-sm text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white">
+                                        <table class="w-full items-start text-left text-sm text-neutral-600" id="tableid">
+                                            <thead class="bg-neutral-100 text-sm text-neutral-700">
                                                 <tr>
                                                     <th scope="col" class="p-4">
                                                         <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
@@ -308,11 +308,11 @@
                                                             </div>
                                                         </label>
                                                     </th>
-                                                    <th scope="col" class="py-4 px-2">Code</th>
-                                                    <th scope="col" class="py-4 px-2">Name</th>
-                                                    <th scope="col" class="py-4 px-4">Type</th>
-                                                    <th scope="col" class="py-4 px-3">Date Created</th>
-                                                    <th scope="col" class="py-4 px-2">Action</th>
+                                                    <th scope="col" class="py-4 px-1">Code</th>
+                                                    <th scope="col" class="py-4 px-1">Name</th>
+                                                    <th scope="col" class="py-4 px-1">Type</th>
+                                                    <th scope="col" class="py-4 px-1">Date Created</th>
+                                                    <th scope="col" class="py-4 px-4">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
@@ -329,14 +329,19 @@
                                                                     </div>
                                                                 </label>
                                                             </td>
-                                                            <td>{{ $coa->code }}</td>
                                                             <td>
                                                                 <x-view-coa />
                                                                 <button @click="$dispatch('open-view-modal', {{ json_encode($coa) }})" class="underline hover:text-blue-500">
+                                                                    {{ $coa->code }}
+                                                                </button>
+                                                            </td>
+                                                            <td>
+                                                                <x-view-coa />
+                                                                <button @click="$dispatch('open-view-modal', {{ json_encode($coa) }})">
                                                                     {{ $coa->name }}
                                                                 </button>
                                                             </td>
-                                                            <td>{{ $coa->type }}</td>
+                                                            <td>{{ $coa->type }} <br/> {{ $coa->description }}</td>
                                                             <td>{{ $coa->created_at }}</td>
                                                             <td class="py-4 px-2">
                                                                 <x-edit-coa />
@@ -380,14 +385,14 @@
                                             <div class="flex flex-col items-center">
                                                 <!-- Icon -->
                                                 <div class="mb-4">
-                                                    <i class="fas fa-exclamation-triangle text-gray-500 text-8xl"></i>
+                                                    <i class="fas fa-exclamation-triangle text-zinc-700 text-8xl"></i>
                                                 </div>
 
                                                 <!-- Title -->
-                                                <h2 class="text-xl font-bold text-gray-800 mb-2">Archive Item/s</h2>
+                                                <h2 class="text-2xl font-extrabold text-zinc-700 mb-2">Archive Item(s)</h2>
 
                                                 <!-- Description -->
-                                                <p class="text-sm text-gray-600 text-center">
+                                                <p class="text-sm text-zinc-700 text-center">
                                                     You're going to Archive the selected item/s in the Charts of Account table. Are you sure?
                                                 </p>
 
@@ -395,15 +400,13 @@
                                                 <div class="flex justify-center space-x-8 mt-6 w-full">
                                                     <button 
                                                         @click="showConfirmArchiveModal = false; showDeleteCancelButtons = true;" 
-                                                        class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded-lg text-sm text-gray-700 transition"
-                                                    >
-                                                        Cancel
+                                                        class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
+                                                    > Cancel
                                                     </button>
                                                     <button 
                                                         @click="deleteRows(); showConfirmArchiveModal = false;" 
-                                                        class="px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-lg text-sm transition"
-                                                    >
-                                                        Archive
+                                                        class="px-5 py-2 bg-zinc-700 hover:bg-zinc-800 text-white rounded-lg text-sm font-medium transition"
+                                                    > Archive
                                                     </button>
                                                 </div>
                                             </div>

@@ -193,7 +193,7 @@
     <div x-data="{ checkAll: false, currentPage: 1, perPage: 5 }" class="mb-12 mx-12 overflow-hidden max-w-full border-neutral-300">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-neutral-600">
-                <thead class="bg-neutral-100 text-sm text-neutral-900">
+                <thead class="bg-neutral-100 text-sm text-neutral-700">
                     <tr>
                         <th scope="col" class="p-4">
                             <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">

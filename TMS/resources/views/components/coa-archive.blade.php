@@ -3,19 +3,19 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <!-- Page Main -->
-                        <div class="container mx-auto my-auto pt-6">
-                            <div class="px-10">
-                                <div class="flex flex-row w-full items-center">
-                                    <img src="{{ asset('images/Frame 17.png') }}" class="px-2"> 
-                                    <p class="font-bold text-3xl auth-color">Archive</p>
-                                </div>
+                    <div class="container mx-auto my-auto pt-6">
+                        <div class="px-10">
+                            <div class="flex flex-row w-full items-center space-x-2">
+                                <svg xmlns="http://www.w3.org/2000/svg"  class="w-8 h-8" viewBox="0 0 512 512"><path fill="none" stroke="#1e3a8a" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M160 144h288M160 256h288M160 368h288"/><circle cx="80" cy="144" r="16" fill="none" stroke="#1e3a8a" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><circle cx="80" cy="256" r="16" fill="none" stroke="#1e3a8a" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><circle cx="80" cy="368" r="16" fill="none" stroke="#1e3a8a" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
+                                <p class="font-bold text-3xl auth-color">Chart of Accounts</p>
                             </div>
-                            <div class="flex items-center px-10">
-                                <div class="flex items-center px-2">            
-                                    <p class="auth-color">The Chart of Accounts feature organizes all your financial accounts in one <br> place, making it simple to manage and track your company’s finances.</p>
-                                </div>
-                            </div>      
                         </div>
+                        <div class="flex items-center px-10">
+                            <div class="flex items-center">            
+                                <p class="taxuri-text text-sm font-normal">The Chart of Accounts feature organizes all your financial accounts in one <br> place, making it simple to manage and track your company’s finances.</p>
+                            </div>
+                        </div>      
+                    </div>
 
                     <div class="container mx-auto pt-2">
                             <!-- Second Header -->
