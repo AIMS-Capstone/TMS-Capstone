@@ -31,15 +31,15 @@
                 <div class="w-2/3 pr-4">
                     <label class="block text-sm font-bold text-zinc-700">Account Type</label>
                     <input 
-                        class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent disabled:opacity-50 disabled:pointer-events-none"
-                        x-bind:value="coa.type" readonly=""
+                        class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200 focus:outline-none focus:ring-0"
+                        x-bind:value="coa.type" disabled readonly
                     >
                 </div>
                 <div class="w-1/3 text-left">
                     <label class="block text-sm font-bold text-zinc-700">Code</label>
                     <input 
-                        class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent disabled:opacity-50 disabled:pointer-events-none"
-                        x-bind:value="coa.code" readonly=""
+                        class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200 focus:outline-none focus:ring-0"
+                        x-bind:value="coa.code" disabled readonly
                     >
                 </div>
             </div>
@@ -48,8 +48,8 @@
             <div class="mb-5">
                 <label class="block text-sm font-bold text-zinc-700">Name</label>
                 <input 
-                    class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent disabled:opacity-50 disabled:pointer-events-none"
-                    x-bind:value="coa.name" readonly=""
+                    class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200 focus:outline-none focus:ring-0"
+                    x-bind:value="coa.name" disabled readonly
                 >
             </div>
     
@@ -57,8 +57,8 @@
             <div class="mb-5">
                 <label class="block text-sm font-bold text-zinc-700">Description</label>
                 <input 
-                    class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent disabled:opacity-50 disabled:pointer-events-none"
-                    x-bind:value="coa.description" disabled readonly=""
+                    class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200 focus:outline-none focus:ring-0"
+                    x-bind:value="coa.description" disabled readonly
                 >
             </div>
     

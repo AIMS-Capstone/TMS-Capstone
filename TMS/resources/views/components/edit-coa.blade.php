@@ -17,40 +17,41 @@
             <button @click="$dispatch('close-modal')" class="absolute right-3 top-3 text-sm text-white hover:text-gray-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <!-- Circle Background -->
-                    <circle cx="12" cy="12" r="10" fill="white" />
+                    <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>
                     <!-- X Icon -->
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 8L16 16M8 16L16 8" stroke="black"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 8L16 16M8 16L16 8" stroke="#1e3a8a" class="transition duration-200 hover:stroke-gray-600"/>
                 </svg>
             </button>
         </div>
 
         <!-- Modal body -->
-        <div class="p-6">
+        <div class="p-10">
             <form id="editAccountForm" method="POST" :action="'/coa/' + coa.id">
                 @csrf
                 @method('PUT')
 
                 <!-- COA Code -->
                 <div class="mb-5">
-                    <label for="coaCode" class="block text-sm font-medium text-gray-700">Code</label>
-                    <input type="text" id="coaCode" name="code" x-model="coa.code" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-900 focus:border-blue-900 sm:text-sm" required>
+                    <label for="coaCode" class="block text-sm font-bold text-gray-700">Code</label>
+                    <input type="text" id="coaCode" name="code" x-model="coa.code" class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" 
+                    required maxlength="10">
                 </div>
 
                 <!-- COA Name -->
                 <div class="mb-5">
-                    <label for="coaName" class="block text-sm font-medium text-gray-700">Name</label>
-                    <input type="text" id="coaName" name="name" x-model="coa.name" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-900 focus:border-blue-900 sm:text-sm" required>
+                    <label for="coaName" class="block text-sm font-bold text-gray-700">Name</label>
+                    <input type="text" id="coaName" name="name" x-model="coa.name" class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" required>
                 </div>
 
                 <!-- COA Type -->
                 <div class="mb-5">
-                    <label for="coaType" class="block text-sm font-medium text-gray-700">Type</label>
-                    <input type="text" id="coaType" name="type" x-model="coa.type" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-900 focus:border-blue-900 sm:text-sm" required>
+                    <label for="coaType" class="block text-sm font-bold text-gray-700">Type</label>
+                    <input type="text" id="coaType" name="type" x-model="coa.type" class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" required>
                 </div>
 
                 <!-- Submit -->
                 <div class="flex justify-end">
-                    <button type="submit" class="bg-blue-900 text-white px-4 py-2 rounded-md hover:bg-blue-950">
+                    <button type="submit" class="bg-blue-900 text-white font-bold px-4 py-2 rounded-md hover:bg-blue-950">
                         Save Changes
                     </button>
                 </div>
