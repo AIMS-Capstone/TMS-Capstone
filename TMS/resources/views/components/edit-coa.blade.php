@@ -1,8 +1,11 @@
+{{-- Note: Ito main na gamit for COA edit, hindi yung "edit-coa-modal" --}}
+
 <div 
     x-data="{ show: false, coa: {} }"
     x-show="show"
     x-on:open-edit-modal.window="show = true; coa = $event.detail"
     x-on:close-modal.window="show = false"
+    x-effect="document.body.classList.toggle('overflow-hidden', show)"
     class="fixed z-50 inset-0 flex items-center justify-center m-2 px-6"
     x-cloak
 >
@@ -30,11 +33,26 @@
                 @csrf
                 @method('PUT')
 
-                <!-- COA Code -->
-                <div class="mb-5">
-                    <label for="coaCode" class="block text-sm font-bold text-gray-700">Code</label>
-                    <input type="text" id="coaCode" name="code" x-model="coa.code" class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" 
-                    required maxlength="10">
+                <div class="mb-5 flex justify-between items-start">
+                    <!-- COA Type -->
+                    <div class="w-2/3 pr-4">
+                        <label for="coaType" class="block text-sm font-bold text-gray-700">Account Type</label>
+                        <select name="type" id="coaType" x-model="coa.type" required class="peer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none cursor-pointer focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                            <option value="" disabled>Select Account Type</option>
+                            <option value="Assets">Assets</option>
+                            <option value="Liabilities">Liabilities</option>
+                            <option value="Equity">Equity</option>
+                            <option value="Revenues">Revenue</option>
+                            <option value="Cost of Sales">Cost of Sales</option>
+                            <option value="Expense">Expenses</option>
+                        </select>
+                    </div>
+                    <!-- COA Code -->
+                    <div class="w-1/3 text-left">
+                        <label for="coaCode" class="block text-sm font-bold text-gray-700">Code</label>
+                        <input type="text" id="coaCode" name="code" x-model="coa.code" class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" 
+                        required maxlength="10">
+                    </div>
                 </div>
 
                 <!-- COA Name -->
@@ -43,10 +61,16 @@
                     <input type="text" id="coaName" name="name" x-model="coa.name" class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" required>
                 </div>
 
-                <!-- COA Type -->
+                {{-- Please check, ayaw mag display --}}
+                {{-- <div class="mb-5">
+                    <label for="sub_type" class="block text-sm font-bold text-gray-700">Sub Category</label>
+                    <input type="text" id="sub_type" name="sub_type" x-model="coa.sub_type" class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" required>
+                </div> --}}
+
+                {{-- Ayaw mag display ng inedit --}}
                 <div class="mb-5">
-                    <label for="coaType" class="block text-sm font-bold text-gray-700">Type</label>
-                    <input type="text" id="coaType" name="type" x-model="coa.type" class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" required>
+                    <label for="coaDescription" class="block text-sm font-bold text-gray-700">Description</label>
+                    <input type="text" id="coaDescription" name="description" x-model="coa.description" class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" required>
                 </div>
 
                 <!-- Submit -->

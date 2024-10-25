@@ -3,6 +3,7 @@
     x-show="show"
     x-on:open-edit-modal.window="show = true; id = $event.detail.id; type = $event.detail.type; code = $event.detail.code; name = $event.detail.name; description = $event.detail.description"
     x-on:close-modal.window="show = false"
+    x-effect="document.body.classList.toggle('overflow-hidden', show)"
     class="fixed z-50 inset-0 flex items-center justify-center m-2"
 >
     <!-- Modal content -->

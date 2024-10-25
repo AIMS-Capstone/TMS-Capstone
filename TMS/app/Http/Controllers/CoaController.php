@@ -39,7 +39,7 @@ class CoaController extends Controller
         }
 
         // Paginate the results
-        $coas = $query->paginate(4);
+        $coas = $query->paginate(5);
 
         return view('coa', compact('coas'));
     }

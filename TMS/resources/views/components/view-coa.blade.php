@@ -3,11 +3,12 @@
     x-show="show"
     x-on:open-view-modal.window="show = true; coa = $event.detail"
     x-on:close-modal.window="show = false"
+    x-effect="document.body.classList.toggle('overflow-hidden', show)"
     class="fixed z-50 inset-0 flex items-center justify-center m-2 px-6"
     x-cloak
 >
     <!-- Modal background -->
-    <div class="fixed inset-0 bg-zinc-300 opacity-40"></div>
+    <div class="fixed inset-0 bg-gray-300 opacity-20"></div>
 
     <!-- Modal container -->
     <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden">
@@ -52,6 +53,16 @@
                     x-bind:value="coa.name" disabled readonly
                 >
             </div>
+
+            <!-- COA Sub Type [Only when it is present] -->
+            {{-- Please check, ayaw mag display --}}
+            {{-- <div class="mb-5">
+                <label class="block text-sm font-bold text-zinc-700">Sub Category</label>
+                <input 
+                    class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200 focus:outline-none focus:ring-0"
+                    x-bind:value="coa.sub_type" disabled readonly
+                >
+            </div> --}}
     
             <!-- COA Description -->
             <div class="mb-5">
