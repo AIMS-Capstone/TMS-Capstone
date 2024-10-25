@@ -185,10 +185,10 @@
                                                     <td class="text-left py-[7px] px-4 capitalize">{{ $organization->tax_type }}</td>
                                                     <td class="text-left py-[7px] px-4">{{ $organization->type }}</td>
                                                     <td class="text-left py-[7px] px-4">
-                                                        <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-4 py-2 rounded-full dark:bg-green-900 dark:text-green-300">Account Active</span>
+                                                        <span class="bg-zinc-100 text-zinc-800 text-xs font-medium me-2 px-4 py-2 rounded-full dark:bg-zinc-700 dark:text-zinc-300">No Account Yet</span>
+                                                        {{-- <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-4 py-2 rounded-full dark:bg-green-900 dark:text-green-300">Account Active</span> --}}
                                                         {{-- lalagyan ng if-else; "Account Active" == may acc si client [nasa user management]; "No Account Yet" == walang acc si client--}}
-                                                        {{-- see display below kapag "No Account Yet" and status --}}
-                                                        {{-- <span class="bg-zinc-100 text-zinc-800 text-xs font-medium me-2 px-4 py-2 rounded-full dark:bg-zinc-700 dark:text-zinc-300">No Account Yet</span> --}}
+                                                        {{-- see display below kapag "No Account Yet" and status [DEFAULT STATUS AY No Account Yet]--}}
                                                     </td>
                                                     <td class="relative text-left py-2 px-3">
                                                         <button type="button" id="dropdownMenuAction-{{ $organization->id }}" class="text-zinc-500 hover:text-zinc-700">
@@ -196,9 +196,11 @@
                                                                 <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
                                                             </svg>
                                                         </button>
-                                                        <div id="dropdownAction-{{ $organization->id }}" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-32 origin-top-right overflow-hidden max-h-64 overflow-y-auto">
+                                                        <div id="dropdownAction-{{ $organization->id }}" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-40 origin-top-right overflow-hidden max-h-64 overflow-y-auto">
                                                             <div class="py-2 px-2 text-sm text-zinc-700" aria-labelledby="dropdownMenuAction">
                                                                 <div onclick="editOrganization('{{ $organization->id }}')" class="block px-4 py-2 w-full text-left hover-dropdown">Edit</div>
+                                                                {{-- Deafult selection in action button kapag status ay "No Account Yet" --}}
+                                                                <div onclick="createAccount('{{ $organization->id }}')" class="block px-4 py-2 w-full text-left hover-dropdown">Create Account</div>
                                                                 <div onclick="deleteOrganization('{{ $organization->id }}')" class="block px-4 py-2 w-full text-left hover-dropdown">Delete</div>
                                                             </div>
                                                         </div>
@@ -218,8 +220,7 @@
                                         @endif
                                     </tbody>
                                 </table>
-                                {{-- {{ $orgsetups->links() }} --}}
-                                {{ $orgsetups->appends(request()->input())->links() }}
+                                {{ $orgsetups->appends(request()->input())->links('vendor.pagination.custom') }}
                             </div>
                         </div>
                     </div>

@@ -27,7 +27,6 @@
                     <label for="type" class="block font-semibold text-sm text-gray-700">
                         Account Type <span class="text-red-500">*</span>
                     </label>
-                    {{-- Naming of value and option must be the same para gumana nang maayos ang filter tab --}}
                     <select name="type" id="accountType" required
                         class="mt-1 block w-full ps-4 p-2 text-xs border rounded-md focus:ring-blue-900 focus:border-blue-900">
                         <option value="" disabled selected>Select Account Type</option>
@@ -35,8 +34,6 @@
                         <option value="Liabilities">Liabilities</option>
                         <option value="Equity">Equity</option>
                         <option value="Revenue">Revenue</option>
-
-                        {{-- either ang gamitin sa lahat ay Sales or Cost of Sales. Hindi pwede na magkaiba dahil hindi gagana ang filter tab --}}
                         <option value="Cost of Sales">Cost of Sales</option>
                         <option value="Expenses">Expenses</option>
                     </select>

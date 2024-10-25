@@ -57,6 +57,7 @@ Route::middleware([
     Route::get('/org-setup', [OrgSetupController::class, 'index'])->name('org-setup');
     Route::post('/org-setup', [OrgSetupController::class, 'store'])->name('OrgSetup.store');
 
+
     // Routes Requiring Organization Session
     Route::middleware([CheckOrganizationSession::class])->group(function () {
         // User Management

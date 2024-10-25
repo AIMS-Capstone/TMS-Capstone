@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 .select2-container--default .select2-selection--single {
     border: none !important; /* Tailwind: border-none */
     border-radius: 0.75rem; /* Tailwind: rounded-xl */

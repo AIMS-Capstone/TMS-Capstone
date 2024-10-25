@@ -157,7 +157,7 @@
                                     </tbody>
                                 </table>
                                 {{-- comment out na lang if may data na --}}
-                                {{-- {{ $orgsetups->appends(request()->input())->links() }} --}}
+                                {{-- {{ $orgsetups->appends(request()->input())->links('vendor.pagination.custom') }} --}}
                             </div>
                         </div>
                     </div>
@@ -266,15 +266,15 @@
                                         </tr>
                                             <tr>
                                                 <td colspan="6" class="text-center p-2">
-                                                    <img src="{{ asset('images/no-account.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
-                                                    <h1 class="font-extrabold">No Account yet</h1>
+                                                    <img src="{{ asset('images/Box.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                                    <h1 class="font-extrabold">No Client Users yet</h1>
                                                     <p class="text-sm text-neutral-500 mt-2">Start creating accounts with the <br> + Add Account button.</p>
                                                 </td>
                                             </tr>
                                     </tbody>
                                 </table>
                                 {{-- comment out na lang if may data na --}}
-                                {{-- {{ $orgsetups->appends(request()->input())->links() }} --}}
+                                {{-- {{ $orgsetups->appends(request()->input())->links('vendor.pagination.custom') }} --}}
                             </div>
                         </div>
                     </div>

@@ -24,9 +24,6 @@ $organization = \App\Models\OrgSetup::find($organizationId);
         @vite(['resources/css/app.css', 'resources/css/custom.css', 'resources/js/app.js'])
         <!-- Styles -->
         @livewireStyles
-     
-        
-        
     </head>
 
     <body class="font-sans antialiased">
@@ -61,20 +58,21 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                     <ul class="space-y-1 my-8 flex-1">
                         <li class="pl-0">
                             <a href="{{ route('dashboard') }}"
-                            class="flex items-center rounded-r-full px-6 py-2 ease-in duration-500 transition-all 
+                            class="flex items-center rounded-r-full px-6 py-2  
                             {{ request()->routeIs('dashboard') ? 'sidebar-active' : '' }}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon mr-2" viewBox="0 0 1024 1024"><path fill="#273C75" d="M946.5 505L534.6 93.4a31.93 31.93 0 0 0-45.2 0L77.5 505c-12 12-18.8 28.3-18.8 45.3c0 35.3 28.7 64 64 64h43.4V908c0 17.7 14.3 32 32 32H448V716h112v224h265.9c17.7 0 32-14.3 32-32V614.3h43.4c17 0 33.3-6.7 45.3-18.8c24.9-25 24.9-65.5-.1-90.5"/></svg>                                <span class="sidebar-text">Home</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon mr-2" viewBox="0 0 1024 1024"><path fill="#273C75" d="M946.5 505L534.6 93.4a31.93 31.93 0 0 0-45.2 0L77.5 505c-12 12-18.8 28.3-18.8 45.3c0 35.3 28.7 64 64 64h43.4V908c0 17.7 14.3 32 32 32H448V716h112v224h265.9c17.7 0 32-14.3 32-32V614.3h43.4c17 0 33.3-6.7 45.3-18.8c24.9-25 24.9-65.5-.1-90.5"/></svg>                               
+                             <span class="sidebar-text ease-in duration-500 transition-all">Home</span>
                             </a>
                         </li>
                         <li class="pl-0">
                             <a href="{{ route('transactions') }}"
-                            class="flex items-center rounded-r-full px-6 py-2 ease-in duration-500 transition-all
+                            class="flex items-center rounded-r-full px-6 py-2 
                             {{ request()->routeIs('transactions') ? 'sidebar-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon mr-2" viewBox="0 0 256 256"><path fill="#273C75" d="M216 40H40a16 16 0 0 0-16 16v152a8 8 0 0 0 11.58 7.15L64 200.94l28.42 14.21a8 8 0 0 0 7.16 0L128 200.94l28.42 14.21a8 8 0 0 0 7.16 0L192 200.94l28.42 14.21A8 8 0 0 0 232 208V56a16 16 0 0 0-16-16m-40 104H80a8 8 0 0 1 0-16h96a8 8 0 0 1 0 16m0-32H80a8 8 0 0 1 0-16h96a8 8 0 0 1 0 16"/></svg>
-                                <span class="sidebar-text">Transactions</span>
+                                <span class="sidebar-text ease-in duration-500 transition-all">Transactions</span>
                             </a>
                         </li>
-                        <li x-data="{ open: false }">
+                        <li x-data="{ open: {{ request()->routeIs('vat_return') ? 'true' : 'false' }} }">
                             <button @click="open = !open" type="button"
                                 :class="{
                                     'flex items-center w-full p-2 text-[14px] ease-in transition-all duration-500 rounded-r-full hover:font-bold px-6 py-2 group': true,
@@ -105,7 +103,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('vat_return') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group">
+                                    <a href="{{ route('vat_return') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
+                                    {{ request()->routeIs('vat_return') ? 'sidebar-submenu-active' : '' }}">
                                         Value Added Tax Return
                                     </a>
                                 </li>
@@ -183,7 +182,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                             <a href="{{ route('coa') }}"
                             class="flex items-center rounded-r-full px-6 py-2 ease-in transition-all
                             {{ request()->routeIs('coa') ? 'sidebar-active' : '' }}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon mr-2" viewBox="0 0 24 24"><path fill="#273C75" d="M19 17h-7c-1.103 0-2 .897-2 2s.897 2 2 2h7c1.103 0 2-.897 2-2s-.897-2-2-2m0-7h-7c-1.103 0-2 .897-2 2s.897 2 2 2h7c1.103 0 2-.897 2-2s-.897-2-2-2m0-7h-7c-1.103 0-2 .897-2 2s.897 2 2 2h7c1.103 0 2-.897 2-2s-.897-2-2-2"/><circle cx="5" cy="19" r="2.5" fill="#172554"/><circle cx="5" cy="12" r="2.5" fill="#172554"/><circle cx="5" cy="5" r="2.5" fill="#172554"/></svg>                                <span class="sidebar-text">Chart of Accounts</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon mr-2" viewBox="0 0 24 24"><path fill="#273C75" d="M19 17h-7c-1.103 0-2 .897-2 2s.897 2 2 2h7c1.103 0 2-.897 2-2s-.897-2-2-2m0-7h-7c-1.103 0-2 .897-2 2s.897 2 2 2h7c1.103 0 2-.897 2-2s-.897-2-2-2m0-7h-7c-1.103 0-2 .897-2 2s.897 2 2 2h7c1.103 0 2-.897 2-2s-.897-2-2-2"/><circle cx="5" cy="19" r="2.5" fill="#172554"/><circle cx="5" cy="12" r="2.5" fill="#172554"/><circle cx="5" cy="5" r="2.5" fill="#172554"/></svg>                                
+                                <span class="sidebar-text ease-in duration-500 transition-all">Chart of Accounts</span>
                             </a>
                         </li>
                         <li class="pl-0">
@@ -191,7 +191,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                             class="flex items-center rounded-r-full px-6 py-2 ease-in transition-all
                             {{ request()->routeIs('financial-reports') ? 'sidebar-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon mr-2" viewBox="0 0 24 24"><g fill="none"><path fill="#273C75" d="M21 7c0 2.21-4.03 4-9 4S3 9.21 3 7s4.03-4 9-4s9 1.79 9 4"/><path stroke="#172554" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 7c0 2.21-4.03 4-9 4S3 9.21 3 7m18 0c0-2.21-4.03-4-9-4S3 4.79 3 7m18 0v5M3 7v5m18 0c0 2.21-4.03 4-9 4s-9-1.79-9-4m18 0v5c0 2.21-4.03 4-9 4s-9-1.79-9-4v-5"/></g></svg>
-                                <span class="sidebar-text">Financial Reports</span>
+                                <span class="sidebar-text ease-in duration-500 transition-all">Financial Reports</span>
                             </a>
                         </li>
                         <li class="pl-0">
@@ -199,7 +199,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                             class="flex items-center rounded-r-full px-6 py-2 ease-in transition-all
                             {{ request()->routeIs('predictive-analytics') ? 'sidebar-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon mr-2" viewBox="0 0 24 24"><path fill="#273C75" d="M14 9q-.425 0-.712-.288T13 8V4q0-.425.288-.712T14 3h6q.425 0 .713.288T21 4v4q0 .425-.288.713T20 9zM4 13q-.425 0-.712-.288T3 12V4q0-.425.288-.712T4 3h6q.425 0 .713.288T11 4v8q0 .425-.288.713T10 13zm10 8q-.425 0-.712-.288T13 20v-8q0-.425.288-.712T14 11h6q.425 0 .713.288T21 12v8q0 .425-.288.713T20 21zM4 21q-.425 0-.712-.288T3 20v-4q0-.425.288-.712T4 15h6q.425 0 .713.288T11 16v4q0 .425-.288.713T10 21z"/></svg>
-                                <span class="sidebar-text">Predictive Analytics</span>
+                                <span class="sidebar-text ease-in duration-500 transition-all">Predictive Analytics</span>
                             </a>
                         </li>
                     </ul>
@@ -212,7 +212,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                             class="flex items-center rounded-r-full px-6 py-2 ease-in transition-all
                             {{ request()->routeIs('org-setup') ? 'sidebar-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon mr-2" viewBox="0 0 24 24"><path fill="#273C75" d="M4.5 6.375a4.125 4.125 0 1 1 8.25 0a4.125 4.125 0 0 1-8.25 0m9.75 2.25a3.375 3.375 0 1 1 6.75 0a3.375 3.375 0 0 1-6.75 0M1.5 19.125a7.125 7.125 0 0 1 14.25 0v.003l-.001.119a.75.75 0 0 1-.363.63a13.07 13.07 0 0 1-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 0 1-.364-.63zm15.75.003l-.001.144a2.25 2.25 0 0 1-.233.96q.302.018.609.018c1.596 0 3.107-.37 4.451-1.029a.75.75 0 0 0 .42-.642l.004-.204a4.875 4.875 0 0 0-6.961-4.407a8.6 8.6 0 0 1 1.71 5.157z"/></svg>
-                                <span class="sidebar-text">Organization Setup</span>
+                                <span class="sidebar-text ease-in duration-500 transition-all">Organization Setup</span>
                             </a>
                         </li>
                         {{-- <li class="pl-0">
