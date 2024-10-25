@@ -22,7 +22,7 @@
                 <!-- Customer Select -->
                 <div class="mt-5 mb-8 ml-10">
                     <label for="select-contact" class="block font-bold text-sm text-blue-900">Customer</label>
-                    <div class="mt-2">
+                    <div class="mt-4">
                         <livewire:select-input
                             name="select_contact"
                             labelKey="name"

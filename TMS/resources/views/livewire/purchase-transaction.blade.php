@@ -31,7 +31,7 @@
                         </div>
                     </span>
                 </label>
-                <div class="mt-1">
+                <div class="mt-4">
                     <livewire:select-input
                         name="select_contact"
                         labelKey="name"
