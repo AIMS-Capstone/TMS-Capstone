@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('inv_number')->nullable();
             $table->boolean('itr_include')->nullable();
             $table->foreignId('contact')->nullable()->constrained('contacts')->nullOnDelete();
+            $table->foreignId('organization_id')->constrained('org_setups')->onDelete('cascade');
             $table->string('reference')->nullable();
             $table->decimal('total_amount', 10, 2)->nullable();
             $table->decimal('vat_amount', 10, 2)->nullable();

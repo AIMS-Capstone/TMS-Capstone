@@ -19,6 +19,7 @@ class SalesTransaction extends Component
     public $date;
     public $contact;
     public $inv_number;
+    public $organization_id;
     public $reference;
     public $selectedContact;
 
@@ -38,6 +39,8 @@ class SalesTransaction extends Component
         $this->addTaxRow();
         $this->addTaxRow();
         $this->addTaxRow();
+        $this->organization_id = session('organization_id');
+       
     }
 
     public function addTaxRow()
@@ -100,39 +103,59 @@ class SalesTransaction extends Component
 
     public function saveTransaction()
     {
+        // Validate the required fields
         $this->validate();
     
+        // Retrieve organization ID from the session
+       
+    
+    
+    
         // Create a transaction with 'Sales' type
-        $transaction = Transactions::create([
-            'transaction_type' => 'Sales',
-            'date' => $this->date,
-            'contact' =>  $this->selectedContact,
-            'inv_number' => $this->inv_number,
-            'reference' => $this->reference,
-            'total_amount' => $this->totalAmount,
-            'vatable_sales' => $this->vatableSales,
-            'vat_amount' => $this->vatAmount,
-            'non_vatable_sales' => $this->nonVatableSales // Save non-vatable sales
-        ]);
-    
-        // Save each tax row linked to the transaction
-        foreach ($this->taxRows as $row) {
-            TaxRow::create([
-                'transaction_id' => $transaction->id,
-                'description' => $row['description'],
-                'amount' => $row['amount'],
-                'tax_code' => $row['tax_code'],
-                'tax_type' => $row['tax_type'],
-                'tax_amount' => $row['tax_amount'],
-                'net_amount' => $row['net_amount'],
-                'coa' => $row['coa'],
+        try {
+         
+            $this->organization_id = session('organization_id');
+            $transaction = Transactions::create([
+                'transaction_type' => 'Sales',
+                'date' => $this->date,
+                'contact' => $this->selectedContact,
+                'inv_number' => $this->inv_number,
+                'reference' => $this->reference,
+                'total_amount' => $this->totalAmount,
+                'vatable_sales' => $this->vatableSales,
+                'vat_amount' => $this->vatAmount,
+                'non_vatable_sales' => $this->nonVatableSales,
+                'organization_id' => $this->organization_id, // Ensure this is included
             ]);
-        }
     
-        // Optionally, redirect or provide feedback to the user
-        session()->flash('message', 'Transaction saved successfully!');
-        return redirect()->route('transactions.show', ['transaction' => $transaction->id]);
+            // Log the transaction ID after saving
+            \Log::info('Transaction saved successfully with ID: ' . $transaction->id);
+    
+            // Save each tax row linked to the transaction
+            foreach ($this->taxRows as $row) {
+                TaxRow::create([
+                    'transaction_id' => $transaction->id,
+                    'description' => $row['description'],
+                    'amount' => $row['amount'],
+                    'tax_code' => !empty($row['tax_code']) ? $row['tax_code'] : null,
+                    'tax_type' => $row['tax_type'],
+                    'tax_amount' => $row['tax_amount'],
+                    'net_amount' => $row['net_amount'],
+                    'coa' => !empty($row['coa']) ? $row['coa'] : null,
+                ]);
+            }
+    
+            // Provide feedback to the user
+            session()->flash('message', 'Transaction saved successfully!');
+            return redirect()->route('transactions.show', ['transaction' => $transaction->id]);
+    
+        } catch (\Exception $e) {
+            // Log the error for further investigation
+            \Log::error('Error saving transaction: ' . $e->getMessage());
+            session()->flash('error', 'There was an error saving the transaction.');
+        }
     }
+    
     
 
     public function render()

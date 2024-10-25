@@ -37,14 +37,15 @@ class OrgSetupController extends Controller
 
      public function setOrganization(Request $request)
      {
-         $request->validate([
-             'organization_id' => 'required|exists:org_setups,id',
-         ]);
+         $organizationId = $request->input('organization_id');
      
-         Session::put('organization_id', $request->organization_id);
+         // Store the organization ID in the session
+         session(['organization_id' => $organizationId]);
      
-         return redirect()->route('dashboard'); // Redirect to the dashboard or the intended page
+         // Redirect to the dashboard or some other page
+         return redirect()->route('dashboard')->with('success', 'Organization selected successfully.');
      }
+     
     public function create(Request $request)
     {
 

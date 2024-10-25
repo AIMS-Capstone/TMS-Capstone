@@ -202,9 +202,10 @@ $organizationId = session('organization_id');
                                          
                                             <td class="py-4 px-2">
                                                 <x-edit-coa />
-                                                <button class="hover:border-slate-600 hover:text-slate-600 border px-3 py-2 rounded-lg text-sm">
-                                                    Edit
-                                                </button>
+                                                <a href="{{ route('tax_return.slsp_data', $taxReturn->id) }}" class="hover:border-slate-600 hover:text-slate-600 border px-3 py-2 rounded-lg text-sm">
+                                                    Show
+                                                </a>
+                                                
                                             </td>
                                         </tr>
                                     @endforeach
@@ -237,17 +238,40 @@ $organizationId = session('organization_id');
                     @csrf
                     <div class="mb-4">
                         <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
-                        <input type="number" id="year" name="year" class="mt-1 p-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Enter Year" required>
+                        <select id="year" name="year" class="mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                            <option value="">Select Year</option>
+                            @php
+                                $currentYear = date('Y');
+                                $startYear = $currentYear - 100;
+                            @endphp
+                            @for ($year = $startYear; $year <= $currentYear; $year++)
+                                <option value="{{ $year }}">{{ $year }}</option>
+                            @endfor
+                        </select>
                     </div>
     
                     <div class="mb-4">
                         <label for="month" class="block text-sm font-medium text-gray-700">Month</label>
                         <select id="month" name="month" class="mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
                             <option value="">Select Month</option>
+                            <!-- Monthly options -->
                             <option value="1">January</option>
                             <option value="2">February</option>
                             <option value="3">March</option>
-                            <!-- Add all other months -->
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                            <!-- Quarterly options -->
+                            <option value="Q1">January - March (Q1)</option>
+                            <option value="Q2">April - June (Q2)</option>
+                            <option value="Q3">July - September (Q3)</option>
+                            <option value="Q4">October - December (Q4)</option>
                         </select>
                     </div>
     

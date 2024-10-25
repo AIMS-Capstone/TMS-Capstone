@@ -20,4 +20,10 @@ class TaxReturn extends Model
     {
         return $this->belongsTo(User::class, 'created_by'); 
     }
+    public function transactions()
+    {
+        return $this->belongsToMany(Transactions::class, 'tax_return_transactions', 'tax_return_id', 'transaction_id')
+                    ->withPivot('allocation_percentage') // If you want to access the allocation percentage
+                    ->withTimestamps();
+    }
 }
