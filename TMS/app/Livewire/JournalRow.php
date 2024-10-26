@@ -19,7 +19,7 @@ class JournalRow extends Component
     public function mount($index, $journalRow = [], $type = 'journal')
     {
         // Load initial data
-        $this->coas = Coa::all();
+        $this->coas = Coa::where('status', 'Active')->get();
         $this->index = $index;
         $this->type = $type; // Initialize type
 

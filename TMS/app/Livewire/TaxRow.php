@@ -30,7 +30,7 @@ class TaxRow extends Component
         // Load initial data
         $this->taxTypes = TaxType::where('transaction_type', $this->type)->get();
         $this->atcs = ATC::where('transaction_type', $this->type)->get();
-        $this->coas = Coa::all();
+        $this->coas = Coa::where('status', 'Active')->get();
         $this->index = $index;
 
         // Initialize properties from $taxRow

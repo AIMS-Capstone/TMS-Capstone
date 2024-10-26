@@ -40,12 +40,20 @@
     <div class="container mx-auto ps-8">
         <div class="flex flex-row space-x-2 items-center">
             <!-- Search row -->
-            <div x-data="{ search: '' }" class="relative w-80 p-5">
-                <input type="text" x-model="search" placeholder="Search..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-950 focus:border-blue-950" />
+            <div class="relative w-80 p-4">
+                <form x-target="tableTransaction" action="/transactions" role="search" aria-label="Table" autocomplete="off">
+                    <input 
+                    type="search" 
+                    name="search" 
+                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
+                    aria-label="Search Term" 
+                    placeholder="Search..." 
+                    @input.debounce="$el.form.requestSubmit()" 
+                    @search="$el.form.requestSubmit()"
+                    >
+                </form>
                 <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <i class="fa-solid fa-xmark absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer" @click="search = ''"></i>
             </div>
-    
             <!-- Sort by dropdown -->
             <div class="relative inline-block text-left min-w-[150px]">
                 <button id="sortButton" class="flex items-center text-gray-600 w-full">
@@ -192,7 +200,7 @@
     <!-- Table -->
     <div x-data="{ checkAll: false, currentPage: 1, perPage: 5 }" class="mb-12 mx-12 overflow-hidden max-w-full border-neutral-300">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-neutral-600">
+            <table class="w-full text-left text-sm text-neutral-600" id="tableTransaction">
                 <thead class="bg-neutral-100 text-sm text-neutral-700">
                     <tr>
                         <th scope="col" class="p-4">
@@ -283,31 +291,7 @@
              
             </table>
             <nav aria-label="pagination">
-                {{-- <ul class="flex flex-shrink-0 items-center gap-2 text-sm font-medium mt-4">
-                    <li>
-                        <button @click="currentPage = Math.max(currentPage - 1, 1)" :disabled="currentPage === 1" class="flex items-center rounded-md p-1 text-neutral-600 hover:text-black" aria-label="previous page">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="size-6">
-                                <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </li>
-                    <template x-for="page in totalPages" :key="page">
-                        <li x-show="page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1) || page === currentPage">
-                            <button @click="currentPage = page" :class="currentPage === page ? 'bg-sky-900 text-neutral-100' : 'text-neutral-600 hover:text-black'" class="flex size-6 items-center justify-center rounded-full p-1" :aria-current="currentPage === page" :aria-label="'page ' + page" x-text="page"></button>
-                        </li>
-                        <li x-show="page === currentPage - 2 || page === currentPage + 2">
-                            <span class="flex items-center justify-center rounded-md p-1 text-neutral-600" aria-label="ellipsis">...</span>
-                        </li>
-                    </template>
-                    <li>
-                        <button @click="currentPage = Math.min(currentPage + 1, totalPages)" :disabled="currentPage === totalPages" class="flex items-center rounded-md p-1 text-neutral-600 hover:text-black" aria-label="next page">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="size-6">
-                                <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </li>
-                </ul> --}}
-                {{ $transactions->links() }}
+                {{ $transactions->links('vendor.pagination.custom') }}
             </nav>
         </div>
     </div>
