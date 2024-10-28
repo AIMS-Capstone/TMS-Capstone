@@ -3,6 +3,7 @@
     x-show="show"
     x-on:open-import-modal.window="show = true"
     x-on:close-modal.window="show = false"
+    x-effect="document.body.classList.toggle('overflow-hidden', show)"
     class="fixed z-50 inset-0 flex items-center justify-center m-2"
     x-cloak
 >

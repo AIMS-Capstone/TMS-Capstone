@@ -90,7 +90,7 @@
                         </div>
                         
                         {{-- Right Table --}}
-                        <div class="w-full md:w-3/4 mt-8 ml-0 md:ml-8 max-h-[500px] border border-zinc-300 rounded-lg p-4 bg-white">
+                        <div class="w-full md:w-3/4 mt-8 ml-0 md:ml-8 h-auto border border-zinc-300 rounded-lg p-4 bg-white">
                             <div class="flex flex-row items-center">
                                 <!-- Search row -->
                                 <div class="relative w-80 p-5">
@@ -161,7 +161,7 @@
                     
                             <hr class="border-zinc-300 w-[calc(100%+2rem)] mx-[-1rem]">
                         
-                            <div class="my-4 overflow-y-auto max-h-[500px]">
+                            <div class="my-4 overflow-y-auto h-auto">
                                 <table class="min-w-full bg-white" id="tableid">
                                     <thead class="bg-zinc-100 text-zinc-700 font-extrabold sticky top-0">
                                         <tr>
