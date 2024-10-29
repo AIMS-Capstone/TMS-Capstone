@@ -304,20 +304,20 @@
                                     <!-- Table of Inactive CoAs -->
                                     <div class="overflow-x-auto">
                                         <table class="w-full text-left text-sm text-neutral-600 dark:text-neutral-300" id="tableid">
-                                            <thead class="border-b border-neutral-300 bg-slate-200 text-sm text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white">
+                                            <thead class="bg-neutral-100 text-sm text-neutral-700">
                                                 <tr>
                                                     <th scope="col" class="p-4">
                                                         <!-- Header Checkbox for Select All -->
-                                                        <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600 dark:text-neutral-300">
+                                                        <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                                             <div class="relative flex items-center">
                                                                 <input 
                                                                     type="checkbox" 
                                                                     x-model="checkAll" 
                                                                     id="checkAll" 
                                                                     @click="toggleAll()" 
-                                                                    class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-gray-700 rounded-full checked:border-gray-700 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"
+                                                                    class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"
                                                                 />
-                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                                                 </svg>
                                                             </div>
@@ -331,17 +331,17 @@
                                             </thead>
                                             <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
                                                 @foreach ($inactiveCoas as $coa)
-                                                    <tr>
+                                                    <tr class="hover:bg-blue-50 cursor-pointer ease-in-out">
                                                         <td class="p-4">
                                                             <!-- Body Checkbox for Individual Selection -->
-                                                            <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600 dark:text-neutral-300">
+                                                            <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                                                 <div class="relative flex items-center">
                                                                     <input 
                                                                         type="checkbox" 
                                                                         @click="toggleCheckbox('{{ $coa->id }}')" 
                                                                         :checked="selectedRows.includes('{{ $coa->id }}')"
                                                                         id="coa{{ $coa->id }}" 
-                                                                        class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-gray-700 rounded-full checked:border-gray-700 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"
+                                                                        class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"
                                                                     />
                                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
                                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -349,14 +349,19 @@
                                                                 </div>
                                                             </label>
                                                         </td>
-                                                        <td>{{ $coa->code }}</td>
-                                                        <td> 
+                                                        <td>
                                                             <x-view-coa />
                                                             <button @click="$dispatch('open-view-modal', {{ json_encode($coa) }})" class="underline hover:text-blue-500">
+                                                                {{ $coa->code }}
+                                                            </button>
+                                                        </td>
+                                                        <td> 
+                                                            <x-view-coa />
+                                                            <button @click="$dispatch('open-view-modal', {{ json_encode($coa) }})">
                                                                 {{ $coa->name }}
                                                             </button>
                                                         </td>
-                                                        <td>{{ $coa->type }}</td>
+                                                        <td>{{ $coa->type }} <br/> {{ $coa->sub_type ? $coa->sub_type : $coa->description }}</td>
                                                         <td>{{ $coa->created_at }}</td>
                                                     </tr>
                                                 @endforeach
@@ -378,33 +383,34 @@
                                             x-cloak 
                                             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
                                             @click.away="showConfirmUnarchiveModal = false"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showConfirmUnarchiveModal)"
                                         >
                                             <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
                                                 <div class="flex flex-col items-center">
                                                     <!-- Icon -->
                                                     <div class="mb-4">
-                                                        <i class="fas fa-exclamation-triangle text-gray-500 text-8xl"></i>
+                                                        <i class="fas fa-exclamation-triangle text-zinc-700 text-8xl"></i>
                                                     </div>
 
                                                     <!-- Title -->
-                                                    <h2 class="text-xl font-bold text-gray-800 mb-2">Unarchive Item/s</h2>
+                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Unarchive Item(s)</h2>
 
                                                     <!-- Description -->
-                                                    <p class="text-sm text-gray-600 text-center">
-                                                        You're going to unarchive the selected item/s in the COA Archive table. Are you sure?
+                                                    <p class="text-sm text-zinc-700 text-center">
+                                                        You're going to unarchive the selected item(s) in the COA Archive table. Are you sure?
                                                     </p>
 
                                                     <!-- Actions -->
                                                     <div class="flex justify-center space-x-8 mt-6 w-full">
                                                         <button 
                                                             @click="showConfirmUnarchiveModal = false; enableButtons(); showRestoreCancelButtons = true; disableButtons();" 
-                                                            class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded-lg text-sm text-gray-700 transition"
+                                                            class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
                                                         >
                                                             Cancel
                                                         </button>
                                                         <button 
                                                             @click="restoreRows(); showConfirmUnarchiveModal = false;" 
-                                                            class="px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-lg text-sm transition"
+                                                            class="px-4 py-2 bg-zinc-700 hover:bg-zinc-800 text-white rounded-lg text-sm transition"
                                                         >
                                                             Unarchive
                                                         </button>
@@ -424,22 +430,22 @@
                                                 <div class="flex flex-col items-center">
                                                     <!-- Icon -->
                                                     <div class="mb-4">
-                                                        <i class="fas fa-exclamation-triangle text-red-500 text-8xl"></i>
+                                                        <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>
                                                     </div>
 
                                                     <!-- Title -->
-                                                    <h2 class="text-xl font-bold text-gray-800 mb-2">Delete COA</h2>
+                                                    <h2 class="text-2xl font-extrabold text-zinc-800 mb-2">Delete COA</h2>
 
                                                     <!-- Description -->
-                                                    <p class="text-sm text-gray-600 text-center">
-                                                        You're going to delete the selected item/s in the COA Archive table. Are you sure?
+                                                    <p class="text-sm text-zinc-600 text-center">
+                                                        You're going to delete the selected item(s) in the COA Archive table. Are you sure?
                                                     </p>
 
                                                     <!-- Actions -->
                                                     <div class="flex justify-center space-x-8 mt-6 w-full">
                                                         <button 
                                                             @click="showConfirmDeleteModal = false; enableButtons(); enableButtons(); showDeleteCancelButtons = true; disableButtons();" 
-                                                            class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded-lg text-sm text-gray-700 transition"
+                                                            class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
                                                         >
                                                             Cancel
                                                         </button>
