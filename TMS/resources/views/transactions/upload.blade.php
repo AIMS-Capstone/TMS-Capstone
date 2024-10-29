@@ -31,7 +31,7 @@
                                 <form action="{{ route('transactions.upload') }}" method="POST" enctype="multipart/form-data">
                                     @csrf
                                     <label for="upload-file" class="flex flex-col items-center justify-center w-full h-[535px] border-2 border-blue-900 border-dashed rounded-t-lg cursor-pointer bg-zinc-50 hover:bg-zinc-200">
-                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <div class="flex flex-col items-center justify-center pt-5 pb-6" id="upload-placeholder">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mb-4 text-blue-900" viewBox="0 0 16 16">
                                                 <g fill="currentColor" fill-rule="evenodd">
                                                     <path d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773C16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318C1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593c.143-.863.698-1.723 1.464-2.383"/>
@@ -41,6 +41,9 @@
                                             <p class="mb-2 text-sm text-blue-900"><span>Drag & Drop an image</span> here or <b class="underline">Browse</b></p>
                                             <p class="text-xs text-blue-900">Supported formats: JPEG and PNG</p>
                                         </div>
+                                        <!-- Image Preview -->
+                                        <img id="image-preview" class="hidden h-full object-cover rounded-t-lg" />
+                                        
                                         <input id="upload-file" type="file" name="receipt" class="hidden" accept=".jpg, .jpeg, .png" required onchange="validateFile()" />
                                     </label>
                         
@@ -225,24 +228,37 @@
         function validateFile() {
             const fileInput = document.getElementById('upload-file');
             const file = fileInput.files[0];
-            
+            const imagePreview = document.getElementById('image-preview');
+            const placeholder = document.getElementById('upload-placeholder');
+
             if (file) {
                 const fileSizeMB = file.size / 1024 / 1024;
                 const fileType = file.type;
-    
+
+                // Validate file size
                 if (fileSizeMB > 5) {
                     alert('File size must be less than 5 MB.');
                     fileInput.value = '';
                     return false;
                 }
-    
+
+                // Validate file type
                 if (!['image/jpeg', 'image/png'].includes(fileType)) {
                     alert('Only JPEG and PNG files are allowed.');
                     fileInput.value = '';
                     return false;
                 }
+
+                // Show image preview if file is valid
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.classList.remove('hidden');
+                    placeholder.classList.add('hidden'); // Hide placeholder text
+                };
+                reader.readAsDataURL(file);
             }
-    
+
             return true;
         }
     </script>

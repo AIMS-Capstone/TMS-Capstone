@@ -206,120 +206,133 @@ $('#select_contact').on('change', function() {
         e.preventDefault(); // Prevent default action
         let title = 'Add New Contact';
         let body = `
-          <form wire:submit.prevent="savePurchase">
-    <!-- Contact Information -->
-    <h2 class="text-xl taxuri-color font-bold mb-4">Contact Information</h2>
-    
-    <div class="grid grid-cols-2 gap-4">
-        <!-- Type (Corporation/Individual) -->
-        <input type="hidden" name="contact_role" wire:model.defer="newContactPurchase.contact_role" value="vendor">
-        <div class="col-span-1">
-            <label for="contact_type" class="block text-gray-700">Type</label>
-            <select id="contact_type" wire:model.defer="newContactPurchase.contact_type" name="contact_type" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-                <option value="Individual">Individual</option>
-                <option value="Non-Individual">Non-Individual</option>
-            </select>
+        <div class="p-10">
+            <form wire:submit.prevent="savePurchase">
+                    <!-- Contact Information -->
+                    <h2 class="text-xl taxuri-color font-bold mb-2">Contact Information</h2>
+            
+                    <div class="grid grid-cols-2 gap-6">
+                        <!-- Left Section -->
+                        <div class="col-span-1 space-y-4">
+                            <p class="text-sm mb-4">Basic Information</p>
+                            <!-- Type (Corporation/Individual) -->
+                            <input type="hidden" name="contact_role" wire:model.defer="newContactPurchase.contact_role" value="vendor">
+                            <div>
+                                <label for="contact_type" class="block text-gray-700 text-sm font-bold">Type</label>
+                                <select id="contact_type" wire:model.defer="newContactPurchase.contact_type" name="contact_type" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
+                                    <option value="" disabled selected>Select Business Type</option>
+                                    <option value="Individual">Individual</option>
+                                    <option value="Non-Individual">Non-Individual</option>
+                                </select>
+                            </div>
+
+                            <!-- Corporation Name -->
+                            <div>
+                                <label for="bus_name" class="block text-gray-700 text-sm font-bold">Corporation Name</label>
+                                <input type="text" id="bus_name" wire:model.defer="newContactPurchase.bus_name" name="bus_name" placeholder="Corporation Name" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
+                            </div>
+
+                            <!-- Tax Identification Number -->
+                            <div>
+                                <label for="contact_tin" class="block text-gray-700 text-sm font-bold">Tax Identification Number</label>
+                                <input type="text" id="contact_tin" wire:model.defer="newContactPurchase.contact_tin" name="contact_tin" placeholder="000-000-000-000" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
+                            </div>
+
+                            <p class="text-sm my-4">Basic Information</p>
+
+                            <!-- Email -->
+                            <div>
+                                <label for="email" class="block text-gray-700 text-sm font-bold">Email</label>
+                                <input type="email" id="email" wire:model.defer="newContactPurchase.email" name="email" placeholder="Enter Email Address" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
+                            </div>
+
+                            <!-- Phone -->
+                            <div>
+                                <label for="phone" class="block text-gray-700 text-sm font-bold">Phone</label>
+                                <input type="text" id="phone" wire:model.defer="newContactPurchase.phone" name="phone" placeholder="e.g 09123456789" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
+                            </div>
+                        </div>
+
+                        <!-- Right Section -->
+                        <div class="col-span-1 space-y-4">
+                            <p class="text-sm mb-4">Address Details</p>
+                            <!-- Address -->
+                            <div>
+                                <label for="contact_address" class="block text-gray-700 text-sm font-bold">Address</label>
+                                <input type="text" id="contact_address" wire:model.defer="newContactPurchase.contact_address" name="contact_address" placeholder="Address" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
+                            </div>
+
+                            <!-- City -->
+                            <div>
+                                <label for="contact_city" class="block text-gray-700 text-sm font-bold">City</label>
+                                <input type="text" id="contact_city" wire:model.defer="newContactPurchase.contact_city" name="contact_city" placeholder="City" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
+                            </div>
+
+                            <!-- Postal/Zip Code -->
+                            <div>
+                                <label for="contact_zip" class="block text-gray-700 text-sm font-bold">Postal</label>
+                                <input type="text" id="contact_zip" wire:model.defer="newContactPurchase.contact_zip" name="contact_zip" placeholder="e.g 1203" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Default Tax Information -->
+                    <h2 class="text-xl taxuri-color font-bold my-4">Default Tax Information</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                    <!-- Revenue Section -->
+                    <div>
+                        <p class="text-sm mb-4">Revenue</p>
+
+                        <label for="revenue_tax_type" class="block text-gray-700 text-sm font-bold">Tax Type</label>
+                        <select id="revenue_tax_type" wire:model.defer="newContactPurchase.revenue_tax_type" name="revenue_tax_type" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
+                            <option value="">Nothing Selected</option>
+                            <!-- Add options for Tax Type here -->
+                        </select>
+
+                        <label for="revenue_atc" class="block text-gray-700 text-sm font-bold mt-4">ATC</label>
+                        <select id="revenue_atc" wire:model.defer="newContactPurchase.revenue_atc" name="revenue_atc" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
+                            <option value="">Nothing Selected</option>
+                            <!-- Add options for ATC here -->
+                        </select>
+
+                        <label for="revenue_chart_accounts" class="block text-gray-700 text-sm font-bold mt-4">Chart of Accounts</label>
+                        <select id="revenue_chart_accounts" wire:model.defer="newContactPurchase.revenue_chart_accounts" name="revenue_chart_accounts" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
+                            <option value="">Nothing Selected</option>
+                            <!-- Add options for Chart of Accounts here -->
+                        </select>
+                    </div>
+
+                    <!-- Expense Section -->
+                    <div>
+                        <p class="text-sm mb-4">Expense</p>
+
+                        <label for="expense_tax_type" class="block text-gray-700 text-sm font-bold">Tax Type</label>
+                        <select id="expense_tax_type" wire:model.defer="newContactPurchase.expense_tax_type" name="expense_tax_type" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
+                            <option value="">Nothing Selected</option>
+                            <!-- Add options for Tax Type here -->
+                        </select>
+
+                        <label for="expense_atc" class="block text-gray-700 text-sm font-bold mt-4">ATC</label>
+                        <select id="expense_atc" wire:model.defer="newContactPurchase.expense_atc" name="expense_atc" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
+                            <option value="">Nothing Selected</option>
+                            <!-- Add options for ATC here -->
+                        </select>
+
+                        <label for="expense_chart_accounts" class="block text-gray-700 text-sm font-bold mt-4">Chart of Accounts</label>
+                        <select id="expense_chart_accounts" wire:model.defer="newContactPurchase.expense_chart_accounts" name="expense_chart_accounts" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peerm">
+                            <option value="">Nothing Selected</option>
+                            <!-- Add options for Chart of Accounts here -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="flex justify-end items-center mt-6 gap-4">
+                    <button type="button" class="text-gray-600 font-semibold" wire:click="closeModal">Cancel</button>
+                    <button type="submit" class="bg-blue-900 text-white py-2 px-6 font-bold text-md rounded-lg">Save</button>
+                </div>
+            </form>
         </div>
-
-        <!-- Corporation Name -->
-        <div class="col-span-1">
-            <label for="bus_name" class="block text-gray-700">Corporation Name</label>
-            <input type="text" id="bus_name" wire:model.defer="newContactPurchase.bus_name" name="bus_name" placeholder="Corporation Name" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-        </div>
-
-        <!-- Tax Identification Number -->
-        <div class="col-span-1">
-            <label for="contact_tin" class="block text-gray-700">Tax Identification Number</label>
-            <input type="text" id="contact_tin" wire:model.defer="newContactPurchase.contact_tin" name="contact_tin" placeholder="000-000-000-000" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-        </div>
-
-        <!-- Email -->
-        <div class="col-span-1">
-            <label for="email" class="block text-gray-700">Email</label>
-            <input type="email" id="email" wire:model.defer="newContactPurchase.email" name="email" placeholder="Enter Email Address" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-        </div>
-
-        <!-- Phone -->
-        <div class="col-span-1">
-            <label for="phone" class="block text-gray-700">Phone</label>
-            <input type="text" id="phone" wire:model.defer="newContactPurchase.phone" name="phone" placeholder="e.g 09123456789" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-        </div>
-
-        <!-- Address Details -->
-        <div class="col-span-1">
-            <label for="contact_address" class="block text-gray-700">Address</label>
-            <input type="text" id="contact_address" wire:model.defer="newContactPurchase.contact_address" name="contact_address" placeholder="Address" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-        </div>
-
-        <!-- City -->
-        <div class="col-span-1">
-            <label for="contact_city" class="block text-gray-700">City</label>
-            <input type="text" id="contact_city" wire:model.defer="newContactPurchase.contact_city" name="contact_city" placeholder="City" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-        </div>
-
-        <!-- Postal/Zip Code -->
-        <div class="col-span-1">
-            <label for="contact_zip" class="block text-gray-700">Postal</label>
-            <input type="text" id="contact_zip" wire:model.defer="newContactPurchase.contact_zip" name="contact_zip" placeholder="e.g 1203" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-        </div>
-    </div>
-
-    <!-- Default Tax Information -->
-    <h2 class="text-xl taxuri-color font-bold mb-4">Default Tax Information</h2>
-    <div class="grid grid-cols-2 gap-4">
-        <!-- Revenue Section -->
-        <div>
-            <h3 class="text-lg font-semibold mb-2">Revenue</h3>
-
-            <label for="revenue_tax_type" class="block text-gray-700">Tax Type</label>
-            <select id="revenue_tax_type" wire:model.defer="newContactPurchase.revenue_tax_type" name="revenue_tax_type" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-                <option value="">Nothing Selected</option>
-                <!-- Add options for Tax Type here -->
-            </select>
-
-            <label for="revenue_atc" class="block text-gray-700 mt-4">ATC</label>
-            <select id="revenue_atc" wire:model.defer="newContactPurchase.revenue_atc" name="revenue_atc" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-                <option value="">Nothing Selected</option>
-                <!-- Add options for ATC here -->
-            </select>
-
-            <label for="revenue_chart_accounts" class="block text-gray-700 mt-4">Chart of Accounts</label>
-            <select id="revenue_chart_accounts" wire:model.defer="newContactPurchase.revenue_chart_accounts" name="revenue_chart_accounts" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-                <option value="">Nothing Selected</option>
-                <!-- Add options for Chart of Accounts here -->
-            </select>
-        </div>
-
-        <!-- Expense Section -->
-        <div>
-            <h3 class="text-lg font-semibold mb-2">Expense</h3>
-
-            <label for="expense_tax_type" class="block text-gray-700">Tax Type</label>
-            <select id="expense_tax_type" wire:model.defer="newContactPurchase.expense_tax_type" name="expense_tax_type" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-                <option value="">Nothing Selected</option>
-                <!-- Add options for Tax Type here -->
-            </select>
-
-            <label for="expense_atc" class="block text-gray-700 mt-4">ATC</label>
-            <select id="expense_atc" wire:model.defer="newContactPurchase.expense_atc" name="expense_atc" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-                <option value="">Nothing Selected</option>
-                <!-- Add options for ATC here -->
-            </select>
-
-            <label for="expense_chart_accounts" class="block text-gray-700 mt-4">Chart of Accounts</label>
-            <select id="expense_chart_accounts" wire:model.defer="newContactPurchase.expense_chart_accounts" name="expense_chart_accounts" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
-                <option value="">Nothing Selected</option>
-                <!-- Add options for Chart of Accounts here -->
-            </select>
-        </div>
-    </div>
-
-    <!-- Save Button -->
-    <div class="mt-6">
-        <button type="submit" class="bg-blue-900 text-white px-4 py-2 rounded-lg">Save</button>
-        <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded-lg ml-2">Cancel</button>
-    </div>
-</form>
 
         `;
         $wire.dispatch('triggerModal', { title, body }); // Trigger the modal from Livewire

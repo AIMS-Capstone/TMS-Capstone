@@ -11,21 +11,48 @@
         <div class="flex items-center px-2">            
             <p class="font-normal text-sm">The Transactions feature ensures accurate tracking and categorization <br> of each transaction.</p>
         </div>
-        <div class="items-end float-end relative sm:w-auto">
-            <button type="button" id="dropdownDefaultButton" class="text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-2 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
+        <div class="items-end float-end relative sm:w-auto" 
+            x-data="{ selectedTab: (new URL(window.location.href)).searchParams.get('type') || 'All' }" 
+            @filter.window="selectedTab = $event.detail.type">
+            <button type="button" 
+                    id="dropdownDefaultButton" 
+                    :class="selectedTab === 'All' ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-950'"
+                    :disabled="selectedTab === 'All'"
+                    class="text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none focus:ring-2 focus:ring-gray-300">
                 <i class="fas fa-plus-circle mr-1"></i>
                 Add Transaction
             </button>
             <div id="dropdown" class="absolute z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-md w-48 mt-2">
                 <ul class="py-2 px-2 text-sm text-gray-700" aria-labelledby="dropdownDefaultButton">
-                    <li>
-                        <a href="{{ url('/transactions/create?type=sales') }}" class="block px-4 py-2 hover-dropdown">Add Sale</a>
+                    
+                    <!-- Options for Sales tab -->
+                    <li x-show="selectedTab === 'Sales'">
+                        <a href="{{ url('/transactions/create?type=sales') }}" class="block px-4 py-2 hover-dropdown">Add Manual</a>
                     </li>
-                    <li>
-                        <a href="{{ url('/transactions/create?type=purchase') }}" class="block px-4 py-2 hover-dropdown">Add Purchase</a>
+                    <li x-show="selectedTab === 'Sales'">
+                        <a href="#" class="block px-4 py-2 hover-dropdown">Import CSV</a>
                     </li>
-                    <li>
-                        <a href="{{ url('/transactions/create?type=journal') }}" class="block px-4 py-2 hover-dropdown">Add Manual Journal</a>
+                    <li x-show="selectedTab === 'Sales'">
+                        <a href="{{ url('/transactions/upload') }}" class="block px-4 py-2 hover-dropdown">Upload Image</a>
+                    </li>
+        
+                    <!-- Options for Purchase tab -->
+                    <li x-show="selectedTab === 'Purchase'">
+                        <a href="{{ url('/transactions/create?type=purchase') }}" class="block px-4 py-2 hover-dropdown">Add Manual</a>
+                    </li>
+                    <li x-show="selectedTab === 'Purchase'">
+                        <a href="#" class="block px-4 py-2 hover-dropdown">Import CSV</a>
+                    </li>
+                    <li x-show="selectedTab === 'Purchase'">
+                        <a href="#" class="block px-4 py-2 hover-dropdown">Upload Image</a>
+                    </li>
+        
+                    <!-- Options for Journal tab -->
+                    <li x-show="selectedTab === 'Journal'">
+                        <a href="{{ url('/transactions/create?type=journal') }}" class="block px-4 py-2 hover-dropdown">Add Manual</a>
+                    </li>
+                    <li x-show="selectedTab === 'Journal'">
+                        <a href="#" class="block px-4 py-2 hover-dropdown">Import CSV</a>
                     </li>
                 </ul>
             </div>
@@ -56,16 +83,16 @@
             </div>
             <!-- Sort by dropdown -->
             <div class="relative inline-block text-left min-w-[150px]">
-                <button id="sortButton" class="flex items-center text-gray-600 w-full">
+                <button id="sortButton" class="flex items-center text-zinc-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
                         <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
                     </svg>
-                    <span id="selectedOption" class="font-normal text-md truncate">Sort by</span>
+                    <span id="selectedOption" class="font-normal text-md text-zinc-700 truncate">Sort by</span>
                 </button>
-    
-                <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden">
+
+                <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
                     <div class="py-2 px-2">
-                        <span class="block px-4 py-2 text-sm font-bold text-gray-700">Sort by</span>
+                        <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
                         <div data-sort="recently-added" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
                         <div data-sort="ascending" class="block px-4 py-2 w-full text-sm hover-dropdown">Ascending</div>
                         <div data-sort="descending" class="block px-4 py-2 w-full text-sm hover-dropdown">Descending</div>
@@ -90,19 +117,19 @@
             </div>
     
             <div class="relative inline-block space-x-4 text-left">
-                <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" class="flex items-center text-gray-600" type="button">
-                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
+                <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" class="flex items-center text-zinc-500 hover:text-zinc-700" type="button">
+                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
                         <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
                     </svg>
                 </button>
-                <!-- Dropdown menu -->
-                <div id="dropdownDots" class="absolute right-0 z-10 hidden bg-white divide-gray-100 rounded-lg shadow-lg w-44 origin-top-right">
-                    <div class="py-2 px-2 text-sm text-gray-700" aria-labelledby="dropdownMenuIconButton">
-                        <span class="block px-4 py-2 text-sm font-bold text-gray-700 text-left">Show Entries</span>
-                        <div onclick="setEntries(5)" class="block px-4 py-2 w-full text-left hover-dropdown">5 per page</div>
-                        <div onclick="setEntries(25)" class="block px-4 py-2 w-full text-left hover-dropdown">25 per page</div>
-                        <div onclick="setEntries(50)" class="block px-4 py-2 w-full text-left hover-dropdown">50 per page</div>
-                        <div onclick="setEntries(100)" class="block px-4 py-2 w-full text-left hover-dropdown">100 per page</div>
+                <div id="dropdownDots" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-44 origin-top-right">
+                    <div class="py-2 px-2 text-sm text-zinc-700" aria-labelledby="dropdownMenuIconButton">
+                        <span class="block px-4 py-2 text-sm font-bold text-zinc-700 text-left">Show Entries</span>
+                        <div onclick="setEntries(5)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">5 per page</div>
+                        <div onclick="setEntries(25)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">25 per page</div>
+                        <div onclick="setEntries(50)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">50 per page</div>
+                        <div onclick="setEntries(100)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">100 per page</div>
+                        <input type="hidden" name="search" value="{{ request('search') }}">
                     </div>
                 </div>
             </div>
@@ -225,7 +252,7 @@
                     <!-- Check if there is any data for the current page -->
                     @if($transactions && $transactions->count() > 0)
                         @foreach ($transactions as $transaction)
-                            <tr>
+                            <tr class="hover:bg-blue-50 cursor-pointer ease-in-out">
                                 <td class="p-4">
                                     <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                         <div class="relative flex items-center">
@@ -236,14 +263,16 @@
                                         </div>
                                     </label>
                                 </td>
-                                {{-- <a href="{{ route('transactions/?', ['id' => $transaction->id]) }}"> --}}
-                                    <td class="py-4 px-2">{{ $transaction->contactDetails->bus_name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 font-bold underline hover:text-blue-500">
+                                        <a href="{{ url('/transactions/show') }}" >
+                                        {{ $transaction->contactDetails->bus_name ?? 'N/A' }}
+                                        </a>
+                                    </td>
                                     <td class="py-4 px-2">{{$transaction ->date}}</td>
                                     <td class="py-4 px-2">{{$transaction ->inv_number}}</td>
                                     <td class="py-4 px-2">{{$transaction ->reference}}</td>
                                     <td class="py-4 px-2">{{$transaction ->vat_amount}}</td>
-                                    <td class="py-4 px-2">{{$transaction ->transaction_type}}</td>
-                                {{-- </a> --}}
+                                    <td class="py-4 px-2"><span class="bg-zinc-100 text-zinc-800 text-xs font-medium me-2 px-4 py-2 rounded-full">{{$transaction ->transaction_type}}</span></td>
                             </tr>                             
                         @endforeach
                     @else
@@ -255,40 +284,7 @@
                             </td>
                         </tr>
                     @endif
-                    {{-- <template x-if="data.slice((currentPage - 1) * perPage, currentPage * perPage).length > 0">
-                        <template x-for="(item, index) in data.slice((currentPage - 1) * perPage, currentPage * perPage)" :key="index">
-                            <tr>
-                                <td class="p-4">
-                                    <label for="user2335" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
-                                        <div class="relative flex items-center">
-                                            <input type="checkbox" id="user2335" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-blue-950 checked:before:bg-blue-950 active:outline-offset-0" :checked="checkAll" />
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-                                            </svg>
-                                        </div>
-                                    </label>
-                                </td>
-                                <td x-text="item.contact">Contact</td>
-                                <td x-text="item.date">Date</td>
-                                <td x-text="item.reference">Reference</td>
-                                <td x-text="item.amount">Amount</td>
-                                <td x-text="item.type">Type</td>
-                            </tr>
-                        </template>
-                    </template> --}}
-                    
-                    <!-- Placeholder Image -->
-                    {{-- <template x-if="data.slice((currentPage - 1) * perPage, currentPage * perPage).length === 0">
-                        <tr>
-                            <td colspan="6" class="text-center p-4">
-                                <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-48 h-48" />
-                                <h1 class="font-bold mt-2">No Transactions yet</h1>
-                                <p class="text-sm text-neutral-500 mt-2">Start adding transactions with the <br> + button at the top.</p>
-                            </td>
-                        </tr>
-                    </template>  --}}
                 </tbody>
-             
             </table>
             <nav aria-label="pagination">
                 {{ $transactions->links('vendor.pagination.custom') }}
@@ -308,10 +304,6 @@
       
          window.location.href = url.toString();
      });    
-
-     // document.addEventListener('filter', event => {
-     //     window.location.href = `?type=${event.detail.type}`;
-     // });
 
      function toggleCheckboxes() {
          document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
@@ -342,16 +334,17 @@
     // FOR SORT BY
     function sortItems(criteria) {
         const table = document.querySelector('table tbody');
-        const rows = Array.from(table.querySelectorAll('tr'));
+        const rows = Array.from(table.querySelectorAll('tr')).filter(row => row.querySelector('td')); // Filter rows with data
         let sortedRows;
+
         if (criteria === 'recently-added') {
             // Sort by the order of rows (assuming they are in the order of addition)
             sortedRows = rows.reverse();
         } else {
-            // Sort by text content of the first column
+            // Sort by text content of the 'Contact' column
             sortedRows = rows.sort((a, b) => {
-                const aText = a.querySelector('td').textContent.trim().toLowerCase();
-                const bText = b.querySelector('td').textContent.trim().toLowerCase();
+                const aText = a.querySelector('td:nth-child(2)').textContent.trim().toLowerCase();
+                const bText = b.querySelector('td:nth-child(2)').textContent.trim().toLowerCase();
 
                 if (criteria === 'ascending') {
                     return aText.localeCompare(bText);
@@ -360,27 +353,48 @@
                 }
             });
         }
+
         // Append sorted rows back to the table body
         table.innerHTML = '';
         sortedRows.forEach(row => table.appendChild(row));
     }
-    // to sort options
+
+    // Dropdown event listeners
     document.querySelectorAll('#dropdownMenu div[data-sort]').forEach(item => {
         item.addEventListener('click', function() {
             const criteria = this.getAttribute('data-sort');
+            document.getElementById('selectedOption').textContent = this.textContent; // Update selected option text
             sortItems(criteria);
         });
     });
 
+    // FOR SHOW ENTRIES
+     // FOR BUTTON OF SHOW ENTRIES
     document.getElementById('dropdownMenuIconButton').addEventListener('click', function() {
         const dropdown = document.getElementById('dropdownDots');
         dropdown.classList.toggle('hidden');
     });
-
+    // FOR SHOWING/SETTING ENTRIES
     function setEntries(entries) {
-        console.log(`Setting ${entries} entries per page`);
-        // no showing entries since no data yet
-        document.getElementById('dropdownDots').classList.add('hidden');
+        const form = document.createElement('form');
+        form.method = 'GET';
+        form.action = "{{ route('transactions') }}";
+        // Create a hidden input for perPage
+        const perPageInput = document.createElement('input');
+        perPageInput.type = 'hidden';
+        perPageInput.name = 'perPage';
+        perPageInput.value = entries;
+        // Add search input value if needed
+        const searchInput = document.createElement('input');
+        searchInput.type = 'hidden';
+        searchInput.name = 'search';
+        searchInput.value = "{{ request('search') }}";
+        // Append inputs to form
+        form.appendChild(perPageInput);
+        form.appendChild(searchInput);
+        // Append the form to the body and submit
+        document.body.appendChild(form);
+        form.submit();
     }
  
 </script>
