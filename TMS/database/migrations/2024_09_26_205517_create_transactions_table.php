@@ -28,6 +28,7 @@ return new class extends Migration
             $table->decimal('non_vatable_purchase', 10, 2)->nullable();
             $table->decimal('total_amount_credit', 10, 2)->nullable();
             $table->decimal('total_amount_debit', 10, 2)->nullable();
+            $table->enum('status', ['draft', 'posted'])->default('draft');
             $table->timestamps();
         });
         

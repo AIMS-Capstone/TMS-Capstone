@@ -10,6 +10,13 @@ use App\Http\Controllers\OrgSetupController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TaxReturnController;
 use App\Http\Middleware\CheckOrganizationSession;
+use App\Http\Controllers\SalesController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\CashReceiptController;
+use App\Http\Controllers\CashDisbursementController;
+use App\Http\Controllers\GeneralLedgerController;
+use App\Http\Controllers\GeneralJournalController;
+
 use App\Models\rdo;
 use App\Models\TaxReturn;
 
@@ -105,34 +112,42 @@ Route::middleware([
         Route::get('/coa/account_type_template', [CoaController::class, 'account_type_template']);
         Route::put('/coa/{coa}', [CoaController::class, 'update'])->name('coa.update');
 
-        // General Accounting Routes
-        Route::get('/general-ledger', function () {
-            return view('general-ledger');
-        })->name('general-ledger');
 
-        Route::get('/sales-book', function () {
-            return view('sales-book');
-        })->name('sales-book');
+    //General Accounting Routing
+        Route::get('/general-ledger', [GeneralLedgerController::class, 'ledger'])->name('general-ledger');
 
-        Route::get('/purchase-book', function () {
-            return view('purchase-book');
-        })->name('purchase-book');
+    //Sales Book routings
+        Route::get('/sales-book', [SalesController::class, 'sales'])->name('sales-book');
+        Route::get('sales-book/posted', [SalesController::class, 'posted'])->name('posted');
+        Route::post('/sales-book/post', [SalesController::class, 'updateToPosted'])->name('.updateToPosted');
+        Route::post('/sales-book/draft', [SalesController::class, 'updateToDraft'])->name('.updateToDraft');
+
+    //Purchase Book routings
+        Route::get('/purchase-book', [PurchaseController::class, 'purchase'])->name('purchase-book');
+        Route::get('purchase-book/posted', [PurchaseController::class, 'posted'])->name('posted');
+        Route::post('/purchase-book/post', [PurchaseController::class, 'updateToPosted'])->name('.updateToPosted');
+        Route::post('/purchase-book/draft', [PurchaseController::class, 'updateToDraft'])->name('.updateToDraft');
+
+    //Cash receipt routings
+        Route::get('/cash-receipt', [CashReceiptController::class, 'cashReceipt'])->name('cash-receipt');
+        Route::get('cash-receipt/posted', [CashReceiptController::class, 'posted'])->name('posted');
+        Route::post('/cash-receipt/post', [CashReceiptController::class, 'updateToPosted'])->name('.updateToPosted');
+        Route::post('/cash-receipt/draft', [CashReceiptController::class, 'updateToDraft'])->name('.updateToDraft');
+
+    //Cash disbursement routings
+        Route::get('/cash-disbursement', [CashDisbursementController::class, 'cashDisbursement'])->name('cash-disbursement');
+        Route::get('cash-disbursement/posted', [CashDisbursementController::class, 'posted'])->name('posted');
+        Route::post('/cash-disbursement/post', [CashDisbursementController::class, 'updateToPosted'])->name('.updateToPosted');
+        Route::post('/cash-disbursement/draft', [CashDisbursementController::class, 'updateToDraft'])->name('.updateToDraft');
+
+    //General Journal Routing
+        Route::get('/general-journal', [GeneralJournalController::class, 'journal'])->name('general-journal');
+
 
         Route::get('/vat_report_pdf', function () {
             return view('tax_return.vat_report_pdf'); // Make sure to create this view file
         })->name('vat_report_pdf');
-        
-        Route::get('/cash-receipt', function () {
-            return view('cash-receipt');
-        })->name('cash-receipt');
 
-        Route::get('/cash-disb', function () {
-            return view('cash-disb');
-        })->name('cash-disb');
-
-        Route::get('/general-journal', function () {
-            return view('general-journal');
-        })->name('general-journal');
 
         // Financial Reports & Predictive Analytics
         Route::get('/financial-reports', function () {

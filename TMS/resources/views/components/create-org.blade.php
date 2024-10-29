@@ -48,7 +48,7 @@
         </div>
 
         <!-- Tab Content -->
-        <form action="{{ route ('OrgSetup.store')}}" method="POST">
+        <form action="{{ route ('OrgSetup.store')}}" method="POST" x-data="{ showModal: false }" @submit.prevent="submitForm">
             @csrf 
             <div id="tab-content" class="container border border-gray-200 rounded-lg p-4 my-10 text-center max-w-full h-[500px] mx-auto flex flex-col">
                 <!-- Classification Content -->
@@ -276,7 +276,8 @@
                     </button>
                 </div>
 
-                <div x-show="showModal" x-data="{ showModal: false }" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30" x-cloak>
+                {{-- <!-- Success Modal -->
+                <div x-data="{ showModal: {{ session()->has('success') ? 'true' : 'false' }} }" x-show="showModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30" x-cloak>
                     <div class="bg-white rounded-lg shadow-lg p-6 text-center max-w-lg w-full">
                         <!-- Centered Image -->
                         <div class="flex justify-center mb-4">
@@ -296,9 +297,31 @@
                             </button>
                         </div>
                     </div>
-                </div>
+                </div> --}}
+
+                
+
             </div>
-        </form>
+    
+                    <!-- Success Modal -->
+    <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
+            <div class="mb-4">
+                <svg class="w-12 h-12 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2l4-4m0 6a9 9 0 1 0-6 0Z" />
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold">Organization Added</h3>
+            <p class="text-sm text-gray-600 mt-2">The organization has been successfully added! Go back to the setup page to continue.</p>
+            <button @click="window.location.href='{{ url('/org-setup') }}'" 
+                    class="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                Go to Setup
+            </button>
+        </div>
+    </div>
+        </form> 
     </div>
 
 <script>    
@@ -594,6 +617,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+function submitForm() {
+    const formData = new FormData(document.querySelector('form'));
+
+    fetch('{{ route('OrgSetup.store') }}', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            this.showModal = true;
+        } else {
+            return response.json().then(data => {
+                console.error('Error:', data);
+                alert('Failed to save organization. Please check your input.');
+            });
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
     </script>
 
 </x-organization-layout>

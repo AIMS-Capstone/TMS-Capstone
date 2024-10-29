@@ -25,11 +25,13 @@ class CoaController extends Controller
 
         $query = Coa::where('status', 'Active');
 
+        // Apply search if there is one
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('type', 'like', "%{$search}%")
                     ->orWhere('name', 'like', "%{$search}%")
-                    ->orWhere('code', 'like', "%{$search}%");
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('sub_type', 'like', "%{$search}%"); // Include sub_type in search
             });
         }
 
@@ -63,20 +65,37 @@ class CoaController extends Controller
         if ($submitAction === 'manual') {
             // Handle manual creation
             $request->validate([
-                'type' => 'required|string|max:255',
+                'account_type_input' => 'required|string|max:255',
                 'code' => 'required|string|max:10',
                 'name' => 'required|string|max:150',
                 'description' => 'nullable|string|max:255',
             ]);
 
-            Coa::create([
-                'type' => $request->input('type'),
-                'code' => $request->input('code'),
-                'name' => $request->input('name'),
-                'description' => $request->input('description'),
-            ]);
+            // Split the input into type and sub_type
+            $accountTypeInput = $request->input('account_type_input');
 
-            return redirect()->route('coa')->with('success', 'Account created successfully.');
+            // Split the input and make sure to handle any potential whitespaces
+            $parts = array_map('trim', explode('|', $accountTypeInput));
+
+            // Check if we have both type and sub_type from the input
+            $type = $parts[0] ?? null;
+            $subType = $parts[1] ?? null;
+
+            // Ensure both are not null and then proceed
+            if ($type && $subType) {
+                Coa::create([
+                    'type' => $type,
+                    'sub_type' => $subType, 
+                    'code' => $request->input('code'),
+                    'name' => $request->input('name'),
+                    'description' => $request->input('description'),
+                ]);
+
+return redirect()->route('coa')->with('success', 'Account created successfully.');
+
+            } else {
+                return redirect()->back()->withErrors(['account_type_input' => 'Please provide a valid input in the format: "Type | Sub Type".']);
+            }
 
         } elseif ($submitAction === 'import') {
 
@@ -113,19 +132,36 @@ class CoaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Coa $coa)
+    public function update(Request $request, $id)
     {
-        // Validate the input
-        $validated = $request->validate([
+        $request->validate([
+            'account_type_input' => 'required|string|max:255',
             'code' => 'required|string|max:10',
             'name' => 'required|string|max:150',
-            'type' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
         ]);
 
-        // Update the CoA record
-        $coa->update($validated);
+// Split the input into type and sub_type
+$accountTypeInput = $request->input('account_type_input');
+$parts = array_map('trim', explode('|', $accountTypeInput));
 
-        return redirect()->route('coa')->with('success', 'COA updated successfully!');
+// Check if we have both type and sub_type from the input
+$type = $parts[0] ?? null;
+$subType = $parts[1] ?? null;
+
+// Update the COA entry
+$coa = Coa::findOrFail($id);
+$coa->update([
+    'type' => $type,
+    'sub_type' => $subType, // Ensure the column exists and is properly defined in the database
+    'code' => $request->input('code'),
+    'name' => $request->input('name'),
+    'description' => $request->input('description'),
+]);
+
+
+return redirect()->route('coa')->with('success', 'Account updated successfully.');
+
     }
 
     public function deactivate(Request $request)

@@ -362,11 +362,10 @@
                                                             </div>
                                                         </label>
                                                     </th>
-                                                    <th scope="col" class="py-4 px-1">Code</th>
-                                                    <th scope="col" class="py-4 px-1">Name</th>
-                                                    <th scope="col" class="py-4 px-1">Type</th>
-                                                    <th scope="col" class="py-4 px-1">Date Created</th>
-                                                    <th scope="col" class="py-4 px-4">Action</th>
+                                                    <th scope="col" class="py-4 px-3">Code</th>
+                                                    <th scope="col" class="py-4 px-3">Name</th>
+                                                    <th scope="col" class="py-4 px-3">Type</th>
+                                                    <th scope="col" class="py-4 px-3">Date Created</th> 
                                                 </tr>
                                             </thead>
                                             <tbody class="divide-y divide-neutral-300 text-left py-[7px]">
@@ -395,24 +394,14 @@
                                                                     {{ $coa->name }}
                                                                 </button>
                                                             </td>
-                                                            <td>{{ $coa->type }} <br/> {{ $coa->sub_type ? $coa->sub_type : $coa->description }}</td>
-                                                            <td>{{ $coa->created_at }}</td>
-                                                            <td class="py-4 px-2">
-                                                                <x-edit-coa />
-                                                                <p
-                                                                    @click="$dispatch('open-edit-modal', {
-                                                                        id: '{{ $coa->id }}',
-                                                                        code: '{{ $coa->code }}',
-                                                                        name: '{{ $coa->name }}',
-                                                                        type: '{{ $coa->type }}',
-                                                                        sub_type: '{{ $coa->sub_type }}',
-                                                                        description: '{{ $coa->description }}'
-                                                                    })"
-                                                                    class="underline hover:border-blue-900 hover:text-blue-900 hover:cursor-pointer px-3 py-y text-sm"
-                                                                >
-                                                                    Edit
-                                                                </p>
+                                                            <td>
+                                                                <b>{{ $coa->type }}</b> <br/> 
+                                                                {{ $coa->sub_type ? $coa->sub_type : '' }} 
+                                                                @if($coa->description)
+                                                                    | {{ $coa->description }}
+                                                                @endif
                                                             </td>
+                                                            <td>{{ $coa->created_at }}</td>
                                                         </tr>
                                                     @endforeach
                                                 @else
@@ -484,7 +473,7 @@
                                             @click="cancelSelection" 
                                             class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
                                         >
-                                            <i class="fa fa-times"></i> Cancel
+                                        Cancel
                                         </button>
                                     </div>
                                     
@@ -504,8 +493,15 @@
         });
 
         document.addEventListener('filter', event => {
+            const type = event.detail.type;
+
+            // Modify URL or use AJAX request to fetch filtered data
             const url = new URL(window.location.href);
-            url.searchParams.set('type', event.detail.type);
+            if (type === 'All') {
+                url.searchParams.delete('type'); // Remove any existing filter
+            } else {
+                url.searchParams.set('type', type); // Set filter to the selected type
+            }
             window.location.href = url.toString();
         });
 

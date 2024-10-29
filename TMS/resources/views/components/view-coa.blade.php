@@ -33,7 +33,7 @@
                     <label class="block text-sm font-bold text-zinc-700">Account Type</label>
                     <input 
                         class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200 focus:outline-none focus:ring-0"
-                        x-bind:value="coa.type" disabled readonly
+                        x-bind:value="coa.sub_type ? `${coa.type} | ${coa.sub_type}` : coa.type" disabled readonly
                     >
                 </div>
                 <div class="w-1/3 text-left">
@@ -53,16 +53,6 @@
                     x-bind:value="coa.name" disabled readonly
                 >
             </div>
-
-            <!-- COA Sub Type [Only when it is present] -->
-            {{-- Please check, ayaw mag display --}}
-            {{-- <div class="mb-5">
-                <label class="block text-sm font-bold text-zinc-700">Sub Category</label>
-                <input 
-                    class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200 focus:outline-none focus:ring-0"
-                    x-bind:value="coa.sub_type" disabled readonly
-                >
-            </div> --}}
     
             <!-- COA Description -->
             <div class="mb-5">
@@ -74,20 +64,19 @@
             </div>
     
             <div class="flex justify-end">
-                <button class="font-semibold bg-blue-900 text-white px-4 py-2 rounded-md border-x-8 border-blue-900 hover:border-x-8 hover:text-white transition">
+                <x-edit-coa />
+                <button 
+                    @click="$dispatch('open-edit-modal', {
+                        id: coa.id,
+                        code: coa.code,
+                        name: coa.name,
+                        type: coa.type,
+                        sub_type: coa.sub_type,
+                        description: coa.description
+                    })"
+                class="font-semibold bg-blue-900 text-white px-4 py-2 rounded-md border-x-8 border-blue-900 hover:border-x-8 hover:text-white transition"
+                >
                     Edit
-                    {{-- <x-edit-coa />
-                    <p
-                        @click="$dispatch('open-edit-modal', {
-                            id: '{{ $coa->id }}',
-                            code: '{{ $coa->code }}',
-                            name: '{{ $coa->name }}',
-                            type: '{{ $coa->type }}'
-                        })"
-                        class="underline hover:border-sky-900 hover:text-sky-900 hover:cursor-pointer px-3 py-y text-sm"
-                    >
-                        Edit
-                    </p> --}}
                 </button>
             </div>
         </div>
