@@ -90,7 +90,7 @@
                         </div>
                         
                         {{-- Right Table --}}
-                        <div class="w-full md:w-3/4 mt-8 ml-0 md:ml-8 max-h-[500px] border border-zinc-300 rounded-lg p-4 bg-white">
+                        <div class="w-full md:w-3/4 mt-8 ml-0 md:ml-8 h-auto border border-zinc-300 rounded-lg p-4 bg-white">
                             <div class="flex flex-row items-center">
                                 <!-- Search row -->
                                 <div class="relative w-80 p-5">
@@ -106,7 +106,6 @@
                                         >
                                         </form>
                                     <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-zinc-400"></i>
-                                    {{-- <i class="fa-solid fa-xmark absolute right-8 top-1/2 transform -translate-y-1/2 text-zinc-400 cursor-pointer" @click="search = ''"></i> --}}
                                 </div>
                     
                                 <!-- Sort by dropdown -->
@@ -161,7 +160,7 @@
                     
                             <hr class="border-zinc-300 w-[calc(100%+2rem)] mx-[-1rem]">
                         
-                            <div class="my-4 overflow-y-auto max-h-[500px]">
+                            <div class="my-4 overflow-y-auto h-auto">
                                 <table class="min-w-full bg-white" id="tableid">
                                     <thead class="bg-zinc-100 text-zinc-700 font-extrabold sticky top-0">
                                         <tr>
@@ -185,7 +184,7 @@
                                                     <td class="text-left py-[7px] px-4 capitalize">{{ $organization->tax_type }}</td>
                                                     <td class="text-left py-[7px] px-4">{{ $organization->type }}</td>
                                                     <td class="text-left py-[7px] px-4">
-                                                        <span class="bg-zinc-100 text-zinc-800 text-xs font-medium me-2 px-4 py-2 rounded-full dark:bg-zinc-700 dark:text-zinc-300">No Account Yet</span>
+                                                        <span class="bg-zinc-100 text-zinc-800 text-xs font-medium me-2 px-4 py-2 rounded-full">No Account Yet</span>
                                                         {{-- <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-4 py-2 rounded-full dark:bg-green-900 dark:text-green-300">Account Active</span> --}}
                                                         {{-- lalagyan ng if-else; "Account Active" == may acc si client [nasa user management]; "No Account Yet" == walang acc si client--}}
                                                         {{-- see display below kapag "No Account Yet" and status [DEFAULT STATUS AY No Account Yet]--}}

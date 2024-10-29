@@ -77,3 +77,6 @@ li, ul {
     font-weight: bold; /* Bold text */
     border-radius: 9999px; /* Fully rounded background */
 }
+.no-scroll {
+    overflow-y: hidden;
+}

@@ -77,24 +77,26 @@ class OrgSetupController extends Controller
                 'start_date' => 'required|date',
                 'financial_year_end' => 'required|string|max:255',
             ]);
-    
-      
-    
+
+
+
+
             OrgSetup::create($validatedData);
-    
+
             return redirect()->route('org-setup')->with('success', 'Organization setup created successfully.');
-    
+
+
         } catch (ValidationException $e) {
             // Handle validation errors here
             $errors = $e->errors();
             $requestData = request()->all();
-            
+
             // Dump or log errors to examine them (or handle them as needed)
             dd([
                 'errors' => $errors,
                 'input_data' => $requestData,
             ]);
-    
+
             // Redirect back with errors if needed
             return redirect()->back()->withErrors($errors)->withInput();
         }
