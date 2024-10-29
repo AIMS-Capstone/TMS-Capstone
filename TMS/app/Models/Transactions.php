@@ -32,4 +32,3 @@ class Transactions extends Model
 
 
 }
-

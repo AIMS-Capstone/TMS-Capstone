@@ -425,11 +425,14 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
 
         // Fill the PDF with the data
         $result = $pdf->fillForm($fields)
-            ->needAppearances() // Ensure fields are filled correctly
-            ->saveAs(storage_path('app/public/filled_report.pdf')); // Save to a public location
+            ->needAppearances()
+            ->saveAs(storage_path('app/public/filled_report.pdf'));
 
-        // Log the result of the fillForm
-        Log::info('PDF fill form result: ' . ($result ? 'success' : 'failure'));
+        // Check for errors
+        if (!$result) {
+            Log::error('PDF fill form error: ' . $pdf->getError());
+            return dd('PDF fill form failed: ' . $pdf->getError());
+        }
 
         // Check if the output PDF was created successfully
         $outputPdfPath = storage_path('app/public/filled_report.pdf');

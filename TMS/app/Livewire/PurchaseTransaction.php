@@ -25,6 +25,7 @@ class PurchaseTransaction extends Component
     public $reference;
     public $selectedContact;
     public $appliedATCs = []; // Array to hold applied ATC details
+    public $organizationId;
 
     protected $listeners = ['taxRowUpdated' => 'updateTaxRow', 'contactSelected', 'taxRowRemoved' => 'removeTaxRow'];
 

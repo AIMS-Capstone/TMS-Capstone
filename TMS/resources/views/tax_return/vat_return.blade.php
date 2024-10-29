@@ -172,11 +172,11 @@ $organizationId = session('organization_id');
                                     <th scope="col" class="py-4 px-2">Action</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
+                            <tbody class="divide-y divide-neutral-300">
                                 @if ($taxReturns->isEmpty())
                                     <tr>
                                         <td colspan="6" class="text-center p-4">
-                                            <img src="{{ asset('images/Wallet 02.png') }}" alt="No data available" class="mx-auto" />
+                                            <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
                                             <h1 class="font-bold mt-2">No Generated VAT yet</h1>
                                             <p class="text-sm text-neutral-500 mt-2">Start generating with the + button <br>at the top.</p>
                                         </td>
