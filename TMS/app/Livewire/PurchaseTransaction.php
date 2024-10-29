@@ -148,7 +148,9 @@ class PurchaseTransaction extends Component
             'vatable_purchase' => $this->vatablePurchase,
             'non_vatable_purchase' => $this->nonVatablePurchase,
             'vat_amount' => $this->vatAmount,
+            'status'=> 'Draft',
             'organization_id'=> $organizationId
+
         ]);
 
         // Save each tax row linked to the transaction
@@ -163,6 +165,7 @@ class PurchaseTransaction extends Component
                 'atc_amount' => $row['atc_amount'], // Save ATC amount if applicable
                 'net_amount' => $row['net_amount'],
                 'coa' => $row['coa'],
+                
             ]);
         }
 

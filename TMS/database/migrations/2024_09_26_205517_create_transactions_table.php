@@ -29,6 +29,7 @@ return new class extends Migration
             $table->decimal('total_amount_credit', 10, 2)->nullable();
             $table->decimal('total_amount_debit', 10, 2)->nullable();
             $table->enum('status', ['draft', 'posted'])->default('draft');
+            $table->enum('Paidstatus', ['Paid', 'Unpaid'])->default('Unpaid');
             $table->timestamps();
         });
         

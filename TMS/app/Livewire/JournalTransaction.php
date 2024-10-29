@@ -90,6 +90,7 @@ class JournalTransaction extends Component
             'total_amount' => $this -> totalAmount,
             'total_amount_debit' => $this->totalAmountDebit,
             'total_amount_credit' => $this->totalAmountCredit,
+            'status'=> 'Draft',
             'contact' => $this->selectedContact, // Optionally link a contact
             'organization_id'=> $organizationId
         ]);

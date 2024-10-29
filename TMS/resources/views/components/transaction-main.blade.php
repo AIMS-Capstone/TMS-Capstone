@@ -264,7 +264,7 @@
                                     </label>
                                 </td>
                                     <td class="py-4 px-2 font-bold underline hover:text-blue-500">
-                                        <a href="{{ url('/transactions/show') }}" >
+                                        <a href="{{ route('transactions.show', ['transaction' => $transaction->id]) }}">
                                         {{ $transaction->contactDetails->bus_name ?? 'N/A' }}
                                         </a>
                                     </td>
