@@ -157,81 +157,92 @@ class="mb-12 mx-12 overflow-hidden max-w-full rounded-md border-neutral-300 dark
         </div>
     </div>
 
-
 <!-- Table -->
 <div class="overflow-x-auto">
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-neutral-600 dark:text-neutral-300" id="tableid">
-            <thead class="border-b border-neutral-300 bg-slate-200 text-sm text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white">
-                <tr>
-                    <th scope="col" class="p-4"> <!-- Checkbox for selecting all -->
-                        <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
-                            <div class="relative flex items-center">
-                                <input type="checkbox" x-model="checkAll" id="checkAll" @change="toggleAll()" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-black checked:before:bg-black focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
+    <table class="w-full text-left text-sm text-neutral-600 dark:text-neutral-300" id="tableid">
+        <thead class="border-b border-neutral-300 bg-slate-200 text-sm text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white">
+            <tr>
+                <th scope="col" class="p-4">
+                    <!-- Checkbox for selecting all -->
+                    <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
+                        <div class="relative flex items-center">
+                            <input type="checkbox" x-model="checkAll" id="checkAll" @change="toggleAll()" 
+                                class="peer relative cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white 
+                                before:content[''] before:absolute before:inset-0 checked:border-black checked:before:bg-black focus:outline focus:outline-2 
+                                focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black active:outline-offset-0 
+                                dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white 
+                                dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" 
+                                stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-neutral-100 
+                                peer-checked:visible dark:text-black">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                            </svg>
+                        </div>
+                    </label>
+                </th>
+                <th scope="col" class="py-4 px-2">Contact</th>
+                <th scope="col" class="py-4 px-2">Invoice Number</th>
+                <th scope="col" class="py-4 px-2">Reference No.</th>
+                <th scope="col" class="py-4 px-2">Date</th>
+                <th scope="col" class="py-4 px-2">Description</th>
+                <th scope="col" class="py-4 px-2">Sales Amount</th>
+                <th scope="col" class="py-4 px-2">Tax Amount</th>
+                <th scope="col" class="py-4 px-2">Tax Type</th>
+                <th scope="col" class="py-4 px-2">ATC</th>
+                <th scope="col" class="py-4 px-2">COA</th>
+            </tr>
+        </thead>
+
+        <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
+            @forelse ($transactions as $transaction) 
+                @foreach ($transaction->taxRows as $taxRow) 
+                    <tr>
+                        <td>
+                            <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
+                                <input type="checkbox" @change="toggleCheckbox('{{ $transaction->id }}')" 
+                                    id="transaction{{ $transaction->id }}" 
+                                    class="peer relative cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 
+                                    bg-white before:content[''] before:absolute before:inset-0 checked:border-black checked:before:bg-black 
+                                    focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black 
+                                    active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white 
+                                    dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" 
+                                    :checked="selectedRows.includes('{{ $transaction->id }}')" 
+                                    x-show="showCheckboxes" 
+                                    style="display: none;" 
+                                    x-bind:style="showCheckboxes ? 'display: block;' : 'display: none;'" />
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" 
+                                    stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 
+                                    text-neutral-100 peer-checked:visible dark:text-black">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                 </svg>
-                            </div>
-                        </label>
-                    </th>
-                    <th scope="col" class="py-4 px-2">Contact</th>
-                    <th scope="col" class="py-4 px-2">Invoice Number</th>
-                    <th scope="col" class="py-4 px-2">Reference No.</th>
-                    <th scope="col" class="py-4 px-2">Date</th>
-                    <th scope="col" class="py-4 px-2">Description</th>
-                    <th scope="col" class="py-4 px-2">Sales Amount</th>
-                    <th scope="col" class="py-4 px-2">Tax Amount</th>
-                    <th scope="col" class="py-4 px-2">Tax Type</th>
-                    <th scope="col" class="py-4 px-2">ATC</th>
-                    <th scope="col" class="py-4 px-2">COA</th>
-                </tr>
-            </thead>
-        
-            <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
-                @forelse ($transactions as $transaction) 
-                    @foreach ($transaction->taxRows as $taxRow) 
-                        <tr>
-                            @if ($loop->first)   <!-- Only show transaction info on the first tax row -->
-                            <td>
-                                <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
-                                    <input type="checkbox" @change="toggleCheckbox('{{ $transaction->id }}')" id="transaction{{ $transaction->id }}" 
-                                        class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-black checked:before:bg-black focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" 
-                                        :checked="selectedRows.includes('{{ $transaction->id }}')" 
-                                        x-show="showCheckboxes" 
-                                        style="display: none;" 
-                                        x-bind:style="showCheckboxes ? 'display: block;' : 'display: none;'" />
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" 
-                                        class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                    </svg>
-                                </label>
-                            </td>
-                                <td rowspan="{{ $transaction->taxRows->count() }}">{{ $transaction->contact }}</td>
-                                <td rowspan="{{ $transaction->taxRows->count() }}">{{ $transaction->inv_number }}</td>
-                                <td rowspan="{{ $transaction->taxRows->count() }}">{{ $transaction->reference }}</td>
-                                <td rowspan="{{ $transaction->taxRows->count() }}">{{ $transaction->date }}</td>
-                            @endif
-                            <td class="p-5">{{ $taxRow->description }}</td>
-                            <td>{{ $taxRow->amount }}</td>
-                            <td>{{ $taxRow->tax_amount }}</td>
-                            <td>{{ $taxRow->tax_type }}</td>
-                            <td>{{ $taxRow->tax_code }}</td>
-                            <td>{{ $taxRow->coa }}</td>
-                        </tr>
-                    @endforeach
-                @empty <!-- Check if there are no transactions -->
-                    <tr>
-                        <td colspan="12" class="text-center p-4">
-                            <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
-                            <h1 class="font-extrabold text-lg mt-2">No Transactions yet</h1>
-                            <p class="text-sm text-neutral-500 mt-2">Start adding transactions with the <br> + Add button.</p>
+                            </label>
                         </td>
+                        <td>{{ $transaction->contact }}</td>
+                        <td>{{ $transaction->inv_number }}</td>
+                        <td>{{ $transaction->reference }}</td>
+                        <td>{{ $transaction->date }}</td>
+                        <td>{{ $taxRow->description }}</td>
+                        <td>{{ $taxRow->amount }}</td>
+                        <td>{{ $taxRow->tax_amount }}</td>
+                        <td>{{ $taxRow->tax_type }}</td>
+                        <td>{{ $taxRow->tax_code }}</td>
+                        <td>{{ $taxRow->coa }}</td>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-    
+                @endforeach
+            @empty <!-- Handle case where no transactions are present -->
+                <tr>
+                    <td colspan="12" class="text-center p-4">
+                        <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                        <h1 class="font-extrabold text-lg mt-2">No Transactions yet</h1>
+                        <p class="text-sm text-neutral-500 mt-2">Start adding transactions with the <br> + Add button.</p>
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+
+        
     
 
 

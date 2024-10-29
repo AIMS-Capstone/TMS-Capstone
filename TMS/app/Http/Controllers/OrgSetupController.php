@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\ValidationException;
 
 class OrgSetupController extends Controller
 {
@@ -54,42 +55,50 @@ class OrgSetupController extends Controller
     /**
      * Store a newly created resource in storage.
      */
- public function store(Request $request)
+    public function store(Request $request)
     {
-        // Validate the request data
-        $validatedData = $request->validate([
-            'type' => 'required|in:non-individual,individual',
-            'registration_name' => 'required|string|max:255',
-            'line_of_business' => 'required|string|max:255',
-            'address_line' => 'required|string|max:255',
-            'region' => 'required|string|max:255',
-            'province' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'zip_code' => 'required|string|max:10',
-            'contact_number' => 'required|string|max:20',
-            'email' => 'required|email|max:255',
-            'tin' => 'required|string|max:20|unique:org_setups,tin',
-            'rdo' => 'required|string|max:20',
-            'tax_type' => 'required|string|max:255',
-            'registration_date' => 'required|date_format:m/d/Y',
-            'start_date' => 'required|date_format:m/d/Y',
-            'financial_year_end' => 'required|string|max:255',
-        ]);
-
-
-        // pang bago nung format sa db para tumangan ng date
-        $validatedData['start_date'] = Carbon::createFromFormat('m/d/Y', $validatedData['start_date'])->format('Y-m-d');
-        $validatedData['registration_date'] = Carbon::createFromFormat('m/d/Y', $validatedData['registration_date'])->format('Y-m-d');
+        try {
+            // Manually validate the request
+            $validatedData = $request->validate([
+                'type' => 'required|in:Non-Individual,Individual',
+                'registration_name' => 'required|string|max:255',
+                'line_of_business' => 'required|string|max:255',
+                'address_line' => 'required|string|max:255',
+                'region' => 'required|string|max:255',
+                'province' => 'required|string|max:255',
+                'city' => 'required|string|max:255',
+                'zip_code' => 'required|string|max:10',
+                'contact_number' => 'required|string|max:20',
+                'email' => 'required|email|max:255',
+                'tin' => 'required|string|max:20|unique:org_setups,tin',
+                'rdo' => 'required|string|max:20',
+                'tax_type' => 'required|string|max:255',
+                'registration_date' => 'required|date',
+                'start_date' => 'required|date',
+                'financial_year_end' => 'required|string|max:255',
+            ]);
+    
       
-
-
-        // Create new OrgSetup record
-        OrgSetup::create($validatedData);
-
-        // Redirect to the org-setup route with a success message
-        return redirect()->route('org-setup')->with('success', 'Organization setup created successfully.');
+    
+            OrgSetup::create($validatedData);
+    
+            return redirect()->route('org-setup')->with('success', 'Organization setup created successfully.');
+    
+        } catch (ValidationException $e) {
+            // Handle validation errors here
+            $errors = $e->errors();
+            $requestData = request()->all();
+            
+            // Dump or log errors to examine them (or handle them as needed)
+            dd([
+                'errors' => $errors,
+                'input_data' => $requestData,
+            ]);
+    
+            // Redirect back with errors if needed
+            return redirect()->back()->withErrors($errors)->withInput();
+        }
     }
-
     /**
      * Display the specified resource.
      */

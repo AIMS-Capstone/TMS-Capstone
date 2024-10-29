@@ -26,4 +26,9 @@ class TaxReturn extends Model
                     ->withPivot('allocation_percentage') // If you want to access the allocation percentage
                     ->withTimestamps();
     }
+    public function taxReturnTransactions()
+{
+    return $this->hasMany(TaxReturnTransaction::class, 'tax_return_id');
+}
+
 }

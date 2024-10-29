@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Coa;
 use App\Models\Transactions;
 use App\Models\TaxRow; // Assuming this model exists for individual journal rows
+use Illuminate\Support\Facades\Session;
 
 class JournalTransaction extends Component
 {
@@ -23,6 +24,8 @@ class JournalTransaction extends Component
     public $reference; // Reference number
     public $selectedContact; // Selected contact for the transaction
     public $type = 'journal'; // Default to 'journal' transaction type
+    
+    public  $organizationId;
 
     // Listen for child component updates
     protected $listeners = ['journalRowUpdated' => 'updateJournalRow', 'journalRowRemoved' => 'removeJournalRow'];
@@ -78,7 +81,7 @@ class JournalTransaction extends Component
             session()->flash('error', 'Debits and credits must be balanced.');
             return;
         }
-
+        $organizationId = Session::get('organization_id');
         // Create a new transaction
         $transaction = Transactions::create([
             'transaction_type' => 'Journal',
@@ -88,6 +91,7 @@ class JournalTransaction extends Component
             'total_amount_debit' => $this->totalAmountDebit,
             'total_amount_credit' => $this->totalAmountCredit,
             'contact' => $this->selectedContact, // Optionally link a contact
+            'organization_id'=> $organizationId
         ]);
 
         // Save each journal row linked to the transaction
