@@ -17,6 +17,7 @@ class SalesTransaction extends Component
     public $vatAmount = 0;
     public $nonVatableSales = 0; // New property to hold non-vatable sales
     public $date;
+    public $status;
     public $contact;
     public $inv_number;
     public $organization_id;
@@ -126,6 +127,7 @@ class SalesTransaction extends Component
                 'vat_amount' => $this->vatAmount,
                 'non_vatable_sales' => $this->nonVatableSales,
                 'organization_id' => $this->organization_id, // Ensure this is included
+                'status'=> 'Draft'
             ]);
     
             // Log the transaction ID after saving
