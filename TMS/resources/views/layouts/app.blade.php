@@ -120,7 +120,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                 </li>
                             </ul>
                         </li>
-                        <li x-data="{ open: {{ request()->routeIs('general-ledger', 'sales-book', 'purchase-book', 'cash-receipt', 'cash-disb', 'general-journal') ? 'true' : 'false' }} }">
+                        <li x-data="{ open: {{ request()->routeIs('general-ledger', 'sales-book', 'purchase-book', 'cash-receipt', 'cash-disbursement', 'general-journal') ? 'true' : 'false' }} }">
                             <button @click="open = !open" type="button"
                                 :class="{
                                     'flex items-center w-full p-2 text-[14px] ease-in transition-all duration-500 rounded-r-full hover:font-bold px-6 py-2 group': true,
@@ -165,8 +165,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('cash-disb') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
-                                    {{ request()->routeIs('cash-disb') ? 'sidebar-submenu-active' : '' }}">
+                                    <a href="{{ route('cash-disbursement') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
+                                    {{ request()->routeIs('cash-disbursement') ? 'sidebar-submenu-active' : '' }}">
                                         Cash Disbursement Book
                                     </a>
                                 </li>

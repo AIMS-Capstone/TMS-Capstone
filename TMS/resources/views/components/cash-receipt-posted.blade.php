@@ -14,7 +14,7 @@
                         </svg>
                     </li>
                     <li class="flex items-center gap-1">
-                        <a href="{{ route('purchase-book') }}" class="hover:text-blue-950 dark:hover:text-white {{ request()->routeIs('purchase-book') ? 'breadcumb-active' : '' }}">Purchase Book Journal</a>
+                        <a href="{{ route('cash-receipt') }}" class="hover:text-blue-950 dark:hover:text-white {{ request()->routeIs('cash-receipt') ? 'breadcumb-active' : '' }}">cash Book </a>
                     </li>
                 </ol>
             </nav>
@@ -22,7 +22,7 @@
 
                 <div class="container mx-auto my-4 pt-4">
                     <div class="flex justify-between items-center px-10">
-                        <p class="font-bold text-3xl text-left taxuri-color">Purchases Book Journal</p>
+                        <p class="font-bold text-3xl text-left taxuri-color">cash Book </p>
                         <button type="button" class="flex items-center text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24">
                                 <path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
@@ -32,46 +32,48 @@
                     </div>
                     <div class="flex justify-between items-center px-10">
                         <div class="flex items-center">            
-                            <p class="font-normal text-sm">This book houses all the Purchase entered in the Transactions Module.</p>
+                            <p class="font-normal text-sm">This book houses all the cash entered in the Transactions Module.</p>
                         </div>
                     </div>  
+                    <hr class="mt-6">
                     <br>
 
                         <div class="container mx-auto ps-8">
                             <div class="flex flex-row space-x-2 items-center justify-center">
-                                <div x-data="{ selectedTab: 'Draft' }" class="w-full">
+                                <div x-data="{ selectedTab: 'Posted' }" class="w-full">
                                     <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-24 overflow-x-auto  border-neutral-300" role="tablist" aria-label="tab options">
-                                        <button @click="selectedTab = 'Draft'" :aria-selected="selectedTab === 'Draft'" 
-                                            :tabindex="selectedTab === 'Draft' ? '0' : '-1'" 
-                                            :class="selectedTab === 'Draft' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900'   : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'" 
-                                            class="h-min py-2 text-base" 
-                                            type="button"
-                                            role="tab" 
-                                            aria-controls="tabpanelDraft" >
-                                            Draft
-                                        </button>
-                                        <a href="purchase-book/posted">
-                                            <button @click="selectedTab = 'Posted'" :aria-selected="selectedTab === 'Posted'" 
+                                        <a href="/cash-receipt">
+                                            <button @click="selectedTab = 'Draft'" :aria-selected="selectedTab === 'Draft'" 
+                                                :tabindex="selectedTab === 'Draft' ? '0' : '-1'" 
+                                                :class="selectedTab === 'Draft' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900'   : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'" 
+                                                class="h-min py-2 text-base" 
+                                                type="button"
+                                                role="tab" 
+                                                aria-controls="tabpanelDraft" >
+                                                Draft
+                                            </button>
+                                        </a>
+                                        <button @click="selectedTab = 'Posted'" :aria-selected="selectedTab === 'Posted'" 
                                             :tabindex="selectedTab === 'Posted' ? '0' : '-1'" 
                                             :class="selectedTab === 'Posted' ? 'font-bold box-border text-sky-900 border-b-4 border-sky-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-sky-900 hover:text-sky-900'"
                                             class="h-min py-2 text-base" 
-                                                type="button" 
-                                                role="tab" 
-                                                aria-controls="tabpanelPosted" >Posted
-                                            </button>
-                                        </a>
+                                            type="button" 
+                                            role="tab" 
+                                            aria-controls="tabpanelPosted" >Posted
+                                        </button>
                                     </div>
                                 </div>  
                             </div>
                         </div>
-                    <hr class="mb-4">
+                    <hr>
 
                     <!-- Filters Row -->
-                    <div class=" grid grid-cols-8 gap-4 mx-10 overflow-x-auto whitespace-nowrap max-w-full">
+                    <div class="bg-white border border-gray-300 rounded-tl-lg rounded-tr-lg grid grid-cols-8 gap-4 mx-10 overflow-x-auto whitespace-nowrap max-w-full">
                         <div class="flex items-center space-x-8">
-                            <div class="col-span-2 p-4 rounded-tl-lg">
-                                <p class="font-normal">Filter: <b>Purchase Book Journal</b></p>
-                                <p class="font-normal" x-text="getFormattedDate()"></p>
+                            <div class="col-span-2 bg-blue-50 p-4 rounded-tl-lg">
+                                <span class="font-bold text-blue-950">{{ $organization->registration_name ?? 'Organization Name' }}</span>
+                                <p class="font-normal">Filter: <b>cash Book </b></p>
+                                <p class="font-normal text-sm" x-text="getFormattedDate()"></p>
                             </div>
 
                             <div class="flex items-center space-x-8">
@@ -118,21 +120,19 @@
                             <!-- Filter Buttons -->
                             <div class="h-8 border-l border-gray-200"></div>
                             <div class="flex items-center space-x-4">
-                                <button @click="applyFilters" class="flex items-center bg-white border border-gray-300 hover:border-green-500 hover:text-green-500 transition rounded-md px-4 py-2 whitespace-nowrap">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 hover:border-green-500 hover:text-green-500 transition" viewBox="0 0 32 32">
+                                <button @click="applyFilters" class="flex items-center bg-white border border-gray-300 rounded-md px-4 py-2 whitespace-nowrap">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 32 32">
                                         <path fill="#949494" d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5z"/>
                                     </svg>
-                                    <span class="text-sm">Add Filter</span>
+                                    <span class="text-sm text-gray-600">Add Filter</span>
                                 </button>
                                 <button @click="resetFilters" class="text-sm text-gray-600 whitespace-nowrap">
                                     Clear all filters
                                 </button>
                             </div>
-                        </div>  
+                        </div>
                     </div>
-                    <hr class="my-4">
 
-                    <!-- Start ng function ng table -->
                     <div
                         x-data="{
                             showCheckboxes: false,
@@ -178,7 +178,7 @@
 
                             // Confirm update to posted
                             confirmUpdateStatus() {
-                                fetch('/purchase-book/post', {
+                                fetch('/cash-receipt/draft', { 
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
@@ -188,17 +188,14 @@
                                 })
                                 .then(response => {
                                     if (response.ok) {
-                                        // Successfully marked as posted, show success modal
                                         this.showConfirmUpdateModal = false;
-                                        this.showSuccessModal = true;
-                                        location.reload(5000); 
+                                        this.showSuccessModal = true; 
+                                        location.reload(); 
                                     } else {
-                                        // Handle the error
                                         alert('Error updating status.');
                                     }
                                 })
                                 .catch(error => {
-                                    // Handle any network errors
                                     alert('Network error, please try again.');
                                 });
                             },
@@ -221,18 +218,19 @@
                     >
                         <div class="container mx-auto">
                             <div class="flex flex-row space-x-2 items-center justify-between">
-                                <!-- Search row -->
+                                <!-- Search Input -->
                                 <div class="relative w-80 p-4">
-                                    <form x-target="purchase-table" action="/purchase-book" role="search" aria-label="Table" autocomplete="off">
-                                        <input 
-                                        type="search" 
-                                        name="search" 
-                                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900 focus:border-sky-900" 
-                                        aria-label="Search Term" 
-                                        placeholder="Search..." 
-                                        @input.debounce="$el.form.requestSubmit()" 
-                                        @search="$el.form.requestSubmit()"
-                                        value="{{ request('search') }}"
+                                    <form x-target="cash-posted-table" action="/cash-receipt/posted" method="GET" role="search" aria-label="Table" autocomplete="off">
+                                        <input
+                                            type="search"
+                                            name="search"
+                                            value= "{{ request('search')}}"
+                                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900 focus:border-sky-900"
+                                            aria-label="Search Term"
+                                            placeholder="Search..."
+                                            @input.debounce="$el.form.requestSubmit()"
+                                            @search="$el.form.requestSubmit()"
+                                            value="{{ request('search') }}"
                                         >
                                     </form>
                                     <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
@@ -243,31 +241,30 @@
                                         type="button"
                                         @click="showCheckboxes = !showCheckboxes; showUpdateStatusButtons = !showUpdateStatusButtons; $el.disabled = true;"
                                         :disabled="selectedRows.length === 1"
-                                        class="border px-3 py-2 rounded-lg text-sm hover:border-green-500 hover:text-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                        class="border px-3 py-2 rounded-lg text-sm hover:border-yellow-500 hover:text-yellow-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        <i class="fa-solid fa-circle-check"></i> Mark as Posted
+                                        <i class="fa-solid fa-bookmark"></i> Mark as Draft
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        <hr class="flex w-full mx-auto">
 
-                        <!-- Table for Purchases -->
-                        <div class="mt-6 overflow-x-auto" id="purchase-table">
+                        <!-- Table for cash Posted Transactions -->
+                        <div class="mt-6 overflow-x-auto" id="cash-posted-table">
                             <table class="w-full text-left text-sm text-neutral-600 dark:text-neutral-300">
                                 <thead class="border-b border-gray-200 bg-gray-100 text-sm text-gray-600">
                                     <tr>
                                         <th scope="col" class="p-4">
-                                            <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-green-600">
+                                            <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                                 <div class="relative flex items-center">
-                                                    <input type="checkbox" x-model="checkAll" id="checkAll" @change="toggleAll()" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-green-600 checked:before:bg-green-600 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-green-600 checked:focus:outline-green-600 active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2  peer-checked:visible text-white">
+                                                    <input type="checkbox" x-model="checkAll" id="checkAll" @change="toggleAll()" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-yellow-600 checked:before:bg-yellow-600 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-yellow-600 checked:focus:outline-yellow-600 active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 peer-checked:visible text-white">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                                     </svg>
                                                 </div>
                                             </label>
                                         </th>
-                                        <th scope="col" class="p-4">Vendor Contact</th>
+                                        <th scope="col" class="p-4">Contact</th>
                                         <th scope="col" class="p-2">Date</th>
                                         <th scope="col" class="p-2">Invoice</th>
                                         <th scope="col" class="p-2">Reference</th>
@@ -278,14 +275,13 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    
                                     @if (count($transactions) > 0)
                                         @foreach($transactions as $transaction)
                                         <tr class="border-b hover:bg-gray-50">
                                             <td class="p-4">
                                                 <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                                     <div class="relative flex items-center">
-                                                        <input type="checkbox" @change="toggleCheckbox('{{ $transaction->id }}')" :checked="selectedRows.includes('{{ $transaction->id }}')" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-green-600 checked:before:bg-green-600 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-green-600 checked:focus:outline-green-600 active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
+                                                        <input type="checkbox" @change="toggleCheckbox('{{ $transaction->id }}')" :checked="selectedRows.includes('{{ $transaction->id }}')" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-yellow-600 checked:before:bg-yellow-600 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-yellow-600 checked:focus:outline-yellow-600 active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 peer-checked:visible text-white">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                                         </svg>
@@ -294,7 +290,8 @@
                                             </td>
                                             <td class="p-4">
                                                 <strong>{{ $transaction->contactDetails->bus_name ?? 'N/A' }}</strong><br>
-                                                {{ $transaction->contactDetails->contact_address ?? 'N/A' }}
+                                                {{ $transaction->contactDetails->contact_address ?? 'N/A' }}<br>
+                                                {{ $transaction->contactDetails->contact_tin ?? 'N/A'}}
                                             </td>
                                             <td class="p-4">{{ \Carbon\Carbon::parse($transaction->date)->format('F d, Y') ?? 'N/A' }}</td>
                                             <td class="p-4">{{ $transaction->inv_number }}</td>
@@ -307,10 +304,11 @@
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td colspan="9" class="text-center p-6">
+                                            <td colspan="8" class="text-center p-6">
                                                 <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
-                                                <h1 class="font-extrabold mt-4">No Purchase Transactions Available</h1>
-                                                <p class="text-sm text-neutral-500 mt-2">You can start adding new purchase transactions by <br> going to the transactions page.</p>
+                                                <h1
+                                                <h1 class="font-extrabold mt-4">No cash Posted Transactions Available</h1>
+                                                <p class="text-sm text-neutral-500 mt-2">You can start adding new cash transactions by <br> going to the transactions page.</p>
                                             </td>
                                         </tr>
                                     @endif
@@ -325,108 +323,108 @@
                                 <button 
                                     @click="updateStatus" 
                                     :disabled="selectedRows.length === 0"
-                                    class="border px-3 py-2 mx-2 rounded-lg text-sm hover:border-green-500 hover:text-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                    class="border px-3 py-2 mx-2 rounded-lg text-sm hover:border-yellow-500 hover:text-yellow-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    <i class="fa-solid fa-circle-check"></i> Mark as Posted Selected <span x-show="selectedCount > 0" x-text="'(' + selectedCount + ')'"></span>
+                                    <i class="fa-solid fa-bookmark"></i> Mark as Draft Selected <span x-show="selectedCount > 0" x-text="'(' + selectedCount + ')'"></span>
                                 </button>
                                 <button 
                                     @click="cancelSelection" 
                                     class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
                                 >
-                                Cancel
+                                    Cancel
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Confirm Posted Modal -->
+                        <!-- Confirm Update Status Modal -->
                         <div 
-                                x-show="showConfirmUpdateModal" 
-                                x-cloak 
-                                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                                @click.away="showConfirmUpdateModal = false"
-                            >
-                                <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative">
-                                    <button 
-                                        @click="showConfirmUpdateModal = false" 
-                                        class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
-                                    >
-                                        <i class="fa fa-times"></i>
-                                    </button>
-                                    <div class="flex flex-col items-center">
-                                        <!-- Icon -->
-                                        <div class="mb-6">
-                                            <div class="flex items-center justify-center w-24 h-24 rounded-full bg-green-600">
-                                                <i class="fas fa-question text-white text-6xl"></i>
-                                            </div>
-                                        </div>
-
-                                        <!-- Title -->
-                                        <h2 class="text-xl font-bold text-gray-800 mb-4">Mark as Posted Item/s</h2>
-
-                                        <!-- Description -->
-                                        <p class="text-sm text-gray-600 text-center mb-6">
-                                            You're going to mark as posted the selected item/s in the Purchase Book Journal table. Are you sure?
-                                        </p>
-
-                                        <!-- Actions -->
-                                        <div class="flex justify-between w-full">
-                                            <button 
-                                                @click="showConfirmUpdateModal = false; showUpdateStatusButtons = true;" 
-                                                class="px-5 py-2 hover:bg-gray-400 rounded-lg text-sm text-gray-700 transition w-1/2 mr-2"
-                                            >
-                                                Cancel
-                                            </button>
-                                            <button 
-                                                @click="confirmUpdateStatus();" 
-                                                class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition w-1/2 ml-2"
-                                            >
-                                                Mark as Posted
-                                            </button>
+                            x-show="showConfirmUpdateModal" 
+                            x-cloak 
+                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                            @click.away="showConfirmUpdateModal = false"
+                        >
+                            <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative">
+                                <button 
+                                    @click="showConfirmUpdateModal = false" 
+                                    class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
+                                >
+                                    <i class="fa fa-times"></i>
+                                </button>
+                                <div class="flex flex-col items-center">
+                                    <!-- Icon -->
+                                    <div class="mb-6">
+                                        <div class="flex items-center justify-center w-24 h-24 rounded-full bg-yellow-500">
+                                            <i class="fas fa-question text-white text-6xl"></i>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
 
-                            <!-- Success Modal -->
-                            <div 
-                                x-show="showSuccessModal" 
-                                x-cloak 
-                                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                                @click.away="showSuccessModal = false"
-                            >
-                                <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative">
-                                    <button 
-                                        @click="showSuccessModal = false" 
-                                        class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
-                                    >
-                                        <i class="fa fa-times"></i>
-                                    </button>
-                                    <div class="flex flex-col items-center">
-                                        <!-- Icon -->
-                                        <div class="mb-6">
-                                            <div class="flex items-center justify-center w-24 h-24 rounded-full bg-green-600">
-                                                <i class="fas fa-check text-white text-6xl"></i>
-                                            </div>
-                                        </div>
+                                    <!-- Title -->
+                                    <h2 class="text-xl font-bold text-gray-800 mb-4">Mark as Draft Item/s</h2>
 
-                                        <!-- Title -->
-                                        <h2 class="text-xl font-bold text-gray-800 mb-4">Mark as Posted</h2>
+                                    <!-- Description -->
+                                    <p class="text-sm text-gray-600 text-center mb-6">
+                                        You're going to mark as draft the selected item/s in the cash Book  table. Are you sure?
+                                    </p>
 
-                                        <!-- Description -->
-                                        <p class="text-sm text-gray-600 text-center mb-6">
-                                            The selected item(s) has been successfully marked as posted.
-                                        </p>
-
-                                        <!-- Close Button -->
+                                    <!-- Actions -->
+                                    <div class="flex justify-between w-full">
                                         <button 
-                                            @click="showSuccessModal = false; cancelSelection();" 
-                                            class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition w-1/2"
+                                            @click="showConfirmUpdateModal = false; showUpdateStatusButtons = true;" 
+                                            class="px-5 py-2 hover:bg-gray-400 rounded-lg text-sm text-gray-700 transition w-1/2 mr-2"
                                         >
-                                            OK
+                                            Cancel
+                                        </button>
+                                        <button 
+                                            @click="confirmUpdateStatus();" 
+                                            class="px-5 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg text-sm transition w-1/2 ml-2"
+                                        >
+                                            Mark as Draft
                                         </button>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Success Modal -->
+                        <div 
+                            x-show="showSuccessModal" 
+                            x-cloak 
+                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                            @click.away="showSuccessModal = false"
+                        >
+                            <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative">
+                                <button 
+                                    @click="showSuccessModal = false" 
+                                    class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
+                                >
+                                    <i class="fa fa-times"></i>
+                                </button>
+                                <div class="flex flex-col items-center">
+                                    <!-- Icon -->
+                                    <div class="mb-6">
+                                        <div class="flex items-center justify-center w-24 h-24 rounded-full bg-green-600">
+                                            <i class="fas fa-check text-white text-6xl"></i>
+                                        </div>
+                                    </div>
+
+                                    <!-- Title -->
+                                    <h2 class="text-xl font-bold text-green-600 mb-4">Mark as Draft</h2>
+
+                                    <!-- Description -->
+                                    <p class="text-sm text-gray-600 text-center mb-6">
+                                        The selected item(s) have been successfully mark as draft.
+                                    </p>
+
+                                    <!-- Close Button -->
+                                    <button 
+                                        @click="showSuccessModal = false; cancelSelection();" 
+                                        class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition w-1/2"
+                                    >
+                                        OK
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
 
                     </div>
 
@@ -492,11 +490,11 @@
         getFormattedDate() {
             if (this.period === 'monthly' && this.selectedMonth) {
                 const month = this.months.find(m => m.value === this.selectedMonth).label;
-                return `as of ${month} 01, ${this.selectedYear}`;
+                return `${month} 01, ${this.selectedYear}`;
             } else if (this.period === 'quarterly' && this.selectedQuarter) {
-                return `as of ${this.selectedQuarter}, ${this.selectedYear}`;
+                return `${this.selectedQuarter}, ${this.selectedYear}`;
             } else {
-                return `as of January 01, ${this.selectedYear}`;
+                return `January 01, ${this.selectedYear}`;
             }
         },
         async applyFilters() {
@@ -522,8 +520,8 @@
             .then(html => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                const newTableContent = doc.querySelector('#purchase-table').innerHTML;
-                document.querySelector('#purchase-table').innerHTML = newTableContent;
+                const newTableContent = doc.querySelector('#transaction-table').innerHTML;
+                document.querySelector('#transaction-table').innerHTML = newTableContent;
             })
             .catch(error => console.error('Error fetching data:', error));
         },
@@ -557,21 +555,11 @@
             .then(html => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                const newTableContent = doc.querySelector('#purchase-table').innerHTML;
-                document.querySelector('#purchase-table').innerHTML = newTableContent;
+                const newTableContent = doc.querySelector('#transaction-table').innerHTML;
+                document.querySelector('#transaction-table').innerHTML = newTableContent;
             })
             .catch(error => console.error('Error resetting data:', error));
         }
     };
 }
-
-        function toggleCheckboxes() {
-            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-                checkbox.checked = this.checkAll;
-            });
-        }
-
-        document.addEventListener('search', event => {
-            window.location.href = `?search=${event.detail.search}`;
-        });
 </script>

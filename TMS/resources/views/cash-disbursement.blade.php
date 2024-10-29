@@ -1,8 +1,8 @@
 <x-app-layout>
-    @php
-    $organizationId = session('organization_id');
-    $organization = \App\Models\OrgSetup::find($organizationId);
-    @endphp
+        @php
+        $organizationId = session('organization_id');
+        $organization = \App\Models\OrgSetup::find($organizationId);
+        @endphp
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <nav class="text-sm font-medium text-gray-600 dark:text-slate-300 mb-6" aria-label="breadcrumb">
@@ -14,7 +14,7 @@
                         </svg>
                     </li>
                     <li class="flex items-center gap-1">
-                        <a href="{{ route('purchase-book') }}" class="hover:text-blue-950 dark:hover:text-white {{ request()->routeIs('purchase-book') ? 'breadcumb-active' : '' }}">Purchase Book Journal</a>
+                        <a href="{{ route('cash-disbursement') }}" class="hover:text-blue-950 dark:hover:text-white {{ request()->routeIs('cash-disbursement') ? 'breadcumb-active' : '' }}">Cash Book Journal</a>
                     </li>
                 </ol>
             </nav>
@@ -22,7 +22,7 @@
 
                 <div class="container mx-auto my-4 pt-4">
                     <div class="flex justify-between items-center px-10">
-                        <p class="font-bold text-3xl text-left taxuri-color">Purchases Book Journal</p>
+                        <p class="font-bold text-3xl text-left taxuri-color">Cash Disbursement Book</p>
                         <button type="button" class="flex items-center text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24">
                                 <path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
@@ -32,7 +32,7 @@
                     </div>
                     <div class="flex justify-between items-center px-10">
                         <div class="flex items-center">            
-                            <p class="font-normal text-sm">This book houses all the Purchase entered in the Transactions Module.</p>
+                            <p class="font-normal text-sm">This book houses all the invoices that are marked as paid in the Transactions Module.</p>
                         </div>
                     </div>  
                     <br>
@@ -50,7 +50,7 @@
                                             aria-controls="tabpanelDraft" >
                                             Draft
                                         </button>
-                                        <a href="purchase-book/posted">
+                                        <a href="cash-disbursement/posted">
                                             <button @click="selectedTab = 'Posted'" :aria-selected="selectedTab === 'Posted'" 
                                             :tabindex="selectedTab === 'Posted' ? '0' : '-1'" 
                                             :class="selectedTab === 'Posted' ? 'font-bold box-border text-sky-900 border-b-4 border-sky-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-sky-900 hover:text-sky-900'"
@@ -70,7 +70,7 @@
                     <div class=" grid grid-cols-8 gap-4 mx-10 overflow-x-auto whitespace-nowrap max-w-full">
                         <div class="flex items-center space-x-8">
                             <div class="col-span-2 p-4 rounded-tl-lg">
-                                <p class="font-normal">Filter: <b>Purchase Book Journal</b></p>
+                                <p class="font-normal">Filter: <b>Cash Disbursement Book</b></p>
                                 <p class="font-normal" x-text="getFormattedDate()"></p>
                             </div>
 
@@ -178,7 +178,7 @@
 
                             // Confirm update to posted
                             confirmUpdateStatus() {
-                                fetch('/purchase-book/post', {
+                                fetch('/cash-disbursement/post', {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
@@ -223,7 +223,7 @@
                             <div class="flex flex-row space-x-2 items-center justify-between">
                                 <!-- Search row -->
                                 <div class="relative w-80 p-4">
-                                    <form x-target="purchase-table" action="/purchase-book" role="search" aria-label="Table" autocomplete="off">
+                                    <form x-target="cash-table" action="/cash-disbursement" role="search" aria-label="Table" autocomplete="off">
                                         <input 
                                         type="search" 
                                         name="search" 
@@ -252,8 +252,8 @@
                         </div>
                         <hr class="flex w-full mx-auto">
 
-                        <!-- Table for Purchases -->
-                        <div class="mt-6 overflow-x-auto" id="purchase-table">
+                        <!-- Table for Cashs -->
+                        <div class="mt-6 overflow-x-auto" id="cash-table">
                             <table class="w-full text-left text-sm text-neutral-600 dark:text-neutral-300">
                                 <thead class="border-b border-gray-200 bg-gray-100 text-sm text-gray-600">
                                     <tr>
@@ -267,7 +267,7 @@
                                                 </div>
                                             </label>
                                         </th>
-                                        <th scope="col" class="p-4">Vendor Contact</th>
+                                        <th scope="col" class="p-4">Contact</th>
                                         <th scope="col" class="p-2">Date</th>
                                         <th scope="col" class="p-2">Invoice</th>
                                         <th scope="col" class="p-2">Reference</th>
@@ -294,7 +294,8 @@
                                             </td>
                                             <td class="p-4">
                                                 <strong>{{ $transaction->contactDetails->bus_name ?? 'N/A' }}</strong><br>
-                                                {{ $transaction->contactDetails->contact_address ?? 'N/A' }}
+                                                {{ $transaction->contactDetails->contact_address ?? 'N/A' }}<br>
+                                                {{ $transaction->contactDetails->contact_tin ?? 'N/A'}}
                                             </td>
                                             <td class="p-4">{{ \Carbon\Carbon::parse($transaction->date)->format('F d, Y') ?? 'N/A' }}</td>
                                             <td class="p-4">{{ $transaction->inv_number }}</td>
@@ -309,8 +310,8 @@
                                         <tr>
                                             <td colspan="9" class="text-center p-6">
                                                 <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
-                                                <h1 class="font-extrabold mt-4">No Purchase Transactions Available</h1>
-                                                <p class="text-sm text-neutral-500 mt-2">You can start adding new purchase transactions by <br> going to the transactions page.</p>
+                                                <h1 class="font-extrabold mt-4">No Cash Disbursement Transactions Available</h1>
+                                                <p class="text-sm text-neutral-500 mt-2">You can start adding new Cash Disbursement transactions by <br> going to the transactions page.</p>
                                             </td>
                                         </tr>
                                     @endif
@@ -365,7 +366,7 @@
 
                                         <!-- Description -->
                                         <p class="text-sm text-gray-600 text-center mb-6">
-                                            You're going to mark as posted the selected item/s in the Purchase Book Journal table. Are you sure?
+                                            You're going to mark as posted the selected item/s in the Cash Disbursement Book table. Are you sure?
                                         </p>
 
                                         <!-- Actions -->
@@ -492,11 +493,11 @@
         getFormattedDate() {
             if (this.period === 'monthly' && this.selectedMonth) {
                 const month = this.months.find(m => m.value === this.selectedMonth).label;
-                return `as of ${month} 01, ${this.selectedYear}`;
+                return ` as of ${month} 01, ${this.selectedYear}`;
             } else if (this.period === 'quarterly' && this.selectedQuarter) {
-                return `as of ${this.selectedQuarter}, ${this.selectedYear}`;
+                return ` as of ${this.selectedQuarter}, ${this.selectedYear}`;
             } else {
-                return `as of January 01, ${this.selectedYear}`;
+                return ` as of January 01, ${this.selectedYear}`;
             }
         },
         async applyFilters() {
@@ -522,8 +523,8 @@
             .then(html => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                const newTableContent = doc.querySelector('#purchase-table').innerHTML;
-                document.querySelector('#purchase-table').innerHTML = newTableContent;
+                const newTableContent = doc.querySelector('#cash-table').innerHTML;
+                document.querySelector('#cash-table').innerHTML = newTableContent;
             })
             .catch(error => console.error('Error fetching data:', error));
         },
@@ -557,8 +558,8 @@
             .then(html => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                const newTableContent = doc.querySelector('#purchase-table').innerHTML;
-                document.querySelector('#purchase-table').innerHTML = newTableContent;
+                const newTableContent = doc.querySelector('#cash-table').innerHTML;
+                document.querySelector('#cash-table').innerHTML = newTableContent;
             })
             .catch(error => console.error('Error resetting data:', error));
         }

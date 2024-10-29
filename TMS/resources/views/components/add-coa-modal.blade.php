@@ -29,16 +29,10 @@
                         <label for="type" class="block font-semibold text-sm text-gray-700">
                             Account Type <span class="text-red-500">*</span>
                         </label>
-                        <select name="type" id="accountType" required
-                            class="block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none cursor-pointer focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                            <option value="" disabled selected>Select Account Type</option>
-                            <option value="Assets">Assets</option>
-                            <option value="Liabilities">Liabilities</option>
-                            <option value="Equity">Equity</option>
-                            <option value="Revenue">Revenue</option>
-                            <option value="Cost of Sales">Cost of Sales</option>
-                            <option value="Expenses">Expenses</option>
-                        </select>
+                        <input type="text" name="account_type_input" id="accountTypeInput" required
+                            placeholder="Expense | Ordinary Allowance Itemized Deductions"
+                            class="peer py-2.5 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none">
+                        <p class="text-[10px] opacity-75 px-1">Enter in the format: Type | Sub Type</p>
                     </div>
                     <!-- Account Code -->
                     <div class="w-1/3 text-left">
@@ -60,17 +54,6 @@
                         maxlength="150" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none">
                     <p class="text-xs opacity-75 px-1">A short title for this account (limited 150 characters)</p>
                 </div>
-
-                <!-- Account Sub Category -->
-                {{-- Please check, ayaw mag display --}}
-                {{-- <div class="mb-3">
-                    <label for="sub_type" class="block font-semibold text-sm text-gray-700">
-                        Sub Category <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" name="sub_type" id="sub_type" required
-                        maxlength="150" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none">
-                    <p class="text-xs opacity-75 px-1">A sub category for this account (limited 150 characters)</p>
-                </div> --}}
 
                 <!-- Account Description -->    
                 <div class="mb-3">
