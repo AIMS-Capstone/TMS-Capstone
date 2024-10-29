@@ -23,8 +23,7 @@
                         </a>
                     </nav>
 
-                    <iframe src="data:application/pdf;base64,{{ $pdfOutput }}" width="100%" height="600px">
-                        Your browser does not support iframes.
-                    </iframe>
+                    <h1>VAT Report for {{ $taxReturn->name }}</h1>
+                    <iframe src="{{ $pdfPath }}" width="100%" height="600px"></iframe>
 
 </x-app-layout>

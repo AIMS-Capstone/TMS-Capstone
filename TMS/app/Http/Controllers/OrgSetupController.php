@@ -80,9 +80,11 @@ class OrgSetupController extends Controller
 
 
 
+
             OrgSetup::create($validatedData);
 
             return redirect()->route('org-setup')->with('success', 'Organization setup created successfully.');
+
 
         } catch (ValidationException $e) {
             // Handle validation errors here
@@ -99,7 +101,6 @@ class OrgSetupController extends Controller
             return redirect()->back()->withErrors($errors)->withInput();
         }
     }
-
     /**
      * Display the specified resource.
      */

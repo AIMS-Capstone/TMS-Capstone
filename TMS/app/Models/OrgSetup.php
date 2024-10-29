@@ -31,6 +31,6 @@ class OrgSetup extends Model
     
     public function rdo()
     {
-        return $this->belongsTo(RDO::class);
+        return $this->belongsTo(RDO::class, 'rdo');
     }
 }

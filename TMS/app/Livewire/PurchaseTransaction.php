@@ -8,6 +8,7 @@ use App\Models\ATC;
 use App\Models\TaxType;
 use App\Models\Coa;
 use App\Models\Transactions;
+use Illuminate\Support\Facades\Session;
 
 class PurchaseTransaction extends Component
 {
@@ -135,7 +136,7 @@ class PurchaseTransaction extends Component
     public function saveTransaction()
     {
    
-
+        $organizationId = Session::get('organization_id');
         // Create a transaction with 'Purchase' type
         $transaction = Transactions::create([
             'transaction_type' => 'Purchase',
@@ -147,6 +148,7 @@ class PurchaseTransaction extends Component
             'vatable_purchase' => $this->vatablePurchase,
             'non_vatable_purchase' => $this->nonVatablePurchase,
             'vat_amount' => $this->vatAmount,
+            'organization_id'=> $organizationId
         ]);
 
         // Save each tax row linked to the transaction
