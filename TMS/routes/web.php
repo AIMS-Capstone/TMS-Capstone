@@ -16,6 +16,7 @@ use App\Http\Controllers\CashReceiptController;
 use App\Http\Controllers\CashDisbursementController;
 use App\Http\Controllers\GeneralLedgerController;
 use App\Http\Controllers\GeneralJournalController;
+use App\Http\Controllers\FinancialController;
 
 use App\Models\rdo;
 use App\Models\TaxReturn;
@@ -143,16 +144,12 @@ Route::middleware([
     //General Journal Routing
         Route::get('/general-journal', [GeneralJournalController::class, 'journal'])->name('general-journal');
 
+    // Financial Reports Routing
+        Route::get('/financial-reports', [FinancialController::class, 'financial'])->name('financial-reports');
 
         Route::get('/vat_report_pdf', function () {
             return view('tax_return.vat_report_pdf'); // Make sure to create this view file
         })->name('vat_report_pdf');
-
-
-        // Financial Reports & Predictive Analytics
-        Route::get('/financial-reports', function () {
-            return view('financial-reports');
-        })->name('financial-reports');
 
         Route::get('/predictive-analytics', function () {
             return view('predictive-analytics');
