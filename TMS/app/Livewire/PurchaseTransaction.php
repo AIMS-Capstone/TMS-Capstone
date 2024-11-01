@@ -165,7 +165,7 @@ class PurchaseTransaction extends Component
                 'tax_amount' => $row['tax_amount'],
                 'atc_amount' => $row['atc_amount'], // Save ATC amount if applicable
                 'net_amount' => $row['net_amount'],
-                'coa' => $row['coa'],
+                'coa' => !empty($row['coa']) ? $row['coa'] : null,
                 
             ]);
         }
