@@ -48,7 +48,7 @@
         </div>
 
         <!-- Tab Content -->
-        <form action="{{ route ('OrgSetup.store')}}" method="POST" x-data="{ showModal: false }" @submit.prevent="submitForm">
+        <form action="{{ route ('OrgSetup.store')}}" method="POST" x-data="{ showModal: false }">
             @csrf 
             <div id="tab-content" class="container border border-gray-200 rounded-lg p-4 my-10 text-center max-w-full h-[500px] mx-auto flex flex-col">
                 <!-- Classification Content -->
@@ -618,28 +618,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-function submitForm() {
-    const formData = new FormData(document.querySelector('form'));
-
-    fetch('{{ route('OrgSetup.store') }}', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: formData
-    })
-    .then(response => {
-        if (response.ok) {
-            this.showModal = true;
-        } else {
-            return response.json().then(data => {
-                console.error('Error:', data);
-                alert('Failed to save organization. Please check your input.');
-            });
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
 
     </script>
 

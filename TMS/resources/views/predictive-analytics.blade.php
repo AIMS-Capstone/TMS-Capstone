@@ -32,28 +32,28 @@
                     <h1 class="taxuri-color font-bold">Overview and Key Metrics</h1>
                     <div class="mt-4 align-middle items-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
                         <div class="bg-white border rounded-lg p-4 text-left">
-                            <p class="text-4xl font-bold text-blue-900 text-left">₱2,500,340</p>
+                            <p class="text-4xl font-bold text-blue-900 text-left">₱{{ number_format($totalRevenueCollected, 2) }}</p>
                             <p class="text-zinc-600 text-left font-bold">Total Revenue Collected</p>
                             <p class="text-zinc-500 text-sm text-left mb-2">Total of all revenue collected from your business activities</p>
                             <span class="bg-blue-100 text-left text-blue-800 rounded-full px-3 py-1 text-xs mt-4">Monthly</span>
                         </div>
                         
                         <div class="bg-white border rounded-lg p-4 text-left">
-                            <p class="text-4xl font-bold text-blue-900 text-left">₱2,500,340</p>
+                            <p class="text-4xl font-bold text-blue-900 text-left">₱{{ number_format($totalTaxPaid, 2) }}</p>
                             <p class="text-zinc-600 text-left font-bold">Total Tax Paid</p>
                             <p class="text-zinc-500 text-sm text-left mb-2">Total amount of taxes that have been paid by the business</p>
                             <span class="bg-blue-100 text-left text-blue-800 rounded-full px-3 py-1 text-xs mt-4">Monthly</span>
                         </div>
                         
                         <div class="bg-white border rounded-lg p-4 text-left">
-                            <p class="text-4xl font-bold text-blue-900 text-left">₱2,500,340</p>
+                            <p class="text-4xl font-bold text-blue-900 text-left">{{ number_format($totalPurchasesMade) }}</p>
                             <p class="text-zinc-600 text-left font-bold">Total Purchases Made</p>
                             <p class="text-zinc-500 text-sm text-left mb-2">Total amount of purchases made by the business</p>
                             <span class="bg-blue-100 text-left text-blue-800 rounded-full px-3 py-1 text-xs mt-4">Monthly</span>
                         </div>
                         
                         <div class="bg-white border rounded-lg p-4 text-left">
-                            <p class="text-4xl font-bold text-blue-900 text-left">₱2,500,340</p>
+                            <p class="text-4xl font-bold text-blue-900 text-left">₱{{ number_format($totalCostOfPurchases, 2) }}</p>
                             <p class="text-zinc-600 text-left font-bold">Total Cost of Purchase</p>
                             <p class="text-zinc-500 text-sm text-left mb-2">The cost associated with the purchase made</p>
                             <span class="bg-blue-100 text-left text-blue-800 rounded-full px-3 py-1 text-xs mt-4">Monthly</span>
@@ -111,7 +111,7 @@
                     <!-- Projected Quarterly Revenue -->
                     <div class="text-left ml-4 relative pr-6 text-zinc-700">
                         <h2 class="font-semibold  flex items-center">
-                            Projected Quarterly Revenue
+                            Projected Purchases Made
                             <span class="ml-2 group relative">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="cursor-pointer group-hover:opacity-100">
                                     <path fill="#3f3f46" d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2"/>
@@ -121,10 +121,9 @@
                                 </div>
                             </span>
                         </h2>
-                        <p class="text-sm">Quarter 1 - ₱ 3,000,000</p>
-                        <p class="text-sm">Quarter 2 - ₱ 3,200,000</p>
-                        <p class="text-sm">Quarter 3 - ₱ 3,500,000</p>
-                        <p class="text-sm">Quarter 4 - ₱ 3,800,000</p>
+                        @foreach ($predictions['projected_quarterly_purchase_count'] as $index => $cost)
+                        <p class="text-sm">Quarter {{ $index + 1 }} - {{ number_format($cost, 2) }}</p>
+                    @endforeach
                         
                         <div class="absolute top-4 right-0 h-3/4 w-px bg-gray-300"></div>
                     </div>
@@ -132,7 +131,7 @@
                     <!-- Projected Purchases Made -->
                     <div class="text-left relative pr-6 text-zinc-700 ">
                         <h2 class="font-semibold flex items-center">
-                            Projected Purchases Made
+                            Projected Cost of Purchase
                             <span class="ml-2 group relative">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="cursor-pointer group-hover:opacity-100">
                                     <path fill="#3f3f46" d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2"/>
@@ -142,32 +141,31 @@
                                 </div>
                             </span>
                         </h2>
-                        <p class="text-sm">Quarter 1 - ₱ 750,000</p>
-                        <p class="text-sm">Quarter 2 - ₱ 800,000</p>
-                        <p class="text-sm">Quarter 3 - ₱ 850,000</p>
-                        <p class="text-sm">Quarter 4 - ₱ 900,000</p>
+                        @foreach ($predictions['projected_quarterly_purchase_cost'] as $index => $cost)
+        <p class="text-sm">Quarter {{ $index + 1 }} - ₱ {{ number_format($cost, 2) }}</p>
+    @endforeach
                         
                         <div class="absolute top-4 right-0 h-3/4 w-px bg-gray-300"></div>
                     </div>
                 
-                    <!-- Projected Sales Revenue -->
-                    <div class="text-left text-zinc-700 ">
-                        <h2 class="font-semibold flex items-center">
-                            Projected Sales Revenue
-                            <span class="ml-2 group relative">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="cursor-pointer group-hover:opacity-100">
-                                    <path fill="#3f3f46" d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2"/>
-                                </svg>
-                                <div class="absolute left-1/2 transform -translate-x-1/2 p-4 mt-2 w-48 text-xs font-normal text-zinc-700 bg-white border border-zinc-300 rounded-lg shadow-lg opacity-0 transition-opacity duration-200 tooltip group-hover:opacity-100">
-                                    This data shows the projected sales figures, giving insight into the potential growth in revenue over the next few quarters.
-                                </div>
-                            </span>
-                        </h2>
-                        <p class="text-sm">Quarter 1 - ₱ 3,200,000</p>
-                        <p class="text-sm">Quarter 2 - ₱ 3,400,000</p>
-                        <p class="text-sm">Quarter 3 - ₱ 3,600,000</p>
-                        <p class="text-sm">Quarter 4 - ₱ 3,900,000</p>
-                    </div>
+          <!-- Projected Sales Revenue -->
+<div class="text-left text-zinc-700">
+    <h2 class="font-semibold flex items-center">
+        Projected Sales Revenue
+        <span class="ml-2 group relative">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="cursor-pointer group-hover:opacity-100">
+                <path fill="#3f3f46" d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2"/>
+            </svg>
+            <div class="absolute left-1/2 transform -translate-x-1/2 p-4 mt-2 w-48 text-xs font-normal text-zinc-700 bg-white border border-zinc-300 rounded-lg shadow-lg opacity-0 transition-opacity duration-200 tooltip group-hover:opacity-100">
+                This data shows the projected sales figures, giving insight into the potential growth in revenue over the next few quarters.
+            </div>
+        </span>
+    </h2>
+    @foreach ($predictions['projected_quarterly_sales_revenue'] as $index => $revenue)
+        <p class="text-sm">Quarter {{ $index + 1 }} - ₱ {{ number_format($revenue, 2) }}</p>
+    @endforeach
+</div>
+
                 </div>
 
                 <div class="grid grid-cols-3 gap-10 mt-6">
@@ -191,9 +189,11 @@
                         <div class="grid grid-rows-2 gap-4">
                             <!-- Projected End-of-Year Tax Liability -->
                             <div class="bg-white border rounded-lg p-6 text-left h-36"> 
-                                <h2 class="text-4xl font-bold text-left taxuri-color flex items-center">₱2,490,720</h2>
+                                <h2 class="text-4xl font-bold text-left taxuri-color flex items-center">
+                                    ₱ {{ number_format($predictions['projected_end_of_year_tax'], 2) }}
+                                </h2>
                                 <h2 class="font-semibold text-left text-zinc-700 flex items-center">
-                                    Purchases Tax Distribution
+                                    Projected End-of-Year Tax Liability
                                     <span class="ml-2 group relative">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="cursor-pointer group-hover:opacity-100">
                                             <path fill="#3f3f46" d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2"/>
@@ -206,24 +206,24 @@
                                 <span class="mt-4 bg-blue-100 text-blue-900 text-xs py-1 px-2 rounded-full">Full Year Projection</span>
                             </div>
                         
-                            <!-- Quarterly Tax Estimates -->
-                            <div class="bg-white border rounded-lg p-6 text-zinc-700 h-36 mt-5"> 
-                                <h2 class="font-semibold text-left flex items-center">
-                                    Quarterly Tax Estimates
-                                    <span class="ml-2 group relative">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="cursor-pointer group-hover:opacity-100">
-                                            <path fill="#3f3f46" d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2"/>
-                                        </svg>
-                                        <div class="absolute left-1/2 transform -translate-x-1/2 p-4 mt-2 w-48 text-xs font-normal text-zinc-700 bg-white border border-zinc-300 rounded-lg shadow-lg opacity-0 transition-opacity duration-200 tooltip group-hover:opacity-100">
-                                            This provides tax estimates for each quarter
-                                        </div>
-                                    </span>
-                                </h2>
-                                <p class="text-sm">Quarter 1 - ₱ 450,000</p>
-                                <p class="text-sm">Quarter 2 - ₱ 500,000</p>
-                                <p class="text-sm">Quarter 3 - ₱ 600,000</p>
-                                <p class="text-sm">Quarter 4 - ₱ 850,000</p>
-                            </div>
+                     <!-- Quarterly Tax Estimates -->
+<div class="bg-white border rounded-lg p-6 text-zinc-700 h-36 mt-5">
+    <h2 class="font-semibold text-left flex items-center">
+        Quarterly Tax Estimates
+        <span class="ml-2 group relative">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="cursor-pointer group-hover:opacity-100">
+                <path fill="#3f3f46" d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2"/>
+            </svg>
+            <div class="absolute left-1/2 transform -translate-x-1/2 p-4 mt-2 w-48 text-xs font-normal text-zinc-700 bg-white border border-zinc-300 rounded-lg shadow-lg opacity-0 transition-opacity duration-200 tooltip group-hover:opacity-100">
+                This provides tax estimates for each quarter
+            </div>
+        </span>
+    </h2>
+    @foreach ($predictions['projected_quarterly_tax_estimate'] as $index => $estimate)
+        <p class="text-sm">Quarter {{ $index + 1 }} - ₱ {{ number_format($estimate, 2) }}</p>
+    @endforeach
+</div>
+
                         </div>
                 
                         <div class="flex justify-center items-center w-52 h-[345px]">
@@ -253,74 +253,79 @@
     </div>
 
     <script>
-        // LINE CHART CONFIGURATION
-        const lineLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const lineData = {
-            labels: lineLabels,
-            datasets: [
-                {
-                    label: 'Dataset 1',
-                    data: [65, 59, 80, 81, 56, 55, 100],
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                },
-                {
-                    label: 'Dataset 2',
-                    data: [28, 48, 40, 19, 86, 27, 90],
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                },
-                {
-                    label: 'Dataset 3',
-                    data: [45, 25, 60, 75, 45, 60, 70],
-                    borderColor: 'rgba(255, 206, 86, 1)',
-                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
-                }
-            ]
-        };
+    const lineLabels = @json($labels); // Pass the PHP array of labels (months)
+    
+    // Preparing datasets for Chart.js
+    const datasets = [];
+    @foreach($chartData as $data)
+        datasets.push({
+            label: @json($data['label']), // Tax type label
+            data: @json($data['data']), // Monthly counts
+            borderColor: @json($data['borderColor']),
+            backgroundColor: @json($data['backgroundColor']),
+        });
+    @endforeach
 
-        const lineConfig = {
-            type: 'line',
-            data: lineData,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        align: 'start',
-                        labels: {
-                            usePointStyle: true,
-                            pointStyle: 'circle',
-                            font: {
-                                family: 'Inter',
-                                size: 10
-                            }
-                        }
+    const lineData = {
+        labels: lineLabels,
+        datasets: datasets // Pass the datasets directly
+    };
+// Define the chart configuration
+const lineConfig = {
+    type: 'line',
+    data: lineData,
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                align: 'start',
+                labels: {
+                    usePointStyle: true,
+                    pointStyle: 'circle',
+                    font: {
+                        family: 'Inter',
+                        size: 10
                     }
-                },
-                scales: {
-                    x: { ticks: { font: { family: 'Inter' } } },
-                    y: { ticks: { font: { family: 'Inter' } } }
                 }
             }
-        };
+        },
+        scales: {
+            x: {
+                ticks: { font: { family: 'Inter' } } // X-axis ticks
+            },
+            y: {
+                ticks: { font: { family: 'Inter' } } // Y-axis ticks
+            }
+        }
+    }
+};
 
-        const lineCtx = document.getElementById('lineChart').getContext('2d');
-        new Chart(lineCtx, lineConfig);
+// Get the context for the chart and create it
+const lineCtx = document.getElementById('lineChart').getContext('2d');
+
+// Error handling: Try to create the chart and catch any errors
+try {
+    new Chart(lineCtx, lineConfig);
+} catch (error) {
+    console.error('Error creating chart:', error); // Log any errors to the console
+}
 
         // BAR CHART CONFIGURATION
-        const barLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const barData = {
-            labels: barLabels,
-            datasets: [
-                {
-                    label: 'Dataset 1',
-                    data: [10, 20, 30, 40, 50, 60, 70],
-                    borderColor: 'rgba(30, 58, 138, 1)',
-                    backgroundColor: 'rgba(30, 58, 138, 1)',
-                }
-            ]
-        };
+        const barLabels = @json($barLabels); // Get the last 4 months' labels
+    
+const barData = {
+    labels: barLabels,
+    datasets: [
+        {
+      
+            label: 'Monthly Revenue',
+            data: @json($barData), // Get the revenue data for the last 4 months
+            borderColor: 'rgba(30, 58, 138, 1)',
+            backgroundColor: 'rgba(30, 58, 138, 1)',
+        }
+    ]
+};
 
         const barConfig = {
             type: 'bar',
@@ -346,59 +351,54 @@
 
         const barCtx = document.getElementById('barChart').getContext('2d');
         new Chart(barCtx, barConfig);
-
-        // Donut Chart (Predictive)
-        const DATA_COUNT = 5;
-        const NUMBER_CFG = { count: DATA_COUNT, min: 0, max: 100 };
-
-        // Sample data for the donut chart
-        const donutData = {
-            labels: ['Capital Goods', 'Orange', 'Yellow', 'Green', 'Blue'],
-            datasets: [
-                {
-                    label: 'Dataset 1',
-                    data: Array.from({ length: DATA_COUNT }, () => Math.floor(Math.random() * 100)), // Generates random data
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(255, 159, 64, 1)',
-                        'rgba(255, 205, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(54, 162, 235, 1)',
-                    ],
-                }
-            ]
-        };
+        const donutLabels = {!! json_encode($donutLabels) !!}; // Blade syntax for passing array
+        const donutData = {!! json_encode($donutData) !!}; // Blade syntax for passing array
+        // Donut Chart 
+     
 
         const donutConfig = {
-            type: 'doughnut',
-            data: donutData,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            usePointStyle: true,
-                            pointStyle: 'circle',
-                            font: {
-                                family: 'Inter',
-                                size: 12,
-                            },
-                        },
-                    },
-                    title: {
-                        display: true,
-                        text: '',
+        type: 'doughnut',
+        data: {
+            labels: donutLabels, // Labels from PHP data
+            datasets: [{
+                label: 'Purchase Counts',
+                data: donutData, // Data from PHP data
+                backgroundColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 205, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    // Add more colors if needed based on the number of categories
+                ],
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: 'circle',
                         font: {
                             family: 'Inter',
-                            size: 16,
-                            weight: '600',
+                            size: 12,
                         },
-                    }
-                }
-            },
-        };
-
+                    },
+                },
+                title: {
+                    display: true,
+                    text: 'Purchase Counts by Category',
+                    font: {
+                        family: 'Inter',
+                        size: 16,
+                        weight: '600',
+                    },
+                },
+            }
+        },
+    };
         const donutCtx = document.getElementById('donutChart').getContext('2d');
         new Chart(donutCtx, donutConfig);
     </script>

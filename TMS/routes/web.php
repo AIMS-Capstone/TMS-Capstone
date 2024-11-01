@@ -17,11 +17,12 @@ use App\Http\Controllers\CashDisbursementController;
 use App\Http\Controllers\GeneralLedgerController;
 use App\Http\Controllers\GeneralJournalController;
 use App\Http\Controllers\FinancialController;
-
+use App\Http\Controllers\PredictionController;
 use App\Models\rdo;
 use App\Models\TaxReturn;
 
 // Public Routes
+Route::get('/predictive-analytics', [PredictionController::class, 'getPredictions'])->name('predictive-analytics');
 Route::get('/', function () {
     return view('auth/login');
 });
@@ -151,9 +152,9 @@ Route::middleware([
             return view('tax_return.vat_report_pdf'); // Make sure to create this view file
         })->name('vat_report_pdf');
 
-        Route::get('/predictive-analytics', function () {
-            return view('predictive-analytics');
-        })->name('predictive-analytics');
+
+      
 
     });
+   
 });
