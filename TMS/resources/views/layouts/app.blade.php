@@ -20,7 +20,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
         <!-- Scripts -->
         <script defer src="https://cdn.jsdelivr.net/npm/@imacrayon/alpine-ajax@0.9.0/dist/cdn.min.js"></script>
         <script src="https://cdn.tailwindcss.com"></script>
-
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        
         @vite(['resources/css/app.css', 'resources/css/custom.css', 'resources/js/app.js'])
         <!-- Styles -->
         @livewireStyles

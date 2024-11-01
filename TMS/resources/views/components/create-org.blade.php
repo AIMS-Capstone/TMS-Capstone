@@ -163,7 +163,7 @@
                         <div class="flex flex-col w-80">
                             <div class="flex flex-col">
                                 <x-field-label for="email" value="{{ __('Email Address') }}" class="mb-2 text-left" />
-                                <x-input type="email" name="email" id="email" x-model="email" placeholder="Enter Email Address" onblur="validateEmail()"/>
+                                <x-input type="email" name="email" id="email" placeholder="Enter Email Address" onblur="validateEmail()"/>
                             </div>
                             <small id="validationMessage" class="text-red-600 text-sm"></small>
                         </div>
@@ -304,7 +304,7 @@
             </div>
     
                     <!-- Success Modal -->
-    <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50" x-cloak>
+    <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
         <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
             <div class="mb-4">
                 <svg class="w-12 h-12 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
