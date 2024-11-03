@@ -27,8 +27,8 @@ $table->enum('type', ['Non-individual', 'Individual']);
             $table->string('email');
             $table->string('tin');
             $table->foreignId('rdo')->nullable()->constrained('rdos')->nullOnDelete();
-$table->enum('tax_type', ['Percentage Tax', 'Value-Added Tax', 'Tax Exempt']);
-
+            $table->enum('tax_type', ['Percentage Tax', 'Value-Added Tax', 'Tax Exempt']);
+            $table->softDeletes(); 
             $table->date('registration_date');
             $table->date('start_date');
             $table->string('financial_year_end');

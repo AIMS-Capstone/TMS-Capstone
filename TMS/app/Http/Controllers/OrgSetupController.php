@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\OrgSetup;
+use App\Models\TaxReturn;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrgSetupController extends Controller
 {
@@ -28,8 +30,14 @@ class OrgSetupController extends Controller
         }
 
         $orgsetups = $query->paginate($perPage);
+        $unfiledTaxReturnsCount = TaxReturn::where('status', 'Unfiled')->count();
+        $filedTaxReturnsCount = TaxReturn::where('status', 'Filed')->count();
+        $orgSetupCount = OrgSetup::count();
+        $nonIndividualClients = OrgSetup::where('type', 'Non-Individual')->count();
+        $individualClients = OrgSetup::where('type', 'Individual')->count();
 
-        return view('org-setup', compact('orgsetups'));
+
+        return view('org-setup', compact('orgsetups', 'unfiledTaxReturnsCount', 'filedTaxReturnsCount', 'orgSetupCount', 'nonIndividualClients', 'individualClients'));
     }
 
     /**
@@ -83,8 +91,7 @@ class OrgSetupController extends Controller
 
             OrgSetup::create($validatedData);
 
-            return redirect()->route('org-setup')->with('success', 'Organization setup created successfully.');
-
+            return redirect()->back()->with('success', 'Organization setup created successfully.');
 
         } catch (ValidationException $e) {
             // Handle validation errors here
@@ -128,8 +135,15 @@ class OrgSetupController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(OrgSetup $orgSetup)
+    public function destroy(Request $request)
     {
-        //
+        $request->validate([
+            'organization_id' => 'required|exists:org_setups,id',
+        ]);
+    
+        $organization = OrgSetup::findOrFail($request->organization_id);
+        $organization->delete(); // Perform the deletion
+    
+        return redirect()->back()->with('success', 'Organization deleted successfully.');
     }
 }

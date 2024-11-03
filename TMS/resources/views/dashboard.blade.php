@@ -1,8 +1,5 @@
 <x-app-layout>
-    @php
-    $organizationId = session('organization_id');
-    $organization = \App\Models\OrgSetup::find($organizationId);
-@endphp
+    
 <div class="h-full bg-blue-900 p-10 mx-auto sm:px-6 lg:px-8">
     <div class="relative">
         <h1 class="text-amber-400 text-3xl font-bold">{{ $organization->registration_name }}</h1>
@@ -20,7 +17,7 @@
         <div class="bg-white shadow-md rounded-lg p-6 flex items-center justify-between">
             <!-- Total Filed -->
             <div class="flex items-center space-x-4">
-                <div class="bg-blue-900 text-white rounded-full h-12 w-12 flex items-center justify-center text-lg font-bold leading-none aspect-w-1 aspect-h-1">22</div>
+                <div class="bg-blue-900 text-white rounded-full h-12 w-12 flex items-center justify-center text-lg font-bold leading-none aspect-w-1 aspect-h-1">{{$filedTaxReturnCount}}</div>
                 <div>
                     <h2 class="text-zinc-600 font-bold">Total Filed</h2>
                     <p class="text-gray-500 text-xs">Total number of tax returns successfully submitted</p>
@@ -43,7 +40,7 @@
         <div class="bg-white shadow-md rounded-lg p-6 flex items-center justify-between">
             <!-- Total Sales -->
             <div class="flex items-center space-x-4">
-                <div class="bg-blue-900 text-white rounded-full h-12 w-12 flex items-center justify-center text-lg font-bold leading-none aspect-w-1 aspect-h-1">36</div>
+                <div class="bg-blue-900 text-white rounded-full h-12 w-12 flex items-center justify-center text-lg font-bold leading-none aspect-w-1 aspect-h-1">{{$totalSalesTransaction}}</div>
                 <div>
                     <h2 class="text-zinc-600 font-bold">Total Sales</h2>
                     <p class="text-gray-500 text-xs">Total number of sales-related transactions</p>

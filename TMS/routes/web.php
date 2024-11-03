@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CoaController;
 use App\Http\Controllers\ContactsController;
+use App\Http\Controllers\OrgAccountController;
 use App\Http\Controllers\TransactionsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomVerificationController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\GeneralLedgerController;
 use App\Http\Controllers\GeneralJournalController;
 use App\Http\Controllers\FinancialController;
 use App\Http\Controllers\PredictionController;
+use App\Http\Controllers\UserController;
 use App\Models\rdo;
 use App\Models\TaxReturn;
 
@@ -65,22 +67,23 @@ Route::middleware([
 
     Route::get('/org-setup', [OrgSetupController::class, 'index'])->name('org-setup');
     Route::post('/org-setup', [OrgSetupController::class, 'store'])->name('OrgSetup.store');
+    Route::post('/org-delete', [OrgSetupController::class, 'destroy'])->name('orgSetup.destroy');
+    Route::post('/org-account-destroy', [OrgAccountController::class, 'destroy'])->name('orgaccount.destroy');
+    Route::post('/user-account-destroy', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::post('/user-account-store', [UserController::class, 'store'])->name('users.store');
 
 
+    Route::post('/org_accounts', [OrgAccountController::class, 'store'])->name('org_accounts.store');
+    
     // Routes Requiring Organization Session
     Route::middleware([CheckOrganizationSession::class])->group(function () {
         // User Management
-        Route::get('/user-management', function () {
-            return view('user-management');
-        })->name('user-management');
-
+        Route::get('/user-management', [UserController::class, 'index'])->name('user-management');
         Route::get('/recycle-bin', function () {
             return view('recycle-bin');
         })->name('recycle-bin');
 
-        Route::get('/dashboard', function() {
-            return view('dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'showDashboard'])->name('dashboard');
 
         // Transactions Routes
         Route::get('/transactions', [TransactionsController::class, 'index'])->name('transactions');
@@ -153,6 +156,7 @@ Route::middleware([
         Route::get('/vat_report_pdf', function () {
             return view('tax_return.vat_report_pdf'); // Make sure to create this view file
         })->name('vat_report_pdf');
+
 
 
       

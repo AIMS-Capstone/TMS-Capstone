@@ -30,7 +30,7 @@
                             <div class="flex items-center mb-4">
                                 {{-- insert total org number --}}
                                 <div class="flex items-center justify-center w-12 h-12 bg-blue-900 text-white rounded-full text-2xl font-semibold aspect-w-1 aspect-h-1 sm:w-14 sm:h-14">
-                                    22
+                                   {{$orgSetupCount}}
                                 </div>
                                 <div class="ml-4">
                                     <div class="text-zinc-800 font-bold text-sm sm:text-base">Total Organizations</div>
@@ -43,7 +43,7 @@
                             <div class="flex items-center my-4">
                                 {{-- insert total number of all individual clients --}}
                                 <div class="flex items-center justify-center w-12 h-12 bg-blue-900 text-white rounded-full text-2xl font-semibold aspect-w-1 aspect-h-1 sm:w-14 sm:h-14">
-                                    5
+                                    {{$individualClients}}
                                 </div>
                                 <div class="ml-4">
                                     <div class="text-zinc-800 font-bold text-sm sm:text-base">Individual Clients</div>
@@ -56,7 +56,7 @@
                             <div class="flex items-center my-4">
                                 {{-- insert total number of non-individual clients --}}
                                 <div class="flex items-center justify-center w-12 h-12 bg-blue-900 text-white rounded-full text-2xl font-semibold aspect-w-1 aspect-h-1 sm:w-14 sm:h-14">
-                                    17
+                                    {{$nonIndividualClients}}
                                 </div>
                                 <div class="ml-4">
                                     <div class="text-zinc-800 font-bold text-sm sm:text-base">Non-Individual Clients</div>
@@ -68,7 +68,7 @@
                             <!-- Fourth Item -->
                             <div class="flex items-center my-4">
                                 <div class="flex items-center justify-center w-12 h-12 bg-blue-900 text-white rounded-full text-2xl font-semibold aspect-w-1 aspect-h-1 sm:w-14 sm:h-14">
-                                    36
+                                    {{$filedTaxReturnsCount}}
                                 </div>
                                 <div class="ml-4">
                                     <div class="text-zinc-800 font-bold text-sm sm:text-base">Filed Taxes</div>
@@ -80,7 +80,7 @@
                             <!-- Fifth Item -->
                             <div class="flex items-center my-4">
                                 <div class="flex items-center justify-center w-12 h-12 bg-blue-900 text-white rounded-full text-2xl font-semibold aspect-w-1 aspect-h-1 sm:w-14 sm:h-14">
-                                    19
+                                    {{$unfiledTaxReturnsCount}}
                                 </div>
                                 <div class="ml-4">
                                     <div class="text-zinc-800 font-bold text-sm sm:text-base">Unfiled Taxes</div>
@@ -184,10 +184,11 @@
                                                     <td class="text-left py-[7px] px-4 capitalize">{{ $organization->tax_type }}</td>
                                                     <td class="text-left py-[7px] px-4">{{ $organization->type }}</td>
                                                     <td class="text-left py-[7px] px-4">
-                                                        <span class="bg-zinc-100 text-zinc-800 text-xs font-medium me-2 px-4 py-2 rounded-full">No Account Yet</span>
-                                                        {{-- <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-4 py-2 rounded-full dark:bg-green-900 dark:text-green-300">Account Active</span> --}}
-                                                        {{-- lalagyan ng if-else; "Account Active" == may acc si client [nasa user management]; "No Account Yet" == walang acc si client--}}
-                                                        {{-- see display below kapag "No Account Yet" and status [DEFAULT STATUS AY No Account Yet]--}}
+                                                        @if ($organization->account) 
+                                                            <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-4 py-2 rounded-full">Account Active</span>
+                                                        @else
+                                                            <span class="bg-zinc-100 text-zinc-800 text-xs font-medium me-2 px-4 py-2 rounded-full">No Account Yet</span>
+                                                        @endif
                                                     </td>
                                                     <td class="relative text-left py-2 px-3">
                                                         <button type="button" id="dropdownMenuAction-{{ $organization->id }}" class="text-zinc-500 hover:text-zinc-700">
@@ -199,9 +200,18 @@
                                                             <div class="py-2 px-2 text-sm text-zinc-700" aria-labelledby="dropdownMenuAction">
                                                                 <div onclick="editOrganization('{{ $organization->id }}')" class="block px-4 py-2 w-full text-left hover-dropdown">Edit</div>
                                                                 {{-- Deafult selection in action button kapag status ay "No Account Yet" --}}
-                                                                <div onclick="createAccount('{{ $organization->id }}')" class="block px-4 py-2 w-full text-left hover-dropdown">Create Account</div>
-                                                                <div onclick="deleteOrganization('{{ $organization->id }}')" class="block px-4 py-2 w-full text-left hover-dropdown">Delete</div>
-                                                            </div>
+                                                                @if (!$organization->account)
+                                                                <div x-data 
+                                                                    x-on:click="$dispatch('open-generate-modal', { organizationId: '{{ $organization->id }}' })" class="block px-4 py-2 w-full text-left hover-dropdown">
+                                                                    Create Account
+                                                                </div>
+                                                            @endif
+                                                            <div 
+                                                            x-data 
+                                                            x-on:click="$dispatch('open-delete-modal', { organizationId: '{{ $organization->id }}', organizationName: '{{ $organization->registration_name }}' })"  
+                                                            class="block px-4 py-2 w-full text-left hover-dropdown text-red-500 cursor-pointer">
+                                                            Delete
+                                                        </div>
                                                         </div>
                                                     </td>
                                                 </form>
@@ -227,8 +237,61 @@
             </div>
         </div>
     </div>
+    <div x-data="{ open: false, organizationId: null }" 
+    @open-generate-modal.window="open = true; organizationId = $event.detail.organizationId" 
+    x-cloak>
+   <div x-show="open" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
+       <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+           <h2 class="text-lg font-semibold mb-4">Create Client Account</h2>
+           
+           <form method="POST" action="{{ route('org_accounts.store') }}">
+               @csrf
+               
+               <!-- Organization ID (hidden) -->
+               <input type="hidden" name="org_setup_id" :value="organizationId">
+
+             
+               <small class="text-gray-700 text-xs">The client must first provide their Email Address to the accounting firm in order to access their account. Creating an account for the client is optional, but once an account is created, relevant tax-related information will be reflected in the account, allowing the client to view and generate various reports.
+            </small>
+               <div class="mb-4">
+                   <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                   <input type="email" id="email" name="email" class="mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+               </div>
+
+
+
+               <div class="flex justify-end">
+                   <button type="button" @click="open = false" class="mr-4 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg">Cancel</button>
+                   <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg">Create Account</button>
+               </div>
+           </form>
+       </div>
+   </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div x-data="{ open: false, organizationId: null, organizationName: '' }" 
+    @open-delete-modal.window="open = true; organizationId = $event.detail.organizationId; organizationName = $event.detail.organizationName" 
+    x-cloak>
+    <div x-show="open" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h2 class="text-lg font-semibold mb-4">Are you sure?</h2>
+            <p class="mb-4">Do you really want to delete <strong x-text="organizationName"></strong>? This action cannot be undone.</p>
+            <div class="flex justify-end">
+                <button type="button" @click="open = false" class="mr-4 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg">Cancel</button>
+                <form method="POST" action="{{ route('orgSetup.destroy') }}" id="delete-form" class="inline">
+                    @csrf
+                    <input type="hidden" name="organization_id" :value="organizationId">
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
     <script>
         // FOR SORT BUTTON
+
         document.getElementById('sortButton').addEventListener('click', function() {
             const dropdown = document.getElementById('dropdownMenu');
             dropdown.classList.toggle('hidden');

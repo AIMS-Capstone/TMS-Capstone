@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrgSetup extends Model
 {
     use HasFactory;
+    use SoftDeletes;
     protected $table = 'org_setups';
 
     protected $fillable = [
@@ -28,7 +30,10 @@ class OrgSetup extends Model
         'start_date',
         'financial_year_end'
     ];
-    
+    public function account()
+    {
+        return $this->hasOne(OrgAccount::class, 'org_setup_id', 'id');
+    }
     public function rdo()
     {
         return $this->belongsTo(RDO::class, 'rdo');

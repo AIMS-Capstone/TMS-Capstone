@@ -11,37 +11,45 @@ class PredictionController extends Controller
 {
     public function getPredictions(Request $request)
     {
+        $currentYear = Carbon::now()->year;
+        $currentMonth = Carbon::now()->month;
+
         $organizationId = session('organization_id');
         // Retrieve financial metrics (if needed for internal use, not sent to Python)
         $totalRevenueCollected = DB::table('transactions')
             ->where('transaction_type', 'Sales')
             ->where('organization_id', $organizationId)
-            ->whereMonth('date', Carbon::now()->month) // Filter for the current month
+            ->whereYear('date', $currentYear)
+        ->whereMonth('date', $currentMonth)
             ->sum('total_amount');
 
         $totalTaxPaid = DB::table('transactions')
             ->where('Paidstatus', 'Paid')
-            ->whereMonth('date', Carbon::now()->month) // Filter for the current month
+            ->whereYear('date', $currentYear)
+            ->whereMonth('date', $currentMonth)
             ->where('organization_id', $organizationId)
             ->sum('vat_amount');
 
         $totalPurchasesMade = DB::table('transactions')
             ->where('transaction_type', 'Purchase')
-            ->whereMonth('date', Carbon::now()->month) // Filter for the current month
+            ->whereYear('date', $currentYear)
+            ->whereMonth('date', $currentMonth)
             ->where('organization_id', $organizationId)
             ->count();
+          
 
         $totalCostOfPurchases = DB::table('transactions')
             ->where('transaction_type', 'Purchase')
-            ->whereMonth('date', Carbon::now()->month) // Filter for the current month
+            ->whereYear('date', $currentYear)
+            ->whereMonth('date', $currentMonth)
             ->where('organization_id', $organizationId)
             ->sum('total_amount');
 
+           
             
 
             // Get the current year and month
-            $currentYear = Carbon::now()->year;
-            $currentMonth = Carbon::now()->month;
+         
             
             // Get tax counts for the last 12 months only
             $taxCounts = DB::table('transactions')

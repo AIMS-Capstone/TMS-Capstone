@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TaxReturn;
 use Illuminate\Http\Request;
 use App\Models\OrgSetup;
 use App\Models\Transactions;
@@ -9,20 +10,24 @@ use App\Models\Sales;
 
 class DashboardController extends Controller
 {
-    // public function show(Request $request, $orgId)
-    // {
-    //     // Fetch organization by ID
-    //     $organization = OrgSetup::find($orgId);
+    public function showDashboard(Request $request)
+    {
+        // Retrieve organization ID from the session
+        $organizationId = $request->session()->get('organization_id');
 
-    //     if (!$organization) {
-    //         return redirect()->route('org-setup')->with('error', 'Organization not found.');
-    //     }
+        // Retrieve organization details based on organization_id
+        $organization = OrgSetup::find($organizationId);
 
-    //     // Load organization-specific data
-    //     return view('dashboard', [
-    //         'organization' => $organization,
-    //         // 'transactions' => Transactions::where('org-setups_id', $orgId)->get(),
-    //     ]); 
-    // }
+        $filedTaxReturnCount = TaxReturn::where('status', 'Filed')
+        ->where('organization_id', $organizationId)
+        ->count();
+        $totalSalesTransaction = Transactions::where('transaction_type', 'Sales')
+        ->where('organization_id', $organizationId)
+        ->count();
+            
+
+    // Pass data to the view
+    return view('dashboard', compact('organization', 'filedTaxReturnCount', 'totalSalesTransaction'));
+    }
 }
 
