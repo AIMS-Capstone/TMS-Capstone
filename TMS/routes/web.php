@@ -147,6 +147,8 @@ Route::middleware([
 
     // Financial Reports Routing
         Route::get('/financial-reports', [FinancialController::class, 'financial'])->name('financial-reports');
+        Route::get('/financial/export-excel', [FinancialController::class, 'exportExcel'])->name('financial.exportExcel');
+
 
         Route::get('/vat_report_pdf', function () {
             return view('tax_return.vat_report_pdf'); // Make sure to create this view file

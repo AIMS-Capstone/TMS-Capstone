@@ -3,6 +3,13 @@
     $organizationId = session('organization_id');
     $organization = \App\Models\OrgSetup::find($organizationId);
     @endphp
+
+    {{-- Default date for initial export data --}}
+    @php
+        $currentYear = now()->year;
+        $currentMonth = now()->format('m'); 
+        $currentQuarter = 'Q' . ceil(now()->month / 3);
+    @endphp
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg" x-data="filterComponent()">
@@ -10,7 +17,7 @@
                 <div class="container mx-auto my-4 pt-4">
                     <div class="flex justify-between items-center px-10">
                         <p class="font-bold text-3xl text-left taxuri-color">Income Statement</p>
-                        <button type="button" class="flex items-center text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
+                        <button type="button" onclick="exportReportExcel()" class="flex items-center text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24">
                                 <path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
                             </svg>
@@ -33,53 +40,61 @@
                             </div>
 
                             <div class="flex items-center space-x-8">
-                                <div class="flex flex-col w-32">
-                                    <label for="period_select" class="font-bold text-blue-950">Period </label>
-                                    <select id="period_select" x-model="period" @change="updateYearAndMonthOptions" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
-                                        <option value="monthly">Monthly</option>
-                                        <option value="quarterly">Quarterly</option>
-                                        <option value="annually" selected>Annually</option>
-                                    </select>
-                                </div>
-                                <div class="h-8 border-l border-gray-200"></div>
-                                <!-- Year -->
-                                <div class="flex flex-col w-32">
-                                    <label for="year_select" class="font-bold text-blue-950">Year</label>
-                                    <select id="year_select" x-model="selectedYear" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
-                                        <template x-for="year in years" :key="year">
-                                            <option :value="year" x-text="year"></option>
-                                        </template>
-                                    </select>
-                                </div>
-                                <div class="h-8 border-l border-gray-200"></div>
-                                <!-- Quarter (Only visible if Quarterly is selected) -->
-                                <div class="flex flex-col w-32" x-show="period === 'quarterly'">
-                                    <label for="quarter_select" class="font-bold text-blue-950">Quarter</label>
-                                    <select id="quarter_select" x-model="selectedQuarter" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
-                                        <option value="Q1">1st Quarter</option>
-                                        <option value="Q2">2nd Quarter</option>
-                                        <option value="Q3">3rd Quarter</option>
-                                        <option value="Q4">4th Quarter</option>
-                                    </select>
-                                </div>
-                                <!-- Month (Only visible if Monthly is selected) -->
-                                <div class="flex flex-col w-32" x-show="period === 'monthly'">
-                                    <label for="month_select" class="font-bold text-blue-950">Month</label>
-                                    <select id="month_select" x-model="selectedMonth" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
-                                        <template x-for="month in months" :key="month.value">
-                                            <option :value="month.value" x-text="month.label"></option>
-                                        </template>
-                                    </select>
-                                </div>
-                                <!-- Status Filter -->
-                                <div class="flex flex-col w-32">
-                                    <label for="status_filter" class="font-bold text-blue-950">Status</label>
-                                    <select id="status_filter" name="status" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
-                                        <option value="">All</option>
-                                        <option value="draft">Draft</option>
-                                        <option value="posted">Posted</option>
-                                    </select>
-                                </div>
+                            <!-- Period -->
+                            <div class="flex flex-col w-32">
+                                <label for="period_select" class="font-bold text-blue-950">Period</label>
+                                <select id="period_select" x-model="period" @change="updateYearAndMonthOptions"
+                                        class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+                                    <option value="monthly">Monthly</option>
+                                    <option value="quarterly">Quarterly</option>
+                                    <option value="annually" selected>Annually</option>
+                                </select>
+                            </div>
+
+                            <!-- Year -->
+                            <div class="flex flex-col w-32">
+                                <label for="year_select" class="font-bold text-blue-950">Year</label>
+                                <select id="year_select" x-model="selectedYear"
+                                        class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+                                    <template x-for="year in years" :key="year">
+                                        <option :value="year" x-text="year"></option>
+                                    </template>
+                                </select>
+                            </div>
+
+                            <!-- Quarter (Only visible if Quarterly is selected) -->
+                            <div class="flex flex-col w-32" x-show="period === 'quarterly'">
+                                <label for="quarter_select" class="font-bold text-blue-950">Quarter</label>
+                                <select id="quarter_select" x-model="selectedQuarter"
+                                        class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+                                    <option value="Q1">1st Quarter</option>
+                                    <option value="Q2">2nd Quarter</option>
+                                    <option value="Q3">3rd Quarter</option>
+                                    <option value="Q4">4th Quarter</option>
+                                </select>
+                            </div>
+
+                            <!-- Month (Only visible if Monthly is selected) -->
+                            <div class="flex flex-col w-32" x-show="period === 'monthly'">
+                                <label for="month_select" class="font-bold text-blue-950">Month</label>
+                                <select id="month_select" x-model="selectedMonth"
+                                        class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+                                    <template x-for="month in months" :key="month.value">
+                                        <option :value="month.value" x-text="month.label"></option>
+                                    </template>
+                                </select>
+                            </div>
+
+                            <!-- Status Filter -->
+                            <div class="flex flex-col w-32">
+                                <label for="status_filter" class="font-bold text-blue-950">Status</label>
+                                <select id="status_filter" name="status"
+                                        class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+                                    
+                                    <option value="draft">Draft</option>
+                                    <option value="posted">Posted</option>
+                                </select>
+                            </div>
                             </div>
 
                             <!-- Filter Buttons -->
@@ -327,6 +342,7 @@
         async applyFilters() {
             let url = new URL(window.location.origin + window.location.pathname);
             url.searchParams.set('year', this.selectedYear);
+            url.searchParams.set('period', this.period);
 
             if (this.period === 'monthly') {
                 url.searchParams.set('month', this.selectedMonth);
@@ -395,5 +411,22 @@
         }
     };
 }
+    function exportReportExcel() {
+        // Set default values using PHP variables
+        const defaultYear = "{{ $currentYear }}";
+        const defaultMonth = "{{ $currentMonth }}";
+        const defaultQuarter = "{{ $currentQuarter }}";
+
+        // Get values from dropdowns or use defaults if not selected
+        const year = document.getElementById('year_select')?.value || defaultYear;
+        const month = document.getElementById('month_select') ? document.getElementById('month_select').value || defaultMonth : '';
+        const quarter = document.getElementById('quarter_select') ? document.getElementById('quarter_select').value || defaultQuarter : '';
+        const status = document.getElementById('status_filter')?.value || '';
+
+        // Build the URL with parameters
+        let url = `{{ route('financial.exportExcel') }}?year=${year}&month=${month}&quarter=${quarter}&status=${status}`;
+        
+        window.location.href = url;
+    }
 
 </script>
