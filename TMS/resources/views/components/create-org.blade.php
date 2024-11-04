@@ -303,24 +303,31 @@
 
             </div>
     
-                    <!-- Success Modal -->
-    <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
-        <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
-            <div class="mb-4">
-                <svg class="w-12 h-12 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12l2 2l4-4m0 6a9 9 0 1 0-6 0Z" />
-                </svg>
+            <div x-data="{ showModal: false }" x-init="@if(session('success')) showModal = true @endif">
+              
+          
+                 
+        
+                <!-- Success Modal -->
+                <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50" @click.outside="showModal = false; window.location.href='{{ route('org-setup') }}'">
+                    <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
+                        <div class="mb-4">
+                            <svg class="w-12 h-12 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2l4-4m0 6a9 9 0 1 0-6 0Z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold">Organization Added</h3>
+                        <p class="text-sm text-gray-600 mt-2">The organization has been successfully added! Go back to the setup page to continue.</p>
+                        <div class="flex justify-end">
+                            <button type="button" @click="showModal = false; window.location.href='{{ route('org-setup') }}'"       class="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Go to Org Setup</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <h3 class="text-lg font-semibold">Organization Added</h3>
-            <p class="text-sm text-gray-600 mt-2">The organization has been successfully added! Go back to the setup page to continue.</p>
-            <button @click="window.location.href='{{ url('/org-setup') }}'" 
-                    class="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-                Go to Setup
-            </button>
-        </div>
-    </div>
+                    
+  
         </form> 
     </div>
 

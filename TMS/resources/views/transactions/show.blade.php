@@ -415,59 +415,69 @@
 
     @endif
 </x-app-layout>
-
 <script>
-    function toggleSalesOptions(event) {
-        event.preventDefault(); // Prevent default action to avoid page refresh
-        const options = document.getElementById('salesOptions');
-        options.classList.toggle('hidden');
-    }
-
-    // Close the options if clicked outside
-    window.onclick = function(event) {
-        const options = document.getElementById('salesOptions');
-        const button = document.getElementById('salesOptionsButton');
-        if (!event.target.matches('#salesOptionsButton') && !button.contains(event.target)) {
-            options.classList.add('hidden');
+    document.addEventListener('DOMContentLoaded', function () {
+        
+        // Toggle Sales Options dropdown
+        function toggleSalesOptions(event) {
+            event.preventDefault(); // Prevent default action to avoid page refresh
+            const options = document.getElementById('salesOptions');
+            if (options) options.classList.toggle('hidden');
         }
-    }
-    function togglePurchaseOptions(event) {
-        const dropdown = document.getElementById('purchaseOptions');
-        dropdown.classList.toggle('hidden');
-        // Close other dropdowns if necessary
-        // You can also include logic to close this dropdown when clicking outside
-    }
 
-    // Optional: Add an event listener to close the dropdown when clicking outside
-    document.addEventListener('click', function (event) {
-        const button = document.getElementById('purchaseOptionsButton');
-        const dropdown = document.getElementById('purchaseOptions');
-        if (!button.contains(event.target) && !dropdown.contains(event.target)) {
-            dropdown.classList.add('hidden');
+        // Toggle Purchase Options dropdown
+        function togglePurchaseOptions(event) {
+            event.preventDefault();
+            const dropdown = document.getElementById('purchaseOptions');
+            if (dropdown) dropdown.classList.toggle('hidden');
         }
-    });
-    function toggleJournalOptions(event) {
-        // Prevent the default button action
-        event.preventDefault();
 
-        // Get the dropdown menu
-        const journalOptions = document.getElementById('journalOptions');
+        // Toggle Journal Options dropdown
+        function toggleJournalOptions(event) {
+            event.preventDefault();
+            const journalOptions = document.getElementById('journalOptions');
+            if (journalOptions) journalOptions.classList.toggle('hidden');
+        }
 
-        // Toggle the hidden class to show/hide the dropdown
-        journalOptions.classList.toggle('hidden');
-    }
-
-    // Close the dropdown if the user clicks outside of it
-    window.onclick = function(event) {
-        if (!event.target.matches('#journalOptionsButton')) {
-            const dropdowns = document.getElementsByClassName("absolute");
-            for (let i = 0; i < dropdowns.length; i++) {
-                const openDropdown = dropdowns[i];
-                if (!openDropdown.classList.contains('hidden')) {
-                    openDropdown.classList.add('hidden');
+        // Handle clicks outside of dropdowns to close them
+        document.addEventListener('click', function (event) {
+            const salesButton = document.getElementById('salesOptionsButton');
+            const salesOptions = document.getElementById('salesOptions');
+            const purchaseButton = document.getElementById('purchaseOptionsButton');
+            const purchaseOptions = document.getElementById('purchaseOptions');
+            const journalButton = document.getElementById('journalOptionsButton');
+            const journalOptions = document.getElementById('journalOptions');
+            
+            // Close Sales Options if click is outside
+            if (salesOptions && !salesOptions.classList.contains('hidden')) {
+                if (!salesButton.contains(event.target) && !salesOptions.contains(event.target)) {
+                    salesOptions.classList.add('hidden');
                 }
             }
-        }
-    }
 
+            // Close Purchase Options if click is outside
+            if (purchaseOptions && !purchaseOptions.classList.contains('hidden')) {
+                if (!purchaseButton.contains(event.target) && !purchaseOptions.contains(event.target)) {
+                    purchaseOptions.classList.add('hidden');
+                }
+            }
+
+            // Close Journal Options if click is outside
+            if (journalOptions && !journalOptions.classList.contains('hidden')) {
+                if (!journalButton.contains(event.target) && !journalOptions.contains(event.target)) {
+                    journalOptions.classList.add('hidden');
+                }
+            }
+        });
+
+        // Add event listeners to toggle buttons
+        const salesOptionsButton = document.getElementById('salesOptionsButton');
+        if (salesOptionsButton) salesOptionsButton.onclick = toggleSalesOptions;
+
+        const purchaseOptionsButton = document.getElementById('purchaseOptionsButton');
+        if (purchaseOptionsButton) purchaseOptionsButton.onclick = togglePurchaseOptions;
+
+        const journalOptionsButton = document.getElementById('journalOptionsButton');
+        if (journalOptionsButton) journalOptionsButton.onclick = toggleJournalOptions;
+    });
 </script>

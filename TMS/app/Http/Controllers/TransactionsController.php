@@ -24,8 +24,10 @@ class TransactionsController extends Controller
     public function index(Request $request) {
         $search = $request->input('search');
         $type = $request->input('type');
+        $organizationId = session('organization_id'); // Retrieve the organization_id from the session
     
-        $query = Transactions::with('contactDetails'); // Use new relationship name
+        $query = Transactions::with('contactDetails')
+            ->where('organization_id', $organizationId); // Filter by organization_id
     
         if ($search) {
             $query->where(function ($query) use ($search) {
@@ -45,7 +47,6 @@ class TransactionsController extends Controller
     
         return view('transactions', compact('transactions'));
     }
-    
     
 
     /**

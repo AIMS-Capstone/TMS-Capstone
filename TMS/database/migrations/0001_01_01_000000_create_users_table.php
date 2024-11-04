@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 return new class extends Migration
 {
@@ -16,8 +17,11 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('suffix')->nullable();
+            $table->string( 'middle_name')->nullable();
             $table->string('email')->unique();
+            $table->enum('role',['Admin','Accountant'])->default('Accountant');
             $table->timestamp('email_verified_at')->nullable();
+            $table->softDeletes(); 
             $table->string('password');
             $table->rememberToken();
             $table->foreignId('current_team_id')->nullable();
