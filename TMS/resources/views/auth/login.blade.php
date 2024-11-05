@@ -54,9 +54,9 @@
                 </x-auth-button>
             </div>
 
-            <p class="font-normal text-sm text-center mt-5 taxuri-text">Don't have an account yet? <a class="font-bold text-sm hover:text-gray-900 focus:outline-none" href="{{ route('register') }}">
+            {{-- <p class="font-normal text-sm text-center mt-5 taxuri-text">Don't have an account yet? <a class="font-bold text-sm hover:text-gray-900 focus:outline-none" href="{{ route('register') }}">
                 {{ __('Register Now') }}
-            </a>
+            </a> --}}
             
         </div>
         </form>

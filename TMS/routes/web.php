@@ -74,11 +74,12 @@ Route::middleware([
 
 
     Route::post('/org_accounts', [OrgAccountController::class, 'store'])->name('org_accounts.store');
+    // User Management
+    Route::get('/user-management', [UserController::class, 'index'])->name('user-management');
     
     // Routes Requiring Organization Session
     Route::middleware([CheckOrganizationSession::class])->group(function () {
-        // User Management
-        Route::get('/user-management', [UserController::class, 'index'])->name('user-management');
+        
         Route::get('/recycle-bin', function () {
             return view('recycle-bin');
         })->name('recycle-bin');

@@ -142,29 +142,29 @@
                             </span>
                         </h2>
                         @foreach ($predictions['projected_quarterly_purchase_cost'] as $index => $cost)
-        <p class="text-sm">Quarter {{ $index + 1 }} - ₱ {{ number_format($cost, 2) }}</p>
-    @endforeach
+                            <p class="text-sm">Quarter {{ $index + 1 }} - ₱ {{ number_format($cost, 2) }}</p>
+                        @endforeach
                         
                         <div class="absolute top-4 right-0 h-3/4 w-px bg-gray-300"></div>
                     </div>
                 
-          <!-- Projected Sales Revenue -->
-<div class="text-left text-zinc-700">
-    <h2 class="font-semibold flex items-center">
-        Projected Sales Revenue
-        <span class="ml-2 group relative">
-            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="cursor-pointer group-hover:opacity-100">
-                <path fill="#3f3f46" d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2"/>
-            </svg>
-            <div class="absolute left-1/2 transform -translate-x-1/2 p-4 mt-2 w-48 text-xs font-normal text-zinc-700 bg-white border border-zinc-300 rounded-lg shadow-lg opacity-0 transition-opacity duration-200 tooltip group-hover:opacity-100">
-                This data shows the projected sales figures, giving insight into the potential growth in revenue over the next few quarters.
-            </div>
-        </span>
-    </h2>
-    @foreach ($predictions['projected_quarterly_sales_revenue'] as $index => $revenue)
-        <p class="text-sm">Quarter {{ $index + 1 }} - ₱ {{ number_format($revenue, 2) }}</p>
-    @endforeach
-</div>
+                    <!-- Projected Sales Revenue -->
+                    <div class="text-left text-zinc-700">
+                        <h2 class="font-semibold flex items-center">
+                            Projected Sales Revenue
+                            <span class="ml-2 group relative">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="cursor-pointer group-hover:opacity-100">
+                                    <path fill="#3f3f46" d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2"/>
+                                </svg>
+                                <div class="absolute left-1/2 transform -translate-x-1/2 p-4 mt-2 w-48 text-xs font-normal text-zinc-700 bg-white border border-zinc-300 rounded-lg shadow-lg opacity-0 transition-opacity duration-200 tooltip group-hover:opacity-100">
+                                    This data shows the projected sales figures, giving insight into the potential growth in revenue over the next few quarters.
+                                </div>
+                            </span>
+                        </h2>
+                        @foreach ($predictions['projected_quarterly_sales_revenue'] as $index => $revenue)
+                            <p class="text-sm">Quarter {{ $index + 1 }} - ₱ {{ number_format($revenue, 2) }}</p>
+                        @endforeach
+                    </div>
 
                 </div>
 
@@ -361,7 +361,7 @@ const barData = {
         data: {
             labels: donutLabels, // Labels from PHP data
             datasets: [{
-                label: 'Purchase Counts',
+                label: '',
                 data: donutData, // Data from PHP data
                 backgroundColor: [
                     'rgba(255, 99, 132, 1)',

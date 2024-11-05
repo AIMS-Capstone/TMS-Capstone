@@ -38,7 +38,7 @@ class UserController extends Controller
         }
     
         // Paginate the results for users
-        $users = $userQuery->paginate(10);
+        $users = $userQuery->paginate(5);
     
         // Now query for clients from OrgAccount
         $clientQuery = OrgAccount::with('orgSetup');
@@ -59,7 +59,7 @@ class UserController extends Controller
         }
     
         // Paginate the results for clients
-        $clients = $clientQuery->paginate(10);
+        $clients = $clientQuery->paginate(5);
     
         // Return view with both users and clients
         return view('user-management', compact('users', 'clients'));
@@ -82,9 +82,9 @@ class UserController extends Controller
         // Validate incoming request
         $request->validate([
             'first_name' => 'required|string|max:255',
-            'middle_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
             'last_name' => 'required|string|max:255',
-            'suffix' => 'required|string|max:255',
+            'suffix' => 'nullable|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
         ]);
     

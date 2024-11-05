@@ -275,59 +275,31 @@
                         </span>
                     </button>
                 </div>
-
-                {{-- <!-- Success Modal -->
-                <div x-data="{ showModal: {{ session()->has('success') ? 'true' : 'false' }} }" x-show="showModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30" x-cloak>
+            </div>
+    
+            <!-- Success Modal -->
+            <div x-data="{ showModal: false }" x-init="@if(session('success')) showModal = true @endif" x-cloak x-effect="document.body.classList.toggle('overflow-hidden', showModal)">
+                <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50" @click.outside="showModal = false; window.location.href='{{ route('org-setup') }}'">
                     <div class="bg-white rounded-lg shadow-lg p-6 text-center max-w-lg w-full">
-                        <!-- Centered Image -->
                         <div class="flex justify-center mb-4">
-                            <img src="{{ asset('images/Ok-amico.png') }}" alt="Organization Added" class="w-40 h-40 mr-6">
+                            <img src="{{ asset('images/Success.png') }}" alt="Organization Added" class="w-28 h-28 mr-6">
                         </div>
-                        <h2 class="text-emerald-500 font-bold text-3xl whitespace-normal mb-4">Organization Added</h2>
-                        <p class="font-normal text-sm mb-4">The organization has been successfully<br>added! Go back to the Organizxations to open<br/> and start the session.</p>
+                        <h3 class="text-emerald-500 font-extrabold text-3xl whitespace-normal mb-4">Organization Added</h3>
+                        <p class="font-normal text-sm mb-4">The organization has been successfully<br> added! Go back to the Organizations to<br> open and start the session.</p>
                         <div class="flex items-center justify-center mt-4 mb-4">
-                            <button type="button" onclick="window.location.href='{{ route('org-setup') }}'" @click="showModal = false" class="inline-flex items-center w-48 justify-center py-2 bg-emerald-500 border border-transparent rounded-xl 
+                            <button type="button" @click="showModal = false; window.location.href='{{ route('org-setup') }}'" class="inline-flex items-center w-72 justify-center px-4 py-2 bg-emerald-500 border border-transparent rounded-xl 
                             font-bold text-sm text-white tracking-widest hover:bg-emerald-600 focus:bg-emerald-700 active:bg-emerald-700 focus:outline-none disabled:opacity-50 transition ease-in-out duration-150">
                                 {{ __('Go Back to Organizations') }} 
-                                <div class="ms-2 w-5 h-5 flex items-center justify-center border-2 border-white rounded-full">
+                                <div class="ml-2 w-5 h-5 flex items-center justify-center border-2 border-white rounded-full">
                                     <svg class="rtl:rotate-180 w-3.5 h-3.5 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
                                     </svg>
                                 </div>
-                            </button>
-                        </div>
-                    </div>
-                </div> --}}
-
-                
-
-            </div>
-    
-            <div x-data="{ showModal: false }" x-init="@if(session('success')) showModal = true @endif">
-              
-          
-                 
-        
-                <!-- Success Modal -->
-                <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50" @click.outside="showModal = false; window.location.href='{{ route('org-setup') }}'">
-                    <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
-                        <div class="mb-4">
-                            <svg class="w-12 h-12 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2l4-4m0 6a9 9 0 1 0-6 0Z" />
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-semibold">Organization Added</h3>
-                        <p class="text-sm text-gray-600 mt-2">The organization has been successfully added! Go back to the setup page to continue.</p>
-                        <div class="flex justify-end">
-                            <button type="button" @click="showModal = false; window.location.href='{{ route('org-setup') }}'"       class="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Go to Org Setup</button>
+                            </button>                        
                         </div>
                     </div>
                 </div>
             </div>
-                    
-  
         </form> 
     </div>
 

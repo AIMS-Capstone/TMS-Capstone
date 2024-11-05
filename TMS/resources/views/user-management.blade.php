@@ -123,20 +123,20 @@
                                 <th class="text-left py-3 px-4 font-semibold text-sm">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-zinc-200 text-sm text-zinc-700 overflow-y-auto">
+                        <tbody class="divide-y divide-zinc-200 text-sm text-zinc-700 overflow-y-auto py-2 px-4">
                             @forelse ($users as $user)
                                 <tr id="user-{{ $user->id }}" class="hover:bg-slate-100 cursor-pointer">
-                                    <td class="text-left py-[7px] px-4">{{ $user->first_name }} {{ $user->last_name }}</td>
-                                    <td class="text-left py-[7px] px-4">{{ $user->email }}</td>
-                                    <td class="text-left py-[7px] px-4">
+                                    <td class="text-left py-2 px-4">{{ $user->first_name }} {{ $user->last_name }}</td>
+                                    <td class="text-left py-2 px-4">{{ $user->email }}</td>
+                                    <td class="text-left py-2 px-4">
                                         @if ($user->role == "Admin")
-                                        <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-4 py-2 rounded-full dark:bg-green-900 dark:text-green-300">Admin</span>
+                                        <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-4 py-2 rounded-full">Admin</span>
                                     @else
-                                        <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-4 py-2 rounded-full dark:bg-green-900 dark:text-green-300">Accountant</span>
+                                        <span class="bg-gray-100 text-gray-700 text-xs font-medium me-2 px-4 py-2 rounded-full">Accountant</span>
                                     @endif
                                     
                                     </td>
-                              <td class="text-left py-[7px] px-4">{{ $user->created_at->format('F j, Y') }}</td>
+                                    <td class="text-left py-2 px-4">{{ $user->created_at->format('F j, Y') }}</td>
                                     <td class="relative text-left py-2 px-3">
                                         <button type="button" id="dropdownMenuAction-{{ $user->id }}" class="text-zinc-500 hover:text-zinc-700">
                                             <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
@@ -156,7 +156,7 @@
                             @empty
                                 <tr>
                                     <td colspan="5" class="text-center p-2">
-                                        <img src="{{ asset('images/no-account.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                        <img src="{{ asset('images/no-account.png') }}" alt="No data available" class="mx-auto w-48 h-48" />
                                         <h1 class="font-extrabold">No Account yet</h1>
                                         <p class="text-sm text-neutral-500 mt-2">Start creating accounts with the <br> + Add Account button.</p>
                                     </td>
@@ -168,7 +168,8 @@
                 </div>
             </div>
         </div>
-             {{-- Client Users Table/Tab --}}
+
+{{-- Client Users Table/Tab --}}
 <div id="tab-client-content" role="tabpanel" aria-labelledby="tab-client" class="flex flex-col md:flex-row justify-between">
     <div class="w-full mt-8 ml-0 max-h-[500px] border border-zinc-300 rounded-lg p-4 bg-white">
         <div class="flex flex-row items-center">
@@ -280,7 +281,7 @@
                     @if($clients->isEmpty())
                         <tr>
                             <td colspan="5" class="text-center p-2">
-                                <img src="{{ asset('images/Box.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                <img src="{{ asset('images/Box.png') }}" alt="No data available" class="mx-auto w-48 h-48" />
                                 <h1 class="font-extrabold">No Client Users yet</h1>
                                 <p class="text-sm text-neutral-500 mt-2">Start creating accounts with the <br> + Add Account button.</p>
                             </td>
@@ -347,36 +348,33 @@ x-cloak>
                 <input type="email" id="email" name="email" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
             </div>
             <div class="flex justify-end">
-                <button type="button" @click="open = false" class="mr-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg px-4 py-2">Cancel</button>
-                <button type="submit" class="bg-blue-900 text-white rounded-lg px-4 py-2">Submit</button>
+                <button type="button" @click="open = false" class="mr-2 font-semibold text-zinc-700 px-3 py-1 rounded-md hover:text-zinc-900 transition">Cancel</button>
+                <button type="submit" class="bg-blue-900 text-white hover:bg-blue-950 rounded-lg px-3 py-2">Add Account</button>
             </div>
         </form>
     </div>
 </div>
 
 </div>
-<div x-data="{ showModal: false }" x-init="@if(session('success')) showModal = true @endif">
-              
-          
-                 
-    
+{{-- Success Modal --}}
+<div x-data="{ showModal: false }" x-init="@if(session('success')) showModal = true @endif" x-cloak x-effect="document.body.classList.toggle('overflow-hidden', showModal)">
     <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50" @click.outside="showModal = false; " x-cloak>
-        <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
-            <div class="mb-4">
-                <svg class="w-12 h-12 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12l2 2l4-4m0 6a9 9 0 1 0-6 0Z" />
+        <div class="relative bg-white rounded-lg shadow-lg p-6 text-center w-96">
+             <!-- Close Button at Top Right -->
+             <button @click="showModal = false;" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none">
+                <svg class="w-6 h-6" fill="#d1d5db" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
+            </button>
+            <div class="flex justify-center align-middle mb-4">
+                <img src="{{ asset('images/Success.png') }}" alt="Account Added" class="w-28 h-28">
             </div>
-            <h3 class="text-lg font-semibold">Account Added</h3>
-            <p class="text-sm text-gray-600 mt-2"> {{ session('success') }}</p>
-            <div class="flex justify-end">
-                <button type="button" @click="showModal = false;"       class="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Close</button>
-            </div>
+            <h3 class="text-emerald-500 font-extrabold text-3xl whitespace-normal mb-4">Account Added</h3>
+            <p class="font-normal text-sm mb-4"> {{ session('success') }}</p>
         </div>
     </div>
 </div>
+
         
 <!-- Delete Confirmation Modal for User (Accountant) -->
 <div x-data="{ open: false, userId: null, userName: '' }" 

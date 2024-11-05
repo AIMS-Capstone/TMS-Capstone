@@ -181,7 +181,7 @@
                                                     <td class="text-left py-[7px] px-4">
                                                         {{ $organization->registration_name }}<br/>{{ $organization->tin }}
                                                     </td>
-                                                    <td class="text-left py-[7px] px-4 capitalize">{{ $organization->tax_type }}</td>
+                                                    <td class="text-left py-[7px] px-4">{{ $organization->tax_type }}</td>
                                                     <td class="text-left py-[7px] px-4">{{ $organization->type }}</td>
                                                     <td class="text-left py-[7px] px-4">
                                                         @if ($organization->account) 
@@ -198,7 +198,7 @@
                                                         </button>
                                                         <div id="dropdownAction-{{ $organization->id }}" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-40 origin-top-right overflow-hidden max-h-64 overflow-y-auto">
                                                             <div class="py-2 px-2 text-sm text-zinc-700" aria-labelledby="dropdownMenuAction">
-                                                                <div onclick="editOrganization('{{ $organization->id }}')" class="block px-4 py-2 w-full text-left hover-dropdown">Edit</div>
+                                                                {{-- <div onclick="editOrganization('{{ $organization->id }}')" class="block px-4 py-2 w-full text-left hover-dropdown">Edit</div> --}}
                                                                 {{-- Deafult selection in action button kapag status ay "No Account Yet" --}}
                                                                 @if (!$organization->account)
                                                                 <div x-data 
