@@ -5,25 +5,12 @@
     @endphp
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <nav class="text-sm font-medium text-gray-600 dark:text-slate-300 mb-6" aria-label="breadcrumb">
-                <ol class="flex flex-wrap items-center gap-1">
-                    <li class="flex items-center gap-1">
-                        <a href="{{ route('dashboard') }}" class="hover:text-black dark:hover:text-white">Home</a>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2" stroke="currentColor" class="size-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                        </svg>
-                    </li>
-                    <li class="flex items-center gap-1">
-                        <a href="{{ route('sales-book') }}" class="hover:text-blue-950 dark:hover:text-white {{ request()->routeIs('sales-book') ? 'breadcumb-active' : '' }}">Sales Book Journal</a>
-                    </li>
-                </ol>
-            </nav>
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg" x-data="filterComponent()">
 
                 <div class="container mx-auto my-4 pt-4">
                     <div class="flex justify-between items-center px-10">
                         <p class="font-bold text-3xl text-left taxuri-color">Sales Book Journal</p>
-                        <button type="button" class="flex items-center text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
+                        <button type="button" onclick="exportReportExcel()" class="flex items-center text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24">
                                 <path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
                             </svg>
@@ -120,11 +107,11 @@
                             <!-- Filter Buttons -->
                             <div class="h-8 border-l border-gray-200"></div>
                             <div class="flex items-center space-x-4">
-                                <button @click="applyFilters" class="flex items-center bg-white border border-gray-300 rounded-md px-4 py-2 whitespace-nowrap">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 32 32">
+                                <button @click="applyFilters" class="flex items-center bg-white border border-gray-300 hover:border-green-500 hover:text-green-500 transition rounded-md px-4 py-2 whitespace-nowrap">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 hover:border-green-500 hover:text-green-500 transition" viewBox="0 0 32 32">
                                         <path fill="#949494" d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5z"/>
                                     </svg>
-                                    <span class="text-sm text-gray-600">Add Filter</span>
+                                    <span class="text-sm text-gray-600 hover:border-green-500 hover:text-green-500 transition">Add Filter</span>
                                 </button>
                                 <button @click="resetFilters" class="text-sm text-gray-600 whitespace-nowrap">
                                     Clear all filters
@@ -230,7 +217,6 @@
                                             placeholder="Search..."
                                             @input.debounce="$el.form.requestSubmit()"
                                             @search="$el.form.requestSubmit()"
-                                            value="{{ request('search') }}"
                                         >
                                     </form>
                                     <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
@@ -305,7 +291,6 @@
                                         <tr>
                                             <td colspan="8" class="text-center p-6">
                                                 <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
-                                                <h1
                                                 <h1 class="font-extrabold mt-4">No Sales Posted Transactions Available</h1>
                                                 <p class="text-sm text-neutral-500 mt-2">You can start adding new sales transactions by <br> going to the transactions page.</p>
                                             </td>
@@ -434,7 +419,7 @@
 </x-app-layout>
 
 <script>
-    function filterComponent() {
+function filterComponent() {
     return {
         period: 'annually',
         selectedYear: new Date().getFullYear(),
@@ -489,11 +474,11 @@
         getFormattedDate() {
             if (this.period === 'monthly' && this.selectedMonth) {
                 const month = this.months.find(m => m.value === this.selectedMonth).label;
-                return `${month} 01, ${this.selectedYear}`;
+                return ` as of ${month} 01, ${this.selectedYear}`;
             } else if (this.period === 'quarterly' && this.selectedQuarter) {
-                return `${this.selectedQuarter}, ${this.selectedYear}`;
+                return ` as of ${this.selectedQuarter}, ${this.selectedYear}`;
             } else {
-                return `January 01, ${this.selectedYear}`;
+                return ` as of January 01, ${this.selectedYear}`;
             }
         },
         async applyFilters() {
@@ -519,8 +504,8 @@
             .then(html => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                const newTableContent = doc.querySelector('#transaction-table').innerHTML;
-                document.querySelector('#transaction-table').innerHTML = newTableContent;
+                const newTableContent = doc.querySelector('#sales-posted-table').innerHTML;
+                document.querySelector('#sales-posted-table').innerHTML = newTableContent;
             })
             .catch(error => console.error('Error fetching data:', error));
         },
@@ -554,11 +539,51 @@
             .then(html => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                const newTableContent = doc.querySelector('#transaction-table').innerHTML;
-                document.querySelector('#transaction-table').innerHTML = newTableContent;
+                const newTableContent = doc.querySelector('#sales-posted-table').innerHTML;
+                document.querySelector('#sales-posted-table').innerHTML = newTableContent;
             })
             .catch(error => console.error('Error resetting data:', error));
         }
     };
 }
+
+    function exportReportExcel() {
+        const period = document.getElementById('period_select')?.value || 'annually';
+        const year = document.getElementById('year_select')?.value || '';
+        const month = (period === 'monthly') ? document.getElementById('month_select')?.value || '' : '';
+        const quarter = (period === 'quarterly') ? document.getElementById('quarter_select')?.value || '' : '';
+        const status = document.getElementById('status_filter')?.value || '';
+        const startMonth = (quarter) ? getQuarterStartMonth(quarter) : '';
+        const endMonth = (quarter) ? getQuarterEndMonth(quarter) : '';
+
+        // Build the URL for export
+        let url = `{{ route('sales-posted.exportExcel') }}?year=${year}&month=${month}&period=${period}&quarter=${quarter}&start_month=${startMonth}&end_month=${endMonth}&status=${status}`;
+        
+        // Log URL for debugging
+        console.log("Export URL:", url);
+
+        // Redirect to the generated URL for download
+        window.location.href = url;
+    }
+
+    // Helper functions to get the start and end months for each quarter
+    function getQuarterStartMonth(quarter) {
+        const quarters = {
+            Q1: '01',
+            Q2: '04',
+            Q3: '07',
+            Q4: '10'
+        };
+        return quarters[quarter] || '';
+    }
+
+    function getQuarterEndMonth(quarter) {
+        const quarters = {
+            Q1: '03',
+            Q2: '06',
+            Q3: '09',
+            Q4: '12'
+        };
+        return quarters[quarter] || '';
+    }
 </script>

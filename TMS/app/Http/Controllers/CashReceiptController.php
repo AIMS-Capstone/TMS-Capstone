@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transactions;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\CashReceiptExport;
+use App\Exports\CashReceiptPostedExport;
 use Illuminate\Http\Request;
 
 class CashReceiptController extends Controller
@@ -19,6 +22,7 @@ class CashReceiptController extends Controller
         // Query to fetch only draft Cash Receipt transactions
         $query = Transactions::where('status', 'draft')
             ->where('Paidstatus', 'Paid')
+            ->where('transaction_type', 'Sales')
             ->with('contactDetails');
 
         if ($year) {
@@ -61,6 +65,7 @@ class CashReceiptController extends Controller
         // Query to fetch only posted Cash Receipt transactions
         $query = Transactions::where('status', 'posted')
             ->where('Paidstatus', 'Paid')
+            ->where('transaction_type', 'Sales')
             ->with('contactDetails');
 
         if ($year) {
@@ -102,6 +107,7 @@ class CashReceiptController extends Controller
         // Update the status of the selected transactions to 'posted'
         Transactions::whereIn('id', $request->ids)
             ->where('Paidstatus', 'Paid')
+            ->where('transaction_type', 'Sales')
             ->update(['status' => 'posted']);
 
         // Return a JSON response indicating success
@@ -120,9 +126,89 @@ class CashReceiptController extends Controller
         // Update the status of the selected transactions to 'draft'
         Transactions::whereIn('id', $request->ids)
             ->where('Paidstatus', 'Paid')
+            ->where('transaction_type', 'Sales')
             ->update(['status' => 'draft']);
 
         // Return a JSON response indicating success
         return response()->json(['message' => 'Selected transactions have been marked as draft.']);
     }
+    public function exportCashReceipt(Request $request)
+    {
+        $year = $request->query('year');
+        $period = $request->query('period', 'annually');
+        $month = ($period === 'monthly') ? $request->query('month') : null;
+        $quarter = ($period === 'quarterly') ? $request->query('quarter') : null;
+        $status = $request->query('status', 'draft');
+
+        // Calculate start and end months if quarterly period is selected
+        $startMonth = null;
+        $endMonth = null;
+
+        if ($period === 'quarterly' && $quarter) {
+            switch ($quarter) {
+                case 'Q1':
+                    $startMonth = '01';
+                    $endMonth = '03';
+                    break;
+                case 'Q2':
+                    $startMonth = '04';
+                    $endMonth = '06';
+                    break;
+                case 'Q3':
+                    $startMonth = '07';
+                    $endMonth = '09';
+                    break;
+                case 'Q4':
+                    $startMonth = '10';
+                    $endMonth = '12';
+                    break;
+            }
+        }
+
+        // Pass period, startMonth, and endMonth along with other parameters to the export
+        return Excel::download(
+            new CashReceiptExport($year, $month, $startMonth, $endMonth, $status, $period, $quarter),
+            'cash_receipt.xlsx'
+        );
+    }
+    public function exportCashReceiptPosted(Request $request)
+    {
+        $year = $request->query('year');
+        $period = $request->query('period', 'annually');
+        $month = ($period === 'monthly') ? $request->query('month') : null;
+        $quarter = ($period === 'quarterly') ? $request->query('quarter') : null;
+        $status = $request->query('status', 'posted');
+
+        // Calculate start and end months if quarterly period is selected
+        $startMonth = null;
+        $endMonth = null;
+
+        if ($period === 'quarterly' && $quarter) {
+            switch ($quarter) {
+                case 'Q1':
+                    $startMonth = '01';
+                    $endMonth = '03';
+                    break;
+                case 'Q2':
+                    $startMonth = '04';
+                    $endMonth = '06';
+                    break;
+                case 'Q3':
+                    $startMonth = '07';
+                    $endMonth = '09';
+                    break;
+                case 'Q4':
+                    $startMonth = '10';
+                    $endMonth = '12';
+                    break;
+            }
+        }
+
+        // Pass period, startMonth, and endMonth along with other parameters to the export
+        return Excel::download(
+            new CashReceiptPostedExport($year, $month, $startMonth, $endMonth, $status, $period, $quarter),
+            'cash_receipt_posted.xlsx'
+        );
+    }
+
 }

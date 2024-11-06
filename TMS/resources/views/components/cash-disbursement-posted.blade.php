@@ -5,25 +5,12 @@
     @endphp
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <nav class="text-sm font-medium text-gray-600 dark:text-slate-300 mb-6" aria-label="breadcrumb">
-                <ol class="flex flex-wrap items-center gap-1">
-                    <li class="flex items-center gap-1">
-                        <a href="{{ route('dashboard') }}" class="hover:text-black dark:hover:text-white">Home</a>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2" stroke="currentColor" class="size-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                        </svg>
-                    </li>
-                    <li class="flex items-center gap-1">
-                        <a href="{{ route('cash-disbursement') }}" class="hover:text-blue-950 dark:hover:text-white {{ request()->routeIs('cash-disbursement') ? 'breadcumb-active' : '' }}">cash Book </a>
-                    </li>
-                </ol>
-            </nav>
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg" x-data="filterComponent()">
 
                 <div class="container mx-auto my-4 pt-4">
                     <div class="flex justify-between items-center px-10">
                         <p class="font-bold text-3xl text-left taxuri-color">Cash Disbursement Book </p>
-                        <button type="button" class="flex items-center text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
+                        <button type="button" onclick="exportReportExcel()" class="flex items-center text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24">
                                 <path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
                             </svg>
@@ -32,7 +19,7 @@
                     </div>
                     <div class="flex justify-between items-center px-10">
                         <div class="flex items-center">            
-                            <p class="font-normal text-sm">This book houses all the Cash Disbursement entered in the Transactions Module.</p>
+                            <p class="font-normal text-sm">This book houses all the invoices that are marked as paid in the Transactions Module.</p>
                         </div>
                     </div>  
                     <hr class="mt-6">
@@ -520,8 +507,8 @@
             .then(html => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                const newTableContent = doc.querySelector('#transaction-table').innerHTML;
-                document.querySelector('#transaction-table').innerHTML = newTableContent;
+                const newTableContent = doc.querySelector('#cash-posted-table').innerHTML;
+                document.querySelector('#cash-posted-table').innerHTML = newTableContent;
             })
             .catch(error => console.error('Error fetching data:', error));
         },
@@ -555,11 +542,48 @@
             .then(html => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                const newTableContent = doc.querySelector('#transaction-table').innerHTML;
-                document.querySelector('#transaction-table').innerHTML = newTableContent;
+                const newTableContent = doc.querySelector('#cash-posted-table').innerHTML;
+                document.querySelector('#cash-posted-table').innerHTML = newTableContent;
             })
             .catch(error => console.error('Error resetting data:', error));
         }
     };
 }
+
+    function exportReportExcel() {
+        const period = document.getElementById('period_select')?.value || 'annually';
+        const year = document.getElementById('year_select')?.value || '';
+        const month = (period === 'monthly') ? document.getElementById('month_select')?.value || '' : '';
+        const quarter = (period === 'quarterly') ? document.getElementById('quarter_select')?.value || '' : '';
+        const status = document.getElementById('status_filter')?.value || '';
+        const startMonth = (quarter) ? getQuarterStartMonth(quarter) : '';
+        const endMonth = (quarter) ? getQuarterEndMonth(quarter) : '';
+
+        // Build the URL for export
+        let url = `{{ route('cash_disbursement-posted.exportExcel') }}?year=${year}&month=${month}&period=${period}&quarter=${quarter}&start_month=${startMonth}&end_month=${endMonth}&status=${status}`;
+
+        // Redirect to the generated URL for download
+        window.location.href = url;
+    }
+
+    // Helper functions to get the start and end months for each quarter
+    function getQuarterStartMonth(quarter) {
+        const quarters = {
+            Q1: '01',
+            Q2: '04',
+            Q3: '07',
+            Q4: '10'
+        };
+        return quarters[quarter] || '';
+    }
+
+    function getQuarterEndMonth(quarter) {
+        const quarters = {
+            Q1: '03',
+            Q2: '06',
+            Q3: '09',
+            Q4: '12'
+        };
+        return quarters[quarter] || '';
+    }
 </script>
