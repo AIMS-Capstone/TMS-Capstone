@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transactions;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\GeneralLedgerExport;
 use Illuminate\Http\Request;
 
 class GeneralLedgerController extends Controller
@@ -53,5 +55,45 @@ class GeneralLedgerController extends Controller
 
     return view('general-ledger', compact('transactions', 'totalDebit', 'totalCredit'));
 }
+
+    public function exportExcel(Request $request)
+    {
+        $year = $request->query('year');
+        $period = $request->query('period', 'annually');
+        $month = ($period === 'monthly') ? $request->query('month') : null;
+        $quarter = ($period === 'quarterly') ? $request->query('quarter') : null;
+        $status = $request->query('status', 'draft');
+
+        // Calculate start and end months if quarterly period is selected
+        $startMonth = null;
+        $endMonth = null;
+
+        if ($period === 'quarterly' && $quarter) {
+            switch ($quarter) {
+                case 'Q1':
+                    $startMonth = '01';
+                    $endMonth = '03';
+                    break;
+                case 'Q2':
+                    $startMonth = '04';
+                    $endMonth = '06';
+                    break;
+                case 'Q3':
+                    $startMonth = '07';
+                    $endMonth = '09';
+                    break;
+                case 'Q4':
+                    $startMonth = '10';
+                    $endMonth = '12';
+                    break;
+            }
+        }
+
+        // Pass period, startMonth, and endMonth along with other parameters to the export
+        return Excel::download(
+            new GeneralLedgerExport($year, $month, $startMonth, $endMonth, $status, $period, $quarter),
+            'general_ledger.xlsx'
+        );
+    }
 
 }

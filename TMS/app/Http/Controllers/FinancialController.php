@@ -11,7 +11,7 @@ use Carbon\Carbon;
 class FinancialController extends Controller
 {
 
-    private function getQuarterMonths($quarter)
+private function getQuarterMonths($quarter)
 {
     switch ($quarter) {
         case 'Q1':
@@ -35,66 +35,71 @@ private function getFinancialData(Request $request)
     $period = $request->input('period', 'annually');  
     $status = $request->input('status', 'draft');
 
-
     $query = Transactions::with(['taxRows.coaAccount']);
-
     $query->whereYear('date', $year);
 
-
-        if ($period === 'monthly' && $month) {
-            $query->whereMonth('date', $month);
-        } elseif ($period === 'quarterly' && $quarter) {
-            [$startMonth, $endMonth] = $this->getQuarterMonths($quarter);
-            $query->whereMonth('date', '>=', $startMonth)
-                ->whereMonth('date', '<=', $endMonth);
-        }
+    if ($period === 'monthly' && $month) {
+        $query->whereMonth('date', $month);
+    } elseif ($period === 'quarterly' && $quarter) {
+        [$startMonth, $endMonth] = $this->getQuarterMonths($quarter);
+        $query->whereMonth('date', '>=', $startMonth)
+            ->whereMonth('date', '<=', $endMonth);
+    }
 
     if ($status) {
-    $query->where('status', $status);
+        $query->where('status', $status);
     }
 
     $transactions = $query->get();
 
-        // Aggregating revenue and cost of sales
-        $totalRevenue = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.type', 'Revenue'))->sum('amount') ?? 0;
-        $totalCostOfSales = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.type', 'Sales'))->sum('amount') ?? 0;
+    // Aggregate total revenue (including Sales as a subtype of Revenue)
+    $totalRevenue = $transactions->flatMap(fn($transaction) =>
+        $transaction->taxRows->where('coaAccount.type', 'Revenue')
+    )->sum('amount') ?? 0;
 
-        // Manually summing specific sub-expenses
-        $rentalTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'Rental')->where('coaAccount.type', 'Expense'))->sum('amount') ?? 0;
-        $depreciationTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'Depreciation')->where('coaAccount.type', 'Expense'))->sum('amount') ?? 0;
-        $managementFeeTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'Management and Consultancy Fee')->where('coaAccount.type', 'Expense'))->sum('amount') ?? 0;
-        $officeSuppliesTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'Office Supplies')->where('coaAccount.type', 'Expense'))->sum('amount') ?? 0;
-        $professionalFeesTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'Professional Fees')->where('coaAccount.type', 'Expense'))->sum('amount') ?? 0;
-        $representationTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'Representation and Entertainment')->where('coaAccount.type', 'Expense'))->sum('amount') ?? 0;
-        $researchDevelopmentTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'Research and Development')->where('coaAccount.type', 'Expense'))->sum('amount') ?? 0;
-        $salariesAllowancesTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'Salaries and Allowances')->where('coaAccount.type', 'Expense'))->sum('amount') ?? 0;
-        $contributionsTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'SSS, GSIS, PhilHealth, HDMF and Other Contributions')->where('coaAccount.type', 'Expense'))->sum('amount') ?? 0;
+    // Aggregate cost of goods sold (COGS), specifically under Expenses with sub-type 'Cost of Goods Sold'
+    $totalCostOfSales = $transactions->flatMap(fn($transaction) =>
+        $transaction->taxRows->where('coaAccount.type', 'Expenses')
+            ->where('coaAccount.sub_type', 'Cost of Goods Sold')
+    )->sum('amount') ?? 0;
 
-        // Summing all other expenses as "Others"
-        $otherExpensesTotal = $transactions->flatMap(function ($transaction) {
-            return $transaction->taxRows->where('coaAccount.type', 'Expense')
-                ->whereNotIn('coaAccount.sub_type', [
-                    'Rental', 'Depreciation', 'Management and Consultancy Fee', 'Office Supplies', 'Professional Fees',
-                    'Representation and Entertainment', 'Research and Development', 'Salaries and Allowances',
-                    'SSS, GSIS, PhilHealth, HDMF and Other Contributions',
-                ]);
-        })->sum('amount') ?? 0;
+    // Manually summing specific operating expenses
+    $rentalTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'Rental')->where('coaAccount.type', 'Expenses'))->sum('amount') ?? 0;
+    $depreciationTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'Depreciation')->where('coaAccount.type', 'Expenses'))->sum('amount') ?? 0;
+    $managementFeeTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'Management and Consultancy Fee')->where('coaAccount.type', 'Expenses'))->sum('amount') ?? 0;
+    $officeSuppliesTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'Office Supplies')->where('coaAccount.type', 'Expenses'))->sum('amount') ?? 0;
+    $professionalFeesTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'Professional Fees')->where('coaAccount.type', 'Expenses'))->sum('amount') ?? 0;
+    $representationTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'Representation and Entertainment')->where('coaAccount.type', 'Expenses'))->sum('amount') ?? 0;
+    $researchDevelopmentTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'Research and Development')->where('coaAccount.type', 'Expenses'))->sum('amount') ?? 0;
+    $salariesAllowancesTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'Salaries and Allowances')->where('coaAccount.type', 'Expenses'))->sum('amount') ?? 0;
+    $contributionsTotal = $transactions->flatMap(fn($transaction) => $transaction->taxRows->where('coaAccount.sub_type', 'SSS, GSIS, PhilHealth, HDMF and Other Contributions')->where('coaAccount.type', 'Expenses'))->sum('amount') ?? 0;
 
-        $totalOperatingExpenses = $rentalTotal + $depreciationTotal + $managementFeeTotal + $officeSuppliesTotal +
-            $professionalFeesTotal + $representationTotal + $researchDevelopmentTotal +
-            $salariesAllowancesTotal + $contributionsTotal + $otherExpensesTotal;
+    // Summing all other expenses as "Others"
+    $otherExpensesTotal = $transactions->flatMap(function ($transaction) {
+        return $transaction->taxRows->where('coaAccount.type', 'Expenses')
+            ->whereNotIn('coaAccount.sub_type', [
+                'Rental', 'Depreciation', 'Management and Consultancy Fee', 'Office Supplies', 'Professional Fees',
+                'Representation and Entertainment', 'Research and Development', 'Salaries and Allowances',
+                'SSS, GSIS, PhilHealth, HDMF and Other Contributions', 'Cost of Goods Sold',
+            ]);
+    })->sum('amount') ?? 0;
 
-        $grossProfit = $totalRevenue - $totalCostOfSales;
-        $netIncome = $grossProfit - $totalOperatingExpenses;
+    $totalOperatingExpenses = $rentalTotal + $depreciationTotal + $managementFeeTotal + $officeSuppliesTotal +
+        $professionalFeesTotal + $representationTotal + $researchDevelopmentTotal +
+        $salariesAllowancesTotal + $contributionsTotal + $otherExpensesTotal;
 
-        // Return all calculated data
-        return compact(
-            'totalRevenue', 'totalCostOfSales', 'rentalTotal', 'depreciationTotal', 'managementFeeTotal',
-            'officeSuppliesTotal', 'professionalFeesTotal', 'representationTotal', 'researchDevelopmentTotal',
-            'salariesAllowancesTotal', 'contributionsTotal', 'otherExpensesTotal', 'totalOperatingExpenses',
-            'grossProfit', 'netIncome'
-        );
-    }
+    $grossProfit = $totalRevenue - $totalCostOfSales;
+    $netIncome = $grossProfit - $totalOperatingExpenses;
+
+    // Return all calculated data
+    return compact(
+        'totalRevenue', 'totalCostOfSales', 'rentalTotal', 'depreciationTotal', 'managementFeeTotal',
+        'officeSuppliesTotal', 'professionalFeesTotal', 'representationTotal', 'researchDevelopmentTotal',
+        'salariesAllowancesTotal', 'contributionsTotal', 'otherExpensesTotal', 'totalOperatingExpenses',
+        'grossProfit', 'netIncome'
+    );
+}
+
         // Render Financial Report View
     public function financial(Request $request)
     {

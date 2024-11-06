@@ -23,7 +23,7 @@
                 <div class="container mx-auto my-4 pt-4">
                     <div class="flex justify-between items-center px-10">
                         <p class="font-bold text-3xl text-left taxuri-color">General Journal </p>
-                        <button type="button" class="flex items-center text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
+                        <button type="button" onclick="exportReportExcel()" class="flex items-center text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24">
                                 <path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
                             </svg>
@@ -311,14 +311,43 @@
         }
     };
 }
+    function exportReportExcel() {
+        const period = document.getElementById('period_select')?.value || 'annually';
+        const year = document.getElementById('year_select')?.value || '';
+        const month = (period === 'monthly') ? document.getElementById('month_select')?.value || '' : '';
+        const quarter = (period === 'quarterly') ? document.getElementById('quarter_select')?.value || '' : '';
+        const status = document.getElementById('status_filter')?.value || '';
+        const startMonth = (quarter) ? getQuarterStartMonth(quarter) : '';
+        const endMonth = (quarter) ? getQuarterEndMonth(quarter) : '';
 
-        function toggleCheckboxes() {
-            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-                checkbox.checked = this.checkAll;
-            });
-        }
+        // Build the URL for export
+        let url = `{{ route('journal.exportExcel') }}?year=${year}&month=${month}&period=${period}&quarter=${quarter}&start_month=${startMonth}&end_month=${endMonth}&status=${status}`;
+        
+        // Log URL for debugging
+        console.log("Export URL:", url);
 
-        document.addEventListener('search', event => {
-            window.location.href = `?search=${event.detail.search}`;
-        });
+        // Redirect to the generated URL for download
+        window.location.href = url;
+    }
+
+    // Helper functions to get the start and end months for each quarter
+    function getQuarterStartMonth(quarter) {
+        const quarters = {
+            Q1: '01',
+            Q2: '04',
+            Q3: '07',
+            Q4: '10'
+        };
+        return quarters[quarter] || '';
+    }
+
+    function getQuarterEndMonth(quarter) {
+        const quarters = {
+            Q1: '03',
+            Q2: '06',
+            Q3: '09',
+            Q4: '12'
+        };
+        return quarters[quarter] || '';
+    }
 </script>
