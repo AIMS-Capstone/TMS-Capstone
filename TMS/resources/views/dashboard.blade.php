@@ -51,7 +51,7 @@
             <!-- Total Purchases -->
             <div class="flex items-center space-x-4 lg:pl-6">
                 <div class="text-blue-900 text-xl rounded-full flex items-center justify-center font-bold">
-                    87
+                    
                 </div>
                 <div>
                     <h2 class="text-zinc-600 font-bold">Total Purchases</h2>
@@ -59,29 +59,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Right Metric Card -->
-        {{-- <div class="bg-white shadow-md rounded-lg p-6 flex items-center justify-between">
-            <!-- Total Sales -->
-            <div class="flex items-center space-x-4">
-                <div class="bg-blue-900 text-white rounded-full h-12 w-12 flex items-center justify-center text-lg font-bold leading-none aspect-w-1 aspect-h-1">{{$totalSalesTransaction}}</div>
-                <div>
-                    <h2 class="text-zinc-600 font-bold">Total Sales</h2>
-                    <p class="text-gray-500 text-xs">Total number of sales-related transactions</p>
-                </div>
-            </div>
-
-            <div class="h-12 border-l border-gray-200 mx-6"></div>
-            
-            <!-- Total Purchases -->
-            <div class="flex items-center space-x-4">
-                <div class="bg-blue-900 text-white rounded-full h-12 w-12 flex items-center justify-center text-lg font-bold leading-none aspect-w-1 aspect-h-1">87</div>
-                <div>
-                    <h2 class="text-zinc-600 font-bold">Total Purchases</h2>
-                    <p class="text-gray-500 text-xs">Total number of purchase-related transactions</p>
-                </div>
-            </div>
-        </div> --}}
     </div>
 </div>
 
