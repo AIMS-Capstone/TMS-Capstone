@@ -31,7 +31,7 @@
                     @if ($page == $currentPage)
                         {{-- Current Page --}}
                         <li>
-                            <span class="inline-flex items-center text-xs justify-center w-6 h-6 bg-sky-900 text-white rounded-full">{{ $page }}</span>
+                            <span class="inline-flex items-center text-xs justify-center w-6 h-6 bg-blue-900 text-white rounded-full">{{ $page }}</span>
                         </li>
                     @elseif (
                         $page == 1 || 

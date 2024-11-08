@@ -13,11 +13,9 @@ class UserController extends Controller
     /**
      * Display a listing of the users.
      */
-    public function index(Request $request)
-    {
-        // Get search and status input
+    public function user(Request $request) {
+        
         $userSearch = $request->input('user_search'); // Change to user_search for clarity
-        $clientSearch = $request->input('client_search'); // New search parameter for clients
         $status = $request->input('status');
     
         // Start building the query for active users
@@ -39,6 +37,16 @@ class UserController extends Controller
     
         // Paginate the results for users
         $users = $userQuery->paginate(5);
+        return view('user-management', compact('users'));
+    }
+    public function client(Request $request){
+        $clientSearch = $request->input('client_search'); // New search parameter for clients
+        $status = $request->input('status');
+    
+        // Start building the query for active users
+ 
+    
+
     
         // Now query for clients from OrgAccount
         $clientQuery = OrgAccount::with('orgSetup');
@@ -62,8 +70,9 @@ class UserController extends Controller
         $clients = $clientQuery->paginate(5);
     
         // Return view with both users and clients
-        return view('user-management', compact('users', 'clients'));
-    }
+        return view('user-management-client', compact( 'clients'));
+
+    } 
         
 
     /**

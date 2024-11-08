@@ -34,42 +34,25 @@
                         </div>
                     </div> 
 
-                    {{-- <nav class="flex gap-x-4 overflow-x-auto justify-center mt-4" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
-                        <button type="button" class="py-3 px-4 inline-flex items-center gap-x-4 text-sm font-medium text-center text-gray-500 hover:text-blue-900"
-                            id="tab-acc"
-                            role="tab"
-                            aria-selected="true"
-                            onclick="activateTab('tab-acc')">
-                            Accountant Users
-                        </button>
-                        <button type="button" class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium text-center text-gray-500 hover:text-blue-900"
-                            id="tab-client"
-                            role="tab"
-                            aria-selected="false"
-                            onclick="activateTab('tab-client')">
-                            Client Users
-                        </button>
-                    </nav> --}}
                     <div class="flex gap-x-4 overflow-x-auto justify-center mt-4">
-                        <div x-data="{ selectedTab: 'Accountant Users' }" class="w-full">
-                            <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-24 overflow-x-auto  border-neutral-300" role="tablist" aria-label="tab options">
-                                <button @click="selectedTab = 'Accountant Users'" :aria-selected="selectedTab === 'Accountant Users'" 
-                                :tabindex="selectedTab === 'Accountant Users' ? '0' : '-1'" 
-                                :class="selectedTab === 'Accountant Users' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900'   : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'" 
-                                class="h-min py-2 text-base" 
-                                type="button"
-                                role="tab" 
-                                aria-controls="tabpanelAccountantUsers" >Accountant Users</button>
-
-                                <a href="{{ route('user-management.client') }}">
-                                    <button @click="selectedTab = 'Client Users'" :aria-selected="selectedTab === 'Client Users'" 
-                                    :tabindex="selectedTab === 'Client Users' ? '0' : '-1'" 
-                                    :class="selectedTab === 'Client Users' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900'   : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'"
+                        <div x-data="{ selectedTab: 'Client Users' }" class="w-full">
+                            <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-24 overflow-x-auto  border-neutral-300 dark:border-neutral-700" role="tablist" aria-label="tab options">
+                                <a href="{{ route('user-management.user') }}">
+                                    <button @click="selectedTab = 'Accountant Users'" :aria-selected="selectedTab === 'Accountant Users'" 
+                                    :tabindex="selectedTab === 'Accountant Users' ? '0' : '-1'" 
+                                    :class="selectedTab === 'Accountant Users' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'" 
                                     class="h-min py-2 text-base" 
-                                    type="button" 
+                                    type="button"
                                     role="tab" 
-                                    aria-controls="tabpanelClientUsers" >Client Users</button>
+                                    aria-controls="tabpanelAccountantUsers" >Accountant Users</button>
                                 </a>
+                                <button @click="selectedTab = 'Client Users'" :aria-selected="selectedTab === 'Client Users'" 
+                                :tabindex="selectedTab === 'Client Users' ? '0' : '-1'" 
+                                :class="selectedTab === 'Client Users' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'"
+                                class="h-min py-2 text-base" 
+                                type="button" 
+                                role="tab" 
+                                aria-controls="tabpanelClientUsers" >Client Users</button>
                             </div>
                         </div>  
                     </div>
@@ -77,130 +60,10 @@
                     <hr class="mx-1 mt-auto">
 
         {{-- Accountant Users Table/Tab --}}
-    <div id="tab-acc-content" role="tabpanel" aria-labelledby="tab-acc" class="flex flex-col md:flex-row justify-between">
-        <div class="w-full mt-8 ml-0 max-h-[500px] border border-zinc-300 rounded-lg p-4 bg-white">
-            <div class="flex flex-row items-center">
-                <!-- Search row -->
-                <div class="relative w-80 p-5">
-                    <form action="{{ url()->current() }}" method="GET" role="search" aria-label="Table" autocomplete="off">
-                        <input type="hidden" name="tab" value="accountant"> <!-- Hidden field to retain tab state -->
-                        <input 
-                            type="search" 
-                            name="user_search" 
-                            class="w-full pl-10 pr-4 py-2 text-sm border border-zinc-300 rounded-lg focus:outline-none focus:ring-sky-900 focus:border-sky-900" 
-                            aria-label="Search Term" 
-                            placeholder="Search..." 
-                            @input.debounce="$el.form.requestSubmit()" 
-                            @search="$el.form.requestSubmit()"
-                        >
-                    </form>
-                    
-                    <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-zinc-400"></i>
-                </div>
-
-        
-                    <!-- Sort by dropdown -->
-                    <div class="relative inline-block text-left sm:w-auto">
-                        <button id="sortButton" class="flex items-center text-zinc-600 w-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
-                                <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
-                            </svg>
-                            <span id="selectedOption" class="font-normal text-md text-zinc-700 truncate">Sort by</span>
-                        </button>
-
-                        <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
-                            <div class="py-2 px-2">
-                                <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
-                                <div data-sort="recently-added" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
-                                <div data-sort="ascending" class="block px-4 py-2 w-full text-sm hover-dropdown">Ascending</div>
-                                <div data-sort="descending" class="block px-4 py-2 w-full text-sm hover-dropdown">Descending</div>
-                            </div>
-                        </div>
-                    </div>
-
-        
-                    {{-- Right side: Set as Session button and Dropdown --}}
-                    <div class="ml-auto flex flex-row items-center space-x-4">
-                        <div class="relative inline-block space-x-4 text-left sm:w-auto">
-                            <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" class="flex items-center text-zinc-500 hover:text-zinc-700" type="button">
-                                <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
-                                    <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
-                                </svg>
-                            </button>
-                            <div id="dropdownDots" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-44 origin-top-right">
-                                <div class="py-2 px-2 text-sm text-zinc-700" aria-labelledby="dropdownMenuIconButton">
-                                    <span class="block px-4 py-2 text-sm font-bold text-zinc-700 text-left">Show Entries</span>
-                                    <div onclick="setEntries(5)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">5 per page</div>
-                                    <div onclick="setEntries(25)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">25 per page</div>
-                                    <div onclick="setEntries(50)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">50 per page</div>
-                                    <div onclick="setEntries(100)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">100 per page</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-        
-                <hr class="border-zinc-300 w-[calc(100%+2rem)] mx-[-1rem]">
-            
-                <div class="my-4 overflow-y-auto max-h-[500px]">
-                    <table class="min-w-full bg-white" id="tableid1">
-                        <thead class="bg-zinc-100 text-zinc-700 font-extrabold sticky top-0">
-                            <tr>
-                                <th class="text-left py-3 px-4 font-semibold text-sm">Name</th>
-                                <th class="text-left py-3 px-4 font-semibold text-sm">Email Address</th>
-                                <th class="text-left py-3 px-4 font-semibold text-sm">Account Type</th>
-                                <th class="text-left py-3 px-4 font-semibold text-sm">Date Created</th>
-                                <th class="text-left py-3 px-4 font-semibold text-sm">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-zinc-200 text-sm text-zinc-700 overflow-y-auto py-2 px-4">
-                            @forelse ($users as $user)
-                                <tr id="user-{{ $user->id }}" class="hover:bg-slate-100 cursor-pointer">
-                                    <td class="text-left py-2 px-4">{{ $user->first_name }} {{ $user->last_name }}</td>
-                                    <td class="text-left py-2 px-4">{{ $user->email }}</td>
-                                    <td class="text-left py-2 px-4">
-                                        @if ($user->role == "Admin")
-                                        <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-4 py-2 rounded-full">Admin</span>
-                                    @else
-                                        <span class="bg-gray-100 text-gray-700 text-xs font-medium me-2 px-4 py-2 rounded-full">Accountant</span>
-                                    @endif
-                                    
-                                    </td>
-                                    <td class="text-left py-2 px-4">{{ $user->created_at->format('F j, Y') }}</td>
-                                    <td class="relative text-left py-2 px-3">
-                                        <button type="button" id="dropdownMenuAction-{{ $user->id }}" class="text-zinc-500 hover:text-zinc-700">
-                                            <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
-                                                <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
-                                            </svg>
-                                        </button>
-                                        <div id="dropdownAction-{{ $user->id }}" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-32 origin-top-right overflow-hidden max-h-64 overflow-y-auto">
-                                            <div 
-                                            x-data 
-                                            x-on:click="$dispatch('open-delete-user-modal', { userId: '{{ $user->id }}', userName: '{{ $user->first_name }} {{ $user->last_name }}' })"  
-                                            class="block px-4 py-2 w-full text-left hover-dropdown text-red-500 cursor-pointer">
-                                            Delete
-                                        </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="text-center p-2">
-                                        <img src="{{ asset('images/no-account.png') }}" alt="No data available" class="mx-auto w-48 h-48" />
-                                        <h1 class="font-extrabold">No Account yet</h1>
-                                        <p class="text-sm text-neutral-500 mt-2">Start creating accounts with the <br> + Add Account button.</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                    {{ $users->appends(request()->input())->links('vendor.pagination.custom') }}
-                </div>
-            </div>
-        </div>
+    
 
 {{-- Client Users Table/Tab --}}
-{{-- <div id="tab-client-content" role="tabpanel" aria-labelledby="tab-client" class="flex flex-col md:flex-row justify-between">
+<div id="tab-client-content" role="tabpanel" aria-labelledby="tab-client" class="flex flex-col md:flex-row justify-between">
     <div class="w-full mt-8 ml-0 max-h-[500px] border border-zinc-300 rounded-lg p-4 bg-white">
         <div class="flex flex-row items-center">
             <!-- Search row -->
@@ -335,7 +198,7 @@
             {{ $clients->appends(request()->input())->links('vendor.pagination.custom') }}
         </div>
     </div>
-</div> --}}
+</div>
 
                 </div>
             </div>
@@ -359,84 +222,9 @@ x-cloak>
        </div>
    </div>
 </div>
-<!-- Add Account Modal -->
-<div x-data="{ open: false }" 
-     @open-add-account-modal.window="open = true" 
-     x-show="open" 
-     class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center" 
-     x-cloak>
-    <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-        <h2 class="text-lg font-semibold mb-4">Add New Account</h2>
-        <form id="addAccountForm" method="POST" action="{{ route('users.store') }}">
-            @csrf
-            <div class="mb-4">
-                <label for="first_name" class="block text-sm font-medium text-gray-700">First Name</label>
-                <input type="text" id="first_name" name="first_name" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
-            </div>
-            <div class="mb-4">
-                <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
-                <input type="text" id="last_name" name="last_name" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
-            </div>
-            <div class="mb-4">
-                <label for="suffix" class="block text-sm font-medium text-gray-700">Suffix</label>
-                <input type="text" id="suffix" name="suffix" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
-            </div>
-            <div class="mb-4">
-                <label for="middle_name" class="block text-sm font-medium text-gray-700">Middle Name</label>
-                <input type="text" id="middle_name" name="middle_name" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
-            </div>
-            <div class="mb-4">
-                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" id="email" name="email" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
-            </div>
-            <div class="flex justify-end">
-                <button type="button" @click="open = false" class="mr-2 font-semibold text-zinc-700 px-3 py-1 rounded-md hover:text-zinc-900 transition">Cancel</button>
-                <button type="submit" class="bg-blue-900 text-white hover:bg-blue-950 rounded-lg px-3 py-2">Add Account</button>
-            </div>
-        </form>
-    </div>
-</div>
 
 </div>
-{{-- Success Modal -- may problem kapag nasa Client tab --}}
-{{-- <div x-data="{ showModal: false }" x-init="@if(session('success')) showModal = true @endif" x-cloak x-effect="document.body.classList.toggle('overflow-hidden', showModal)">
-    <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50" @click.outside="showModal = false; " x-cloak>
-        <div class="relative bg-white rounded-lg shadow-lg p-6 text-center w-96">
-             <!-- Close Button at Top Right -->
-             <button @click="showModal = false;" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none">
-                <svg class="w-6 h-6" fill="#d1d5db" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-            <div class="flex justify-center align-middle mb-4">
-                <img src="{{ asset('images/Success.png') }}" alt="Account Added" class="w-28 h-28">
-            </div>
-            <h3 class="text-emerald-500 font-extrabold text-3xl whitespace-normal mb-4">Account Added</h3>
-            <p class="font-normal text-sm mb-4"> {{ session('success') }}</p>
-        </div>
-    </div>
-</div> --}}
 
-        
-<!-- Delete Confirmation Modal for User (Accountant) -->
-<div x-data="{ open: false, userId: null, userName: '' }" 
-     @open-delete-user-modal.window="open = true; userId = $event.detail.userId; userName = $event.detail.userName" 
-     x-cloak>
-    <div x-show="open" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
-        <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h2 class="text-lg font-semibold mb-4">Are you sure?</h2>
-            <p class="mb-4">Do you really want to delete <strong x-text="userName"></strong>? This action cannot be undone.</p>
-            <div class="flex justify-end">
-                <button type="button" @click="open = false" class="mr-4 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg">Cancel</button>
-                <form method="POST" action="{{ route('users.destroy') }}" id="delete-form" class="inline">
-                    @csrf
-                    <input type="hidden" name="user_id" :value="userId">
-                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg">Delete</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
     <script>
         // TAB Activation Function
      // Function to activate a tab based on the provided tab ID
@@ -604,31 +392,31 @@ document.addEventListener('DOMContentLoaded', initializeTabs);
         });
     
         // FOR SHOWING/SETTING ENTRIES - Accountant TAB
-//         function setEntries(entries) {
-//     const form = document.createElement('form');
-//     form.method = 'GET';
-//     form.action = "{{ route('user-management/user') }}"; // Ensure this matches your route name
+        // function setEntries(entries) {
+        //     const form = document.createElement('form');
+        //     form.method = 'GET';
+        //     form.action = "{{ route('user-management') }}"; // Ensure this matches your route name
 
-//     // Input for number of entries per page
-//     const perPageInput = document.createElement('input');
-//     perPageInput.type = 'hidden';
-//     perPageInput.name = 'perPage'; // Make sure this matches your controller's expected input
-//     perPageInput.value = entries;
+        //     // Input for number of entries per page
+        //     const perPageInput = document.createElement('input');
+        //     perPageInput.type = 'hidden';
+        //     perPageInput.name = 'perPage'; // Make sure this matches your controller's expected input
+        //     perPageInput.value = entries;
 
-//     // Input for search term (user search)
-//     const searchInput = document.createElement('input');
-//     searchInput.type = 'hidden';
-//     searchInput.name = 'user_search'; // Make sure this matches your controller's expected input
-//     searchInput.value = "{{ request('user_search') }}"; // Correcting to 'user_search'
+        //     // Input for search term (user search)
+        //     const searchInput = document.createElement('input');
+        //     searchInput.type = 'hidden';
+        //     searchInput.name = 'user_search'; // Make sure this matches your controller's expected input
+        //     searchInput.value = "{{ request('user_search') }}"; // Correcting to 'user_search'
 
-//     // Append inputs to form
-//     form.appendChild(perPageInput);
-//     form.appendChild(searchInput);
+        //     // Append inputs to form
+        //     form.appendChild(perPageInput);
+        //     form.appendChild(searchInput);
 
-//     // Append form to the document and submit
-//     document.body.appendChild(form);
-//     form.submit();
-// }
+        //     // Append form to the document and submit
+        //     document.body.appendChild(form);
+        //     form.submit();
+        // }
 
     
         // FOR CLIENT

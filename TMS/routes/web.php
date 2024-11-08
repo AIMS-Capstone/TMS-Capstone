@@ -75,7 +75,9 @@ Route::middleware([
 
     Route::post('/org_accounts', [OrgAccountController::class, 'store'])->name('org_accounts.store');
     // User Management
-    Route::get('/user-management', [UserController::class, 'index'])->name('user-management');
+    // Route::get('/user-management', [UserController::class, 'index'])->name('user-management');
+    Route::get('/user-management/user', [UserController::class, 'user'])->name('user-management.user');
+    Route::get('/user-management/client', [UserController::class, 'client'])->name('user-management.client');
     
     // Routes Requiring Organization Session
     Route::middleware([CheckOrganizationSession::class])->group(function () {

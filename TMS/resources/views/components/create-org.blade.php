@@ -288,7 +288,7 @@
                         <p class="font-normal text-sm mb-4">The organization has been successfully<br> added! Go back to the Organizations to<br> open and start the session.</p>
                         <div class="flex items-center justify-center mt-4 mb-4">
                             <button type="button" @click="showModal = false; window.location.href='{{ route('org-setup') }}'" class="inline-flex items-center w-72 justify-center px-4 py-2 bg-emerald-500 border border-transparent rounded-xl 
-                            font-bold text-sm text-white tracking-widest hover:bg-emerald-600 focus:bg-emerald-700 active:bg-emerald-700 focus:outline-none disabled:opacity-50 transition ease-in-out duration-150">
+                            font-bold text-sm text-white hover:bg-emerald-600 focus:bg-emerald-700 active:bg-emerald-700 focus:outline-none disabled:opacity-50 transition ease-in-out duration-150">
                                 {{ __('Go Back to Organizations') }} 
                                 <div class="ml-2 w-5 h-5 flex items-center justify-center border-2 border-white rounded-full">
                                     <svg class="rtl:rotate-180 w-3.5 h-3.5 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">

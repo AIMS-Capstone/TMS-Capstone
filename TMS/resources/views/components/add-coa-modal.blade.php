@@ -8,7 +8,7 @@
     x-cloak
     >
     <!-- Modal background -->
-    <div class="fixed inset-0 bg-gray-300 opacity-60"></div>
+    <div class="fixed inset-0 bg-gray-400 opacity-50"></div>
 
     <!-- Modal container -->
     <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden">
@@ -31,7 +31,7 @@
                         </label>
                         <input type="text" name="account_type_input" id="accountTypeInput" required
                             placeholder="Expense | Ordinary Allowance Itemized Deductions"
-                            class="peer py-2.5 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none">
+                            class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                         <p class="text-[10px] opacity-75 px-1">Enter in the format: Type | Sub Type</p>
                     </div>
                     <!-- Account Code -->
@@ -40,7 +40,7 @@
                             Code <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="code" id="code" required
-                            maxlength="10" class="peer py-2.5 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none">
+                            maxlength="10" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                         <p class="text-[10px] opacity-75 px-1">Unique code/number for this account (limited 10 characters)</p>
                     </div>
                 </div>
@@ -51,7 +51,7 @@
                         Name <span class="text-red-500">*</span>
                     </label>
                     <input type="text" name="name" id="name" required
-                        maxlength="150" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none">
+                        maxlength="150" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                     <p class="text-xs opacity-75 px-1">A short title for this account (limited 150 characters)</p>
                 </div>
 
@@ -61,7 +61,7 @@
                         Description
                     </label>
                     <input type="text" name="description" id="description"  
-                        maxlength="100" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none">
+                        maxlength="100" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                     <p class="text-xs opacity-75 px-1">A description of how this account should be used</p>
                 </div>
 
@@ -69,7 +69,7 @@
                 <div class="flex justify-end my-4">
                     <button 
                         x-on:click="$dispatch('close-modal')"
-                        class="mr-2 font-semibold text-zinc-700 px-3 py-1 rounded-md hover:bg-zinc-300 hover:text-white transition">
+                        class="mr-2 font-semibold text-zinc-600 px-3 py-1 rounded-md hover:text-zinc-900 transition">
                         Cancel
                     </button>
                     <button 

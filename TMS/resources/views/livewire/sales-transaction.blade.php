@@ -233,8 +233,8 @@ $('#select_contact').on('change', function() {
                         </div>
                     </div>
                     <div class="flex justify-end items-center mt-6 gap-4">
-                        <button type="button" class="text-gray-600 font-semibold" wire:click="closeModal">Cancel</button>
-                        <button type="submit" class="bg-blue-900 text-white py-2 px-6 font-bold text-md rounded-lg">Save</button>
+                        <button type="button" class="font-semibold text-zinc-700 px-3 py-1 rounded-md hover:text-zinc-900 transition" wire:click="closeModal">Cancel</button>
+                        <button type="submit" class="font-semibold bg-blue-900 text-white text-center px-6 py-1.5 rounded-md hover:bg-blue-950 border-blue-900 hover:text-white transition">Save</button>
                     </div>
                 </form>
             `;

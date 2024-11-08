@@ -8,7 +8,7 @@
     x-cloak
 >
     <!-- Modal background -->
-    <div class="fixed inset-0 bg-gray-300 opacity-20"></div>
+    <div class="fixed inset-0"></div>
 
     <!-- Modal container -->
     <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden">
@@ -34,21 +34,21 @@
                 <div class="mb-5 flex justify-between items-start">
                     <!-- COA Type -->
                     <div class="w-2/3 pr-4">
-                        <label for="coaType" class="block text-sm font-bold text-gray-700">Account Type</label>
+                        <label for="coaType" class="block text-sm font-bold text-zinc-700">Account Type</label>
                         <input 
                             type="text" 
                             id="coaType" 
                             name="account_type_input" 
                             x-bind:value="coa.sub_type ? `${coa.type} | ${coa.sub_type}` : coa.type" 
-                            class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0" 
+                            class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
                             required 
                             placeholder="Expense | Ordinary Allowance Itemized Deductions"
                         >
                     </div>
                     <!-- COA Code -->
                     <div class="w-1/3 text-left">
-                        <label for="coaCode" class="block text-sm font-bold text-gray-700">Code</label>
-                        <input type="text" id="coaCode" name="code" x-model="coa.code" class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" 
+                        <label for="coaCode" class="block text-sm font-bold text-zinc-700">Code</label>
+                        <input type="text" id="coaCode" name="code" x-model="coa.code" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
                         required maxlength="10">
                     </div>
                 </div>
@@ -56,17 +56,17 @@
                 <!-- COA Name -->
                 <div class="mb-5">
                     <label for="coaName" class="block text-sm font-bold text-gray-700">Name</label>
-                    <input type="text" id="coaName" name="name" x-model="coa.name" class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" required>
+                    <input type="text" id="coaName" name="name" x-model="coa.name" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
                 </div>
 
                 <!-- COA Description -->
                 <div class="mb-5">
                     <label for="coaDescription" class="block text-sm font-bold text-gray-700">Description</label>
-                    <input type="text" id="coaDescription" name="description" x-model="coa.description" class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" required>
+                    <input type="text" id="coaDescription" name="description" x-model="coa.description" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
                 </div>
 
                 <!-- Submit -->
-                <div class="flex justify-end">
+                <div class="flex justify-end mt-12">
                     <button type="submit" class="bg-blue-900 text-white font-bold px-4 py-2 rounded-md hover:bg-blue-950">
                         Save Changes
                     </button>

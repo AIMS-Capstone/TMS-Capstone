@@ -4,6 +4,7 @@
             <div class="overflow-hidden sm:rounded-xs">
                 <div class="overflow-x-auto pt-6 px-10">
                     <p class="font-bold text-3xl taxuri-color">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-8 h-8 justify-center" viewBox="0 0 16 16"><path fill="#1e3a8a" d="M7 14s-1 0-1-1s1-4 5-4s5 3 5 4s-1 1-1 1zm4-6a3 3 0 1 0 0-6a3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5a2.5 2.5 0 0 0 0 5"/></svg>
                         Organizations
                     </p>
 
@@ -237,57 +238,163 @@
             </div>
         </div>
     </div>
-    <div x-data="{ open: false, organizationId: null }" 
-    @open-generate-modal.window="open = true; organizationId = $event.detail.organizationId" 
-    x-cloak>
-   <div x-show="open" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
-       <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-           <h2 class="text-lg font-semibold mb-4">Create Client Account</h2>
-           
-           <form method="POST" action="{{ route('org_accounts.store') }}">
-               @csrf
-               
-               <!-- Organization ID (hidden) -->
-               <input type="hidden" name="org_setup_id" :value="organizationId">
 
-             
-               <small class="text-gray-700 text-xs">The client must first provide their Email Address to the accounting firm in order to access their account. Creating an account for the client is optional, but once an account is created, relevant tax-related information will be reflected in the account, allowing the client to view and generate various reports.
-            </small>
-               <div class="mb-4">
-                   <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                   <input type="email" id="email" name="email" class="mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-               </div>
+    {{-- Create Client Account MODAL --}}
+    <div x-data="{ open: false, organizationId: null, email: '', isEmailValid() { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email); } }" 
+     @open-generate-modal.window="open = true; organizationId = $event.detail.organizationId" 
+     x-effect="document.body.classList.toggle('overflow-hidden', open)"
+     x-cloak>
+        <div x-show="open" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden">
+                <!-- Modal header -->
+                <div class="flex bg-blue-900 justify-center rounded-t-lg items-center p-3 border-b border-opacity-80 mx-auto">
+                    <h1 class="text-lg font-bold text-white">Create Client Account</h1>
+                </div>
+                <!-- Modal Body -->
+                <div class="p-10">
+                    <form method="POST" action="{{ route('org_accounts.store') }}">
+                        @csrf
+                        <!-- Organization ID (hidden) -->
+                        <input type="hidden" name="org_setup_id" :value="organizationId">
 
+                        <div class="text-zinc-500 text-xs leading-4 mb-4">
+                            The client must first provide their <b class="text-zinc-700">Email Address</b> to the accounting firm in order to access their account. Creating an account for the client is optional, but once an account is created, relevant tax-related information will be reflected in the account, allowing the client to view and generate various reports.
+                        </div>
+                        <div class="mb-4">
+                            <label for="email" class="block text-sm font-bold text-zinc-700">Email Address<span class="text-red-500">*</span></label>
+                            <input type="email" id="email" name="email" x-model="email" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
+                            placeholder="Email Address" maxlength="100" required>
+                        </div>
 
-
-               <div class="flex justify-end">
-                   <button type="button" @click="open = false" class="mr-4 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg">Cancel</button>
-                   <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg">Create Account</button>
-               </div>
-           </form>
-       </div>
-   </div>
-</div>
-
-<!-- Delete Confirmation Modal -->
-<div x-data="{ open: false, organizationId: null, organizationName: '' }" 
-    @open-delete-modal.window="open = true; organizationId = $event.detail.organizationId; organizationName = $event.detail.organizationName" 
-    x-cloak>
-    <div x-show="open" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
-        <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h2 class="text-lg font-semibold mb-4">Are you sure?</h2>
-            <p class="mb-4">Do you really want to delete <strong x-text="organizationName"></strong>? This action cannot be undone.</p>
-            <div class="flex justify-end">
-                <button type="button" @click="open = false" class="mr-4 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg">Cancel</button>
-                <form method="POST" action="{{ route('orgSetup.destroy') }}" id="delete-form" class="inline">
-                    @csrf
-                    <input type="hidden" name="organization_id" :value="organizationId">
-                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg">Delete</button>
-                </form>
+                        <div class="flex justify-end mt-10">
+                            <button type="button" @click="open = false" class="mr-4 font-semibold text-zinc-700 px-3 py-1 rounded-md hover:text-zinc-900 transition">Cancel</button>
+                            <button type="submit" 
+                                    :disabled="!isEmailValid()"
+                                    class="font-semibold bg-blue-900 text-white text-center px-6 py-1.5 rounded-md hover:bg-blue-950 border-blue-900 hover:text-white transition disabled:bg-gray-300 disabled:cursor-not-allowed">
+                                Create Account
+                            </button>                   
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    {{-- CREATE CLIENT ACCOUNT WITH SUCCESS MODAL NA MABAGAL. I prefer the modal above kasi nakikita na nagpprocess yung submission--}}
+    {{-- <div x-data="{ open: false, organizationId: null, email: '', success: false, 
+               isEmailValid() { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email); } }" 
+        @open-generate-modal.window="open = true; organizationId = $event.detail.organizationId" 
+        @submit-success.window="open = false; success = true"
+        x-effect="document.body.classList.toggle('overflow-hidden', open || success)"
+        x-cloak>
+        
+        <!-- Create Account Modal -->
+        <div x-show="open" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden">
+                <!-- Modal header -->
+                <div class="flex bg-blue-900 justify-center rounded-t-lg items-center p-3 border-b border-opacity-80 mx-auto">
+                    <h1 class="text-lg font-bold text-white">Create Client Account</h1>
+                </div>
+                <!-- Modal Body -->
+                <div class="p-10">
+                    <form method="POST" action="{{ route('org_accounts.store') }}" @submit.prevent="submitForm">
+                        @csrf
+                        <!-- Organization ID (hidden) -->
+                        <input type="hidden" name="org_setup_id" :value="organizationId">
+
+                        <div class="text-zinc-500 text-xs leading-4 mb-4">
+                            The client must first provide their <b class="text-zinc-700">Email Address</b> to the accounting firm in order to access their account. Creating an account for the client is optional, but once an account is created, relevant tax-related information will be reflected in the account, allowing the client to view and generate various reports.
+                        </div>
+                        <div class="mb-4">
+                            <label for="email" class="block text-sm font-bold text-zinc-700">Email Address<span class="text-red-500">*</span></label>
+                            <input type="email" id="email" name="email" x-model="email" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
+                                placeholder="Email Address" maxlength="100" required>
+                        </div>
+
+                        <div class="flex justify-end mt-10">
+                            <button type="button" @click="open = false" class="mr-4 font-semibold text-zinc-700 px-3 py-1 rounded-md hover:text-zinc-900 transition">Cancel</button>
+                            <button type="submit" 
+                                    :disabled="!isEmailValid()"
+                                    class="font-semibold bg-blue-900 text-white text-center px-6 py-1.5 rounded-md hover:bg-blue-950 border-blue-900 hover:text-white transition disabled:bg-gray-300 disabled:cursor-not-allowed">
+                                Create Account
+                            </button>                   
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div x-show="success" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto h-auto z-10 overflow-hidden p-10 relative">
+                <!-- Close Button -->
+                <button @click="success = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <!-- Success Modal Header (Centered Image) -->
+                <div class="flex justify-center mb-4">
+                    <img src="{{ asset('images/Success.png') }}" alt="Organization Added" class="w-28 h-28">
+                </div>
+                <!-- Success Modal Body -->
+                <div class="text-center">
+                    <p class="text-emerald-500 font-bold text-3xl mb-2">Client Account Created</p>
+                    <p class="text-sm text-zinc-700 mb-6">
+                        The account for <strong x-text="organizationName"></strong> has been successfully created. An email has been sent to <strong x-text="organizationEmail"></strong> with login details and a link to access their account.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div> --}}
+
+    <!-- Delete Confirmation Modal -->
+    <div x-data="{ open: false, organizationId: null, organizationName: '' }" 
+        @open-delete-modal.window="open = true; organizationId = $event.detail.organizationId; organizationName = $event.detail.organizationName"
+        x-effect="document.body.classList.toggle('overflow-hidden', open)" 
+        x-cloak>
+        <div x-show="open" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
+            <div class="bg-white p-10 rounded-lg shadow-lg max-w-lg w-full relative">
+                <!-- Close Button -->
+                <button @click="open = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <!-- Warning Icon -->
+                <div class="flex justify-start mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-8xl"></i>
+                </div>
+                <!-- Title -->
+                <h2 class="text-xl text-zinc-700 font-bold text-start mb-4">Confirm Delete Organization</h2>
+                <!-- Description -->
+                <p class="text-start mb-6 text-sm text-zinc-700">Are you sure you want to move the organization <br /><strong x-text="organizationName"></strong> to the recycle bin?</p>
+                <!-- Warning Box -->
+                <div class="bg-red-100 border-l-8 border-red-500 text-red-500 p-6 rounded-lg mb-6">
+                    <ul class="list-disc pl-5 text-[13px]">
+                        <li class="pl-2">
+                            <span class="inline-block align-top">This action will immediately hide the organization<br />and all its data from active views.</span>
+                        </li>
+                        <li class="pl-2">
+                            <span class="inline-block align-top">The organization can be restored later, but it will be<br />inaccessible until then.</span>
+                        </li>
+                        <li class="pl-2">
+                            <span class="inline-block align-top">Proceed only if you’re sure this organization should<br />be removed from regular access.</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Action Buttons -->
+                <div class="flex justify-end gap-4">
+                    <button type="button" @click="open = false" class="mr-2 font-semibold text-zinc-600 px-3 py-1 rounded-md hover:text-zinc-900 transition">Cancel</button>
+                    <form method="POST" action="{{ route('orgSetup.destroy') }}" id="delete-form" class="inline">
+                        @csrf
+                        <input type="hidden" name="organization_id" :value="organizationId">
+                        <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-semibold py-1.5 px-5 rounded-lg">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         // FOR SORT BUTTON
@@ -384,5 +491,30 @@
             setSessionButton.classList.remove('border-gray-300', 'text-gray-600', 'hover:bg-blue-200', 'hover:border-blue-700');
             setSessionButton.classList.add('bg-blue-200', 'text-blue-700', 'border-blue-700');
         }
+
+        // MABAGAL MAG-APPEAR NA SUCCESS MODAL for Create Client Account
+        // function submitForm() {
+        //     // Example asynchronous submission (AJAX)
+        //     fetch('{{ route("org_accounts.store") }}', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+        //         },
+        //         body: JSON.stringify({ 
+        //             org_setup_id: this.organizationId, 
+        //             email: this.email 
+        //         })
+        //     })
+        //     .then(response => {
+        //         if (response.ok) {
+        //             // Emit success event
+        //             window.dispatchEvent(new CustomEvent('submit-success'));
+        //         } else {
+        //             alert("Failed to create account.");
+        //         }
+        //     })
+        //     .catch(error => console.error('Error:', error));
+        // }
     </script>
 </x-organization-layout>

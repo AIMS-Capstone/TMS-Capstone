@@ -26,7 +26,7 @@
                                             <a href="/coa">
                                                 <button @click="selectedTab = 'Accounts'" :aria-selected="selectedTab === 'Accounts'" 
                                                 :tabindex="selectedTab === 'Accounts' ? '0' : '-1'" 
-                                                :class="selectedTab === 'Accounts' ? 'font-bold box-border text-sky-900 border-b-4 border-sky-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-sky-900 hover:text-sky-900'" 
+                                                :class="selectedTab === 'Accounts' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'" 
                                                 class="h-min py-2 text-base" 
                                                 type="button"
                                                 role="tab" 
@@ -34,7 +34,7 @@
                                             </a>
                                             <button @click="selectedTab = 'Archive'" :aria-selected="selectedTab === 'Archive'" 
                                             :tabindex="selectedTab === 'Archive' ? '0' : '-1'" 
-                                            :class="selectedTab === 'Archive' ? 'font-bold box-border text-sky-900 border-b-4 border-sky-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-sky-900 hover:text-sky-900'"
+                                            :class="selectedTab === 'Archive' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'"
                                             class="h-min py-2 text-base" 
                                             type="button" 
                                             role="tab" 
@@ -269,7 +269,7 @@
                                                     <input 
                                                         type="search" 
                                                         name="search" 
-                                                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900 focus:border-sky-900" 
+                                                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900" 
                                                         aria-label="Search Term" 
                                                         placeholder="Search..." 
                                                         @input.debounce="$el.form.requestSubmit()" 
@@ -424,6 +424,7 @@
                                             x-show="showConfirmDeleteModal" 
                                             x-cloak 
                                             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
                                             @click.away="showConfirmDeleteModal = false"
                                         >
                                             <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
@@ -445,7 +446,7 @@
                                                     <div class="flex justify-center space-x-8 mt-6 w-full">
                                                         <button 
                                                             @click="showConfirmDeleteModal = false; enableButtons(); enableButtons(); showDeleteCancelButtons = true; disableButtons();" 
-                                                            class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
+                                                            class="px-4 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-900 font-bold transition"
                                                         >
                                                             Cancel
                                                         </button>
