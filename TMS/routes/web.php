@@ -11,6 +11,7 @@ use App\Http\Controllers\OrgSetupController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TaxReturnController;
 use App\Http\Middleware\CheckOrganizationSession;
+use App\Http\Middleware\ClientAuth;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\CashReceiptController;
@@ -20,6 +21,13 @@ use App\Http\Controllers\GeneralJournalController;
 use App\Http\Controllers\FinancialController;
 use App\Http\Controllers\PredictionController;
 use App\Http\Controllers\UserController;
+
+//Client
+use App\Http\Controllers\ClientAuthController;
+use App\Http\Controllers\ClientFinancialController;
+use App\Http\Controllers\ClientProfileController;
+use App\Http\Controllers\ClientAnalyticsController;
+
 use App\Models\rdo;
 use App\Models\TaxReturn;
 
@@ -75,8 +83,9 @@ Route::middleware([
 
     Route::post('/org_accounts', [OrgAccountController::class, 'store'])->name('org_accounts.store');
     // User Management
-    Route::get('/user-management/user', [UserController::class, 'user'])->name('user-management.user');
-    Route::get('/user-management/client', [UserController::class, 'client'])->name('user-management.client');
+Route::get('/user-management/user', [UserController::class, 'user'])->name('user-management.user');
+Route::get('/user-management/client', [UserController::class, 'client'])->name('user-management.client');
+
     
     // Routes Requiring Organization Session
     Route::middleware([CheckOrganizationSession::class])->group(function () {
@@ -140,8 +149,6 @@ Route::middleware([
         Route::get('/purchase-book/export', [PurchaseController::class, 'exportPurchaseBook'])->name('purchase.exportExcel');
         Route::get('/purchase-book-posted/export', [PurchaseController::class, 'exportPurchaseBookPosted'])->name('purchase-posted.exportExcel');
 
-
-
     //Cash receipt routings
         Route::get('/cash-receipt', [CashReceiptController::class, 'cashReceipt'])->name('cash-receipt');
         Route::get('cash-receipt/posted', [CashReceiptController::class, 'posted'])->name('posted');
@@ -175,10 +182,50 @@ Route::middleware([
             return view('tax_return.vat_report_pdf'); // Make sure to create this view file
         })->name('vat_report_pdf');
 
-
-
-      
-
     });
    
 });
+
+    //client-side routings
+
+    //clients verification
+    Route::get('/client/login', [ClientAuthController::class, 'showLoginForm'])->name('client.login');
+    Route::post('/client/login', [ClientAuthController::class, 'login']);
+    Route::post('/client/logout', [ClientAuthController::class, 'logout'])->name('client.logout');
+
+    // Client forgot password routes
+    Route::get('/client/password/forgot', [ClientAuthController::class, 'showForgotPasswordForm'])->name('client.auth.password.request');
+    Route::post('/client/password/email', [ClientAuthController::class, 'sendResetLink'])->name('client.password.email');
+    Route::get('/client/password/reset/{token}', [ClientAuthController::class, 'showResetPasswordForm'])->name('client.password.reset');
+    Route::post('/client/password/reset', [ClientAuthController::class, 'resetPassword'])->name('client.password.update');
+
+    Route::get('/client/check-mail', function () {
+        return view('client.check-mail');
+    })->name('client.check-mail');
+
+
+    // Client confirm password route
+    Route::get('/client/password/confirm', [ClientAuthController::class, 'showConfirmPasswordForm'])->name('client.password.confirm');
+    Route::post('/client/password/confirm', [ClientAuthController::class, 'confirmPassword']);
+
+    // Protect client-specific routes
+    Route::middleware(['client.auth', 'client.organization'])->group(function () {
+        Route::get('/client/dashboard', [ClientAuthController::class, 'dashboard'])->name('client.dashboard');
+        Route::get('/client/forms', [ClientAuthController::class, 'forms'])->name('client.forms');
+        Route::get('/client/income_statement', [ClientFinancialController::class, 'income_statement'])->name('client.income_statement');
+        Route::get('/client/income_statement/export-excel', [ClientFinancialController::class, 'clientExportExcel'])->name('client.financial.exportExcel');
+
+        Route::get('/client/analytics', [ClientAnalyticsController::class, 'analytics'])->name('client.analytics');
+
+        Route::get('/client/profile', [ClientProfileController::class, 'profile'])->name('client.profile');
+        Route::post('/client/profile/update_photo', [ClientProfileController::class, 'updateProfilePhoto'])->name('client.profile.update_photo');
+        Route::post('/client/profile/update_email', [ClientProfileController::class, 'updateEmail'])->name('client.profile.update_email');
+        
+        Route::get('/client/settings', [ClientAuthController::class, 'settings'])->name('client.settings');
+
+
+    });
+
+
+
+
