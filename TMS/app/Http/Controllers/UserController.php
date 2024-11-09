@@ -125,7 +125,7 @@ class UserController extends Controller
                     ");
         });
     
-        return redirect()->route('user-management')->with('success', "The account for {$user->first_name} {$user->last_name} has been successfully added. A generated password has been sent via email for account login.");
+        return redirect()->route('user-management.user')->with('success', "The account for {$user->first_name} {$user->last_name} has been successfully added. A generated password has been sent via email for account login.");
     }
     /**
      * Display the specified user.

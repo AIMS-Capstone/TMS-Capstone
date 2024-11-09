@@ -99,7 +99,7 @@
                                         <input 
                                         type="search" 
                                         name="search" 
-                                        class="w-full pl-10 pr-4 py-2 text-sm border border-zinc-300 rounded-lg focus:outline-none focus:ring-sky-900 focus:border-sky-900" 
+                                        class="w-full pl-10 pr-4 py-2 text-sm border border-zinc-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
                                         aria-label="Search Term" 
                                         placeholder="Search..." 
                                         @input.debounce="$el.form.requestSubmit()" 
