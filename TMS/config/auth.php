@@ -11,7 +11,7 @@ return [
     | reset "broker" for your application. You may change these values
     | as required, but they're a perfect start for most applications.
     |
-    */
+    */  
 
     'defaults' => [
         'guard' => env('AUTH_GUARD', 'web'),
@@ -21,7 +21,7 @@ return [
     /*
     |--------------------------------------------------------------------------
     | Authentication Guards
-    |--------------------------------------------------------------------------
+    |-----------------------------------------  ---------------------------------
     |
     | Next, you may define every authentication guard for your application.
     | Of course, a great default configuration has been defined for you
@@ -39,6 +39,11 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
+        ],
+        'client' => [
+            'driver' => 'session',
+            'provider' => 'client_accounts',
+            'session' => 'org_account_sessions',
         ],
     ],
 
@@ -62,14 +67,19 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => App\Models\User::class,
         ],
+        'client_accounts' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\OrgAccount::class, 
+        ],
+    ],
 
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
-    ],
+
 
     /*
     |--------------------------------------------------------------------------
@@ -95,6 +105,12 @@ return [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,
+            'throttle' => 60,
+        ],
+        'client_accounts' => [
+            'provider' => 'client_accounts',
+            'table' => 'password_resets',
+            'expire' => 60, 
             'throttle' => 60,
         ],
     ],
