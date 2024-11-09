@@ -53,15 +53,15 @@
                         </div>  
                     </div>
         
-                    <hr class="mx-1 mt-auto">
+                <hr class="mx-1 mt-auto">
 
                 {{-- Accountant Users Table/Tab --}}
-                <div id="tab-acc-content" role="tabpanel" aria-labelledby="tab-acc" class="flex flex-col md:flex-row justify-between">
-                    <div class="w-full mt-8 ml-0 max-h-[500px] border border-zinc-300 rounded-lg p-4 bg-white">
+                <div class="flex flex-col md:flex-row justify-between">
+                    <div class="w-full mt-8 ml-0 h-auto border border-zinc-300 rounded-lg p-4 bg-white">
                         <div class="flex flex-row items-center">
                             <!-- Search row -->
                             <div class="relative w-80 p-5">
-                                <form x-target="tableid1" action="{{url()->current()}}" role="search" aria-label="Table" autocomplete="off">
+                                <form x-target="userTable" action="{{url()->current()}}" role="search" aria-label="Table" autocomplete="off">
                                     <input 
                                     type="user_search" 
                                     name="user_search" 
@@ -118,8 +118,8 @@
                     
                         <hr class="border-zinc-300 w-[calc(100%+2rem)] mx-[-1rem]">
                         
-                            <div class="my-4 overflow-y-auto max-h-[500px]">
-                                <table class="min-w-full bg-white" id="tableid1">
+                            <div class="my-4 overflow-y-auto h-auto">
+                                <table class="min-w-full bg-white" id="userTable">
                                     <thead class="bg-zinc-100 text-zinc-700 font-extrabold sticky top-0">
                                         <tr>
                                             <th class="text-left py-3 px-4 font-semibold text-sm">Name</th>
@@ -136,12 +136,12 @@
                                                     <button
                                                         x-data 
                                                         x-on:click="$dispatch('open-view-user-modal', { id: '{{ $user->id }}', name: '{{ $user->first_name }} {{ $user->last_name }}', email: '{{ $user->email }}', date_created: '{{ $user->created_at->format('F j, Y') }}', role: '{{ $user->role }}' })"
-                                                        class="text-left py-2 px-4 hover:underline hover:text-blue-500">
+                                                        class="text-left py-4 px-4 hover:underline hover:text-blue-500">
                                                         {{ $user->first_name }} {{ $user->last_name }}
                                                     </button>
                                                 </td>
-                                                <td class="text-left py-2 px-4">{{ $user->email }}</td>
-                                                <td class="text-left py-2 px-4">
+                                                <td class="text-left py-4 px-4">{{ $user->email }}</td>
+                                                <td class="text-left py-4 px-4">
                                                     @if ($user->role == "Admin")
                                                     <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-4 py-2 rounded-full">Admin</span>
                                                 @else
@@ -149,7 +149,7 @@
                                                 @endif
                                                 
                                                 </td>
-                                                <td class="text-left py-2 px-4">{{ $user->created_at->format('F j, Y') }}</td>
+                                                <td class="text-left py-4 px-4">{{ $user->created_at->format('F j, Y') }}</td>
                                                 <td class="relative text-left py-2 px-3">
                                                     <button type="button" id="dropdownMenuAction-{{ $user->id }}" class="text-zinc-500 hover:text-zinc-700">
                                                         <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
@@ -158,8 +158,7 @@
                                                     </button>
                                                     <div id="dropdownAction-{{ $user->id }}" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-32 py-2 px-4 origin-top-right overflow-hidden max-h-64 overflow-y-auto">
                                                         <div 
-                                                        x-data 
-                                                        x-on:click="$dispatch('open-delete-user-modal', { userId: '{{ $user->id }}', userName: '{{ $user->first_name }} {{ $user->last_name }}' })"  
+                                                        x-data x-on:click="$dispatch('open-delete-user-modal', { userId: '{{ $user->id }}', userName: '{{ $user->first_name }} {{ $user->last_name }}' })"  
                                                         class="block px-4 py-2 w-full text-left hover-dropdown text-red-500 cursor-pointer">
                                                         Delete
                                                     </div>
@@ -237,7 +236,7 @@
 
 </div>
 
-    {{-- Success Modal -- may problem kapag nasa Client tab --}}
+    {{-- Success Modal -- may problem: sa usercontroller ata--}}
     <div x-data="{ showSuccess: false }" x-init="@if(session('success')) showSuccess = true @endif" x-cloak x-effect="document.body.classList.toggle('overflow-hidden', showSuccess)">
         <div x-show="showSuccess" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50" @click.outside="showSuccess = false; " x-transition:enter="transition ease-out duration-100 transform"
             x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-90 transform"
@@ -370,7 +369,7 @@
     
         // Unified sorting function for Account tab
         function sortAccountItems(criteria) {
-            const table = document.querySelector('#tableid1 tbody');
+            const table = document.querySelector('#userTable tbody');
             const rows = Array.from(table.querySelectorAll('tr'));
             console.log('Original rows:', rows); // Log the original rows
             let sortedRows;
