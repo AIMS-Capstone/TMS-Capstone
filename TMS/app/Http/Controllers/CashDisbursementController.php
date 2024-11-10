@@ -2,17 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Transactions;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\CashDisbursementExport;
 use App\Exports\CashDisbursementPostedExport;
+use App\Models\OrgSetup;
+use App\Models\Transactions;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CashDisbursementController extends Controller
 {
-    //Cash disbursement-Book page
+    // Helper function to retrieve organization ID from session
+    protected function getOrganizationId(Request $request)
+    {
+        $organizationId = $request->session()->get('organization_id');
+        if (!$organizationId) {
+            abort(403, 'Organization ID not set in session');
+        }
+
+        return $organizationId;
+    }
+
+    // Cash disbursement-Book page
     public function cashDisbursement(Request $request)
     {
+        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
+
         $year = $request->input('year');
         $month = $request->input('month');
         $startMonth = $request->input('start_month');
@@ -22,6 +36,7 @@ class CashDisbursementController extends Controller
         $query = Transactions::where('status', 'draft')
             ->where('Paidstatus', 'Paid')
             ->where('transaction_type', 'Purchase')
+            ->where('organization_id', $organizationId) // Filter by organization
             ->with('contactDetails');
 
         if ($year) {
@@ -55,16 +70,19 @@ class CashDisbursementController extends Controller
     // Cash disbursement posted page
     public function posted(Request $request)
     {
+        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
+
         $year = $request->input('year');
         $month = $request->input('month');
         $startMonth = $request->input('start_month');
         $endMonth = $request->input('end_month');
         $search = $request->input('search');
 
-        // Query to fetch only posted Cash disbursement transactions
+        // Query to fetch only posted Cash disbursement transactions for the organization
         $query = Transactions::where('status', 'posted')
             ->where('Paidstatus', 'Paid')
             ->where('transaction_type', 'Purchase')
+            ->where('organization_id', $organizationId) // Filter by organization
             ->with('contactDetails');
 
         if ($year) {
@@ -97,50 +115,54 @@ class CashDisbursementController extends Controller
     // Update selected Cash disbursement to 'posted' status
     public function updateToPosted(Request $request)
     {
-        // Validate the request to ensure 'ids' are provided and exist in the transactions table
+        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
+
         $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:transactions,id',
         ]);
 
-        // Update the status of the selected transactions to 'posted'
+        // Update the status of the selected transactions to 'posted' for the specific organization
         Transactions::whereIn('id', $request->ids)
             ->where('Paidstatus', 'Paid')
             ->where('transaction_type', 'Purchase')
+            ->where('organization_id', $organizationId) // Filter by organization
             ->update(['status' => 'posted']);
 
-        // Return a JSON response indicating success
         return response()->json(['message' => 'Selected transactions have been marked as posted.']);
     }
 
     // Update selected transactions to 'draft' status
     public function updateToDraft(Request $request)
     {
-        // Validate the request to ensure 'ids' are provided and exist in the transactions table
+        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
+
         $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:transactions,id',
         ]);
 
-        // Update the status of the selected transactions to 'draft'
+        // Update the status of the selected transactions to 'draft' for the specific organization
         Transactions::whereIn('id', $request->ids)
             ->where('Paidstatus', 'Paid')
             ->where('transaction_type', 'Purchase')
+            ->where('organization_id', $organizationId) // Filter by organization
             ->update(['status' => 'draft']);
 
-        // Return a JSON response indicating success
         return response()->json(['message' => 'Selected transactions have been marked as draft.']);
     }
 
     public function exportCashDisbursement(Request $request)
     {
+        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
+        $organization = OrgSetup::find($organizationId); // Fetch organization details
+
         $year = $request->query('year');
         $period = $request->query('period', 'annually');
         $month = ($period === 'monthly') ? $request->query('month') : null;
         $quarter = ($period === 'quarterly') ? $request->query('quarter') : null;
         $status = $request->query('status', 'draft');
 
-        // Calculate start and end months if quarterly period is selected
         $startMonth = null;
         $endMonth = null;
 
@@ -165,22 +187,24 @@ class CashDisbursementController extends Controller
             }
         }
 
-        // Pass period, startMonth, and endMonth along with other parameters to the export
+        $filename = "CashDisbursement_{$organization->registration_name}_{$year}_{$month}.xlsx";
         return Excel::download(
             new CashDisbursementExport($year, $month, $startMonth, $endMonth, $status, $period, $quarter),
-            'cash_disbursement.xlsx'
+            $filename
         );
     }
 
     public function exportCashDisbursementPosted(Request $request)
     {
+        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
+        $organization = OrgSetup::find($organizationId); // Fetch organization details
+
         $year = $request->query('year');
         $period = $request->query('period', 'annually');
         $month = ($period === 'monthly') ? $request->query('month') : null;
         $quarter = ($period === 'quarterly') ? $request->query('quarter') : null;
         $status = $request->query('status', 'posted');
 
-        // Calculate start and end months if quarterly period is selected
         $startMonth = null;
         $endMonth = null;
 
@@ -205,11 +229,10 @@ class CashDisbursementController extends Controller
             }
         }
 
-        // Pass period, startMonth, and endMonth along with other parameters to the export
+        $filename = "CashDisbursementPosted_{$organization->registration_name}_{$year}_{$month}.xlsx";
         return Excel::download(
             new CashDisbursementPostedExport($year, $month, $startMonth, $endMonth, $status, $period, $quarter),
-            'cash_disbursement_posted.xlsx'
+            $filename
         );
     }
-
 }
