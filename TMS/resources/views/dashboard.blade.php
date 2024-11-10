@@ -12,47 +12,41 @@
 </div>
 
 <div class="py-6 h-full">
-    <div class="max-w-7xl mx-auto px-8 whitespace-nowrap text-wrap">
-        <!-- Left Metric Card -->
-        <div class="bg-white shadow-sm items-center justify-between rounded-lg grid grid-cols-2 lg:grid-cols-4 p-6 gap-8">
+    <div class="max-w-7xl mx-auto px-7 flex justify-between space-x-4">
+        <!-- Left Metric Container -->
+        <div class="bg-white shadow-sm items-center justify-between rounded-lg grid grid-cols-2 p-6 gap-6 w-1/2">
             <!-- Total Filed -->
             <div class="flex items-center space-x-4">
-                <div class="text-blue-900 text-xl rounded-full flex items-center justify-center font-bold">
-                    {{$filedTaxReturnCount}}
-                </div>
+                <div class="text-blue-900 text-4xl rounded-full flex items-center justify-center font-bold">{{$filedTaxReturnCount}}</div>
                 <div>
+                    {{--  --}}
                     <h2 class="text-zinc-600 font-bold">Total Filed</h2>
                     <p class="text-gray-500 text-xs">Total number of tax returns successfully submitted</p>
                 </div>
             </div>
-        
             <!-- Unfiled Taxes -->
-            <div class="flex items-center space-x-4 pl-6">
-                <div class="text-blue-900 text-xl rounded-full flex items-center justify-center font-bold">
-                    13
-                </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-blue-900 text-4xl rounded-full flex items-center justify-center font-bold"></div>
                 <div>
                     <h2 class="text-zinc-600 font-bold">Unfiled Taxes</h2>
                     <p class="text-gray-500 text-xs">Total number of pending or overdue tax returns</p>
                 </div>
             </div>
-        
+        </div>
+        <!-- Right Metric Container -->
+        <div class="bg-white shadow-sm items-center justify-between rounded-lg grid grid-cols-2 p-6 gap-6 w-1/2">
             <!-- Total Sales -->
-            <div class="flex items-center space-x-4 lg:pl-6">
-                <div class="text-blue-900 text-xl rounded-full flex items-center justify-center font-bold">
-                    {{$totalSalesTransaction}}
-                </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-blue-900 text-4xl rounded-full flex items-center justify-center font-bold">{{$totalSalesTransaction}}</div>
                 <div>
+                    {{--  --}}
                     <h2 class="text-zinc-600 font-bold">Total Sales</h2>
                     <p class="text-gray-500 text-xs">Total number of sales-related transactions</p>
                 </div>
             </div>
-        
             <!-- Total Purchases -->
-            <div class="flex items-center space-x-4 lg:pl-6">
-                <div class="text-blue-900 text-xl rounded-full flex items-center justify-center font-bold">
-                    
-                </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-blue-900 text-4xl rounded-full flex items-center justify-center font-bold"></div>
                 <div>
                     <h2 class="text-zinc-600 font-bold">Total Purchases</h2>
                     <p class="text-gray-500 text-xs">Total number of purchase-related transactions</p>
@@ -62,7 +56,7 @@
     </div>
 </div>
 
-<div class="py-4 h-full">
+<div class="py-2 h-full">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="grid grid-cols-4 gap-4 whitespace-nowrap text-wrap">
             <div class="p-6 col-span-2 bg-white border-gray-200 rounded-lg">
@@ -70,7 +64,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 36 36"><path fill="#1e3a8a" d="M32.25 6h-4v3a2.2 2.2 0 1 1-4.4 0V6H12.2v3a2.2 2.2 0 0 1-4.4 0V6h-4A1.78 1.78 0 0 0 2 7.81v22.38A1.78 1.78 0 0 0 3.75 32h28.5A1.78 1.78 0 0 0 34 30.19V7.81A1.78 1.78 0 0 0 32.25 6M10 26H8v-2h2Zm0-5H8v-2h2Zm0-5H8v-2h2Zm6 10h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Zm6 10h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Zm6 10h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Z" class="clr-i-solid clr-i-solid-path-1"/><path fill="#172554" d="M10 10a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v6a1 1 0 0 0 1 1" class="clr-i-solid clr-i-solid-path-2"/><path fill="#172554" d="M26 10a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v6a1 1 0 0 0 1 1" class="clr-i-solid clr-i-solid-path-3"/><path fill="none" d="M0 0h36v36H0z"/></svg>
                     <span class="font-bold text-2xl taxuri-color leading-tight">Tax Reminder</span>
                 </div>
-                <p class="font-normal text-xs">Stay updated with essential tax deadlines and obligations. Easily keep track of important
+                <p class="font-normal text-xs text-zinc-700">Stay updated with essential tax deadlines and obligations. Easily keep track of important
                     filling and payment dates to ensure seamless compliance with the BIR regulations.
                 </p>
                 <div class="my-3"><hr /></div>

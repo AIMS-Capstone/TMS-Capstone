@@ -1,5 +1,5 @@
 <!-- Page Header -->
-@props(['transactions'])
+@props(['transactions', 'purchaseCount', 'salesCount', 'allTransactionsCount','journalCount'])
 <div class="container mx-auto my-4 pt-6">
     <div class="px-10">
         <div class="flex flex-row w-64 items-start space-x-2">
@@ -24,35 +24,25 @@
             </button>
             <div id="dropdown" class="absolute z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-md w-48 mt-2">
                 <ul class="py-2 px-2 text-sm text-gray-700" aria-labelledby="dropdownDefaultButton">
-                    
                     <!-- Options for Sales tab -->
                     <li x-show="selectedTab === 'Sales'">
                         <a href="{{ url('/transactions/create?type=sales') }}" class="block px-4 py-2 hover-dropdown">Add Manual</a>
                     </li>
                     <li x-show="selectedTab === 'Sales'">
-                     
-                    
-
-
                         <livewire:multi-step-import-modal/>
-
                     </li>
                     <li x-show="selectedTab === 'Sales'">
                         <a href="{{ url('/transactions/upload') }}" class="block px-4 py-2 hover-dropdown">Upload Image</a>
                     </li>
-        
                     <!-- Options for Purchase tab -->
                     <li x-show="selectedTab === 'Purchase'">
                         <a href="{{ url('/transactions/create?type=purchase') }}" class="block px-4 py-2 hover-dropdown">Add Manual</a>
                     </li>
                     <li x-show="selectedTab === 'Purchase'">
-                  
-        
                     </li>
                     <li x-show="selectedTab === 'Purchase'">
                         <a href="#" class="block px-4 py-2 hover-dropdown">Upload Image</a>
                     </li>
-        
                     <!-- Options for Journal tab -->
                     <li x-show="selectedTab === 'Journal'">
                         <a href="{{ url('/transactions/create?type=journal') }}" class="block px-4 py-2 hover-dropdown">Add Manual</a>
@@ -168,10 +158,10 @@
                 role="tab"
                 aria-controls="tabpanelAll">
                 All
-                {{-- <span :class="selectedTab === 'All'
+                <span :class="selectedTab === 'All'
                     ? 'text-white bg-sky-900'
                     : 'bg-slate-500 text-white'"
-                    class="text-xs font-medium px-1 rounded-full"></span> --}}
+                    class="text-xs font-medium px-1 rounded-full">{{$allTransactionsCount}}</span>
             </button>
             
             <!-- Tab 2: Sales -->
@@ -186,10 +176,10 @@
                 role="tab"
                 aria-controls="tabpanelSales">
                 Sales
-                {{-- <span :class="selectedTab === 'Sales'
+                <span :class="selectedTab === 'Sales'
                     ? 'text-white bg-sky-900'
                     : 'bg-slate-500 text-white'"
-                    class="text-xs font-medium px-1 rounded-full"></span> --}}
+                    class="text-xs font-medium px-1 rounded-full">{{$salesCount}}</span>
             </button>
             
             <!-- Tab 3: Purchases -->
@@ -204,10 +194,10 @@
                 role="tab"
                 aria-controls="tabpanelPurchases">
                 Purchases
-                {{-- <span :class="selectedTab === 'Purchases'
+                <span :class="selectedTab === 'Purchases'
                     ? 'text-white bg-sky-900'
                     : 'bg-slate-500 text-white'"
-                    class="text-xs font-medium px-1 rounded-full">0</span> --}}
+                    class="text-xs font-medium px-1 rounded-full">{{$purchaseCount}}</span>
             </button>
             
             <!-- Tab 4: Journal -->
@@ -222,10 +212,10 @@
                 role="tab"
                 aria-controls="tabpanelJournal">
                 Journal
-                {{-- <span :class="selectedTab === 'Journal'
+                <span :class="selectedTab === 'Journal'
                     ? 'text-white bg-sky-900'
                     : 'bg-slate-500 text-white'"
-                    class="text-xs font-medium px-1 rounded-full">0</span> --}}
+                    class="text-xs font-medium px-1 rounded-full">{{$journalCount}}</span>
             </button>
         </div>
     </div>
@@ -252,6 +242,7 @@
                         <th scope="col" class="p-2">Reference No.</th>
                         <th scope="col" class="p-2">Gross Amount</th>
                         <th scope="col" class="p-2">Type</th>
+                        <th scope="col" class="p-2">Status</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-neutral-300">
@@ -274,11 +265,12 @@
                                         {{ $transaction->contactDetails->bus_name ?? 'N/A' }}
                                         </a>
                                     </td>
-                                    <td class="py-4 px-2">{{$transaction ->date}}</td>
+                                    <td class="py-4 px-2">{{ \Carbon\Carbon::parse($transaction->date)->format('F j, Y') }}</td>
                                     <td class="py-4 px-2">{{$transaction ->inv_number}}</td>
                                     <td class="py-4 px-2">{{$transaction ->reference}}</td>
                                     <td class="py-4 px-2">{{$transaction ->vat_amount}}</td>
                                     <td class="py-4 px-2"><span class="bg-zinc-100 text-zinc-800 text-xs font-medium me-2 px-4 py-2 rounded-full">{{$transaction ->transaction_type}}</span></td>
+                                    <td class="py-4 px-2"></td>
                             </tr>                             
                         @endforeach
                     @else

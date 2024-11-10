@@ -27,10 +27,10 @@ class TransactionsController extends Controller
     public function index(Request $request) {
         $search = $request->input('search');
         $type = $request->input('type');
-        $organizationId = session('organization_id'); // Retrieve the organization_id from the session
+        $organizationId = session('organization_id'); 
     
         $query = Transactions::with('contactDetails')
-            ->where('organization_id', $organizationId); // Filter by organization_id
+            ->where('organization_id', $organizationId);
     
         if ($search) {
             $query->where(function ($query) use ($search) {
@@ -46,9 +46,27 @@ class TransactionsController extends Controller
             $query->where('transaction_type', $type);
         }
     
+        
         $transactions = $query->paginate(5);
     
-        return view('transactions', compact('transactions'));
+        
+        $purchaseCount = Transactions::where('organization_id', $organizationId)
+            ->where('transaction_type', 'Purchase')
+            ->count();
+    
+        $salesCount = Transactions::where('organization_id', $organizationId)
+            ->where('transaction_type', 'Sales')
+            ->count();
+    
+        $journalCount = Transactions::where('organization_id', $organizationId)
+            ->where('transaction_type', 'Journal')
+            ->count();
+    
+        
+        $allTransactionsCount = Transactions::where('organization_id', $organizationId)->count();
+    
+       
+        return view('transactions', compact('transactions', 'purchaseCount', 'salesCount', 'journalCount', 'allTransactionsCount'));
     }
     
 

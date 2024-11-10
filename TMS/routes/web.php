@@ -105,6 +105,11 @@ Route::get('/user-management/client', [UserController::class, 'client'])->name('
         Route::get('/transactions/create', [TransactionsController::class, 'create']);
         Route::get('/transactions/{transaction}', [TransactionsController::class, 'show'])->name('transactions.show');
 
+        // Contacts Routes
+        Route::get('/contacts', function () {
+            return view('contacts');
+        })->name('contacts');
+
         // Tax Return Routes
         Route::resource('tax_return', TaxReturnController::class);
         Route::get('/vat_return', function () {
