@@ -53,29 +53,18 @@ class SelectInput extends Component
         ]);
     }
 
-    protected function fetchOptions()
-    {
-        // Modify the query based on the type
-        if ($this->type === 'purchase') {
-            return Contacts::where('contact_role', 'Vendor')->get()->map(function ($contact) {
-                return [
-                    'value' => $contact->id,
-                    'name' => $contact->bus_name,
-                    'tax_identification_number' => $contact->contact_tin
-                ];
-            })->toArray();
-        } elseif ($this->type === 'sales') {
-            return Contacts::where('contact_role', 'Customer')->get()->map(function ($contact) {
-                return [
-                    'value' => $contact->id,
-                    'name' => $contact->bus_name,
-                    'tax_identification_number' => $contact->contact_tin
-                ];
-            })->toArray();
-        }
+  protected function fetchOptions()
+{
+    // Modify the query to fetch all contacts without separating by role
+    return Contacts::all()->map(function ($contact) {
+        return [
+            'value' => $contact->id,
+            'name' => $contact->bus_name,
+            'tax_identification_number' => $contact->contact_tin
+        ];
+    })->toArray();
+}
 
-        return [];
-    }
 
     public function render()
     {

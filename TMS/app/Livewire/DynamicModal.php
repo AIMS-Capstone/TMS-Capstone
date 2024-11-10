@@ -11,7 +11,6 @@ class DynamicModal extends Component
     public $id;
     public $showModal = false;
     public $newContactPurchase = [
-        'contact_role' => 'Vendor',
         'contact_type' => '',
         'contact_tin' => '',
         'bus_name' => '',
@@ -86,7 +85,6 @@ class DynamicModal extends Component
     {
         // Validate all fields related to the purchase contact
         $validatedData = $this->validate([
-            'newContactPurchase.contact_role' => 'required|string|max:255',
             'newContactPurchase.contact_type' => 'required|string|max:255',
             'newContactPurchase.contact_tin' => 'nullable|string|max:255',
             'newContactPurchase.bus_name' => 'required|string|max:255',
