@@ -32,6 +32,7 @@
             <form method="POST" action="{{ route('coa.store') }}" enctype="multipart/form-data" id="import-form">
                 @csrf
                 <input type="hidden" name="submit_action" value="import">
+                <input type="hidden" name="organization_id" value="{{ Auth::user()->organization_id }}">
 
                 <!-- Step 1: Upload CSV -->
                     <div class="tab-content-item" id="tab-content-upload">
@@ -76,7 +77,7 @@
                                         <span class="px-4 py-2 bg-white border border-sky-900 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-900 hover:bg-gray-50">
                                             Browse
                                         </span>
-                                        <input type="file" name="sample" id="file" class="hidden" required onchange="showFileName()">
+                                        <input type="file" name="csv_file" id="file" class="hidden" required onchange="showFileName()">
                                     </label>
                                     <span id="file-name" class="text-sm text-gray-500">No file chosen</span>
                                 </div>

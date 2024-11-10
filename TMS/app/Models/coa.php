@@ -14,9 +14,18 @@ class coa extends Model
     protected $fillable = [
         'type',
         'sub_type',
-        'code', 
+        'code',
         'name',
         'description',
-        'status'
+        'organization_id', 
+        'status',
     ];
+
+    /**
+     * Relationship with Organization
+     */
+    public function organization()
+    {
+        return $this->belongsTo(OrgSetup::class, 'organization_id');
+    }
 }

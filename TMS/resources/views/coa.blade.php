@@ -1,3 +1,8 @@
+    @php
+    $organizationId = session('organization_id');
+    $organization = \App\Models\OrgSetup::find($organizationId);
+    @endphp
+
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -183,7 +188,7 @@
                                         
                                         // Toggle all rows
                                         toggleAll() {
-                                            this.checkAll = !this.checkAll;
+                                            this.checkAll = !this.caheckAll;
                                             if (this.checkAll) {
                                                 this.selectedRows = {{ json_encode($coas->pluck('id')->toArray()) }}; 
                                             } else {
