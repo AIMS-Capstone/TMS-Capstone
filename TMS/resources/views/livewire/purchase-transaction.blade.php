@@ -216,7 +216,6 @@ $('#select_contact').on('change', function() {
                         <div class="col-span-1 space-y-4">
                             <p class="text-sm mb-4">Basic Information</p>
                             <!-- Type (Corporation/Individual) -->
-                            <input type="hidden" name="contact_role" wire:model.defer="newContactPurchase.contact_role" value="vendor">
                             <div>
                                 <label for="contact_type" class="block text-gray-700 text-sm font-bold">Type</label>
                                 <select id="contact_type" wire:model.defer="newContactPurchase.contact_type" name="contact_type" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">

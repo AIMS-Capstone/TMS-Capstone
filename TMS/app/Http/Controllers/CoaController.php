@@ -12,6 +12,8 @@ use Maatwebsite\Excel\Facades\Excel as MaatExcel;
 use App\Exports\ExportCoa;
 use App\Exports\import_template;
 use App\Exports\account_type_template;
+use App\Exports\CoaExport;
+use Maatwebsite\Excel\Excel;
 
 class CoaController extends Controller
 {
@@ -254,6 +256,11 @@ return redirect()->route('coa')->with('success', 'Account updated successfully.'
 
     public function account_type_template(){
         return MaatExcel::download(new account_type_template, 'account_type_template.xlsx');
+    }
+
+    public function exportCoas()
+    {
+        return MaatExcel::download(new CoaExport, "coa_list.csv");
     }
 
 }

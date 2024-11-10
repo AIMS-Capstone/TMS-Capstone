@@ -13,6 +13,8 @@ class TaxType extends Model
         'tax_type',
         'description',
         'VAT',
+        'short_code',
+        'category'
 
     ];
 }

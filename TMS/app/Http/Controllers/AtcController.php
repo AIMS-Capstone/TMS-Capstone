@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AtcExport;
 use App\Models\atc;
 use App\Http\Requests\StoreatcRequest;
 use App\Http\Requests\UpdateatcRequest;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AtcController extends Controller
 {
@@ -62,5 +64,16 @@ class AtcController extends Controller
     public function destroy(atc $atc)
     {
         //
+    }
+
+    public function exportAtcs($type)
+    {
+        // Validate that the type is either 'purchase' or 'sale'
+        if (!in_array($type, ['purchase', 'sales'])) {
+            return redirect()->back()->with('error', 'Invalid type.');
+        }
+
+        // Pass the type to the export class and trigger the download
+        return Excel::download(new AtcExport($type), "{$type}_atcs.csv");
     }
 }

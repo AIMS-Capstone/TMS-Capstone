@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('contact_email')->nullable(); // Email can be null
             $table->string('contact_phone')->nullable(); // Phone can be null
             $table->string('contact_tin');
-            $table->string('contact_role');
+          
             
             // Revenue Information
             $table->string('revenue_tax_type')->nullable(); // Tax Type can be null

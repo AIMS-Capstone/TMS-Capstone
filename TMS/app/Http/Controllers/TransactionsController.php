@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Transactions;
 use App\Http\Requests\StoreTransactionsRequest;
 use App\Http\Requests\UpdateTransactionsRequest;
+use App\Imports\SalesImport;
+use App\Livewire\SalesTransaction;
 use App\Livewire\TaxRow;
 use App\Models\atc;
 use App\Models\coa;
@@ -13,6 +15,7 @@ use App\Models\TaxRow as ModelsTaxRow;
 use App\Models\TaxType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 use thiagoalessio\TesseractOCR\TesseractOCR;
 
 
@@ -145,5 +148,30 @@ class TransactionsController extends Controller
     public function destroy(Transactions $transactions)
     {
         //
+    }
+    public function import(Request $request)
+    {
+        // Validate the file input
+        $request->validate([
+            'file' => 'required|mimes:csv,txt'
+        ]);
+
+        // Import the file
+        Excel::import(new SalesImport, $request->file('file'));
+
+        return back()->with('success', 'Transactions imported successfully!');
+    }
+    public function importPreview(Request $request)
+    {
+        // Validate the file input
+        $request->validate([
+            'file' => 'required|mimes:csv,txt'
+        ]);
+
+        // Load the CSV data but don't save it to the database yet
+        $data = Excel::toArray(new SalesImport, $request->file('file'))[0];
+
+        // Pass the data to the view to preview
+        return view('transactions.preview', compact('data'));
     }
 }

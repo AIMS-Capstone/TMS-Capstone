@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->enum('transaction_type',['sales','purchase']);
             $table->string('tax_type');
+            $table->string('short_code');
+            $table->enum('category',['Goods','Services','General']);
             $table->integer('VAT');
             $table->string('description');
             $table->timestamps();
