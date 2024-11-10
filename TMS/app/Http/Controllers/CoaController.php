@@ -2,16 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UpdatecoaRequest;
+use App\Exports\account_type_template;
+use App\Exports\import_template;
 use App\Imports\CoaImport;
-use App\Models\coa;
-// use Excel;
+use App\Models\Coa;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel as MaatExcel;
-use App\Exports\ExportCoa;
-use App\Exports\import_template;
-use App\Exports\account_type_template;
 use App\Exports\CoaExport;
 use Maatwebsite\Excel\Excel;
 
@@ -25,35 +22,27 @@ class CoaController extends Controller
         $search = $request->input('search');
         $type = $request->input('type');
 
-        $query = Coa::where('status', 'Active');
+        $organizationId = session('organization_id'); // Using session-based organization ID
 
-        // Apply search if there is one
+        $query = Coa::where('organization_id', $organizationId)
+            ->where('status', 'Active');
+
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('type', 'like', "%{$search}%")
                     ->orWhere('name', 'like', "%{$search}%")
                     ->orWhere('code', 'like', "%{$search}%")
-                    ->orWhere('sub_type', 'like', "%{$search}%"); // Include sub_type in search
+                    ->orWhere('sub_type', 'like', "%{$search}%");
             });
         }
 
-        // Apply type filter if specified and not 'All'
         if ($type && $type !== 'All') {
             $query->where('type', $type);
         }
 
-        // Paginate the results
         $coas = $query->paginate(5);
 
         return view('coa', compact('coas'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-
     }
 
     /**
@@ -61,11 +50,15 @@ class CoaController extends Controller
      */
     public function store(Request $request)
     {
-        // Determine which action is being performed (manual add or CSV import)
+        $organizationId = session('organization_id');
+
+        if (!$organizationId) {
+            return redirect()->back()->withErrors(['error' => 'User does not have an organization ID.']);
+        }
+
         $submitAction = $request->input('submit_action');
 
         if ($submitAction === 'manual') {
-            // Handle manual creation
             $request->validate([
                 'account_type_input' => 'required|string|max:255',
                 'code' => 'required|string|max:10',
@@ -73,62 +66,38 @@ class CoaController extends Controller
                 'description' => 'nullable|string|max:255',
             ]);
 
-            // Split the input into type and sub_type
             $accountTypeInput = $request->input('account_type_input');
-
-            // Split the input and make sure to handle any potential whitespaces
             $parts = array_map('trim', explode('|', $accountTypeInput));
-
-            // Check if we have both type and sub_type from the input
             $type = $parts[0] ?? null;
             $subType = $parts[1] ?? null;
 
-            // Ensure both are not null and then proceed
             if ($type && $subType) {
                 Coa::create([
                     'type' => $type,
-                    'sub_type' => $subType, 
+                    'sub_type' => $subType,
                     'code' => $request->input('code'),
                     'name' => $request->input('name'),
                     'description' => $request->input('description'),
+                    'organization_id' => $organizationId,
                 ]);
 
-return redirect()->route('coa')->with('success', 'Account created successfully.');
-
+                return redirect()->route('coa')->with('success', 'Account created successfully.');
             } else {
                 return redirect()->back()->withErrors(['account_type_input' => 'Please provide a valid input in the format: "Type | Sub Type".']);
             }
-
         } elseif ($submitAction === 'import') {
-
-            MaatExcel::import(new CoaImport, $request->file('sample'));
-
-            // Handle CSV import
             $request->validate([
-                'csv_file' => 'required|file|mimes:csv|max:2048',
+                'csv_file' => 'required|file|mimes:csv,xlsx|max:2048',
             ]);
+
+            dd("Starting import with organization_id: {$organizationId}");
+
+            // Pass organization ID when creating CoaImport instance
+            MaatExcel::import(new CoaImport($organizationId), $request->file('csv_file'));
 
             return redirect()->route('coa')->with('success', 'CSV imported successfully.');
         }
-
-        // Fallback for unsupported actions
         return redirect()->route('coa')->with('error', 'Invalid action.');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(coa $coa)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(coa $coa)
-    {
-        
     }
 
     /**
@@ -136,6 +105,8 @@ return redirect()->route('coa')->with('success', 'Account created successfully.'
      */
     public function update(Request $request, $id)
     {
+        $organizationId = session('organization_id');
+
         $request->validate([
             'account_type_input' => 'required|string|max:255',
             'code' => 'required|string|max:10',
@@ -143,31 +114,29 @@ return redirect()->route('coa')->with('success', 'Account created successfully.'
             'description' => 'nullable|string|max:255',
         ]);
 
-// Split the input into type and sub_type
-$accountTypeInput = $request->input('account_type_input');
-$parts = array_map('trim', explode('|', $accountTypeInput));
+        $accountTypeInput = $request->input('account_type_input');
+        $parts = array_map('trim', explode('|', $accountTypeInput));
+        $type = $parts[0] ?? null;
+        $subType = $parts[1] ?? null;
 
-// Check if we have both type and sub_type from the input
-$type = $parts[0] ?? null;
-$subType = $parts[1] ?? null;
+        $coa = Coa::where('id', $id)
+            ->where('organization_id', $organizationId)
+            ->firstOrFail();
 
-// Update the COA entry
-$coa = Coa::findOrFail($id);
-$coa->update([
-    'type' => $type,
-    'sub_type' => $subType, // Ensure the column exists and is properly defined in the database
-    'code' => $request->input('code'),
-    'name' => $request->input('name'),
-    'description' => $request->input('description'),
-]);
+        $coa->update([
+            'type' => $type,
+            'sub_type' => $subType,
+            'code' => $request->input('code'),
+            'name' => $request->input('name'),
+            'description' => $request->input('description'),
+        ]);
 
-
-return redirect()->route('coa')->with('success', 'Account updated successfully.');
-
+        return redirect()->route('coa')->with('success', 'Account updated successfully.');
     }
 
     public function deactivate(Request $request)
     {
+        $organizationId = session('organization_id');
 
         $request->validate([
             'ids' => 'required|array',
@@ -175,6 +144,7 @@ return redirect()->route('coa')->with('success', 'Account updated successfully.'
         ]);
 
         Coa::whereIn('id', $request->ids)
+            ->where('organization_id', $organizationId)
             ->update(['status' => 'Inactive']);
 
         return response()->json(['message' => 'Selected CoAs have been deactivated.']);
@@ -182,6 +152,7 @@ return redirect()->route('coa')->with('success', 'Account updated successfully.'
 
     public function destroy(Request $request)
     {
+        $organizationId = session('organization_id');
 
         $request->validate([
             'ids' => 'required|array',
@@ -190,6 +161,7 @@ return redirect()->route('coa')->with('success', 'Account updated successfully.'
 
         Coa::whereIn('id', $request->ids)
             ->where('status', 'Inactive')
+            ->where('organization_id', $organizationId)
             ->delete();
 
         return response()->json(['message' => 'Selected archived COAs have been deleted successfully.'], 200);
@@ -197,10 +169,12 @@ return redirect()->route('coa')->with('success', 'Account updated successfully.'
 
     public function archive(Request $request)
     {
+        $organizationId = session('organization_id');
         $search = $request->input('search');
         $type = $request->input('type');
 
-        $query = Coa::where('status', 'Inactive');
+        $query = Coa::where('status', 'Inactive')
+            ->where('organization_id', $organizationId);
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -221,40 +195,46 @@ return redirect()->route('coa')->with('success', 'Account updated successfully.'
 
     public function restore(Request $request)
     {
+        $organizationId = session('organization_id');
+
         $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:coas,id',
         ]);
 
-        Coa::whereIn('id', $request->ids)->update(['status' => 'Active']);
+        Coa::whereIn('id', $request->ids)
+            ->where('organization_id', $organizationId)
+            ->update(['status' => 'Active']);
 
         return response()->json(['message' => 'Selected COAs have been restored successfully.'], 200);
     }
 
     public function download_coa(Request $request)
     {
-        // Get the active COAs
-        $coas = Coa::where('status', 'Active')->get();
+        $organizationId = session('organization_id');
 
-        // Prepare the data to pass to the view
+        $coas = Coa::where('status', 'Active')
+            ->where('organization_id', $organizationId)
+            ->get();
+
         $data = [
             'title' => 'Available Charts of Accounts',
             'date' => date('m/d/Y'),
-            'coas' => $coas, // Pass the COAs to the view
+            'coas' => $coas,
         ];
 
-        // Load the view and pass the data
         $pdf = PDF::loadView('coaPDF', $data);
 
-        // Download the PDF with a custom name
         return $pdf->download('Coa.pdf');
     }
 
-    public function import_template(){
+    public function import_template()
+    {
         return MaatExcel::download(new import_template, 'import_template.xlsx');
     }
 
-    public function account_type_template(){
+    public function account_type_template()
+    {
         return MaatExcel::download(new account_type_template, 'account_type_template.xlsx');
     }
 

@@ -373,6 +373,11 @@
                                                 @endif
                                             </tbody>
                                         </table>
+                                    @if (count($inactiveCoas) > 0)
+                                        <div class="mt-4">
+                                            {{ $inactiveCoas ->links('vendor.pagination.custom')}}
+                                        </div>
+                                    @endif
                                     </div>
 
                                     <!-- Modals -->
@@ -494,7 +499,6 @@
                                                 </button>
                                             </div>
                                         </div>
-                                    {{ $inactiveCoas ->links('vendor.pagination.custom')}}
                                     </div>
                                 </div>
                         </div>  

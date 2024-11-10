@@ -2,62 +2,80 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Transactions;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\GeneralLedgerExport;
+use App\Models\OrgSetup;
+use App\Models\Transactions;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class GeneralLedgerController extends Controller
 {
+    // Helper function to retrieve organization ID from session
+    protected function getOrganizationId(Request $request)
+    {
+        $organizationId = $request->session()->get('organization_id');
+        if (!$organizationId) {
+            abort(403, 'Organization ID not set in session');
+        }
+
+        return $organizationId;
+    }
+
     public function ledger(Request $request)
-{
-    $year = $request->input('year');
-    $month = $request->input('month');
-    $startMonth = $request->input('start_month');
-    $endMonth = $request->input('end_month');
-    $search = $request->input('search');
-    $status = $request->input('status');
+    {
+        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
 
-    $query = Transactions::with('taxRows.coaAccount');
+        $year = $request->input('year');
+        $month = $request->input('month');
+        $startMonth = $request->input('start_month');
+        $endMonth = $request->input('end_month');
+        $search = $request->input('search');
+        $status = $request->input('status');
 
-    if ($year) {
-        $query->whereYear('date', $year);
+        $query = Transactions::with('taxRows.coaAccount')
+            ->where('organization_id', $organizationId); // Filter by organization
+
+        if ($year) {
+            $query->whereYear('date', $year);
+        }
+
+        if ($month && $year) {
+            $query->whereMonth('date', $month);
+        }
+
+        if ($startMonth && $endMonth && $year) {
+            $query->whereMonth('date', '>=', $startMonth)
+                ->whereMonth('date', '<=', $endMonth);
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        if ($search) {
+            $query->whereHas('taxRows.coaAccount', function ($q) use ($search) {
+                $q->where('code', 'LIKE', "%{$search}%")
+                    ->orWhere('name', 'LIKE', "%{$search}%")
+                    ->orWhere('type', 'LIKE', "%{$search}%");
+            })
+                ->orWhere('inv_number', 'LIKE', "%{$search}%")
+                ->orWhere('reference', 'LIKE', "%{$search}%");
+        }
+
+        $transactions = $query->get();
+
+        // Summing debit and credit from taxRows
+        $totalDebit = $transactions->pluck('taxRows')->flatten()->sum('debit');
+        $totalCredit = $transactions->pluck('taxRows')->flatten()->sum('credit');
+
+        return view('general-ledger', compact('transactions', 'totalDebit', 'totalCredit'));
     }
-
-    if ($month && $year) {
-        $query->whereMonth('date', $month);
-    }
-
-    if ($startMonth && $endMonth && $year) {
-        $query->whereMonth('date', '>=', $startMonth)
-              ->whereMonth('date', '<=', $endMonth);
-    }
-
-    if ($status) {
-        $query->where('status', $status);
-    }
-
-    if ($search) {
-        $query->whereHas('taxRows.coaAccount', function ($q) use ($search) {
-            $q->where('code', 'LIKE', "%{$search}%")
-              ->orWhere('name', 'LIKE', "%{$search}%")
-              ->orWhere('type', 'LIKE', "%{$search}%");
-        })
-        ->orWhere('inv_number', 'LIKE', "%{$search}%")
-        ->orWhere('reference', 'LIKE', "%{$search}%");
-    }
-
-    $transactions = $query->get();
-
-    // Summing debit and credit from taxRows
-    $totalDebit = $transactions->pluck('taxRows')->flatten()->sum('debit');
-    $totalCredit = $transactions->pluck('taxRows')->flatten()->sum('credit');
-
-    return view('general-ledger', compact('transactions', 'totalDebit', 'totalCredit'));
-}
 
     public function exportExcel(Request $request)
     {
+        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
+        $organization = OrgSetup::find($organizationId); // Fetch organization details
+
         $year = $request->query('year');
         $period = $request->query('period', 'annually');
         $month = ($period === 'monthly') ? $request->query('month') : null;
@@ -89,11 +107,12 @@ class GeneralLedgerController extends Controller
             }
         }
 
-        // Pass period, startMonth, and endMonth along with other parameters to the export
+        // Generate the filename with organization name
+        $filename = "GeneralLedger_{$organization->registration_name}_{$year}_{$month}.xlsx";
+
         return Excel::download(
             new GeneralLedgerExport($year, $month, $startMonth, $endMonth, $status, $period, $quarter),
-            'general_ledger.xlsx'
+            $filename
         );
     }
-
 }

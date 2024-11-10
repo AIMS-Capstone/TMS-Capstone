@@ -2,15 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Transactions;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\GeneralJournalExport;
+use App\Models\OrgSetup;
+use App\Models\Transactions;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class GeneralJournalController extends Controller
 {
+    // Helper function to retrieve organization ID from session
+    protected function getOrganizationId(Request $request)
+    {
+        $organizationId = $request->session()->get('organization_id');
+        if (!$organizationId) {
+            abort(403, 'Organization ID not set in session');
+        }
+
+        return $organizationId;
+    }
+
     public function journal(Request $request)
     {
+        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
+
         $year = $request->input('year');
         $month = $request->input('month');
         $startMonth = $request->input('start_month');
@@ -19,8 +33,8 @@ class GeneralJournalController extends Controller
         $status = $request->input('status'); // New status filter
 
         $query = Transactions::with('taxRows.coaAccount')
-        ->where('transaction_type', 'Journal');
-
+            ->where('transaction_type', 'Journal')
+            ->where('organization_id', $organizationId); // Filter by organization
 
         if ($year) {
             $query->whereYear('date', $year);
@@ -51,13 +65,15 @@ class GeneralJournalController extends Controller
 
         $transactions = $query->paginate(5);
 
-
         return view('general-journal', compact('transactions'));
     }
 
     public function exportJournalExcel(Request $request)
     {
-       $year = $request->query('year');
+        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
+        $organization = OrgSetup::find($organizationId); // Fetch organization details if needed
+
+        $year = $request->query('year');
         $period = $request->query('period', 'annually');
         $month = ($period === 'monthly') ? $request->query('month') : null;
         $quarter = ($period === 'quarterly') ? $request->query('quarter') : null;
@@ -88,11 +104,12 @@ class GeneralJournalController extends Controller
             }
         }
 
-        // Pass period, startMonth, and endMonth along with other parameters to the export
+        // Generate filename with organization name
+        $filename = "GeneralJournal_{$organization->registration_name}_{$year}_{$month}.xlsx";
+
         return Excel::download(
             new GeneralJournalExport($year, $month, $startMonth, $endMonth, $status, $period, $quarter),
-            'general_journal.xlsx'
+            $filename
         );
     }
-
 }

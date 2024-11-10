@@ -2,26 +2,41 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Transactions;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PurchaseBookExport;
 use App\Exports\PurchaseBookPostedExport;
+use App\Models\OrgSetup;
+use App\Models\Transactions;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PurchaseController extends Controller
 {
-    //Purchase-Book page
+    // Helper function to retrieve organization ID from session
+    protected function getOrganizationId(Request $request)
+    {
+        $organizationId = $request->session()->get('organization_id');
+        if (!$organizationId) {
+            abort(403, 'Organization ID not set in session');
+        }
+
+        return $organizationId;
+    }
+
+    // Purchase-Book page
     public function purchase(Request $request)
     {
+        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
+
         $year = $request->input('year');
         $month = $request->input('month');
         $startMonth = $request->input('start_month');
         $endMonth = $request->input('end_month');
         $search = $request->input('search');
 
-        // Query to fetch only draft purchase transactions
+        // Query to fetch only draft purchase transactions for the organization
         $query = Transactions::where('status', 'draft')
             ->where('transaction_type', 'Purchase')
+            ->where('organization_id', $organizationId) // Filter by organization
             ->with('contactDetails');
 
         if ($year) {
@@ -55,15 +70,18 @@ class PurchaseController extends Controller
     // Purchase posted page
     public function posted(Request $request)
     {
+        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
+
         $year = $request->input('year');
         $month = $request->input('month');
         $startMonth = $request->input('start_month');
         $endMonth = $request->input('end_month');
         $search = $request->input('search');
 
-        // Query to fetch only posted purchase transactions
+        // Query to fetch only posted purchase transactions for the organization
         $query = Transactions::where('status', 'posted')
             ->where('transaction_type', 'Purchase')
+            ->where('organization_id', $organizationId) // Filter by organization
             ->with('contactDetails');
 
         if ($year) {
@@ -90,48 +108,54 @@ class PurchaseController extends Controller
 
         $transactions = $query->paginate(5);
 
-
         return view('components.purchase-posted', compact('transactions'));
     }
 
-    // Update selected purchase to 'posted' status
+    // Update selected purchases to 'posted' status
     public function updateToPosted(Request $request)
     {
+        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
+
         // Validate the request to ensure 'ids' are provided and exist in the transactions table
         $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:transactions,id',
         ]);
 
-        // Update the status of the selected transactions to 'posted'
+        // Update the status of the selected transactions to 'posted' for the specific organization
         Transactions::whereIn('id', $request->ids)
             ->where('transaction_type', 'Purchase')
+            ->where('organization_id', $organizationId) // Filter by organization
             ->update(['status' => 'posted']);
 
-        // Return a JSON response indicating success
         return response()->json(['message' => 'Selected transactions have been marked as posted.']);
     }
 
     // Update selected transactions to 'draft' status
     public function updateToDraft(Request $request)
     {
-        // Validate the request to ensure 'ids' are provided and exist in the transactions table
+        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
+
         $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:transactions,id',
         ]);
 
-        // Update the status of the selected transactions to 'draft'
+        // Update the status of the selected transactions to 'draft' for the specific organization
         Transactions::whereIn('id', $request->ids)
             ->where('transaction_type', 'Purchase')
+            ->where('organization_id', $organizationId) // Filter by organization
             ->update(['status' => 'draft']);
 
-        // Return a JSON response indicating success
         return response()->json(['message' => 'Selected transactions have been marked as draft.']);
     }
+
     public function exportPurchaseBook(Request $request)
     {
-         $year = $request->query('year');
+        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
+        $organization = OrgSetup::find($organizationId); // Fetch organization details
+
+        $year = $request->query('year');
         $period = $request->query('period', 'annually');
         $month = ($period === 'monthly') ? $request->query('month') : null;
         $quarter = ($period === 'quarterly') ? $request->query('quarter') : null;
@@ -162,16 +186,21 @@ class PurchaseController extends Controller
             }
         }
 
-        // Pass period, startMonth, and endMonth along with other parameters to the export
+        // Generate filename with organization name
+        $filename = "PurchaseBook_{$organization->registration_name}_{$year}_{$month}.xlsx";
+
         return Excel::download(
             new PurchaseBookExport($year, $month, $startMonth, $endMonth, $status, $period, $quarter),
-            'purchase_book.xlsx'
+            $filename
         );
     }
 
     public function exportPurchaseBookPosted(Request $request)
     {
-         $year = $request->query('year');
+        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
+        $organization = OrgSetup::find($organizationId); // Fetch organization details
+
+        $year = $request->query('year');
         $period = $request->query('period', 'annually');
         $month = ($period === 'monthly') ? $request->query('month') : null;
         $quarter = ($period === 'quarterly') ? $request->query('quarter') : null;
@@ -202,11 +231,12 @@ class PurchaseController extends Controller
             }
         }
 
-        // Pass period, startMonth, and endMonth along with other parameters to the export
+        // Generate filename with organization name
+        $filename = "PurchaseBookPosted_{$organization->registration_name}_{$year}_{$month}.xlsx";
+
         return Excel::download(
             new PurchaseBookPostedExport($year, $month, $startMonth, $endMonth, $status, $period, $quarter),
-            'purchase_book_posted.xlsx'
+            $filename
         );
     }
-
 }

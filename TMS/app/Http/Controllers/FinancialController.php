@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\FinancialReportExport;
 use App\Models\Transactions; 
+use App\Models\OrgSetup;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
@@ -28,6 +29,7 @@ private function getQuarterMonths($quarter)
 }
 private function getFinancialData(Request $request)
 {
+    $organizationId = $request->session()->get('organization_id');
     // Default values for year, month, and quarter
     $year = $request->input('year', now()->year);
     $month = $request->input('month', now()->month);
@@ -35,8 +37,9 @@ private function getFinancialData(Request $request)
     $period = $request->input('period', 'annually');  
     $status = $request->input('status', 'draft');
 
-    $query = Transactions::with(['taxRows.coaAccount']);
-    $query->whereYear('date', $year);
+    $query = Transactions::with(['taxRows.coaAccount'])
+            ->where('organization_id', $organizationId)
+            ->whereYear('date', $year);
 
     if ($period === 'monthly' && $month) {
         $query->whereMonth('date', $month);
@@ -114,16 +117,33 @@ private function getFinancialData(Request $request)
     {
         // Set up default values
         $year = $request->input('year', now()->year);
-        $month = $request->input('month', now()->month);
+        $month = str_pad($request->input('month', now()->month), 2, '0', STR_PAD_LEFT);
         $quarter = $request->input('quarter', 'Q' . ceil(now()->month / 3));
+        $organizationId = $request->session()->get('organization_id');
 
+        $organization = OrgSetup::find($organizationId);
+        if (!$organization) {
+            return response()->json(['error' => 'Organization not found'], 404);
+        }
+
+        // Get financial data based on the request
         $financialData = $this->getFinancialData($request);
+        
+        // Check if financial data was returned as an error response
+        if (is_array($financialData) && isset($financialData['error'])) {
+            return response()->json(['error' => $financialData['error']], 403);
+        }
+
         $financialData['year'] = $year;
         $financialData['month'] = $month;
         $financialData['quarter'] = $quarter;
 
+        $registrationName = preg_replace('/[^A-Za-z0-9]/', '_', $organization->registration_name); // sanitize filename
 
-        return Excel::download(new FinancialReportExport($financialData), "IncomeStatement_{$year}_{$month}.xlsx");
+        // Generate the Excel file name
+        $filename = "IncomeStatement_Of_{$registrationName}_{$year}_{$month}.xlsx";
+        return Excel::download(new FinancialReportExport($financialData), $filename);
     }
+
 
 }

@@ -143,6 +143,7 @@ class ClientFinancialController extends Controller
         $financialData['month'] = $month;
         $financialData['quarter'] = $quarter;
 
-        return Excel::download(new ClientFinancialReportExport($financialData), "IncomeStatement_{$year}_{$month}.xlsx");
+        $filename = "IncomeStatement_Org{$organizationId}_{$year}_{$month}.xlsx";
+        return Excel::download(new ClientFinancialReportExport($financialData), $filename);
     }
 }

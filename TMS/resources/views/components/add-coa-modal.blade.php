@@ -21,6 +21,7 @@
         <div class="p-10">
             <form id="addAccountForm" action="{{ route('coa.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf   
+                <input type="hidden" name="organization_id" value="{{ Auth::user()->organization_id }}">
 
                 <div class="mb-5 flex justify-between items-start">
                     <!-- Account Type -->
