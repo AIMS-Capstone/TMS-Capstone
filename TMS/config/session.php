@@ -214,4 +214,14 @@ return [
 
     'partitioned' => env('SESSION_PARTITIONED_COOKIE', false),
 
+    // session for client accounts
+
+    'org_account_sessions' => [
+        'driver' => 'database',
+        'table' => 'org_account_sessions',
+        'lottery' => [2, 100],
+        'cookie' => 'org_account_session',
+    ],
+
+
 ];
