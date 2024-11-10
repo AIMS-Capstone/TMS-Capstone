@@ -17,6 +17,7 @@ class UserController extends Controller
         
         $userSearch = $request->input('user_search'); // Change to user_search for clarity
         $status = $request->input('status');
+        $perPage = $request->input('perPage', 5);
     
         // Start building the query for active users
         $userQuery = User::query();
@@ -36,12 +37,13 @@ class UserController extends Controller
         }
     
         // Paginate the results for users
-        $users = $userQuery->paginate(5);
+        $users = $userQuery->paginate($perPage);
         return view('user-management', compact('users'));
     }
     public function client(Request $request){
         $clientSearch = $request->input('client_search'); // New search parameter for clients
         $status = $request->input('status');
+        $perPage = $request->input('perPage', 5);
     
         // Start building the query for active users
  
@@ -67,7 +69,7 @@ class UserController extends Controller
         }
     
         // Paginate the results for clients
-        $clients = $clientQuery->paginate(5);
+        $clients = $clientQuery->paginate($perPage);
     
         // Return view with both users and clients
         return view('user-management-client', compact( 'clients'));
@@ -174,6 +176,6 @@ class UserController extends Controller
         $user = User::findOrFail($request->input('user_id'));
         $user->delete();
     
-        return redirect()->back()->with('success', 'User deleted successfully.');
+        return redirect()->route('user-management.user');
     }
 }

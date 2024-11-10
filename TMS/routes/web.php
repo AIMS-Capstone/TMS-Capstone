@@ -79,6 +79,8 @@ Route::middleware([
     Route::post('/org-account-destroy', [OrgAccountController::class, 'destroy'])->name('orgaccount.destroy');
     Route::post('/user-account-destroy', [UserController::class, 'destroy'])->name('users.destroy');
     Route::post('/user-account-store', [UserController::class, 'store'])->name('users.store');
+    Route::get('/export-atc/{type}', [AtcController::class, 'exportAtcs']);
+    Route::get('/export-coa', [CoaController::class, 'exportCoas']);
 
 
     Route::post('/org_accounts', [OrgAccountController::class, 'store'])->name('org_accounts.store');
@@ -225,7 +227,3 @@ Route::get('/user-management/client', [UserController::class, 'client'])->name('
 
 
     });
-
-
-
-

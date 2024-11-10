@@ -9,6 +9,8 @@ use App\Models\Coa;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel as MaatExcel;
+use App\Exports\CoaExport;
+use Maatwebsite\Excel\Excel;
 
 class CoaController extends Controller
 {
@@ -235,4 +237,10 @@ class CoaController extends Controller
     {
         return MaatExcel::download(new account_type_template, 'account_type_template.xlsx');
     }
+
+    public function exportCoas()
+    {
+        return MaatExcel::download(new CoaExport, "coa_list.csv");
+    }
+
 }

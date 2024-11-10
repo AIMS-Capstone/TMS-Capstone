@@ -49,11 +49,11 @@
 
                     {{-- Client Users Table/Tab --}}
                     <div class="flex flex-col md:flex-row justify-between">
-                        <div class="w-full mt-8 ml-0 max-h-[500px] border border-zinc-300 rounded-lg p-4 bg-white">
+                        <div class="w-full mt-8 ml-0 h-auto border border-zinc-300 rounded-lg p-4 bg-white">
                             <div class="flex flex-row items-center">
                                 <!-- Search row -->
                                 <div class="relative w-80 p-5">
-                                    <form action="{{ url()->current() }}" method="GET" role="search" aria-label="Table" autocomplete="off">
+                                    <form x-target="clientTable" action="{{ url()->current() }}" method="GET" role="search" aria-label="Table" autocomplete="off">
                                         <input type="hidden" name="tab" value="client"> <!-- Hidden field to retain tab state -->
                                         <input 
                                             type="search" 
@@ -65,8 +65,6 @@
                                             @search="$el.form.requestSubmit()"
                                         >
                                     </form>
-                                    
-                                    
                                     <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-zinc-400"></i>
                                 </div>
 
@@ -82,7 +80,7 @@
                                     <div id="clientDropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
                                         <div class="py-2 px-2">
                                             <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
-                                            <div data-sort="recently-Added" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
+                                            <div data-sort="recently-added" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
                                             <div data-sort="allAscending" class="block px-4 py-2 w-full text-sm hover-dropdown">Ascending</div>
                                             <div data-sort="allDescending" class="block px-4 py-2 w-full text-sm hover-dropdown">Descending</div>
                                         </div>
@@ -112,7 +110,7 @@
 
                             <hr class="border-zinc-300 w-[calc(100%+2rem)] mx-[-1rem]">
 
-                            <div class="my-4 overflow-y-auto max-h-[500px]">
+                            <div class="my-4 overflow-y-auto h-auto">
                                 <table class="min-w-full bg-white" id="clientTable">
                                     <thead class="bg-zinc-100 text-zinc-700 font-extrabold sticky top-0">
                                         <tr>
@@ -130,9 +128,23 @@
                                                     @csrf
                                                     @method('DELETE')
                                                     <input type="hidden" name="organization_id" value="{{ $client->id }}">
-                                                    <td class="text-left py-[7px] px-4">{{ $client->orgSetup->registration_name ?? 'N/A' }}</td>
-                                                    <td class="text-left py-[7px] px-4">{{ $client->orgSetup->tin ?? 'N/A' }}</td>
-                                                    <td class="text-left py-[7px] px-4">
+                                                    <td
+                                                        {{-- <button 
+                                                        x-data
+                                                        x-on:click="$dispatch('open-view-client-modal', {
+                                                            id: '{{ $client->id }}', 
+                                                            name: '{{ $client->orgSetup->registration_name ?? 'N/A' }}',
+                                                            tin: '{{ $client->orgSetup->tin ?? 'N/A' }}', 
+                                                            classification: '{{ $client->orgSetup->type ?? 'N/A' }}', 
+                                                            date_created: '{{ $client->created_at->format('F j, Y') }}', 
+                                                            role: 'Client'
+                                                        })"
+                                                        class="text-left py-4 px-4 hover:underline hover:text-blue-500">{{ $client->orgSetup->registration_name ?? 'N/A' }}
+                                                        </button> --}}
+                                                        class="text-left py-4 px-4 hover:underline hover:text-blue-500">{{ $client->orgSetup->registration_name ?? 'N/A' }}
+                                                    </td>
+                                                    <td class="text-left py-4 px-4">{{ $client->orgSetup->tin ?? 'N/A' }}</td>
+                                                    <td class="text-left py-4 px-4">
                                                         <span class="bg-amber-100 text-zinc-700 text-xs font-medium me-2 px-4 py-2 rounded-full">Client</span>
                                                     </td>
                                                     
@@ -145,8 +157,7 @@
                                                         </button>
                                                         <div id="dropdownClientAction-{{ $client->id }}" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 py-2 px-4 rounded-lg shadow-lg w-32 origin-top-right overflow-hidden max-h-64 overflow-y-auto">
                                                             <div 
-                                                            x-data 
-                                                            x-on:click="$dispatch('open-delete-client-modal', { clientId: '{{ $client->id }}', clientName: '{{ $client->name }}' })"  
+                                                            x-data x-on:click="$dispatch('open-delete-client-modal', { clientId: '{{ $client->id }}', clientName: '{{ $client->name }}' })"  
                                                             class="block px-4 py-2 w-full text-left hover-dropdown text-red-500 cursor-pointer">
                                                             Delete
                                                         </div>
@@ -189,12 +200,74 @@
         </div>
     </div>
 
+    {{-- View Modal --}}
+    {{-- <div x-data="{ showClient: false, client: {} }"
+        x-show="showClient"
+        @open-view-client-modal.window="showClient = true; client = $event.detail" 
+        x-on:close-modal.window="showClient = false"
+        x-effect="document.body.classList.toggle('overflow-hidden', showClient)"
+        class="fixed z-50 inset-0 flex items-center justify-center m-2 px-6"
+        x-cloak>
+        <!-- Modal background -->
+        <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
+        <!-- Modal container -->
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden"
+         x-show="showClient" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
+            <!-- Modal header -->
+            <div class="relative p-3 bg-amber-300 border-opacity-80 w-full">
+                <h1 class="text-lg font-bold text-white text-center">Account Details</h1>
+                <button @click="showClient = false" class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 8L16 16M8 16L16 8" stroke="#1e3a8a" class="transition duration-200 hover:stroke-gray-600"/>
+                    </svg>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-10">
+                <div class="mb-5 flex justify-between items-start">
+                    <div class="w-2/3 pr-4">
+                        <label class="block text-sm font-bold text-zinc-700">Name</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="client.name" disabled readonly>
+                    </div>
+                    <div class="w-2/3 text-left">
+                        <label class="block text-sm font-bold text-zinc-700">TIN</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="client.tin" disabled readonly>
+                    </div>
+                </div>
+                <div class="mb-5 flex justify-between items-start">
+                    <div class="w-2/3 pr-4">
+                        <label class="block text-sm font-bold text-zinc-700">Classification</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="client.type" disabled readonly>
+                    </div>
+                    <div class="w-2/3 text-left">
+                        <label class="block text-sm font-bold text-zinc-700">Account Type</label>
+                        <div class="inline-block bg-gray-100 text-gray-700 text-xs font-medium mt-2 px-4 py-2 rounded-full">
+                            <span x-text="client.role"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-2/3 pr-4 mb-4">
+                    <label for="email" class="block text-sm font-bold text-zinc-700">Date Created</label>
+                    <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                    x-bind:value="client.created_at" disabled readonly>                
+                </div>
+            </div>
+        </div>
+    </div> --}}
+
     <!-- Delete Confirmation Modal CLIENT -->
     <div x-data="{ open: false, clientId: null, clientName: '' }" 
         @open-delete-client-modal.window="open = true; clientId = $event.detail.clientId; clientName = $event.detail.clientName" 
         x-effect="document.body.classList.toggle('overflow-hidden', open)"
         x-cloak>
-        <div x-show="open" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
+        <div x-show="open" class="fixed inset-0 bg-gray-200 bg-opacity-50 z-50 flex items-center justify-center" x-transition:enter="transition ease-out duration-100 transform"
+            x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-90 transform" x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-90">
             <div class="bg-white p-10 rounded-lg shadow-lg max-w-lg w-full relative">
                 <!-- Close Button -->
                 <button @click="open = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
@@ -238,7 +311,6 @@
 </div>
 
 <script>
-
     // Client tab sorting logic
     document.getElementById('clientSortButton').addEventListener('click', function() {
         const dropdown = document.getElementById('clientDropdownMenu');
@@ -269,7 +341,6 @@
         table.innerHTML = '';
         sortedRows.forEach(row => table.appendChild(row));
     }
-
     // Add click event listeners to each sort option for Client tab
     document.querySelectorAll('#clientDropdownMenu div[data-sort]').forEach(item => {
         item.addEventListener('click', function() {
@@ -279,53 +350,48 @@
         });
     });
 
-
-
+    // FOR ACTION BUTTON - Client TAB
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[id^="clientDropdownMenuAction-"]').forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.id.split('-')[1];
+                const dropdown = document.getElementById(`dropdownClientAction-${id}`);
+                dropdown.classList.toggle('hidden');
+                console.log(`Dropdown for client ${id} toggled`);
+            });
+        });
+    });
+    
     // FOR CLIENT
-   // FOR BUTTON OF SHOW ENTRIES - Client TAB
-    document.getElementById('dropdownMenuClientButton').addEventListener('click', function(event) {
-        event.stopPropagation(); // Prevents triggering the document click event
-        const dropdown = document.getElementById('clientDropdownDots');
+   // FOR BUTTON OF SHOW ENTRIES
+   document.getElementById('dropdownMenuIconButton').addEventListener('click', function() {
+        const dropdown = document.getElementById('dropdownDots');
         dropdown.classList.toggle('hidden');
     });
-
-    // FOR ACTION BUTTON - Client TAB
-    document.querySelectorAll('[id^="clientDropdownMenuAction-"]').forEach(button => {
-        button.addEventListener('click', function(event) {
-            event.stopPropagation(); // Prevents triggering the document click event
-            const id = this.id.split('-')[1];
-            const dropdown = document.getElementById(`dropdownClientAction-${id}`);
-            dropdown.classList.toggle('hidden');
-        });
-    });
-
-    // Hide dropdown if clicked outside
-    document.addEventListener('click', function(event) {
-        document.querySelectorAll('[id^="dropdownClientAction-"]').forEach(dropdown => {
-            if (!dropdown.contains(event.target)) { // Check if click is outside the dropdown
-                dropdown.classList.add('hidden');
-            }
-        });
-    });
-
-    // FOR SHOWING/SETTING ENTRIES - Client TAB
-    function setClientEntries(entries) {
+    // FOR SHOWING/SETTING ENTRIES
+    function setEntries(entries) {
         const form = document.createElement('form');
         form.method = 'GET';
         form.action = "{{ route('user-management.client') }}";
+        // Create a hidden input for perPage
         const perPageInput = document.createElement('input');
         perPageInput.type = 'hidden';
         perPageInput.name = 'perPage';
         perPageInput.value = entries;
+        // Add search input value if needed
         const searchInput = document.createElement('input');
         searchInput.type = 'hidden';
         searchInput.name = 'client_search';
         searchInput.value = "{{ request('client_search') }}";
+        // Append inputs to form
         form.appendChild(perPageInput);
         form.appendChild(searchInput);
+        // Append the form to the body and submit
         document.body.appendChild(form);
         form.submit();
     }
+
+    
 </script>
     
 </x-organization-layout>
