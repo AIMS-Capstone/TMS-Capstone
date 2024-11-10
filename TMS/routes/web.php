@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AtcController;
 use App\Http\Controllers\CoaController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\OrgAccountController;
@@ -82,21 +81,17 @@ Route::middleware([
     Route::post('/user-account-store', [UserController::class, 'store'])->name('users.store');
     Route::get('/export-atc/{type}', [AtcController::class, 'exportAtcs']);
     Route::get('/export-coa', [CoaController::class, 'exportCoas']);
-    
 
 
     Route::post('/org_accounts', [OrgAccountController::class, 'store'])->name('org_accounts.store');
-
     // User Management
 Route::get('/user-management/user', [UserController::class, 'user'])->name('user-management.user');
 Route::get('/user-management/client', [UserController::class, 'client'])->name('user-management.client');
 
-
     
     // Routes Requiring Organization Session
     Route::middleware([CheckOrganizationSession::class])->group(function () {
-        // User Management
-        Route::get('/user-management', [UserController::class, 'index'])->name('user-management');
+        
         Route::get('/recycle-bin', function () {
             return view('recycle-bin');
         })->name('recycle-bin');
@@ -138,37 +133,47 @@ Route::get('/user-management/client', [UserController::class, 'client'])->name('
 
     //General Accounting Routing
         Route::get('/general-ledger', [GeneralLedgerController::class, 'ledger'])->name('general-ledger');
+        Route::get('/general-ledger/export', [GeneralLedgerController::class, 'exportExcel'])->name('ledger.exportExcel');
 
     //Sales Book routings
         Route::get('/sales-book', [SalesController::class, 'sales'])->name('sales-book');
         Route::get('sales-book/posted', [SalesController::class, 'posted'])->name('posted');
         Route::post('/sales-book/post', [SalesController::class, 'updateToPosted'])->name('.updateToPosted');
         Route::post('/sales-book/draft', [SalesController::class, 'updateToDraft'])->name('.updateToDraft');
+        Route::get('/sales-book/export', [SalesController::class, 'exportSalesBook'])->name('sales.exportExcel');
+        Route::get('/sales-book-posted/export', [SalesController::class, 'exportSalesBookPosted'])->name('sales-posted.exportExcel');
 
     //Purchase Book routings
         Route::get('/purchase-book', [PurchaseController::class, 'purchase'])->name('purchase-book');
         Route::get('purchase-book/posted', [PurchaseController::class, 'posted'])->name('posted');
         Route::post('/purchase-book/post', [PurchaseController::class, 'updateToPosted'])->name('.updateToPosted');
         Route::post('/purchase-book/draft', [PurchaseController::class, 'updateToDraft'])->name('.updateToDraft');
-
         Route::get('/purchase-book/export', [PurchaseController::class, 'exportPurchaseBook'])->name('purchase.exportExcel');
         Route::get('/purchase-book-posted/export', [PurchaseController::class, 'exportPurchaseBookPosted'])->name('purchase-posted.exportExcel');
-
 
     //Cash receipt routings
         Route::get('/cash-receipt', [CashReceiptController::class, 'cashReceipt'])->name('cash-receipt');
         Route::get('cash-receipt/posted', [CashReceiptController::class, 'posted'])->name('posted');
         Route::post('/cash-receipt/post', [CashReceiptController::class, 'updateToPosted'])->name('.updateToPosted');
         Route::post('/cash-receipt/draft', [CashReceiptController::class, 'updateToDraft'])->name('.updateToDraft');
+        Route::get('/cash-receipt/export', [CashReceiptController::class, 'exportCashReceipt'])->name('cash_receipt.exportExcel');
+        Route::get('/cash-receipt-posted/export', [CashReceiptController::class, 'exportCashReceiptPosted'])->name('cash_receipt-posted.exportExcel');
+
 
     //Cash disbursement routings
         Route::get('/cash-disbursement', [CashDisbursementController::class, 'cashDisbursement'])->name('cash-disbursement');
         Route::get('cash-disbursement/posted', [CashDisbursementController::class, 'posted'])->name('posted');
         Route::post('/cash-disbursement/post', [CashDisbursementController::class, 'updateToPosted'])->name('.updateToPosted');
         Route::post('/cash-disbursement/draft', [CashDisbursementController::class, 'updateToDraft'])->name('.updateToDraft');
+        Route::get('/cash-disbursement/export', [CashDisbursementController::class, 'exportCashDisbursement'])->name('cash_disbursement.exportExcel');
+        Route::get('/cash-disbursement-posted/export', [CashDisbursementController::class, 'exportCashDisbursementPosted'])->name('cash_disbursement-posted.exportExcel');
+
+
 
     //General Journal Routing
         Route::get('/general-journal', [GeneralJournalController::class, 'journal'])->name('general-journal');
+        Route::get('/general-journal/export', [GeneralJournalController::class, 'exportJournalExcel'])->name('journal.exportExcel');
+
 
     // Financial Reports Routing
         Route::get('/financial-reports', [FinancialController::class, 'financial'])->name('financial-reports');
@@ -222,7 +227,3 @@ Route::get('/user-management/client', [UserController::class, 'client'])->name('
 
 
     });
-
-
-
-
