@@ -41,6 +41,8 @@ class PurchaseTransaction extends Component
     public function mount()
     {
         $this->addTaxRow();
+        $this->addTaxRow();
+        $this->addTaxRow();
     }
 
     public function addTaxRow()

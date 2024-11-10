@@ -45,10 +45,13 @@
                     <li x-show="selectedTab === 'Purchase'">
                         <a href="{{ url('/transactions/create?type=purchase') }}" class="block px-4 py-2 hover-dropdown">Add Manual</a>
                     </li>
+             
                     <li x-show="selectedTab === 'Purchase'">
-                  
-        
-                    </li>
+                      
+                        <livewire:purchase-multi-step-import/>
+              
+    
+                </li>
                     <li x-show="selectedTab === 'Purchase'">
                         <a href="#" class="block px-4 py-2 hover-dropdown">Upload Image</a>
                     </li>
@@ -58,8 +61,9 @@
                         <a href="{{ url('/transactions/create?type=journal') }}" class="block px-4 py-2 hover-dropdown">Add Manual</a>
                     </li>
                     <li x-show="selectedTab === 'Journal'">
-                        <a href="#" class="block px-4 py-2 hover-dropdown">Import CSV</a>
+                        <livewire:journal-multi-step-import/>
                     </li>
+
                 </ul>
             </div>
         </div>

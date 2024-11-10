@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AtcController;
 use App\Http\Controllers\CoaController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\OrgAccountController;
@@ -27,7 +28,7 @@ use App\Http\Controllers\ClientAuthController;
 use App\Http\Controllers\ClientFinancialController;
 use App\Http\Controllers\ClientProfileController;
 use App\Http\Controllers\ClientAnalyticsController;
-
+use App\Http\Controllers\TaxTypeController;
 use App\Models\rdo;
 use App\Models\TaxReturn;
 
@@ -81,7 +82,10 @@ Route::middleware([
     Route::post('/user-account-store', [UserController::class, 'store'])->name('users.store');
     Route::get('/export-atc/{type}', [AtcController::class, 'exportAtcs']);
     Route::get('/export-coa', [CoaController::class, 'exportCoas']);
-
+    Route::get('/export-tax-type/{type}', [TaxTypeController::class, 'exportTaxType']);
+    Route::get('/edit-sales/{transaction}', [TransactionsController::class, 'editSales']);
+    Route::get('/transactions/{id}/edit-sales', [TransactionsController::class, 'edit'])->name('transactions.edit');
+    Route::post('/transactions/{id}', [TransactionsController::class, 'update'])->name('transactions.update');
 
     Route::post('/org_accounts', [OrgAccountController::class, 'store'])->name('org_accounts.store');
     // User Management

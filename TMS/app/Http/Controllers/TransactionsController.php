@@ -27,10 +27,10 @@ class TransactionsController extends Controller
     public function index(Request $request) {
         $search = $request->input('search');
         $type = $request->input('type');
-        $organizationId = session('organization_id'); // Retrieve the organization_id from the session
+        $organizationId = session('organization_id'); 
     
         $query = Transactions::with('contactDetails')
-            ->where('organization_id', $organizationId); // Filter by organization_id
+            ->where('organization_id', $organizationId);
     
         if ($search) {
             $query->where(function ($query) use ($search) {
@@ -46,9 +46,25 @@ class TransactionsController extends Controller
             $query->where('transaction_type', $type);
         }
     
+        
         $transactions = $query->paginate(5);
     
-        return view('transactions', compact('transactions'));
+        
+        $purchaseCount = 1;
+    
+        $salesCount = Transactions::where('organization_id', $organizationId)
+            ->where('transaction_type', 'Sales')
+            ->count();
+    
+        $journalCount = Transactions::where('organization_id', $organizationId)
+            ->where('transaction_type', 'Journal')
+            ->count();
+    
+        
+        $allTransactionsCount = Transactions::where('organization_id', $organizationId)->count();
+    
+       
+        return view('transactions', compact('transactions', 'purchaseCount', 'salesCount', 'journalCount', 'allTransactionsCount'));
     }
     
 
@@ -119,7 +135,7 @@ class TransactionsController extends Controller
     public function show(Transactions $transaction)
     {
         // Fetch associated tax rows for the transaction
-        $taxRows = ModelsTaxRow::where('transaction_id', $transaction->id)->get();
+        $taxRows = ModelsTaxRow::where('transaction_id', $transaction->id)->with('coaAccount')->get();
     
 
         // Pass the transaction and tax rows to the view
@@ -129,17 +145,31 @@ class TransactionsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Transactions $transactions)
+    public function edit($id)
     {
-        //
+        $transaction = Transactions::with('contactDetails', 'taxRows')->findOrFail($id);
+        return view('livewire.edit-sales-transaction', compact('transaction'));
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(updateTransactionsRequest $request, Transactions $transactions)
+    
+    public function update(Request $request, $id)
     {
-        //
+        $transaction = Transactions::findOrFail($id);
+    
+        // Validate input data
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'inv_number' => 'required|string',
+            'reference' => 'nullable|string',
+            'total_amount' => 'required|numeric',
+            // Add other fields as needed
+        ]);
+    
+        // Update transaction with validated data
+        $transaction->update($validated);
+    
+        // Optionally, handle any additional fields, such as tax rows
+    
+        return redirect()->route('transactions.show', $transaction->id)->with('success', 'Transaction updated successfully.');
     }
 
     /**
@@ -174,4 +204,6 @@ class TransactionsController extends Controller
         // Pass the data to the view to preview
         return view('transactions.preview', compact('data'));
     }
+   
+
 }

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AtcExport;
+use App\Exports\TaxTypeExport;
 use App\Models\TaxType;
 use App\Http\Requests\StoreTaxTypeRequest;
 use App\Http\Requests\UpdateTaxTypeRequest;
-
+use Maatwebsite\Excel\Facades\Excel;
 
 class TaxTypeController extends Controller
 {
@@ -63,6 +65,16 @@ class TaxTypeController extends Controller
     public function destroy(TaxType $taxType)
     {
         //
+    }
+    public function exportTaxType($type)
+    {
+        // Validate that the type is either 'purchase' or 'sale'
+        if (!in_array($type, ['purchase', 'sales'])) {
+            return redirect()->back()->with('error', 'Invalid type.');
+        }
+
+        // Pass the type to the export class and trigger the download
+        return Excel::download(new TaxTypeExport($type), "{$type}_tax_types.csv");
     }
   
 }

@@ -29,7 +29,7 @@
             <!-- Unfiled Taxes -->
             <div class="flex items-center space-x-4 pl-6">
                 <div class="text-blue-900 text-xl rounded-full flex items-center justify-center font-bold">
-                    13
+                    {{$unfiledTaxReturnCount}}
                 </div>
                 <div>
                     <h2 class="text-zinc-600 font-bold">Unfiled Taxes</h2>
@@ -51,7 +51,7 @@
             <!-- Total Purchases -->
             <div class="flex items-center space-x-4 lg:pl-6">
                 <div class="text-blue-900 text-xl rounded-full flex items-center justify-center font-bold">
-                    
+                    {{$totalPurchaseTransaction}}
                 </div>
                 <div>
                     <h2 class="text-zinc-600 font-bold">Total Purchases</h2>
