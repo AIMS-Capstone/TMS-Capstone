@@ -73,6 +73,15 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                 <span class="sidebar-text ease-in duration-500 transition-all">Transactions</span>
                             </a>
                         </li>
+                        <li class="pl-0">
+                            <a href="{{ route('contacts') }}"
+                            class="flex items-center rounded-r-full px-6 py-2 
+                            {{ request()->routeIs('contacts') ? 'sidebar-active' : '' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon mr-3" viewBox="0 0 14 14"><path fill="#273C75" fill-rule="evenodd" d="M8 3a3 3 0 1 1-6 0a3 3 0 0 1 6 0m2.75 4.5a.75.75 0 0 1 .75.75V10h1.75a.75.75 0 0 1 0 1.5H11.5v1.75a.75.75 0 0 1-1.5 0V11.5H8.25a.75.75 0 0 1 0-1.5H10V8.25a.75.75 0 0 1 .75-.75M5 7c1.493 0 2.834.655 3.75 1.693v.057h-.5a2 2 0 0 0-.97 3.75H.5A.5.5 0 0 1 0 12a5 5 0 0 1 5-5" clip-rule="evenodd"/></svg>
+                                <span class="sidebar-text ease-in duration-500 transition-all">Contacts</span>
+                            </a>
+                        </li>
+
                         <li x-data="{ open: {{ request()->routeIs('vat_return') ? 'true' : 'false' }} }">
                             <button @click="open = !open" type="button"
                                 :class="{
@@ -191,7 +200,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                             <a href="{{ route('financial-reports') }}"
                             class="flex items-center rounded-r-full px-6 py-2 ease-in transition-all
                             {{ request()->routeIs('financial-reports') ? 'sidebar-active' : '' }}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon mr-2" viewBox="0 0 24 24"><g fill="none"><path fill="#273C75" d="M21 7c0 2.21-4.03 4-9 4S3 9.21 3 7s4.03-4 9-4s9 1.79 9 4"/><path stroke="#172554" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 7c0 2.21-4.03 4-9 4S3 9.21 3 7m18 0c0-2.21-4.03-4-9-4S3 4.79 3 7m18 0v5M3 7v5m18 0c0 2.21-4.03 4-9 4s-9-1.79-9-4m18 0v5c0 2.21-4.03 4-9 4s-9-1.79-9-4v-5"/></g></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon mr-2" viewBox="0 0 24 24"><path fill="#273C75" d="M12 3.25c-5.59 0-10 2.82-10 6.46v4.58c0 3.62 4.39 6.46 10 6.46s10-2.84 10-6.46V9.72c0-3.63-4.43-6.47-10-6.47m8.5 11c0 2.69-3.89 5-8.5 5s-8.5-2.27-8.5-5V13.1c1.78 1.87 5 3 8.5 3s6.73-1.18 8.5-3z"/></svg>
                                 <span class="sidebar-text ease-in duration-500 transition-all">Financial Reports</span>
                             </a>
                         </li>

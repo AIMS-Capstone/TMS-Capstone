@@ -50,7 +50,11 @@ class TransactionsController extends Controller
         $transactions = $query->paginate(5);
     
         
-        $purchaseCount = 1;
+
+        $purchaseCount = Transactions::where('organization_id', $organizationId)
+            ->where('transaction_type', 'Purchase')
+            ->count();
+
     
         $salesCount = Transactions::where('organization_id', $organizationId)
             ->where('transaction_type', 'Sales')
