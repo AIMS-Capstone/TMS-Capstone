@@ -129,7 +129,7 @@
                                                     @method('DELETE')
                                                     <input type="hidden" name="organization_id" value="{{ $client->id }}">
                                                     <td
-                                                        {{-- <button 
+                                                        <button 
                                                         x-data
                                                         x-on:click="$dispatch('open-view-client-modal', {
                                                             id: '{{ $client->id }}', 
@@ -140,8 +140,8 @@
                                                             role: 'Client'
                                                         })"
                                                         class="text-left py-4 px-4 hover:underline hover:text-blue-500">{{ $client->orgSetup->registration_name ?? 'N/A' }}
-                                                        </button> --}}
-                                                        class="text-left py-4 px-4 hover:underline hover:text-blue-500">{{ $client->orgSetup->registration_name ?? 'N/A' }}
+                                                        </button>
+                                                      
                                                     </td>
                                                     <td class="text-left py-4 px-4">{{ $client->orgSetup->tin ?? 'N/A' }}</td>
                                                     <td class="text-left py-4 px-4">
@@ -199,9 +199,9 @@
             </div>
         </div>
     </div>
-
+    
     {{-- View Modal --}}
-    {{-- <div x-data="{ showClient: false, client: {} }"
+    <div x-data="{ showClient: false, client: {} }"
         x-show="showClient"
         @open-view-client-modal.window="showClient = true; client = $event.detail" 
         x-on:close-modal.window="showClient = false"
@@ -242,7 +242,7 @@
                     <div class="w-2/3 pr-4">
                         <label class="block text-sm font-bold text-zinc-700">Classification</label>
                         <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
-                            x-bind:value="client.type" disabled readonly>
+                            x-bind:value="client.classification" disabled readonly>
                     </div>
                     <div class="w-2/3 text-left">
                         <label class="block text-sm font-bold text-zinc-700">Account Type</label>
@@ -254,11 +254,11 @@
                 <div class="w-2/3 pr-4 mb-4">
                     <label for="email" class="block text-sm font-bold text-zinc-700">Date Created</label>
                     <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
-                    x-bind:value="client.created_at" disabled readonly>                
+                    x-bind:value="client.date_created" disabled readonly>                
                 </div>
             </div>
         </div>
-    </div> --}}
+    </div>
 
     <!-- Delete Confirmation Modal CLIENT -->
     <div x-data="{ open: false, clientId: null, clientName: '' }" 

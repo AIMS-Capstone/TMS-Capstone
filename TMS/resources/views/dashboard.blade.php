@@ -25,8 +25,12 @@
                 </div>
             </div>
             <!-- Unfiled Taxes -->
-            <div class="flex items-center space-x-4">
-                <div class="text-blue-900 text-4xl rounded-full flex items-center justify-center font-bold"></div>
+
+            <div class="flex items-center space-x-4 pl-6">
+                <div class="text-blue-900 text-xl rounded-full flex items-center justify-center font-bold">
+                    {{$unfiledTaxReturnCount}}
+                </div>
+
                 <div>
                     <h2 class="text-zinc-600 font-bold">Unfiled Taxes</h2>
                     <p class="text-gray-500 text-xs">Total number of pending or overdue tax returns</p>
@@ -45,8 +49,12 @@
                 </div>
             </div>
             <!-- Total Purchases -->
-            <div class="flex items-center space-x-4">
-                <div class="text-blue-900 text-4xl rounded-full flex items-center justify-center font-bold"></div>
+
+            <div class="flex items-center space-x-4 lg:pl-6">
+                <div class="text-blue-900 text-xl rounded-full flex items-center justify-center font-bold">
+                    {{$totalPurchaseTransaction}}
+                </div>
+
                 <div>
                     <h2 class="text-zinc-600 font-bold">Total Purchases</h2>
                     <p class="text-gray-500 text-xs">Total number of purchase-related transactions</p>

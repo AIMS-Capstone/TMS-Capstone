@@ -21,13 +21,19 @@ class DashboardController extends Controller
         $filedTaxReturnCount = TaxReturn::where('status', 'Filed')
         ->where('organization_id', $organizationId)
         ->count();
+        $unfiledTaxReturnCount = TaxReturn::where('status', operator: 'Unfiled')
+        ->where('organization_id', $organizationId)
+        ->count();
         $totalSalesTransaction = Transactions::where('transaction_type', 'Sales')
+        ->where('organization_id', $organizationId)
+        ->count();
+        $totalPurchaseTransaction = Transactions::where('transaction_type', 'Purchase')
         ->where('organization_id', $organizationId)
         ->count();
             
 
     // Pass data to the view
-    return view('dashboard', compact('organization', 'filedTaxReturnCount', 'totalSalesTransaction'));
+    return view('dashboard', compact('organization', 'filedTaxReturnCount', 'totalSalesTransaction','unfiledTaxReturnCount','totalPurchaseTransaction'));
     }
 }
 

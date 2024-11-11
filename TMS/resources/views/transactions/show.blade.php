@@ -37,7 +37,7 @@
                     <div id="salesOptions" class="hidden absolute right-0 z-10 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                         <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="salesOptionsButton">
                             <a href="/transactions/add-collection" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Add Collection</a>
-                            <a href="/transactions/edit-sales" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit Sales</a>
+                            <a href="{{ route('transactions.edit', $transaction->id) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit Sales</a>
                             <a href="/transactions/mark-as-posted" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mark as Posted</a>
                         </div>
                     </div>
@@ -373,9 +373,10 @@
                 </thead>
                 <tbody>
                     @foreach($transaction->taxRows as $row)
+                
                         <tr>
-                            <td class="px-4 py-2">{{ $row['description'] }}</td>
-                            <td class="px-4 py-2">{{ $row['account'] }}</td>
+                            <td class="px-4 py-2">{{ $row->description }}</td>
+                            <td class="px-4 py-2">{{ $row->coaAccount->name ?? 'N/A' }}</td>
                             <td class="px-4 py-2">{{ number_format($row['debit'], 2) }}</td>
                             <td class="px-4 py-2">{{ number_format($row['credit'], 2) }}</td>
                         </tr>

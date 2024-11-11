@@ -33,6 +33,7 @@ class JournalTransaction extends Component
     public function mount()
     {
         $this->addJournalRow(); // Add an initial journal row on mount
+        $this->addJournalRow(); 
     }
 
     // Adds a new journal row to the entry

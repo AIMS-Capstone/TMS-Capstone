@@ -239,49 +239,10 @@
         </div>
     </div>
 
-    {{-- Create Client Account MODAL --}}
-    <div x-data="{ open: false, organizationId: null, email: '', isEmailValid() { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email); } }" 
-     @open-generate-modal.window="open = true; organizationId = $event.detail.organizationId" 
-     x-effect="document.body.classList.toggle('overflow-hidden', open)"
-     x-cloak>
-        <div x-show="open" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
-            <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden">
-                <!-- Modal header -->
-                <div class="flex bg-blue-900 justify-center rounded-t-lg items-center p-3 border-b border-opacity-80 mx-auto">
-                    <h1 class="text-lg font-bold text-white">Create Client Account</h1>
-                </div>
-                <!-- Modal Body -->
-                <div class="p-10">
-                    <form method="POST" action="{{ route('org_accounts.store') }}">
-                        @csrf
-                        <!-- Organization ID (hidden) -->
-                        <input type="hidden" name="org_setup_id" :value="organizationId">
-
-                        <div class="text-zinc-500 text-xs leading-4 mb-4">
-                            The client must first provide their <b class="text-zinc-700">Email Address</b> to the accounting firm in order to access their account. Creating an account for the client is optional, but once an account is created, relevant tax-related information will be reflected in the account, allowing the client to view and generate various reports.
-                        </div>
-                        <div class="mb-4">
-                            <label for="email" class="block text-sm font-bold text-zinc-700">Email Address<span class="text-red-500">*</span></label>
-                            <input type="email" id="email" name="email" x-model="email" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
-                            placeholder="Email Address" maxlength="100" required>
-                        </div>
-
-                        <div class="flex justify-end mt-10">
-                            <button type="button" @click="open = false" class="mr-4 font-semibold text-zinc-700 px-3 py-1 rounded-md hover:text-zinc-900 transition">Cancel</button>
-                            <button type="submit" 
-                                    :disabled="!isEmailValid()"
-                                    class="font-semibold bg-blue-900 text-white text-center px-6 py-1.5 rounded-md hover:bg-blue-950 border-blue-900 hover:text-white transition disabled:bg-gray-300 disabled:cursor-not-allowed">
-                                Create Account
-                            </button>                   
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+   
 
     {{-- CREATE CLIENT ACCOUNT WITH SUCCESS MODAL NA MABAGAL. I prefer the modal above kasi nakikita na nagpprocess yung submission--}}
-    {{-- <div x-data="{ open: false, organizationId: null, email: '', success: false, 
+    <div x-data="{ open: false, organizationId: null, email: '', success: false, 
                isEmailValid() { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email); } }" 
         @open-generate-modal.window="open = true; organizationId = $event.detail.organizationId" 
         @submit-success.window="open = false; success = true"
@@ -346,7 +307,7 @@
                 </div>
             </div>
         </div>
-    </div> --}}
+    </div>
 
     <!-- Delete Confirmation Modal -->
     <div x-data="{ open: false, organizationId: null, organizationName: '' }" 
@@ -492,29 +453,29 @@
             setSessionButton.classList.add('bg-blue-200', 'text-blue-700', 'border-blue-700');
         }
 
-        // MABAGAL MAG-APPEAR NA SUCCESS MODAL for Create Client Account
-        // function submitForm() {
-        //     // Example asynchronous submission (AJAX)
-        //     fetch('{{ route("org_accounts.store") }}', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-        //         },
-        //         body: JSON.stringify({ 
-        //             org_setup_id: this.organizationId, 
-        //             email: this.email 
-        //         })
-        //     })
-        //     .then(response => {
-        //         if (response.ok) {
-        //             // Emit success event
-        //             window.dispatchEvent(new CustomEvent('submit-success'));
-        //         } else {
-        //             alert("Failed to create account.");
-        //         }
-        //     })
-        //     .catch(error => console.error('Error:', error));
-        // }
+    
+        function submitForm() {
+            // Example asynchronous submission (AJAX)
+            fetch('{{ route("org_accounts.store") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                },
+                body: JSON.stringify({ 
+                    org_setup_id: this.organizationId, 
+                    email: this.email 
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Emit success event
+                    window.dispatchEvent(new CustomEvent('submit-success'));
+                } else {
+                    alert("Failed to create account.");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
     </script>
 </x-organization-layout>
