@@ -140,10 +140,10 @@ class OrgSetupController extends Controller
         $request->validate([
             'organization_id' => 'required|exists:org_setups,id',
         ]);
-    
+
         $organization = OrgSetup::findOrFail($request->organization_id);
-        $organization->delete(); // Perform the deletion
-    
-        return redirect()->back()->with('success', 'Organization deleted successfully.');
+        $organization->delete(); // Perform the soft delete
+
+        return redirect()->back()->with('success', 'Organization deleted successfully and moved to Recycle Bin.');
     }
 }

@@ -47,7 +47,7 @@ class TaxReturnController extends Controller
             'year' => $request->year,
             'month' => $request->month,
             'created_by' => auth()->id(),
-            'organization_id' => $request->organization_id,
+            'organization_id' => $request->organization_id, 
             'status' => 'Unfiled',
         ]);
     
@@ -466,11 +466,13 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(TaxReturn $taxReturn)
+    //Soft delete
+    public function destroy($id)
     {
-        //
+        $taxreturn = TaxReturn::findOrFail($id);
+        $taxreturn->delete(); // Soft delete the transaction
+
+        return back()->with('success', 'Tax Return deleted successfully!');
     }
 }
+

@@ -6,6 +6,7 @@ use App\Models\OrgAccount;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
@@ -18,9 +19,12 @@ class UserController extends Controller
         $userSearch = $request->input('user_search'); // Change to user_search for clarity
         $status = $request->input('status');
         $perPage = $request->input('perPage', 5);
+
+        $loggedInUserId = Auth::id();
+
     
         // Start building the query for active users
-        $userQuery = User::query();
+        $userQuery = User::where('id', '!=', $loggedInUserId);
     
         // Apply search if there is one
         if ($userSearch) {
@@ -174,8 +178,15 @@ class UserController extends Controller
     public function destroy(Request $request)
     {
         $user = User::findOrFail($request->input('user_id'));
+
+        // Set `deleted_by` to the ID of the currently authenticated user
+        $user->deleted_by = Auth::id();
+        $user->save();
+
+        // Soft delete the user
         $user->delete();
-    
+
         return redirect()->route('user-management.user');
     }
+
 }
