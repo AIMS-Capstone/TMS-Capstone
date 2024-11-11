@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AtcController;
 use App\Http\Controllers\CoaController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\OrgAccountController;
@@ -21,7 +20,15 @@ use App\Http\Controllers\GeneralLedgerController;
 use App\Http\Controllers\GeneralJournalController;
 use App\Http\Controllers\FinancialController;
 use App\Http\Controllers\PredictionController;
+use App\Http\Controllers\AtcController;
 use App\Http\Controllers\UserController;
+
+//Recycle Bin
+use App\Http\Controllers\OrganizationRecycleBinController; //This is the default for layouts
+use App\Http\Controllers\AccountantUsersRecycleBinController;
+use App\Http\Controllers\ClientUsersRecycleBinController;
+use App\Http\Controllers\TransactionsRecycleBinController;
+use App\Http\Controllers\TaxReturnsRecycleBinController;
 
 //Client
 use App\Http\Controllers\ClientAuthController;
@@ -93,13 +100,39 @@ Route::middleware([
 Route::get('/user-management/user', [UserController::class, 'user'])->name('user-management.user');
 Route::get('/user-management/client', [UserController::class, 'client'])->name('user-management.client');
 
+
+    //Recycle Bin Routing   
+    Route::prefix('recycle-bin')->group(function () {
+    // Organization
+    Route::get('/organization', [OrganizationRecycleBinController::class, 'index'])->name('recycle-bin.organization.index');
+    Route::post('/organization/bulk-restore', [OrganizationRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.organization.bulkRestore');
+    Route::delete('/organization/bulk-delete', [OrganizationRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.organization.bulkDelete');
+
+    // Accountant Users
+    Route::get('/accountant-users', [AccountantUsersRecycleBinController::class, 'index'])->name('recycle-bin.accountant-users.index');
+    Route::post('/accountant-users/bulk-restore', [AccountantUsersRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.accountant-users.bulkRestore');
+    Route::delete('/accountant-users/bulk-delete', [AccountantUsersRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.accountant-users.bulkDelete');
+
+    // Client Users
+    Route::get('/client-users', [ClientUsersRecycleBinController::class, 'index'])->name('recycle-bin.client-users.index');
+    Route::post('/client-users/bulk-restore', [ClientUsersRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.client-users.bulkRestore');
+    Route::delete('/client-users/bulk-delete', [ClientUsersRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.client-users.bulkDelete');
+
+    // Transactions
+    Route::get('/transactions', [TransactionsRecycleBinController::class, 'index'])->name('recycle-bin.transactions.index');
+    Route::post('/transactions/bulk-restore', [TransactionsRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.transactions.bulkRestore');
+    Route::delete('/transactions/bulk-delete', [TransactionsRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.transactions.bulkDelete');
+
+    // Tax Returns
+    Route::get('/tax-returns', [TaxReturnsRecycleBinController::class, 'index'])->name('recycle-bin.tax-returns.index');
+    Route::post('/tax-returns/bulk-restore', [TaxReturnsRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.tax-returns.bulkRestore');
+    Route::delete('/tax-returns/bulk-delete', [TaxReturnsRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.tax-returns.bulkDelete');
+});
+
+
     
     // Routes Requiring Organization Session
     Route::middleware([CheckOrganizationSession::class])->group(function () {
-        
-        Route::get('/recycle-bin', function () {
-            return view('recycle-bin');
-        })->name('recycle-bin');
 
         Route::get('/dashboard', [DashboardController::class, 'showDashboard'])->name('dashboard');
 
