@@ -18,8 +18,12 @@ return new class extends Migration
             $table->string('month'); // To store the month (1-12)
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade'); // Foreign key for the user who created the tax return
             $table->foreignId('organization_id')->constrained('org_setups')->onDelete('cascade');
+            $table->softDeletes();
             $table->string('status'); // To store the status of the tax return (e.g., Draft, Submitted, Completed)
             $table->timestamps(); // Created at and updated at timestamps
+
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
         });
     }
 

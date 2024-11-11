@@ -33,6 +33,8 @@ $table->enum('type', ['Non-individual', 'Individual']);
             $table->date('start_date');
             $table->string('financial_year_end');
             $table->timestamps();
+
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
         });
     }
 
