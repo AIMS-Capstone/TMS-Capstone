@@ -17,8 +17,12 @@ return new class extends Migration
             $table->foreignId('org_setup_id')->constrained('org_setups')->onDelete('cascade'); // Link to organization
             $table->string('email')->unique();
             $table->string('password');
+            $table->enum('type', ['client'])->default('client');
             $table->softDeletes();
             $table->timestamps();
+
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
         });
 
         if (!Schema::hasTable('password_resets')) {

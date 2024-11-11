@@ -5,11 +5,14 @@ namespace App\Models;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Auth;
+
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -32,7 +35,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'suffix',
         'email',
         'password',
-        'role'
+        'role',
     ];
 
     /**
@@ -73,5 +76,22 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getNameAttribute()
     {
         return trim("{$this->first_name} {$this->last_name}");
+    }
+    public function deletedByUser()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
+    }
+
+         protected static function boot()
+    {
+        parent::boot();
+
+       static::deleting(function ($User) {
+            if (!$User->isForceDeleting()) {
+                $User->deleted_by = Auth::user()->id;
+                $User->save();
+            }
+        });
+
     }
 }

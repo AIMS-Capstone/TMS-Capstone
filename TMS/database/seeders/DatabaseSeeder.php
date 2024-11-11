@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             'last_name' => 'User',
             'suffix' => 'I',
             'email' => 'admin@gmail.com',
+            'role' => 'Admin',
             'email_verified_at' => now(),
             'password' => static::$hashedPassword,
         ]);

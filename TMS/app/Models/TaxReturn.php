@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Auth;
 
 class TaxReturn extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $fillable = [
         'title',
         'year',
@@ -15,6 +19,7 @@ class TaxReturn extends Model
         'created_by',      
         'organization_id',     
         'status',
+        'deleted_by',
     ];
     public function user()
     {
@@ -75,6 +80,30 @@ class TaxReturn extends Model
         }
 
         return $this->year;
+    }
+
+    //Organization name fetch
+    public function Organization()
+    {
+        return $this->belongsTo(Orgsetup::class, 'organization_id');
+    }
+
+      public function deletedByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
+    }
+    
+     protected static function boot()
+    {
+        parent::boot();
+
+       static::deleting(function ($trasaction) {
+            if (!$$trasaction->isForceDeleting()) {
+                $trasaction->deleted_by = Auth::user()->id;
+                $trasaction->save();
+            }
+        });
+
     }
 
 
