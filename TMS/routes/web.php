@@ -84,6 +84,7 @@ Route::middleware([
     Route::get('/export-coa', [CoaController::class, 'exportCoas']);
     Route::get('/export-tax-type/{type}', [TaxTypeController::class, 'exportTaxType']);
     Route::get('/edit-sales/{transaction}', [TransactionsController::class, 'editSales']);
+    
     Route::get('/transactions/{id}/edit-sales', [TransactionsController::class, 'edit'])->name('transactions.edit');
     Route::post('/transactions/{id}', [TransactionsController::class, 'update'])->name('transactions.update');
 
@@ -108,6 +109,10 @@ Route::get('/user-management/client', [UserController::class, 'client'])->name('
         Route::post('/transactions/upload', [TransactionsController::class, 'upload'])->name('transactions.upload');
         Route::get('/transactions/create', [TransactionsController::class, 'create']);
         Route::get('/transactions/{transaction}', [TransactionsController::class, 'show'])->name('transactions.show');
+        Route::post('/transaction/destroy', [TransactionsController::class, 'destroy']);
+        Route::get('/transaction/download', [TransactionsController::class, 'download_transaction']);
+
+
 
         // Contacts Routes
         Route::get('/contacts', function () {

@@ -66,7 +66,64 @@
     <br>
     <hr>
 
-<div x-data="{ showCheckboxes: false, selectedTab: 'All', checkAll: false }" class="container mx-auto pt-2 ">
+<div x-data="{ showCheckboxes: false, selectedTab: 'All', checkAll: false, showDeleteCancelButtons: false,  selectedRows: [], showConfirmArchiveModal: false, checkAll: false,   // Toggle a single row
+                                        toggleCheckbox(id) {
+                                            if (this.selectedRows.includes(id)) {
+                                                this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
+                                            } else {
+                                                this.selectedRows.push(id);
+                                            }
+                                            console.log(this.selectedRows); // Debugging line
+                                        },
+                                        
+                                        // Toggle all rows
+                                        toggleAll() {
+                                            this.checkAll = !this.caheckAll;
+                                            if (this.checkAll) {
+                                                this.selectedRows = {{ json_encode($transactions->pluck('id')->toArray()) }}; 
+                                            } else {
+                                                this.selectedRows = []; 
+                                            }
+                                            console.log(this.selectedRows); // Debugging line
+                                        },
+                                        
+                                        // Handle archiving
+                                        deleteRows() {
+                                            if (this.selectedRows.length === 0) {
+                                                alert('No rows selected for deletion.');
+                                                return;
+                                            }
+
+                                            fetch('/transaction/destroy', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                },
+                                                body: JSON.stringify({ ids: this.selectedRows })
+                                            })
+                                            .then(response => {
+                                                if (response.ok) {
+                                                    location.reload();  
+                                                } else {
+                                                    alert('Error archiving rows.');
+                                                }
+                                            });
+                                        },
+                                        
+                                        // Cancel selection
+                                        cancelSelection() {
+                                            this.selectedRows = []; 
+                                            this.checkAll = false;
+                                            this.showCheckboxes = false; 
+                                            this.showDeleteCancelButtons = false;
+                                            this.showConfirmArchiveModal = false;
+                                        },
+                                        
+                                        get selectedCount() {
+                                            return this.selectedRows.length;
+                                        }
+                                    }"   class="container mx-auto pt-2 ">
     <!-- Second Header -->
     <div class="container mx-auto ps-8">
         <div class="flex flex-row space-x-2 items-center">
@@ -106,12 +163,18 @@
     
             <!-- Buttons and Show Entries -->
             <div class="flex space-x-4 ps-96 items-center">
-                <button type="button" @click="showCheckboxes = !showCheckboxes" class="border px-3 py-2 rounded-lg flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
-                        <path fill="none" stroke="#696969" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/>
-                    </svg>
-                    <span class="font-normal text-md text-gray-600">Delete</span>
-                </button>
+                <button 
+                type="button" 
+                @click="showCheckboxes = !showCheckboxes;    showDeleteCancelButtons: false, showDeleteCancelButtons = !showDeleteCancelButtons; $el.disabled = true;" 
+                :disabled="selectedRows.length === 1"
+                class="border px-3 py-2 rounded-lg text-sm text-gray-600 hover:border-gray-800 hover:text-gray-800 hover:bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-zinc-500" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
+                </svg>
+                <span class="text-zinc-600 transition group-hover:text-zinc-500">Archive</span>
+            </button>
+            <a href="{{ url('transaction/download')}}">
                 <button type="button" @click="showCheckboxes = !showCheckboxes" class="border px-3 py-2 rounded-lg flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
                         <path fill="none" stroke="#696969" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
@@ -119,6 +182,7 @@
                     <span class="font-normal text-md text-gray-600">Download</span>
                 </button>
             </div>
+        </a>
     
             <div class="relative inline-block space-x-4 text-left">
                 <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" class="flex items-center text-zinc-500 hover:text-zinc-700" type="button">
@@ -237,9 +301,9 @@
                         <th scope="col" class="p-4">
                             <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                 <div class="relative flex items-center">
-                                    <input type="checkbox" x-model="checkAll" id="checkAll" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-blue-950 checked:before:bg-blue-950 active:outline-offset-0" />
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                                    <input type="checkbox" x-model="checkAll" id="checkAll" @change="toggleAll()" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-black checked:before:bg-black focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                     </svg>
                                 </div>
                             </label>
@@ -261,9 +325,9 @@
                                 <td class="p-4">
                                     <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                         <div class="relative flex items-center">
-                                            <input type="checkbox" id="user2335" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-black checked:before:bg-black focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black active:outline-offset-0" :checked="checkAll" />
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                                            <input type="checkbox" @change="toggleCheckbox('{{ $transaction->id }}')" id="transaction{{ $transaction->id }}"  class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-black checked:before:bg-black focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" :checked="selectedRows.includes('{{ $transaction->id }}')" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                             </svg>
                                         </div>
                                     </label>
@@ -292,6 +356,62 @@
                     @endif
                 </tbody>
             </table>
+              <!-- Action Buttons -->
+              <div 
+              x-show="showConfirmArchiveModal" 
+              x-cloak 
+              class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+              x-effect="document.body.classList.toggle('overflow-hidden', showConfirmArchiveModal)"
+          >
+              <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
+                  <div class="flex flex-col items-center">
+                      <!-- Icon -->
+                      <div class="mb-4">
+                          <i class="fas fa-exclamation-triangle text-zinc-700 text-8xl"></i>
+                      </div>
+
+                      <!-- Title -->
+                      <h2 class="text-2xl font-extrabold text-zinc-700 mb-2">Archive Item(s)</h2>
+
+                      <!-- Description -->
+                      <p class="text-sm text-zinc-700 text-center">
+                          You're going to Archive the selected item(s) in the Transactions table. Are you sure?
+                      </p>
+
+                      <!-- Actions -->
+                      <div class="flex justify-center space-x-8 mt-6 w-full">
+                          <button 
+                              @click="showConfirmArchiveModal = false; showDeleteCancelButtons = true;" 
+                              class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
+                          > 
+                              Cancel
+                          </button>
+                          <button 
+                              @click="deleteRows(); showConfirmArchiveModal = false;" 
+                              class="px-5 py-2 bg-zinc-700 hover:bg-zinc-800 text-white rounded-lg text-sm font-medium transition"
+                          > 
+                              Archive
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+              <div x-show="showDeleteCancelButtons" class="flex justify-center py-4" x-cloak>
+                <button 
+                    @click="showConfirmArchiveModal = true; showDeleteCancelButtons = true;" 
+                    :disabled="selectedRows.length === 0"
+                    class="border px-3 py-2 mx-2 rounded-lg text-sm text-gray-700 bg-gray-200 hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <i class="fa fa-box"></i> Archive Selected <span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
+                </button>
+                <button 
+                    @click="cancelSelection" 
+                    class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
+                >
+                Cancel
+                </button>
+            </div>
             <nav aria-label="pagination">
                 {{ $transactions->links('vendor.pagination.custom') }}
             </nav>
@@ -312,10 +432,10 @@
      });    
 
      function toggleCheckboxes() {
-         document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-             checkbox.checked = this.checkAll;
-         });
-     }
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = this.checkAll;
+            });
+        }
 
     document.addEventListener('DOMContentLoaded', function () {
         const dropdownButton = document.getElementById('dropdownDefaultButton');
