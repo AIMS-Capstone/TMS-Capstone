@@ -151,68 +151,97 @@
                                     manually correct any errors, or fill in any missing details.</br>Once done, proceed to save the transaction.
                                 </p>
                 
-                                @if(session('extractedText'))
-                                <div>
-                                    <h2>Extracted Text from Receipt:</h2>
-                                    <pre>{{ session('extractedText') }}</pre>
-                                </div>
-                                @endif
+                             
+                                <form action="{{ route('transactions.storeUpload') }}" method="POST">
+                                    @csrf
 
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-sm font-semibold text-zinc-700">Customer</label>
-                                        <input type="text" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" />
+                                        <label class="block text-sm font-semibold text-zinc-700">Vendor</label>
+                                        <input type="text" name="vendor" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" 
+                                               value="{{ session('cleanedData')['vendor'] ?? '' }}" /> <!-- Empty if not set -->
                                     </div>
                                     <div>
                                         <label class="block text-sm font-semibold text-zinc-700">Customer TIN</label>
-                                        <input type="text" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" />
+                                        <input type="text" name="customer_tin" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" 
+                                               value="{{ session('cleanedData')['tin'] ?? '' }}" /> <!-- Empty if not set -->
                                     </div>
                                     <div>
                                         <label class="block text-sm font-semibold text-zinc-700">Date</label>
-                                        <input type="date" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" />
+                                        <input type="date "name="date"  class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" 
+                                        value="{{ \Carbon\Carbon::parse(session('cleanedData')['date'] ?? '')->format('Y/m/d') }}" /> <!-- Format to YYYY-MM-DD for HTML input -->
+                                    
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-semibold text-zinc-700">Invoice Number</label>
-                                        <input type="text" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" />
+                                        <label class="block text-sm font-semibold text-zinc-700">Reference Number</label>
+                                        <input type="text" name="reference_number"  class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" 
+                                               value="{{ session('cleanedData')['invoice_number'] ?? '' }}" /> <!-- Empty if not set -->
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-semibold text-zinc-700">Reference</label>
-                                        <input type="text" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" />
+                                        <label class="block text-sm font-semibold text-zinc-700">Organization Type</label>
+                                        <select name="organization_type" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none">
+                                            <option value="Individual">Individual</option>
+                                            <option value="Non-Individual">Non-Individual</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-semibold text-zinc-700">City</label>
+                                        <input type="text" name="city" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-zinc-700">Zip Code</label>
+                                        <input type="text" name="zip_code" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-zinc-700">Address</label>
+                                        <input type="text" name="address" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" 
+                                        value="{{ session('cleanedData')['address'] ?? '' }}" /> 
                                     </div>
                                     <div>
                                         
                                         <label class="block text-sm font-semibold text-zinc-700">Description</label>
-                                        <input type="text" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" />
+                                        <input type="text" name="description"  class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" />
                                     </div>
                                     <div>
                                         <label class="block text-sm font-semibold text-zinc-700">Tax Type</label>
-                                        <select class="block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-zinc-200 appearance-none cursor-pointer focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        <select name="tax_type"  class="block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-zinc-200 appearance-none cursor-pointer focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                            @foreach($tax_types as $tax_type)
+                                            <option value="{{ $tax_type->id }}">{{ $tax_type->short_code }} - {{ $tax_type->tax_type }} </option>  <!-- Adjust 'id' and 'name' based on your COA model fields -->
+                                        @endforeach
                                         </select>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-semibold text-zinc-700">ATC</label>
-                                        <select class="block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-zinc-200 appearance-none cursor-pointer focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        <select  name="tax_code"  class="block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-zinc-200 appearance-none cursor-pointer focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                            @foreach($tax_codes as $tax_code)
+                                            <option value="{{ $tax_code->id }}">{{ $tax_code->tax_code }} - {{ $tax_code->category }} </option>  <!-- Adjust 'id' and 'name' based on your COA model fields -->
+                                        @endforeach
                                         </select>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-semibold text-zinc-700">COA</label>
-                                        <select class="block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-zinc-200 appearance-none cursor-pointer focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        <select name="coa" class="block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-zinc-200 appearance-none cursor-pointer focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                         @foreach($coas as $coa)
+            <option value="{{ $coa->id }}">{{ $coa->name }}</option>  <!-- Adjust 'id' and 'name' based on your COA model fields -->
+        @endforeach
                                         </select>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-semibold text-zinc-700">Amount (VAT Inclusive)</label>
-                                        <input type="text" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" />
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-semibold text-zinc-700">Tax Amount</label>
-                                        <input type="text" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" />
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-semibold text-zinc-700">Net Amount</label>
-                                        <input type="text" class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" />
-                                    </div>
-                                </div>
-                
+                                        <input type="text" name="amount"  class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" 
+                                        value="{{ session('cleanedData')['total_amount'] ?? '' }}" /> <!-- Empty if not set -->
+                             </div>
+                             <div>
+                                 <label class="block text-sm font-semibold text-zinc-700">Tax Amount</label>
+                                 <input type="text" name="tax_amount"  class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" 
+                                        value="{{ session('cleanedData')['tax_amount'] ?? '' }}" /> <!-- Empty if not set -->
+                             </div>
+                             <div>
+                                 <label class="block text-sm font-semibold text-zinc-700">Net Amount</label>
+                                 <input type="text" name="net_amount"  class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" 
+                                        value="{{ session('cleanedData')['net_amount'] ?? '' }}" /> <!-- Empty if not set -->
+                             </div>
                                 <div class="my-8 flex justify-center">
                                     <button type="submit" class="px-6 py-2 inline-flex items-center font-semibold text-sm bg-blue-900 text-white rounded-lg hover:bg-blue-950">Save Transaction</button>
                                 </div>
