@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('contact')->nullable()->constrained('contacts')->nullOnDelete();
             $table->foreignId('organization_id')->constrained('org_setups')->onDelete('cascade');
             $table->string('reference')->nullable();
+            $table->softDeletes();
             $table->decimal('total_amount', 10, 2)->nullable();
             $table->decimal('vat_amount', 10, 2)->nullable();
             $table->decimal('vatable_sales', 10, 2)->nullable();

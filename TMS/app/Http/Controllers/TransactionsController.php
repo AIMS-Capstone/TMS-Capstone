@@ -13,6 +13,7 @@ use App\Models\coa;
 use App\Models\Contacts;
 use App\Models\TaxRow as ModelsTaxRow;
 use App\Models\TaxType;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
@@ -175,8 +176,17 @@ class TransactionsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Transactions $transactions)
+    public function destroy(Request $request)
     {
+        
+        $ids = $request->input('ids');  // This will be an array of IDs sent from JavaScript
+
+        // Log the incoming IDs for debugging
+        Log::info('Received transaction IDs: ', $ids);
+        Transactions::whereIn('id', $ids)->delete();
+
+        // Optionally, return a response
+        return response()->json(['message' => 'Transaction soft deleted successfully.']);
         //
     }
     public function import(Request $request)
@@ -203,6 +213,27 @@ class TransactionsController extends Controller
 
         // Pass the data to the view to preview
         return view('transactions.preview', compact('data'));
+    }
+    public function download_transaction()
+    {
+        // Get the organization ID from the session
+        $organizationId = session('organization_id');
+    
+        // Fetch all transactions for the specific organization, with related contact details and tax rows
+        $transactions = Transactions::with(['contactDetails', 'taxRows'])
+                                    ->where('organization_id', $organizationId)
+                                    ->get();
+    
+        // Check if transactions exist, if not, handle the case
+        if ($transactions->isEmpty()) {
+            return response()->json(['message' => 'No transactions found for this organization.'], 404);
+        }
+    
+        // Generate the PDF
+        $pdf = PDF::loadView('transactions.pdf', compact('transactions'));
+    
+        // Download the PDF with a specific name
+        return $pdf->download('transactions_list.pdf');
     }
    
 
