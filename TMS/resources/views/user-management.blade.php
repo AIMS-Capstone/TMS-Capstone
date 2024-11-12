@@ -158,10 +158,10 @@
                                                     </button>
                                                     <div id="dropdownAction-{{ $user->id }}" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-32 py-2 px-4 origin-top-right overflow-hidden max-h-64 overflow-y-auto">
                                                         <div 
-                                                        x-data x-on:click="$dispatch('open-delete-user-modal', { userId: '{{ $user->id }}', userName: '{{ $user->first_name }} {{ $user->last_name }}' })"  
-                                                        class="block px-4 py-2 w-full text-left hover-dropdown text-red-500 cursor-pointer">
-                                                        Delete
-                                                    </div>
+                                                            x-data x-on:click="$dispatch('open-delete-user-modal', { userId: '{{ $user->id }}', userName: '{{ $user->first_name }} {{ $user->last_name }}' })"  
+                                                            class="block px-4 py-2 w-full text-left hover-dropdown text-red-500 cursor-pointer">
+                                                            Delete
+                                                        </div>
                                                     </div>
                                                 </td>
                                             </tr>

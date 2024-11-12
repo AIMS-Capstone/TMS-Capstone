@@ -169,8 +169,8 @@
                                     <div>
                                         <label class="block text-sm font-semibold text-zinc-700">Date</label>
                                         <input type="date "name="date"  class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none" 
-                                        value="{{ \Carbon\Carbon::parse(session('cleanedData')['date'] ?? '')->format('Y/m/d') }}" /> <!-- Format to YYYY-MM-DD for HTML input -->
-                                    
+                                        value="{{ \Carbon\Carbon::parse(session('cleanedData')['date'] ?? '')->format('F j, Y') }}" /> <!-- Format to YYYY-MM-DD for HTML input -->
+                                        
                                     </div>
                                     <div>
                                         <label class="block text-sm font-semibold text-zinc-700">Reference Number</label>

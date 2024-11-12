@@ -29,6 +29,7 @@ class TransactionsController extends Controller
         $search = $request->input('search');
         $type = $request->input('type');
         $organizationId = session('organization_id'); 
+        $perPage = $request->input('perPage', 5);
     
         $query = Transactions::with('contactDetails')
             ->where('organization_id', $organizationId);
@@ -48,7 +49,7 @@ class TransactionsController extends Controller
         }
     
         
-        $transactions = $query->paginate(5);
+        $transactions = $query->paginate($perPage);
     
         
 

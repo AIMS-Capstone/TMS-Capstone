@@ -191,28 +191,26 @@
                                                             <span class="bg-zinc-100 text-zinc-800 text-xs font-medium me-2 px-4 py-2 rounded-full">No Account Yet</span>
                                                         @endif
                                                     </td>
-                                                    <td class="relative text-left py-2 px-3">
+                                                    <td class="overflow-visible relative text-left py-2 px-3">
                                                         <button type="button" id="dropdownMenuAction-{{ $organization->id }}" class="text-zinc-500 hover:text-zinc-700">
                                                             <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
                                                                 <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
                                                             </svg>
                                                         </button>
-                                                        <div id="dropdownAction-{{ $organization->id }}" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-40 origin-top-right overflow-hidden max-h-64 overflow-y-auto">
+                                                        <div id="dropdownAction-{{ $organization->id }}" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-40 origin-top-right overflow-y-auto max-h-64">
                                                             <div class="py-2 px-2 text-sm text-zinc-700" aria-labelledby="dropdownMenuAction">
+                                                                <div onclick="editOrganization('{{ $organization->id }}')" class="block px-4 py-2 w-full text-left hover-dropdown">View Details</div>
                                                                 <div onclick="editOrganization('{{ $organization->id }}')" class="block px-4 py-2 w-full text-left hover-dropdown">Edit</div>
-                                                                {{-- Deafult selection in action button kapag status ay "No Account Yet" --}}
                                                                 @if (!$organization->account)
                                                                 <div x-data 
                                                                     x-on:click="$dispatch('open-generate-modal', { organizationId: '{{ $organization->id }}' })" class="block px-4 py-2 w-full text-left hover-dropdown">
                                                                     Create Account
                                                                 </div>
                                                             @endif
-                                                            <div 
-                                                            x-data 
-                                                            x-on:click="$dispatch('open-delete-modal', { organizationId: '{{ $organization->id }}', organizationName: '{{ $organization->registration_name }}' })"  
-                                                            class="block px-4 py-2 w-full text-left hover-dropdown text-red-500 cursor-pointer">
-                                                            Delete
-                                                        </div>
+                                                            <div x-data x-on:click="$dispatch('open-delete-modal', { organizationId: '{{ $organization->id }}', organizationName: '{{ $organization->registration_name }}' })"  
+                                                                class="block px-4 py-2 w-full text-left hover-dropdown text-red-500 cursor-pointer">
+                                                                Delete
+                                                            </div>
                                                         </div>
                                                     </td>
                                                 </form>
@@ -238,9 +236,7 @@
             </div>
         </div>
     </div>
-
-   
-
+    
     {{-- CREATE CLIENT ACCOUNT WITH SUCCESS MODAL NA MABAGAL. I prefer the modal above kasi nakikita na nagpprocess yung submission--}}
     <div x-data="{ open: false, organizationId: null, email: '', success: false, 
                isEmailValid() { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email); } }" 

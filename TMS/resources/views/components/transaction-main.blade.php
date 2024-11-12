@@ -9,7 +9,7 @@
     </div>
     <div class="flex justify-between items-center px-10">
         <div class="flex items-center px-2">            
-            <p class="font-normal text-sm">The Transactions feature ensures accurate tracking and categorization <br> of each transaction.</p>
+            <p class="font-normal text-sm text-zinc-700">The Transactions feature ensures accurate tracking and categorization <br> of each transaction.</p>
         </div>
         <div class="items-end float-end relative sm:w-auto" 
             x-data="{ selectedTab: (new URL(window.location.href)).searchParams.get('type') || 'All' }" 
@@ -34,22 +34,18 @@
                     <li x-show="selectedTab === 'Sales'">
                         <a href="{{ url('/transactions/upload') }}" class="block px-4 py-2 hover-dropdown">Upload Image</a>
                     </li>
+                    
                     <!-- Options for Purchase tab -->
                     <li x-show="selectedTab === 'Purchase'">
                         <a href="{{ url('/transactions/create?type=purchase') }}" class="block px-4 py-2 hover-dropdown">Add Manual</a>
                     </li>
-             
                     <li x-show="selectedTab === 'Purchase'">
-
-                      
                         <livewire:purchase-multi-step-import/>
-              
-    
-                </li>
-
+                    </li>
                     <li x-show="selectedTab === 'Purchase'">
                         <a href="#" class="block px-4 py-2 hover-dropdown">Upload Image</a>
                     </li>
+
                     <!-- Options for Journal tab -->
                     <li x-show="selectedTab === 'Journal'">
                         <a href="{{ url('/transactions/create?type=journal') }}" class="block px-4 py-2 hover-dropdown">Add Manual</a>
@@ -66,7 +62,7 @@
     <br>
     <hr>
 
-<div x-data="{ showCheckboxes: false, selectedTab: 'All', checkAll: false, showDeleteCancelButtons: false,  selectedRows: [], showConfirmArchiveModal: false, checkAll: false,   // Toggle a single row
+    <div x-data="{ showCheckboxes: false, selectedTab: 'All', checkAll: false, showDeleteCancelButtons: false,  selectedRows: [], showConfirmDeleteModal: false, checkAll: false,   // Toggle a single row
                                         toggleCheckbox(id) {
                                             if (this.selectedRows.includes(id)) {
                                                 this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
@@ -117,7 +113,7 @@
                                             this.checkAll = false;
                                             this.showCheckboxes = false; 
                                             this.showDeleteCancelButtons = false;
-                                            this.showConfirmArchiveModal = false;
+                                            this.showConfirmDeleteModal = false;
                                         },
                                         
                                         get selectedCount() {
@@ -167,19 +163,17 @@
                 type="button" 
                 @click="showCheckboxes = !showCheckboxes;    showDeleteCancelButtons: false, showDeleteCancelButtons = !showDeleteCancelButtons; $el.disabled = true;" 
                 :disabled="selectedRows.length === 1"
-                class="border px-3 py-2 rounded-lg text-sm text-gray-600 hover:border-gray-800 hover:text-gray-800 hover:bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-red-800 hover:text-red-800 hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-zinc-500" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
-                </svg>
-                <span class="text-zinc-600 transition group-hover:text-zinc-500">Archive</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
+                <span class="text-zinc-600 transition group-hover:text-red-500">Delete</span>
             </button>
             <a href="{{ url('transaction/download')}}">
-                <button type="button" @click="showCheckboxes = !showCheckboxes" class="border px-3 py-2 rounded-lg flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
-                        <path fill="none" stroke="#696969" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
+                <button type="button" class="border px-3 py-2 text-sm text-zinc-600 rounded-lg hover:border-green-500 hover:text-green-500 hover:bg-green-100 transition flex items-center group">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5 transition group-hover:text-green-500" viewBox="0 0 24 24">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
                     </svg> 
-                    <span class="font-normal text-md text-gray-600">Download</span>
+                    <span class="text-zinc-600 transition group-hover:text-green-500">Download</span>
                 </button>
             </div>
         </a>
@@ -223,15 +217,15 @@
                 :aria-selected="selectedTab === 'All'"
                 :tabindex="selectedTab === 'All' ? '0' : '-1'"
                 :class="selectedTab === 'All' 
-                    ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg' 
-                    : 'text-neutral-600 font-medium hover:text-sky-900'"
+                    ? 'font-bold text-blue-900 bg-slate-200 border rounded-lg' 
+                    : 'text-neutral-600 font-medium hover:text-blue-900'"
                 class="flex h-min items-center gap-2 px-4 py-2 text-sm"
                 type="button"
                 role="tab"
                 aria-controls="tabpanelAll">
                 All
                 <span :class="selectedTab === 'All'
-                    ? 'text-white bg-sky-900'
+                    ? 'text-white bg-blue-900'
                     : 'bg-slate-500 text-white'"
                     class="text-xs font-medium px-1 rounded-full">{{$allTransactionsCount}}</span>
             </button>
@@ -241,15 +235,15 @@
                 :aria-selected="selectedTab === 'Sales'"
                 :tabindex="selectedTab === 'Sales' ? '0' : '-1'"
                 :class="selectedTab === 'Sales'
-                    ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
-                    : 'text-neutral-600 font-medium hover:text-sky-900'"
+                    ? 'font-bold text-blue-900 bg-slate-200 border rounded-lg'
+                    : 'text-neutral-600 font-medium hover:text-blue-900'"
                 class="flex h-min items-center gap-2 px-4 py-2 text-sm"
                 type="button"
                 role="tab"
                 aria-controls="tabpanelSales">
                 Sales
                 <span :class="selectedTab === 'Sales'
-                    ? 'text-white bg-sky-900'
+                    ? 'text-white bg-blue-900'
                     : 'bg-slate-500 text-white'"
                     class="text-xs font-medium px-1 rounded-full">{{$salesCount}}</span>
             </button>
@@ -259,15 +253,15 @@
                 :aria-selected="selectedTab === 'Purchase'"
                 :tabindex="selectedTab === 'Purchase' ? '0' : '-1'"
                 :class="selectedTab === 'Purchase'
-                    ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
-                    : 'text-neutral-600 font-medium hover:text-sky-900'"
+                    ? 'font-bold text-blue-900 bg-slate-200 border rounded-lg'
+                    : 'text-neutral-600 font-medium hover:text-blue-900'"
                 class="flex h-min items-center gap-2 px-4 py-2 text-sm"
                 type="button"
                 role="tab"
                 aria-controls="tabpanelPurchases">
                 Purchases
                 <span :class="selectedTab === 'Purchases'
-                    ? 'text-white bg-sky-900'
+                    ? 'text-white bg-blue-900'
                     : 'bg-slate-500 text-white'"
                     class="text-xs font-medium px-1 rounded-full">{{$purchaseCount}}</span>
             </button>
@@ -277,15 +271,15 @@
                 :aria-selected="selectedTab === 'Journal'"
                 :tabindex="selectedTab === 'Journal' ? '0' : '-1'"
                 :class="selectedTab === 'Journal'
-                    ? 'font-bold text-sky-900 bg-slate-200 border rounded-lg'
-                    : 'text-neutral-600 font-medium hover:text-sky-900'"
+                    ? 'font-bold text-blue-900 bg-slate-200 border rounded-lg'
+                    : 'text-neutral-600 font-medium hover:text-blue-900'"
                 class="flex h-min items-center gap-2 px-4 py-2 text-sm"
                 type="button"
                 role="tab"
                 aria-controls="tabpanelJournal">
                 Journal
                 <span :class="selectedTab === 'Journal'
-                    ? 'text-white bg-sky-900'
+                    ? 'text-white bg-blue-900'
                     : 'bg-slate-500 text-white'"
                     class="text-xs font-medium px-1 rounded-full">{{$journalCount}}</span>
             </button>
@@ -358,39 +352,39 @@
             </table>
               <!-- Action Buttons -->
               <div 
-              x-show="showConfirmArchiveModal" 
+              x-show="showConfirmDeleteModal" 
               x-cloak 
               class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-              x-effect="document.body.classList.toggle('overflow-hidden', showConfirmArchiveModal)"
+              x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
           >
               <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
                   <div class="flex flex-col items-center">
                       <!-- Icon -->
                       <div class="mb-4">
-                          <i class="fas fa-exclamation-triangle text-zinc-700 text-8xl"></i>
+                          <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>
                       </div>
 
                       <!-- Title -->
-                      <h2 class="text-2xl font-extrabold text-zinc-700 mb-2">Archive Item(s)</h2>
+                      <h2 class="text-2xl font-extrabold text-zinc-800 mb-2">Delete Item(s)</h2>
 
                       <!-- Description -->
                       <p class="text-sm text-zinc-700 text-center">
-                          You're going to Archive the selected item(s) in the Transactions table. Are you sure?
+                          You're going to Delete the selected item(s) in the Transactions table. Are you sure?
                       </p>
 
                       <!-- Actions -->
                       <div class="flex justify-center space-x-8 mt-6 w-full">
                           <button 
-                              @click="showConfirmArchiveModal = false; showDeleteCancelButtons = true;" 
-                              class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
+                              @click="showConfirmDeleteModal = false; showDeleteCancelButtons = true;" 
+                              class="px-4 py-2 rounded-lg text-sm text-zinc-500 hover:text-zinc-800 font-bold transition"
                           > 
                               Cancel
                           </button>
                           <button 
-                              @click="deleteRows(); showConfirmArchiveModal = false;" 
-                              class="px-5 py-2 bg-zinc-700 hover:bg-zinc-800 text-white rounded-lg text-sm font-medium transition"
+                              @click="deleteRows(); showConfirmDeleteModal = false;" 
+                              class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition"
                           > 
-                              Archive
+                              Delete
                           </button>
                       </div>
                   </div>
@@ -399,12 +393,16 @@
 
               <div x-show="showDeleteCancelButtons" class="flex justify-center py-4" x-cloak>
                 <button 
-                    @click="showConfirmArchiveModal = true; showDeleteCancelButtons = true;" 
+                    @click="showConfirmDeleteModal = true; showDeleteCancelButtons = true;" 
                     :disabled="selectedRows.length === 0"
-                    class="border px-3 py-2 mx-2 rounded-lg text-sm text-gray-700 bg-gray-200 hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="border px-3 py-2 mx-2 rounded-lg text-sm text-red-600 border-red-600 bg-red-100 hover:bg-red-200 transition disabled:opacity-50 disabled:cursor-not-allowed group flex items-center space-x-2"
                 >
-                    <i class="fa fa-box"></i> Archive Selected <span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/>
+                    </svg>
+                    <span class="text-red-600 transition group-hover:text-red-600">Delete Selected <span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span></span>
                 </button>
+
                 <button 
                     @click="cancelSelection" 
                     class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
