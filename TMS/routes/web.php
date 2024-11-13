@@ -98,43 +98,40 @@ Route::middleware([
     Route::post('/org_accounts', [OrgAccountController::class, 'store'])->name('org_accounts.store');
 
     Route::middleware(['auth', 'check.role:Accountant'])->group(function () {
-    // User Management
-Route::get('/user-management/user', [UserController::class, 'user'])->name('user-management.user');
-Route::get('/user-management/client', [UserController::class, 'client'])->name('user-management.client');
+        // User Management
+        Route::get('/user-management/user', [UserController::class, 'user'])->name('user-management.user');
+        Route::get('/user-management/client', [UserController::class, 'client'])->name('user-management.client');
+
+        //Recycle Bin Routing   
+        Route::prefix('recycle-bin')->group(function () {
+            // Organization
+            Route::get('/organization', [OrganizationRecycleBinController::class, 'index'])->name('recycle-bin.organization.index');
+            Route::post('/organization/bulk-restore', [OrganizationRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.organization.bulkRestore');
+            Route::delete('/organization/bulk-delete', [OrganizationRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.organization.bulkDelete');
+
+            // Accountant Users
+            Route::get('/accountant-users', [AccountantUsersRecycleBinController::class, 'index'])->name('recycle-bin.accountant-users.index');
+            Route::post('/accountant-users/bulk-restore', [AccountantUsersRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.accountant-users.bulkRestore');
+            Route::delete('/accountant-users/bulk-delete', [AccountantUsersRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.accountant-users.bulkDelete');
+
+            // Client Users
+            Route::get('/client-users', [ClientUsersRecycleBinController::class, 'index'])->name('recycle-bin.client-users.index');
+            Route::post('/client-users/bulk-restore', [ClientUsersRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.client-users.bulkRestore');
+            Route::delete('/client-users/bulk-delete', [ClientUsersRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.client-users.bulkDelete');
+
+            // Transactions
+            Route::get('/transactions', [TransactionsRecycleBinController::class, 'index'])->name('recycle-bin.transactions.index');
+            Route::post('/transactions/bulk-restore', [TransactionsRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.transactions.bulkRestore');
+            Route::delete('/transactions/bulk-delete', [TransactionsRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.transactions.bulkDelete');
+
+            // Tax Returns
+            Route::get('/tax-returns', [TaxReturnsRecycleBinController::class, 'index'])->name('recycle-bin.tax-returns.index');
+            Route::post('/tax-returns/bulk-restore', [TaxReturnsRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.tax-returns.bulkRestore');
+            Route::delete('/tax-returns/bulk-delete', [TaxReturnsRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.tax-returns.bulkDelete');
+        });//ending of recycle-bin prefix
+    });//ending of auth role middleware
 
 
-    //Recycle Bin Routing   
-    Route::prefix('recycle-bin')->group(function () {
-    // Organization
-    Route::get('/organization', [OrganizationRecycleBinController::class, 'index'])->name('recycle-bin.organization.index');
-    Route::post('/organization/bulk-restore', [OrganizationRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.organization.bulkRestore');
-    Route::delete('/organization/bulk-delete', [OrganizationRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.organization.bulkDelete');
-    });
-});
-
-    // Accountant Users
-    Route::get('/accountant-users', [AccountantUsersRecycleBinController::class, 'index'])->name('recycle-bin.accountant-users.index');
-    Route::post('/accountant-users/bulk-restore', [AccountantUsersRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.accountant-users.bulkRestore');
-    Route::delete('/accountant-users/bulk-delete', [AccountantUsersRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.accountant-users.bulkDelete');
-
-    // Client Users
-    Route::get('/client-users', [ClientUsersRecycleBinController::class, 'index'])->name('recycle-bin.client-users.index');
-    Route::post('/client-users/bulk-restore', [ClientUsersRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.client-users.bulkRestore');
-    Route::delete('/client-users/bulk-delete', [ClientUsersRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.client-users.bulkDelete');
-
-    // Transactions
-    Route::get('/transactions', [TransactionsRecycleBinController::class, 'index'])->name('recycle-bin.transactions.index');
-    Route::post('/transactions/bulk-restore', [TransactionsRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.transactions.bulkRestore');
-    Route::delete('/transactions/bulk-delete', [TransactionsRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.transactions.bulkDelete');
-
-    // Tax Returns
-    Route::get('/tax-returns', [TaxReturnsRecycleBinController::class, 'index'])->name('recycle-bin.tax-returns.index');
-    Route::post('/tax-returns/bulk-restore', [TaxReturnsRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.tax-returns.bulkRestore');
-    Route::delete('/tax-returns/bulk-delete', [TaxReturnsRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.tax-returns.bulkDelete');
-});
-
-
-    
     // Routes Requiring Organization Session
     Route::middleware([CheckOrganizationSession::class])->group(function () {
 
@@ -149,9 +146,6 @@ Route::get('/user-management/client', [UserController::class, 'client'])->name('
         Route::post('/transaction/destroy', [TransactionsController::class, 'destroy']);
         Route::get('/transaction/download', [TransactionsController::class, 'download_transaction']);
         Route::post('/transactions/store/upload', [TransactionsController::class, 'storeUpload'])->name('transactions.storeUpload');
-
-
-
 
         // Contacts Routes
         Route::get('/contacts', function () {
@@ -184,11 +178,11 @@ Route::get('/user-management/client', [UserController::class, 'client'])->name('
         Route::put('/coa/{coa}', [CoaController::class, 'update'])->name('coa.update');
 
 
-    //General Accounting Routing
+        //General Accounting Routing
         Route::get('/general-ledger', [GeneralLedgerController::class, 'ledger'])->name('general-ledger');
         Route::get('/general-ledger/export', [GeneralLedgerController::class, 'exportExcel'])->name('ledger.exportExcel');
 
-    //Sales Book routings
+        //Sales Book routings
         Route::get('/sales-book', [SalesController::class, 'sales'])->name('sales-book');
         Route::get('sales-book/posted', [SalesController::class, 'posted'])->name('posted');
         Route::post('/sales-book/post', [SalesController::class, 'updateToPosted'])->name('.updateToPosted');
@@ -196,7 +190,7 @@ Route::get('/user-management/client', [UserController::class, 'client'])->name('
         Route::get('/sales-book/export', [SalesController::class, 'exportSalesBook'])->name('sales.exportExcel');
         Route::get('/sales-book-posted/export', [SalesController::class, 'exportSalesBookPosted'])->name('sales-posted.exportExcel');
 
-    //Purchase Book routings
+        //Purchase Book routings
         Route::get('/purchase-book', [PurchaseController::class, 'purchase'])->name('purchase-book');
         Route::get('purchase-book/posted', [PurchaseController::class, 'posted'])->name('posted');
         Route::post('/purchase-book/post', [PurchaseController::class, 'updateToPosted'])->name('.updateToPosted');
@@ -204,7 +198,7 @@ Route::get('/user-management/client', [UserController::class, 'client'])->name('
         Route::get('/purchase-book/export', [PurchaseController::class, 'exportPurchaseBook'])->name('purchase.exportExcel');
         Route::get('/purchase-book-posted/export', [PurchaseController::class, 'exportPurchaseBookPosted'])->name('purchase-posted.exportExcel');
 
-    //Cash receipt routings
+        //Cash receipt routings
         Route::get('/cash-receipt', [CashReceiptController::class, 'cashReceipt'])->name('cash-receipt');
         Route::get('cash-receipt/posted', [CashReceiptController::class, 'posted'])->name('posted');
         Route::post('/cash-receipt/post', [CashReceiptController::class, 'updateToPosted'])->name('.updateToPosted');
@@ -212,8 +206,7 @@ Route::get('/user-management/client', [UserController::class, 'client'])->name('
         Route::get('/cash-receipt/export', [CashReceiptController::class, 'exportCashReceipt'])->name('cash_receipt.exportExcel');
         Route::get('/cash-receipt-posted/export', [CashReceiptController::class, 'exportCashReceiptPosted'])->name('cash_receipt-posted.exportExcel');
 
-
-    //Cash disbursement routings
+        //Cash disbursement routings
         Route::get('/cash-disbursement', [CashDisbursementController::class, 'cashDisbursement'])->name('cash-disbursement');
         Route::get('cash-disbursement/posted', [CashDisbursementController::class, 'posted'])->name('posted');
         Route::post('/cash-disbursement/post', [CashDisbursementController::class, 'updateToPosted'])->name('.updateToPosted');
@@ -221,23 +214,20 @@ Route::get('/user-management/client', [UserController::class, 'client'])->name('
         Route::get('/cash-disbursement/export', [CashDisbursementController::class, 'exportCashDisbursement'])->name('cash_disbursement.exportExcel');
         Route::get('/cash-disbursement-posted/export', [CashDisbursementController::class, 'exportCashDisbursementPosted'])->name('cash_disbursement-posted.exportExcel');
 
-
-
-    //General Journal Routing
+        //General Journal Routing
         Route::get('/general-journal', [GeneralJournalController::class, 'journal'])->name('general-journal');
         Route::get('/general-journal/export', [GeneralJournalController::class, 'exportJournalExcel'])->name('journal.exportExcel');
 
-
-    // Financial Reports Routing
+        // Financial Reports Routing
         Route::get('/financial-reports', [FinancialController::class, 'financial'])->name('financial-reports');
         Route::get('/financial/export-excel', [FinancialController::class, 'exportExcel'])->name('financial.exportExcel');
-
 
         Route::get('/vat_report_pdf', function () {
             return view('tax_return.vat_report_pdf'); // Make sure to create this view file
         })->name('vat_report_pdf');
 
-    });
+    });//ending of organization middleware
+});//ending of built in auth of Laravel Jetstream
 
     //client-side routings
 
