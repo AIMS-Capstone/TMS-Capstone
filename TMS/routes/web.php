@@ -143,11 +143,13 @@ Route::get('/user-management/client', [UserController::class, 'client'])->name('
         // Transactions Routes
         Route::get('/transactions', [TransactionsController::class, 'index'])->name('transactions');
         Route::get('/transactions/upload', [TransactionsController::class, 'showUploadForm'])->name('receipts.uploadForm');
-        Route::post('/transactions/upload', [TransactionsController::class, 'upload'])->name('transactions.upload');
+        Route::post('/transaction/upload', [TransactionsController::class, 'upload'])->name('transactions.upload');
         Route::get('/transactions/create', [TransactionsController::class, 'create']);
         Route::get('/transactions/{transaction}', [TransactionsController::class, 'show'])->name('transactions.show');
         Route::post('/transaction/destroy', [TransactionsController::class, 'destroy']);
         Route::get('/transaction/download', [TransactionsController::class, 'download_transaction']);
+        Route::post('/transactions/store/upload', [TransactionsController::class, 'storeUpload'])->name('transactions.storeUpload');
+
 
 
 

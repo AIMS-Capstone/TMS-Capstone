@@ -1,7 +1,7 @@
 <div>
     <!-- Modal Trigger Button -->
-    <button wire:click="openModalPurchase" class="btn bg-green-500 text-white p-2 rounded">
-        Open Import Modal 
+    <button wire:click="openModalPurchase" class="w-full text-left block px-4 py-2 hover-dropdown">
+        Import CSV
     </button>
 
     <!-- Modal Content -->

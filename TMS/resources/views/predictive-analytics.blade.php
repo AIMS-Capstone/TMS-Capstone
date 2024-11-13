@@ -389,7 +389,7 @@ const barData = {
                 },
                 title: {
                     display: true,
-                    text: 'Purchase Counts by Category',
+                    text: '',
                     font: {
                         family: 'Inter',
                         size: 16,
