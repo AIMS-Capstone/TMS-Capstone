@@ -37,9 +37,115 @@
                     <!-- Sales Options Menu -->
                     <div id="salesOptions" class="hidden absolute right-0 z-10 mt-2 w-44 rounded-md shadow-lg bg-white ring-opacity-5">
                         <div class="py-2 px-4" role="menu" aria-orientation="vertical" aria-labelledby="salesOptionsButton">
-                            <a href="/transactions/add-collection" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Add Collection</a>
+                            <div class="py-2 px-4" role="menu" aria-orientation="vertical" aria-labelledby="purchaseOptionsButton">
+                                <div x-data="{
+         showPaymentModal: false,
+         transactionTotalAmount: '{{ $transaction->total_amount }}',  // Pass the total amount from backend to Alpine.js
+         paymentDate: '',
+         referenceNumber: '',
+         bankAccount: '',
+         markAsPaid() {
+             // Make an AJAX request or send form data to the backend to mark as paid
+             fetch('/transactions/mark-as-paid/{{ $transaction->id }}', {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json',
+                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                 },
+                 body: JSON.stringify({
+                     payment_date: this.paymentDate,
+                     reference_number: this.referenceNumber,
+                     bank_account: this.bankAccount,
+                     total_amount_paid: this.transactionTotalAmount  // Send total_amount_paid automatically
+                 })
+             })
+             .then(response => response.json())
+             .then(data => {
+                 if (data.successPayment) {
+                    // Show success modal
+                    this.showPaymentModal = false;
+                    this.showSuccessPaymentModal = true;
+                    // Hide modal after a timeout (5 seconds)
+                    setTimeout(() => { this.showSuccessPaymentModal = false }, 5000);
+                 } else {
+                  
+                 }
+             });
+         }
+     }">
+         
+         <!-- Add a Payment Link (Trigger the Modal) -->
+         <a @click.prevent="showPaymentModal = true" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">
+             Add a Payment
+         </a>
+     
+         <!-- Payment Modal -->
+         <div x-show="showPaymentModal" x-transition @click.away="showPaymentModal = false" 
+              class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+     
+             <!-- Modal Content -->
+             <div class="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full relative">
+     
+                 <!-- Close Button -->
+                 <button @click="showPaymentModal = false" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition">
+                     <i class="fa fa-times"></i>
+                 </button>
+     
+                 <!-- Modal Title -->
+                 <h2 class="text-xl font-bold text-gray-800 mb-4">Mark as Paid</h2>
+     
+                 <!-- Modal Body -->
+                 <div class="grid grid-cols-2 gap-4">
+     
+                     <!-- Left Side -->
+                     <div>
+                         <p class="text-sm text-gray-600">
+                             You are about to pay: <span class="font-bold">$<span x-text="transactionTotalAmount"></span></span>
+                         </p>
+                         <p class="text-sm text-gray-600 mt-4">
+                             Please enter the required fields and mark this transaction as Paid. Make sure that you are entering correct information to match your Sales/Purchases transaction. 
+                             You may also do a partial payment by entering a lower amount.
+                         </p>
+                     </div>
+     
+                     <!-- Right Side: Payment Form -->
+                     <div>
+                         <div class="mb-4">
+                             <label for="payment-date" class="block text-sm font-medium text-gray-700">Payment Date</label>
+                             <input type="date" id="payment-date" x-model="paymentDate" class="mt-1 block w-full border px-3 py-2 rounded-md" required />
+                         </div>
+                         <div class="mb-4">
+                             <label for="reference-number" class="block text-sm font-medium text-gray-700">Reference Number</label>
+                             <input type="text" id="reference-number" x-model="referenceNumber" class="mt-1 block w-full border px-3 py-2 rounded-md" required />
+                         </div>
+                         <div class="mb-4">
+                             <label for="bank-account" class="block text-sm font-medium text-gray-700">Bank Account</label>
+                             <input type="text" id="bank-account" x-model="bankAccount" class="mt-1 block w-full border px-3 py-2 rounded-md" required />
+                         </div>
+     
+                         <!-- Hidden Total Amount Paid -->
+                         <input type="hidden" id="total-amount-paid" :value="transactionTotalAmount" name="total_amount_paid" />
+                     </div>
+                 </div>
+     
+                 <!-- Action Buttons -->
+                 <div class="mt-6 flex justify-between">
+                     <button @click="markAsPaid" class="px-6 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600">
+                         Mark as Paid
+                     </button>
+                     <button @click="showPaymentModal = false" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-400">
+                         Cancel
+                     </button>
+                 </div>
+                </div>
+            </div>
+        </div>
+     
+    </div>
+     
+     
                             <a href="{{ route('transactions.edit', $transaction->id) }}" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Edit Sales</a>
-                            <a href="/transactions/mark-as-posted" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Mark as Posted</a>
+                            <a href="{{route('transactions.mark', $transaction->id)}}" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Mark as Posted</a>
                         </div>
                     </div>
                 </div>
@@ -187,9 +293,113 @@
                     <!-- Purchase Options Menu -->
                     <div id="purchaseOptions" class="hidden absolute right-0 z-10 mt-2 w-44 rounded-md shadow-lg bg-white ring-opacity-5">
                         <div class="py-2 px-4" role="menu" aria-orientation="vertical" aria-labelledby="purchaseOptionsButton">
-                            <a href="" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Add a Payment</a>
-                            <a href="" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Edit Purchase</a>
-                            <a href="" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Mark as Posted</a>
+                           <div x-data="{
+    showPaymentModal: false,
+    transactionTotalAmount: '{{ $transaction->total_amount }}',  // Pass the total amount from backend to Alpine.js
+    paymentDate: '',
+    referenceNumber: '',
+    bankAccount: '',
+    markAsPaid() {
+        // Make an AJAX request or send form data to the backend to mark as paid
+        fetch('/transactions/mark-as-paid/{{ $transaction->id }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            },
+            body: JSON.stringify({
+                payment_date: this.paymentDate,
+                reference_number: this.referenceNumber,
+                bank_account: this.bankAccount,
+                total_amount_paid: this.transactionTotalAmount  // Send total_amount_paid automatically
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+           if (data.successPayment) {
+                    // Show success modal
+                    this.showPaymentModal = false;
+                    this.showSuccessPaymentModal = true;
+                    // Hide modal after a timeout (5 seconds)
+                    setTimeout(() => { this.showSuccessPaymentModal = false }, 5000);
+            } else {
+             
+            }
+        });
+    }
+}">
+    
+    <!-- Add a Payment Link (Trigger the Modal) -->
+    <a @click.prevent="showPaymentModal = true" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">
+        Add a Payment
+    </a>
+
+    <!-- Payment Modal -->
+    <div x-show="showPaymentModal" x-transition @click.away="showPaymentModal = false" 
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+
+        <!-- Modal Content -->
+        <div class="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full relative">
+
+            <!-- Close Button -->
+            <button @click="showPaymentModal = false" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition">
+                <i class="fa fa-times"></i>
+            </button>
+
+            <!-- Modal Title -->
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Mark as Paid</h2>
+
+            <!-- Modal Body -->
+            <div class="grid grid-cols-2 gap-4">
+
+                <!-- Left Side -->
+                <div>
+                    <p class="text-sm text-gray-600">
+                        You are about to pay: <span class="font-bold">$<span x-text="transactionTotalAmount"></span></span>
+                    </p>
+                    <p class="text-sm text-gray-600 mt-4">
+                        Please enter the required fields and mark this transaction as Paid. Make sure that you are entering correct information to match your Sales/Purchases transaction. 
+                        You may also do a partial payment by entering a lower amount.
+                    </p>
+                </div>
+
+                <!-- Right Side: Payment Form -->
+                <div>
+                    <div class="mb-4">
+                        <label for="payment-date" class="block text-sm font-medium text-gray-700">Payment Date</label>
+                        <input type="date" id="payment-date" x-model="paymentDate" class="mt-1 block w-full border px-3 py-2 rounded-md" required />
+                    </div>
+                    <div class="mb-4">
+                        <label for="reference-number" class="block text-sm font-medium text-gray-700">Reference Number</label>
+                        <input type="text" id="reference-number" x-model="referenceNumber" class="mt-1 block w-full border px-3 py-2 rounded-md" required />
+                    </div>
+                    <div class="mb-4">
+                        <label for="bank-account" class="block text-sm font-medium text-gray-700">Bank Account</label>
+                        <input type="text" id="bank-account" x-model="bankAccount" class="mt-1 block w-full border px-3 py-2 rounded-md" required />
+                    </div>
+
+                    <!-- Hidden Total Amount Paid -->
+                    <input type="hidden" id="total-amount-paid" :value="transactionTotalAmount" name="total_amount_paid" />
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-6 flex justify-between">
+                <button @click="markAsPaid" class="px-6 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600">
+                    Mark as Paid
+                </button>
+                <button @click="showPaymentModal = false" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-400">
+                    Cancel
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+                         
+                            <a href="{{ route('transactions.edit', $transaction->id) }}" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Edit Purchase</a>
+                            <a href="{{route('transactions.mark', $transaction->id)}}" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Mark as Posted</a>
                         </div>
                     </div>
                 </div>
@@ -335,7 +545,7 @@
                     <!-- Journal Options Menu -->
                     <div id="journalOptions" class="hidden absolute right-0 z-10 mt-2 w-44 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                         <div class="py-2 px-4" role="menu" aria-orientation="vertical" aria-labelledby="journalOptionsButton">
-                            <a href="/transactions/edit-journal/{{ $transaction->id }}" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Edit Journal</a>
+                            <a href="{{ route('transactions.edit', $transaction->id) }}" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Edit Journal</a>
                         </div>
                     </div>
                 </div>
@@ -412,8 +622,102 @@
                 </div>
             </x-slot:actions> --}}
         </x-transaction-form-section>
+       
+ 
+</div>
 
     @endif
+    @if(session()->has('success'))
+        <div x-data="{ showSuccessModal: true }" 
+             x-init="setTimeout(() => showSuccessModal = false, 5000)" 
+             x-show="showSuccessModal" 
+             x-cloak 
+             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+             @click.away="showSuccessModal = false">
+            
+            <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative">
+                <button 
+                    @click="showSuccessModal = false" 
+                    class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
+                >
+                    <i class="fa fa-times"></i>
+                </button>
+                
+                <div class="flex flex-col items-center">
+                    <!-- Icon -->
+                    <div class="mb-6">
+                        <div class="flex items-center justify-center w-24 h-24 rounded-full bg-green-600">
+                            <i class="fas fa-check text-white text-6xl"></i>
+                        </div>
+                    </div>
+
+                    <!-- Title -->
+                    <a href="{{route('transactions.mark', $transaction->id)}}" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Mark as Posted</a>
+
+                    <!-- Description -->
+                    <p class="text-sm text-gray-600 text-center mb-6">
+                        {{ session('success') }}
+                    </p>
+
+                    <!-- Close Button -->
+                    <button 
+                        @click="showSuccessModal = false" 
+                        class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition w-1/2"
+                    >
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if(session()->has('successPayment'))
+    <div x-data="{ showSuccessPaymentModal: true }" 
+         x-init="setTimeout(() => showSuccessPaymentModal = false, 5000)" 
+         x-show="showSuccessPaymentModal" 
+         x-cloak 
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+         @click.away="showSuccessPaymentModal = false">
+        
+        <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative">
+            <button 
+                @click="showSuccessPaymentModal = false" 
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
+            >
+                <i class="fa fa-times"></i>
+            </button>
+            
+            <div class="flex flex-col items-center">
+                <!-- Icon -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-center w-24 h-24 rounded-full bg-green-600">
+                        <i class="fas fa-check text-white text-6xl"></i>
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <a href="{{route('transactions.mark', $transaction->id)}}" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Payment Added</a>
+
+                <!-- Description -->
+                <p class="text-sm text-gray-600 text-center mb-6">
+                    The payment for this transaction has been successfully added.
+                </p>
+
+                <!-- Close Button -->
+                <button 
+                    @click="showSuccessPaymentModal = false" 
+                    class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition w-1/2"
+                >
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+
+    
+</div>
 </x-app-layout>
 <script>
     document.addEventListener('DOMContentLoaded', function () {

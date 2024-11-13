@@ -15,13 +15,15 @@ class JournalRow extends Component
     public $description; // Description for the entry
   
     public $type; // Journal entry type (journal, sales, purchase, etc.)
+    public $mode; // Mode for the row (create/edit)
 
-    public function mount($index, $journalRow = [], $type = 'journal')
+    public function mount($index, $journalRow = [], $type = 'journal', $mode = 'create')
     {
         // Load initial data
         $this->coas = Coa::where('status', 'Active')->get();
         $this->index = $index;
         $this->type = $type; // Initialize type
+        $this->mode = $mode;
 
         // Initialize properties from $journalRow (if provided)
         $this->coa = $journalRow['coa'] ?? null;
@@ -51,9 +53,16 @@ class JournalRow extends Component
 
     protected function getParentComponentClass()
     {
-        // Define the parent component (if applicable)
-        return $this->type === 'sales' ? 'App\Livewire\SalesTransaction' : 'App\Livewire\JournalTransaction';
+        // Check if the mode is 'edit' or 'create', and adjust the parent accordingly
+        if ($this->mode === 'edit') {
+            // If in edit mode, send the event to the EditJournalTransaction parent
+            return $this->type === 'journal' ? 'App\Livewire\EditJournalTransaction' : 'App\Livewire\EditTransaction';
+        } else {
+            // If in create mode, send the event to the JournalTransaction or appropriate component
+            return $this->type === 'journal' ? 'App\Livewire\JournalTransaction' : 'App\Livewire\CreateTransaction';
+        }
     }
+
 
     public function render()
     {

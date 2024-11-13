@@ -142,6 +142,11 @@ Route::get('/user-management/client', [UserController::class, 'client'])->name('
         Route::post('/transaction/upload', [TransactionsController::class, 'upload'])->name('transactions.upload');
         Route::get('/transactions/create', [TransactionsController::class, 'create']);
         Route::get('/transactions/{transaction}', [TransactionsController::class, 'show'])->name('transactions.show');
+        Route::get('/transactions/{transactionId}/edit', [TransactionsController::class, 'edit'])->name('transactions.edit');
+        Route::get('/transactions/{transaction}/mark', [TransactionsController::class, 'mark'])->name('transactions.mark');
+Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController::class, 'markAsPaid'])->name('transactions.markAsPaid');
+
+
         Route::post('/transaction/destroy', [TransactionsController::class, 'destroy']);
         Route::get('/transaction/download', [TransactionsController::class, 'download_transaction']);
         Route::post('/transactions/store/upload', [TransactionsController::class, 'storeUpload'])->name('transactions.storeUpload');

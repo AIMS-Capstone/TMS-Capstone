@@ -21,41 +21,57 @@ class TaxRow extends Component
     public $description; // Added if needed
     public $tax_type; // Added if needed
     public $type; // Added to store transaction type
+    public $mode;
 
-    public function mount($index, $taxRow = [], $type = 'purchase')
+    // Handle initialization for both edit and create
+    public function mount($index, $taxRow = null, $type = 'purchase', $mode ='create')
     {
-        // Initialize type
+        $this->mode = $mode;
         $this->type = $type;
-
-        // Load initial data
+        
+        // Load initial data based on the type
         $this->taxTypes = TaxType::where('transaction_type', $this->type)->get();
         $this->atcs = ATC::where('transaction_type', $this->type)->get();
         $this->coas = Coa::where('status', 'Active')->get();
         $this->index = $index;
 
-        // Initialize properties from $taxRow
-        $this->tax_code = $taxRow['tax_code'] ?? null;
-        $this->coa = $taxRow['coa'] ?? null;
-        $this->amount = $taxRow['amount'] ?? 0;
-        $this->tax_amount = $taxRow['tax_amount'] ?? 0;
-        $this->net_amount = $taxRow['net_amount'] ?? 0;
-        $this->description = $taxRow['description'] ?? '';
-        $this->tax_type = $taxRow['tax_type'] ?? '';
+        // If editing, populate fields with taxRow data; else, use default values for creating
+        if ($taxRow) {
+            $this->tax_code = $taxRow['tax_code'] ?? null;
+            $this->coa = $taxRow['coa'] ?? null;
+            $this->amount = $taxRow['amount'] ?? 0;
+            $this->tax_amount = $taxRow['tax_amount'] ?? 0;
+            $this->net_amount = $taxRow['net_amount'] ?? 0;
+            $this->description = $taxRow['description'] ?? '';
+            $this->tax_type = $taxRow['tax_type'] ?? '';
+        } else {
+            // Initialize for create
+            $this->tax_code = null;
+            $this->coa = null;
+            $this->amount = 0;
+            $this->tax_amount = 0;
+            $this->net_amount = 0;
+            $this->description = '';
+            $this->tax_type = '';
+        }
 
-        // Calculate tax on mount
+        // Calculate tax (if any initial values are available)
         $this->calculateTax();
     }
 
+    // Method to remove the row
     public function removeRow()
     {
         $this->dispatch('taxRowRemoved', $this->index);  // Emit the event with the row index
     }
 
+    // Automatically update tax when specific fields are updated
     public function updated($field)
     {
         if (in_array($field, ['tax_code', 'amount', 'tax_type'])) {
             $this->calculateTax();
-            // Dispatch event to the appropriate parent component based on type
+            
+            // Dispatch updated event to parent component
             $this->dispatch('taxRowUpdated', [
                 'index' => $this->index,
                 'description' => $this->description,
@@ -69,27 +85,37 @@ class TaxRow extends Component
         }
     }
 
+    // Determine parent component for event dispatch
     protected function getParentComponentClass()
     {
-        return $this->type === 'sales' ? 'App\Livewire\SalesTransaction' : 'App\Livewire\PurchaseTransaction';
+        if ($this->mode === 'edit') {
+            // If in edit mode, dispatch to the Edit component
+            return $this->type === 'sales' ? 'App\Livewire\EditSalesTransaction' : 'App\Livewire\EditPurchaseTransaction';
+        }
+    
+        // If in create mode, dispatch to the create component
+        if ($this->mode === 'create') {
+            return $this->type === 'sales' ? 'App\Livewire\SalesTransaction' : 'App\Livewire\PurchaseTransaction';
+        }
+    
+        // Fallback default
+        return 'App\Livewire\SalesTransaction';
     }
+    
+    // Calculate tax and net amounts
     public function calculateTax()
     {
-        // Retrieve the tax rate based on the tax type
         $taxRate = $this->getTaxRateByType($this->tax_type);
-    
-        // Calculate VAT-exclusive amount and VAT amount for VAT-inclusive totals
+
         if ($taxRate > 0) {
             $vatExclusiveAmount = $this->amount / (1 + ($taxRate / 100));
             $this->tax_amount = $this->amount - $vatExclusiveAmount; // VAT amount
             $this->net_amount = $vatExclusiveAmount; // VAT-exclusive amount
         } else {
-            // For non-VAT cases
             $this->tax_amount = 0;
             $this->net_amount = $this->amount;
         }
-    
-        // Notify the parent component to update totals
+
         $this->dispatch('taxRowUpdated', [
             'index' => $this->index,
             'description' => $this->description,
@@ -101,21 +127,11 @@ class TaxRow extends Component
             'net_amount' => $this->net_amount,
         ]);
     }
-    
-    
-    
-    public function getTaxRate($taxCode)
-    {
-        $tax = ATC::find($taxCode);
-        return $tax ? $tax->tax_rate : 0;
-    }
 
+    // Fetch the tax rate for a specific tax type
     public function getTaxRateByType($taxTypeId)
     {
-        // Fetch the tax type record using its ID
         $taxTypeRecord = TaxType::find($taxTypeId);
-        
-        // Return the VAT percentage, or 0 if no record is found
         return $taxTypeRecord ? $taxTypeRecord->VAT : 0;
     }
 
