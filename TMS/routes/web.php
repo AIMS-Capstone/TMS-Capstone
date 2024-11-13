@@ -96,6 +96,8 @@ Route::middleware([
     Route::post('/transactions/{id}', [TransactionsController::class, 'update'])->name('transactions.update');
 
     Route::post('/org_accounts', [OrgAccountController::class, 'store'])->name('org_accounts.store');
+
+    Route::middleware(['auth', 'check.role:Accountant'])->group(function () {
     // User Management
 Route::get('/user-management/user', [UserController::class, 'user'])->name('user-management.user');
 Route::get('/user-management/client', [UserController::class, 'client'])->name('user-management.client');
@@ -107,6 +109,8 @@ Route::get('/user-management/client', [UserController::class, 'client'])->name('
     Route::get('/organization', [OrganizationRecycleBinController::class, 'index'])->name('recycle-bin.organization.index');
     Route::post('/organization/bulk-restore', [OrganizationRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.organization.bulkRestore');
     Route::delete('/organization/bulk-delete', [OrganizationRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.organization.bulkDelete');
+    });
+});
 
     // Accountant Users
     Route::get('/accountant-users', [AccountantUsersRecycleBinController::class, 'index'])->name('recycle-bin.accountant-users.index');
@@ -234,8 +238,6 @@ Route::get('/user-management/client', [UserController::class, 'client'])->name('
         })->name('vat_report_pdf');
 
     });
-   
-});
 
     //client-side routings
 
