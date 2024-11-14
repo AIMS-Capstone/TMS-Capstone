@@ -10,6 +10,7 @@ class SelectInput extends Component
     public $options = [];
     public $labelKey;
     public $valueKey;
+    
     public $class;
     public $id;
     public $isGrouped;
@@ -18,9 +19,11 @@ class SelectInput extends Component
 
     protected $listeners = ['contactAddedToSelectContact' => 'updateOptions'];
 
-    public function mount($name, $options = [], $labelKey = 'name', $valueKey = 'value', $class = '', $id = '', $isGrouped = false, $type = '')
+    public function mount($name, $options = [], $labelKey = 'name', $valueKey = 'value', $class = '', $id = '', $isGrouped = false, $type = '', $selectedValue = '')
     {
         $this->name = $name;
+        $this->selectedValue = $selectedValue;  // Set the initial selected value
+
         $this->options = $options;
         $this->labelKey = $labelKey;
         $this->valueKey = $valueKey;

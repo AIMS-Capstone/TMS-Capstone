@@ -336,7 +336,16 @@
                                     <td class="py-4 px-2">{{$transaction ->reference}}</td>
                                     <td class="py-4 px-2">{{$transaction ->vat_amount}}</td>
                                     <td class="py-4 px-2"><span class="bg-zinc-100 text-zinc-800 text-xs font-medium me-2 px-4 py-2 rounded-full">{{$transaction ->transaction_type}}</span></td>
-                                    <td class="py-4 px-2"></td>
+                                    <td class="py-4 px-2">
+                        
+                                        @if($transaction->Paidstatus === 'Unpaid')
+                                            Awaiting Payment
+                                        @elseif($transaction->Paidstatus === 'Partial')
+                                            Partially Paid
+                                        @else
+                                            Paid
+                                        @endif
+                                    </td>
                             </tr>                             
                         @endforeach
                     @else

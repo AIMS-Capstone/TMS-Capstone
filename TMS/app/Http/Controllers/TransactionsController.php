@@ -11,6 +11,7 @@ use App\Livewire\TaxRow;
 use App\Models\atc;
 use App\Models\coa;
 use App\Models\Contacts;
+use App\Models\Payment;
 use App\Models\TaxRow as ModelsTaxRow;
 use App\Models\TaxType;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -349,20 +350,83 @@ private function extractTextFromReceipt($filePath)
     {
         // Fetch associated tax rows for the transaction
         $taxRows = ModelsTaxRow::where('transaction_id', $transaction->id)->with('coaAccount')->get();
-    
+        $coas = coa::all();
+        $tax_types = TaxType::all();
+        $atcs = Atc::all();
+
+        $contacts = Contacts::all()->map(function ($contact) {
+            return [
+                'id' => $contact->id,  // The value key
+                'bus_name' => $contact->bus_name,  // The label key
+                'contact_tin'=>$contact->contact_tin,
+            ];
+        })->toArray();
 
         // Pass the transaction and tax rows to the view
-        return view('transactions.show', compact('transaction', 'taxRows'));
+        return view('transactions.show', compact('transaction', 'taxRows', 'contacts','atcs','tax_types','coas'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit($transactionId)
     {
-        $transaction = Transactions::with('contactDetails', 'taxRows')->findOrFail($id);
-        return view('livewire.edit-sales-transaction', compact('transaction'));
+        $transaction = Transactions::with('contactDetails', 'taxRows')->findOrFail($transactionId);
+       
+        $type = $transaction->transaction_type;
+      
+        // Pass 'transaction_type' to the view
+        return view('transactions.edit', compact('transaction', 'type'));
     }
+    public function mark($transactionId)
+    {
+        $transaction = Transactions::findOrFail($transactionId);
+
+        // Update the status to 'posted'
+        $transaction->status = 'posted';
+        $transaction->save();
+
+        // Optionally, you can return a response or redirect to another page
+        session()->flash('success', 'Transaction has been successfully marked as Posted.');
+        
+        // You can redirect to the transaction show page, or wherever needed
+        return redirect()->route('transactions.show', ['transaction' => $transactionId]);
+    }
+    public function markAsPaid(Request $request, Transactions $transaction)
+{
+    // Validate payment data
+    $validated = $request->validate([
+        'payment_date' => 'required|date',
+        'reference_number' => 'required|string|max:255',
+        'bank_account' => 'required|string|max:255',
+        'total_amount_paid' => 'required|numeric|min:0', // Optional field for partial payments
+    ]);
+
+    // Create a new payment record
+    $payment = Payment::create([
+        'transaction_id' => $transaction->id,
+        'payment_date' => $validated['payment_date'],
+        'reference_number' => $validated['reference_number'],
+        'bank_account' => $validated['bank_account'],
+        'total_amount_paid' => $validated['total_amount_paid'],  // Amount paid
+    ]);
+
+    // Update the transaction's status based on whether it's fully or partially paid
+    $totalPaid = Payment::where('transaction_id', $transaction->id)->sum('total_amount_paid');
+    if ($totalPaid >= $transaction->total_amount) {
+        $transaction->Paidstatus = 'Paid';  // Fully paid
+    } else {
+        $transaction->Paidstatus = 'Partially Paid';  // Partial payment
+    }
+    $transaction->save();
+
+    session()->flash('successPayment', 'Transaction has been successfully marked as Posted.');
+    // Return a JSON response indicating success
+    return response()->json(['successPayment' => true]);
+}
+
+    
+    
     
     public function update(Request $request, $id)
     {

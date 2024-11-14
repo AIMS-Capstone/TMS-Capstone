@@ -16,7 +16,7 @@
                 </div>
                 <!-- Render the after slot here -->
                 <div class="mt-6">
-                    {{ $after ?? 'hello' }}
+                    {{ $after ?? '' }}
                 </div>
                 @if (isset($actions))
                     <div class="flex items-center justify-end px-4 py-3 bg-white text-end sm:px-6  sm:rounded-bl-md sm:rounded-br-md">
