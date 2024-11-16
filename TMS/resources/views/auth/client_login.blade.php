@@ -9,11 +9,11 @@
 
         <!-- "Client" label with reduced margin -->
         <div class="flex justify-center">
-            <span class="bg-yellow-100 text-yellow-600 font-bold text-xs px-3 pt-1 rounded-full">Client</span>
+            <span class="bg-yellow-100 mt-32 text-yellow-600 font-bold text-xs px-3 pt-1 rounded-full">Client</span>
         </div>
 
         <!-- "Log In" with a negative margin to move closer to "Client" -->
-        <p class="font-extrabold text-2xl sm:text-4xl text-center auth-color mt-1 ">Log In</p>
+        <p class="font-extrabold text-2xl sm:text-4xl text-center auth-color">Log In</p>
 
         <p class="font-normal mt-2 text-sm sm:text-base text-center taxuri-text mb-4 sm:mb-6">
             Enter your details to sign in to your client account
@@ -36,7 +36,8 @@
             <div class="mt-4">
                 <x-auth-label for="password" value="{{ __('Password') }}" />
                 <div x-data="{ show: false }" class="relative">
-                    <x-input id="password" class="block mt-1 w-full" name="password" required autocomplete="new-password" placeholder="Enter your password" maxlength="30" oninput="checkForm()" />
+                    <x-input :type="show ? 'text' : 'password'" id="password" class="block mt-1 w-full" type="password" name="password" required 
+                    autocomplete="new-password" placeholder="Enter your password" maxlegnth="30" oninput="checkForm()"/>
                     <button type="button" onclick="togglePassword('password')" class="absolute inset-y-0 right-0 flex items-center px-4 text-xs font-bold text-gray-500 hover:text-gray-700 focus:outline-none">
                         SHOW
                     </button>

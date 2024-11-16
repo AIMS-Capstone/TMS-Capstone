@@ -1,0 +1,434 @@
+{{-- Tab Stepper --}}
+    <div class="flex items-center justify-center my-6 px-20">
+        <div class="flex w-full items-center justify-center text-blue-600 dark:text-blue-500 after:content-[''] after:w-full after:h-1 after:border-b after:border-blue-100 after:border-4 after:inline-block dark:after:border-blue-800">
+            <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full lg:h-12 lg:w-12 dark:bg-blue-800 shrink-0">
+                <svg class="w-4 h-4 text-blue-600 lg:w-6 lg:h-6 dark:text-blue-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 16">
+                    <path d="M18 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2ZM6.5 3a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3.014 13.021l.157-.625A3.427 3.427 0 0 1 6.5 9.571a3.426 3.426 0 0 1 3.322 2.805l.159.622-6.967.023ZM16 12h-3a1 1 0 0 1 0-2h3a1 1 0 0 1 0 2Zm0-3h-3a1 1 0 1 1 0-2h3a1 1 0 1 1 0 2Zm0-3h-3a1 1 0 1 1 0-2h3a1 1 0 1 1 0 2Z"/>
+                </svg>
+            </div>
+        </div>
+        <div class="flex w-full items-center justify-center after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-100 after:border-4 after:inline-block dark:after:border-gray-700">
+            <div class="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full lg:h-12 lg:w-12 dark:bg-gray-700 shrink-0">
+                <svg class="w-4 h-4 text-blue-600 lg:w-6 lg:h-6 dark:text-blue-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
+                    <path d="M18 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2ZM2 12V6h16v6H2Z"/>
+                    <path d="M6 8H4a1 1 0 0 0 0 2h2a1 1 0 0 0 0-2Zm8 0H9a1 1 0 0 0 0 2h5a1 1 0 1 0 0-2Z"/>
+                </svg>
+            </div>
+        </div>
+        <div class="flex w-full items-center justify-center after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-100 after:border-4 after:inline-block dark:after:border-gray-700">
+            <div class="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full lg:h-12 lg:w-12 dark:bg-gray-700 shrink-0">
+                <svg class="w-4 h-4 text-blue-600 lg:w-6 lg:h-6 dark:text-blue-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
+                    <path d="M18 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2ZM2 12V6h16v6H2Z"/>
+                    <path d="M6 8H4a1 1 0 0 0 0 2h2a1 1 0 0 0 0-2Zm8 0H9a1 1 0 0 0 0 2h5a1 1 0 1 0 0-2Z"/>
+                </svg>
+            </div>
+        </div>
+        <div class="flex items-center w-full">
+            <div class="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full lg:h-12 lg:w-12 dark:bg-gray-700 shrink-0">
+                <svg class="w-4 h-4 text-blue-600 lg:w-6 lg:h-6 dark:text-blue-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
+                    <path d="M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2ZM7 2h4v3H7V2Zm5.7 8.289-3.975 3.857a1 1 0 0 1-1.393 0L5.3 12.182a1.002 1.002 0 1 1 1.4-1.436l1.328 1.289 3.28-3.181a1 1 0 1 1 1.392 1.435Z"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex justify-center items-center px-20">
+        <div class="flex items-center my-6 px-20">
+            <div class="flex w-full items-center justify-center text-blue-600 dark:text-blue-500 after:content-[''] after:w-full after:h-1 after:border-b after:border-blue-100 after:border-4 after:inline-block dark:after:border-blue-800">
+                <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full lg:h-12 lg:w-12 dark:bg-blue-800 shrink-0">
+                    <svg class="w-4 h-4 text-blue-600 lg:w-6 lg:h-6 dark:text-blue-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 16">
+                        <path d="M18 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2ZM6.5 3a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3.014 13.021l.157-.625A3.427 3.427 0 0 1 6.5 9.571a3.426 3.426 0 0 1 3.322 2.805l.159.622-6.967.023ZM16 12h-3a1 1 0 0 1 0-2h3a1 1 0 0 1 0 2Zm0-3h-3a1 1 0 1 1 0-2h3a1 1 0 1 1 0 2Zm0-3h-3a1 1 0 1 1 0-2h3a1 1 0 1 1 0 2Z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="flex w-full items-center justify-center after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-100 after:border-4 after:inline-block dark:after:border-gray-700">
+                <div class="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full lg:h-12 lg:w-12 dark:bg-gray-700 shrink-0">
+                    <svg class="w-4 h-4 text-blue-600 lg:w-6 lg:h-6 dark:text-blue-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
+                        <path d="M18 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2ZM2 12V6h16v6H2Z"/>
+                        <path d="M6 8H4a1 1 0 0 0 0 2h2a1 1 0 0 0 0-2Zm8 0H9a1 1 0 0 0 0 2h5a1 1 0 1 0 0-2Z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="flex w-full items-center justify-center after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-100 after:border-4 after:inline-block dark:after:border-gray-700">
+                <div class="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full lg:h-12 lg:w-12 dark:bg-gray-700 shrink-0">
+                    <svg class="w-4 h-4 text-blue-600 lg:w-6 lg:h-6 dark:text-blue-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
+                        <path d="M18 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2ZM2 12V6h16v6H2Z"/>
+                        <path d="M6 8H4a1 1 0 0 0 0 2h2a1 1 0 0 0 0-2Zm8 0H9a1 1 0 0 0 0 2h5a1 1 0 1 0 0-2Z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="flex items-center w-full">
+                <div class="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full lg:h-12 lg:w-12 dark:bg-gray-700 shrink-0">
+                    <svg class="w-4 h-4 text-blue-600 lg:w-6 lg:h-6 dark:text-blue-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
+                        <path d="M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2ZM7 2h4v3H7V2Zm5.7 8.289-3.975 3.857a1 1 0 0 1-1.393 0L5.3 12.182a1.002 1.002 0 1 1 1.4-1.436l1.328 1.289 3.28-3.181a1 1 0 1 1 1.391 1.435Z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- real size -->
+{{-- <div id="stepper" class="flex items-center justify-center my-6 px-20">
+        <!-- Step 1 -->
+        <div class="flex flex-col items-center step" data-step="1">
+            <div class="w-16 h-16 flex items-center justify-center rounded-full bg-blue-900 text-yellow-400 text-2xl font-bold">1</div>
+            <span class="font-medium text-zinc-700 mt-2">Upload CSV File</span>
+        </div>
+        <div class="flex-grow border-8 border-zinc-300"></div>
+
+        <!-- Step 2 -->
+        <div class="flex flex-col items-center step" data-step="2">
+            <div class="w-16 h-16 flex items-center justify-center rounded-full border-4 border-blue-900 text-blue-900 text-2xl font-bold">2</div>
+            <span class="font-medium text-zinc-700 mt-2">Column Mapping</span>
+        </div>
+        <div class="flex-grow border-8 border-zinc-300"></div>
+
+        <!-- Step 3 -->
+        <div class="flex flex-col items-center step" data-step="3">
+            <div class="w-16 h-16 flex items-center justify-center rounded-full border-4 border-zinc-300 text-zinc-500 text-2xl font-bold">3</div>
+            <span class="font-medium text-zinc-500 mt-2">Review Import</span>
+        </div>
+        <div class="flex-grow border-8 border-zinc-300"></div>
+
+        <!-- Step 4 -->
+        <div class="flex flex-col items-center step" data-step="4">
+            <div class="w-16 h-16 flex items-center justify-center rounded-full border-4 border-zinc-300 text-zinc-500 text-2xl font-bold">4</div>
+            <span class="font-medium text-zinc-500 mt-2">Complete Import</span>
+        </div>
+    </div> --}}
+
+    <!-- Closest https://www.codehim.com/demo/horizontal-stepper-for-bootstrap-5/-->
+<div class="container">
+    <div class="accordion" id="accordionExample">
+        <div class="steps flex justify-between items-center mb-8 relative">
+        <progress id="progress" value="0" max="100" class="absolute w-11/12 z-5 h-2.5 mx-4 mb-4"></progress>
+        
+        <div class="step-item text-center z-10">
+            <button class="step-button w-12 h-12 rounded-full border-none bg-gray-400 transition-all duration-300 hover:bg-prm-color"
+            type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            1
+            </button>
+            <div class="step-title">First Step</div>
+        </div>
+        <div class="step-item text-center z-10">
+            <button class="step-button w-12 h-12 rounded-full border-none bg-gray-400 transition-all duration-300 hover:bg-prm-color"
+            type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            2
+            </button>
+            <div class="step-title">Second Step</div>
+        </div>
+        <div class="step-item text-center z-10">
+            <button class="step-button w-12 h-12 rounded-full border-none bg-gray-400 transition-all duration-300 hover:bg-prm-color"
+            type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            3
+            </button>
+            <div class="step-title">Third Step</div>
+        </div>
+        <div class="step-item text-center z-10">
+            <button class="step-button w-12 h-12 rounded-full border-none bg-gray-400 transition-all duration-300 hover:bg-prm-color"
+            type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+            4
+            </button>
+            <div class="step-title">Fourth Step</div>
+        </div>
+        </div>
+    
+        <!-- Step 1 Content -->
+        <div class="card">
+        <div id="headingOne"></div>
+        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+            <div class="card-body">
+            your content goes here...
+            </div>
+        </div>
+        </div>
+    
+        <!-- Step 2 Content -->
+        <div class="card">
+        <div id="headingTwo"></div>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+            <div class="card-body">
+            your content goes here...
+            </div>
+        </div>
+        </div>
+    
+        <!-- Step 3 Content -->
+        <div class="card">
+        <div id="headingThree"></div>
+        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+            <div class="card-body">
+            your content goes here...
+            </div>
+        </div>
+        </div>
+    
+        <!-- Step 4 Content -->
+        <div class="card">
+        <div id="headingFour"></div>
+        <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
+            <div class="card-body">
+            your content goes here...
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const stepButtons = document.querySelectorAll('.step-button');
+const progress = document.querySelector('#progress');
+
+Array.from(stepButtons).forEach((button,index) => {
+    button.addEventListener('click', () => {
+        progress.setAttribute('value', index * 100 /(stepButtons.length - 1) );//there are 3 buttons. 2 spaces.
+
+        stepButtons.forEach((item, secindex)=>{
+            if(index > secindex){
+                item.classList.add('done');
+            }
+            if(index < secindex){
+                item.classList.remove('done');
+            }
+        })
+    })
+})
+</script>
+
+<!-- A bit closest: https://readymadeui.com/tailwind/component/responsive-stepper -->
+<div id="stepper" class="flex items-end max-w-screen-lg mx-auto my-6 p-10">
+    <!-- Step 1 -->
+    <div id="step-1" class="w-full step">
+        <div class="flex items-center w-full">
+            <div class="w-8 h-8 shrink-0 mx-[-1px] border-2 border-blue-900 bg-blue-900 p-1.5 flex items-center justify-center rounded-full">
+                <span class="text-base text-center text-yellow-400 font-bold">1</span>
+            </div>
+            <div class="w-full h-1 bg-blue-900"></div>
+        </div>
+        <h6 class="text-base font-bold text-blue-900 mb-2">Step 1</h6>
+    </div>
+    <!-- Step 2 (initially Disabled) -->
+    <div id="step-2" class="w-full step">
+        <div class="flex items-center w-full">
+            <div class="w-8 h-8 shrink-0 mx-[-1px] border-2 p-1.5 flex items-center justify-center rounded-full">
+                <span class="text-base text-gray-400 font-bold">2</span>
+            </div>
+            <div class="w-full h-1 bg-gray-300"></div>
+        </div>
+        <h6 class="text-base font-bold text-gray-400 mb-2">Step 2</h6>
+    </div>
+    <!-- Step 3 (initially Disabled) -->
+    <div id="step-3" class="w-full step">
+        <div class="flex items-center w-full">
+            <div class="w-8 h-8 shrink-0 mx-[-1px] border-2 p-1.5 flex items-center justify-center rounded-full">
+                <span class="text-base text-gray-400 font-bold">3</span>
+            </div>
+            <div class="w-full h-1 bg-gray-300"></div>
+        </div>
+        <h6 class="text-base font-bold text-gray-400 mb-2">Step 3</h6>
+    </div>
+    <!-- Step 4 (initially Disabled) -->
+    <div id="step-4" class="step">
+        <div class="flex items-center">
+            <div class="w-8 h-8 shrink-0 mx-[-1px] border-2 p-1.5 flex items-center justify-center rounded-full">
+                <span class="text-base text-gray-400 font-bold">4</span>
+            </div>
+        </div>
+        <h6 class="text-base font-bold text-gray-400 w-max mb-2">Step 4</h6>
+    </div>
+</div>
+<button id="prev" class="btn">Previous</button>
+<button id="next" class="btn">Next</button>
+                
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+    const steps = document.querySelectorAll(".step");
+    const nextButton = document.getElementById("next");
+    const prevButton = document.getElementById("prev");
+    let currentStep = 0;
+
+    function updateSteps() {
+        steps.forEach((step, index) => {
+            const circle = step.querySelector("div > div");
+            const line = step.querySelector("div > div + div");
+            const label = step.querySelector("h6");
+
+            if (index < currentStep) {
+                // Done state
+                circle.className = "w-8 h-8 shrink-0 mx-[-1px] border-2 border-blue-900 bg-blue-900 p-1.5 flex items-center justify-center rounded-full";
+                circle.querySelector("span").className = "text-base text-yellow-400 font-bold";
+                if (line) line.className = "w-full h-1 bg-blue-900";
+                label.className = "text-base font-bold text-blue-900 mb-2";
+            } else if (index === currentStep) {
+                // Active state
+                circle.className = "w-8 h-8 shrink-0 mx-[-1px] border-2 border-blue-900 p-1.5 flex items-center justify-center rounded-full";
+                circle.querySelector("span").className = "text-base text-blue-900 font-bold";
+                if (line) line.className = "w-full h-1 bg-gray-300";
+                label.className = "text-base font-bold text-blue-900 mb-2";
+            } else {
+                // Disabled state
+                circle.className = "w-8 h-8 shrink-0 mx-[-1px] border-2 p-1.5 flex items-center justify-center rounded-full";
+                circle.querySelector("span").className = "text-base text-gray-400 font-bold";
+                if (line) line.className = "w-full h-1 bg-gray-300";
+                label.className = "text-base font-bold text-gray-400 mb-2";
+            }
+        });
+
+        // Disable/Enable navigation buttons
+        prevButton.disabled = currentStep === 0;
+        nextButton.disabled = currentStep === steps.length - 1;
+    }
+
+    nextButton.addEventListener("click", () => {
+        if (currentStep < steps.length - 1) {
+            currentStep++;
+            updateSteps();
+        }
+    });
+
+    prevButton.addEventListener("click", () => {
+        if (currentStep > 0) {
+            currentStep--;
+            updateSteps();
+        }
+    });
+
+    // Initialize stepper
+    updateSteps();
+});
+</script>
+
+
+
+<!-- Script ng COA import -->
+{{-- <script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content-item');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const footer = document.getElementById('footer');
+        const requiredField = document.querySelectorAll('#tab-content-fields input[required]');
+
+        let currentTab = 0;
+
+        function activateTab(index) {
+            tabs.forEach((tab, idx) => {
+                tab.classList.toggle('text-blue-900', idx === index);
+                tab.classList.toggle('font-semibold', idx === index);
+                tabContents[idx].classList.toggle('hidden', idx !== index);
+            });
+
+            // Toggle Previous button visibility
+            if (index === 0) {
+                prevBtn.classList.add('hidden'); // Hide Previous button on the first step
+                footer.classList.remove('justify-between');
+                footer.classList.add('justify-end'); // Align to end when Previous is hidden
+            } else {
+                prevBtn.classList.remove('hidden');
+                footer.classList.remove('justify-end');
+                footer.classList.add('justify-between'); // Spread out buttons when Previous is visible
+            }
+
+            // On the last step, hide Next and Cancel, show Done
+            if (index === tabs.length - 1) {
+                cancelBtn.classList.add('hidden'); // Hide cancel on last step
+                saveBtn.classList.remove('hidden'); // Show Done button
+                nextBtn.classList.add('hidden'); // Hide Next button
+                prevBtn.classList.add('hidden');
+                footer.classList.remove('justify-between'); // Remove justify-between
+                footer.classList.add('justify-end'); // Align Done button to the end
+            } else {
+                cancelBtn.classList.remove('hidden');
+                saveBtn.classList.add('hidden');
+                nextBtn.classList.remove('hidden');
+            }
+                // Recheck required fields for the current step
+                checkRequiredFields();
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentTab < tabs.length - 1) {
+                currentTab++;
+                activateTab(currentTab);
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentTab > 0) {
+                currentTab--;
+                activateTab(currentTab);
+            }
+        });
+
+        // Initialize the tab display
+        activateTab(currentTab);
+
+        // Disable the Next button initially
+        nextBtn.disabled = true;
+        nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+        // Function to check if all required fields are filled
+        function checkRequiredFields() {
+            let allValid = true;
+            // Get only the required fields from the current tab
+            const requiredFields = tabContents[currentTab].querySelectorAll('input[required]');
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    allValid = false;
+                }
+            });
+            
+            if (allValid) {
+                nextBtn.disabled = false;
+                nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                nextBtn.disabled = true;
+                nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // Listen for input changes on all required fields across all tabs
+        document.querySelectorAll('input[required]').forEach(field => {
+            field.addEventListener('input', checkRequiredFields);
+        });
+    });
+
+    function showFileName() {
+        const fileInput = document.getElementById('file');
+        const fileNameDisplay = document.getElementById('file-name');
+        const nextBtn = document.getElementById('nextBtn'); // To disable the Next button if file is invalid
+        const allowedExtensions = ['xlsx'];
+
+        if (fileInput.files.length > 0) {
+            const fileName = fileInput.files[0].name;
+            const fileExtension = fileName.split('.').pop().toLowerCase();
+
+            // Check if the file is an Excel file
+            if (!allowedExtensions.includes(fileExtension)) {
+                fileNameDisplay.textContent = "Invalid file type! Please select an Excel (.xlsx) file.";
+                fileNameDisplay.classList.add('text-red-500');
+                nextBtn.disabled = true; // Disable the next button if invalid file type
+                nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                fileInput.value = ""; // Clear the file input
+            } else {
+                fileNameDisplay.textContent = fileName;
+                fileNameDisplay.classList.remove('text-red-500');
+                nextBtn.disabled = false; // Enable next button
+                nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        } else {
+            fileNameDisplay.textContent = "No file chosen";
+            nextBtn.disabled = true; // Disable Next if no file is selected
+            nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+    }
+
+    // Modify the file input element to accept only Excel files
+    document.getElementById('file').setAttribute('accept', '.xlsx');
+
+</script> --}}

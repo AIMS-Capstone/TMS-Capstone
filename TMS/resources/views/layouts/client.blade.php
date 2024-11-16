@@ -46,8 +46,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
 <body class="bg-gray-100 font-sans antialiased">
 
 <!-- Header -->
-<header class="bg-blue-900 text-white py-3">
-    <div class="container mx-auto flex justify-between items-center px-4">
+<header class="bg-blue-900 text-white py-4">
+    <div class="container mx-4 flex justify-between items-center px-4">
         <!-- Logo and Site Name -->
         <a href="{{ route('client.dashboard') }}" class="flex items-center">
             <img src="{{ asset('images/Taxuri Logo (Client).png') }}" alt="Taxuri Logo" class="h-8 mr-2">

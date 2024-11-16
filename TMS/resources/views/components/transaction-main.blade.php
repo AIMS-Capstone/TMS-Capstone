@@ -350,7 +350,7 @@
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="6" class="text-center p-4">
+                            <td colspan="7" class="text-center p-4">
                                 <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
                                 <h1 class="font-extrabold text-lg mt-2">No Transactions yet</h1>
                                 <p class="text-sm text-neutral-500 mt-2">Start adding transactions with the <br> + Add Transaction button.</p>

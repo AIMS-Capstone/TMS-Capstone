@@ -7,8 +7,12 @@
             </span>
         </x-slot>
 
-        <div class="mb-4 text-sm mt-10">
-            <p class="font-extrabold text-4xl text-center auth-color mt-36">Forgot Password</p>
+        <!-- "Client" label with reduced margin -->
+        <div class="flex justify-center">
+            <span class="bg-yellow-100 mt-32 text-yellow-600 font-bold text-xs px-3 pt-1 rounded-full">Client</span>
+        </div>
+        <div class="mb-4 text-sm mt-5">
+            <p class="font-extrabold text-4xl text-center auth-color">Forgot Password</p>
             <p class="font-normal mt-2 text-base text-center taxuri-text mb-10">
                 No worries, just let us know your email address and we will email you a password reset link.
             </p>

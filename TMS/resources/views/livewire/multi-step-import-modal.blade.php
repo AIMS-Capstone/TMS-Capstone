@@ -6,12 +6,13 @@
 
     <!-- Modal Content -->
     @if($modalOpen)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
-            <div class="bg-white rounded-lg p-6 w-full max-w-2xl">
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900 bg-opacity-50">
+            <div class="bg-white rounded-lg w-full max-w-screen-lg max-h-screen mx-auto h-auto z-10 overflow-hidden">
                 <!-- Modal Header -->
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-semibold">Multi-Step Import</h3>
-                    <button wire:click="closeModal" class="text-gray-500">X</button>
+                <div class="flex relative justify-between items-center mb-4 bg-blue-900 border-opacity-80 w-full p-3">
+                    <div class="flex justify-center items-center bg-blue-900 border-opacity-80 w-full">
+                        <h1 class="text-lg font-bold text-white">Sales Transaction Source</h1>
+                    </div>
                 </div>
 
                 @if(session()->has('error'))
@@ -26,9 +27,12 @@
                     </div>
                 @endif
 
+                
+                {{-- Tab Stepper: Active-Done-Disabled --}}
+
                 <!-- Step 1: File Upload -->
                 @if($step === 1)
-                    <div>
+                    <div class="p-10">
                         <h4 class="text-xl font-semibold mb-2">Step 1: Select a File</h4>
                         <p class="mb-4">Please upload an Excel file for import.</p>
                         <input type="file" wire:model="file" class="border p-2 w-full" accept=".xlsx,.xls,.csv" />
@@ -38,8 +42,8 @@
                         @error('file') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         
                         <div class="mt-4 flex justify-end">
-                            <button wire:click="closeModal" class="btn bg-gray-500 text-white p-2 rounded mr-2">Cancel</button>
-                        </div>
+                            <button wire:click="closeModal" class="btn bg-zinc-500 text-white p-2 rounded mr-2">Cancel</button>
+                        </div>                        
                     </div>
                 @endif
 
@@ -116,7 +120,7 @@
                             </div>
 
                             <div class="mt-4 flex justify-end space-x-2">
-                                <button type="button" wire:click="$set('step', 1)" class="btn bg-gray-500 text-white p-2 rounded">
+                                <button type="button" wire:click="$set('step', 1)" class="btn bg-zinc-500 text-white p-2 rounded">
                                     Back
                                 </button>
                                 <button type="submit" class="btn bg-blue-500 text-white p-2 rounded">
@@ -138,7 +142,7 @@
                                 <thead>
                                     <tr>
                                         @foreach($mappedColumns as $field => $column)
-                                            <th class="border p-2 bg-gray-100">{{ $databaseColumns[$field] }}</th>
+                                            <th class="border p-2 bg-zinc-100">{{ $databaseColumns[$field] }}</th>
                                         @endforeach
                                     </tr>
                                 </thead>
@@ -157,7 +161,7 @@
                         </div>
 
                         <div class="mt-4 flex justify-end space-x-2">
-                            <button wire:click="$set('step', 2)" class="btn bg-gray-500 text-white p-2 rounded">
+                            <button wire:click="$set('step', 2)" class="btn bg-zinc-500 text-white p-2 rounded">
                                 Back
                             </button>
                             <button wire:click="saveImport" class="btn bg-green-500 text-white p-2 rounded">
@@ -172,7 +176,7 @@
                     <div class="text-center">
                         <h4 class="text-xl font-semibold mb-2">Import Successful!</h4>
                         <p class="mb-4">Your data has been successfully imported.</p>
-                        <button wire:click="closeModal" class="btn bg-gray-500 text-white p-2 rounded">
+                        <button wire:click="closeModal" class="btn bg-zinc-500 text-white p-2 rounded">
                             Close
                         </button>
                     </div>
