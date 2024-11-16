@@ -10,7 +10,7 @@
 
                     <div class="flex justify-between items-center">
                         <div class="flex items-center">            
-                            <p class="font-normal text-sm">All created organizations, whether for business or clients, are listed on this page for easy <br /> 
+                            <p class="text-zinc-700 font-normal text-sm">All created organizations, whether for business or clients, are listed on this page for easy <br /> 
                                 identification and management. Select an organization to start a session.</p>
                         </div>
                         <div class="items-end float-end">
@@ -199,11 +199,10 @@
                                                         </button>
                                                         <div id="dropdownAction-{{ $organization->id }}" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-40 origin-top-right overflow-y-auto max-h-64">
                                                             <div class="py-2 px-2 text-sm text-zinc-700" aria-labelledby="dropdownMenuAction">
-                                                                <div onclick="editOrganization('{{ $organization->id }}')" class="block px-4 py-2 w-full text-left hover-dropdown">View Details</div>
-                                                                <div onclick="editOrganization('{{ $organization->id }}')" class="block px-4 py-2 w-full text-left hover-dropdown">Edit</div>
+                                                                <div x-data x-on:click="$dispatch('open-view-org-modal', { organization: {{ $organization->toJson() }} })" class="block px-4 py-2 w-full text-left hover-dropdown">View Details</div>
+                                                                <div  x-data x-on:click="$dispatch('open-edit-org-modal', { organizationId: '{{ $organization->id }}' })" class="block px-4 py-2 w-full text-left hover-dropdown">Edit</div>
                                                                 @if (!$organization->account)
-                                                                <div x-data 
-                                                                    x-on:click="$dispatch('open-generate-modal', { organizationId: '{{ $organization->id }}' })" class="block px-4 py-2 w-full text-left hover-dropdown">
+                                                                <div x-data x-on:click="$dispatch('open-generate-modal', { organizationId: '{{ $organization->id }}' })" class="block px-4 py-2 w-full text-left hover-dropdown">
                                                                     Create Account
                                                                 </div>
                                                             @endif
@@ -236,7 +235,204 @@
             </div>
         </div>
     </div>
+
+    {{-- View Modal --}}
+    <div x-data="{ showOrg: false, organization: {} }"
+        x-show="showOrg"
+        @open-view-org-modal.window="showOrg = true; organization = $event.detail.organization" 
+        x-on:close-modal.window="showOrg = false"
+        x-effect="document.body.classList.toggle('overflow-hidden', showOrg)"
+        class="fixed z-50 inset-0 flex items-center justify-center m-2 px-6"
+        x-cloak>
+        <!-- Modal background -->
+        <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
+        <!-- Modal container -->
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl mx-auto h-auto z-10 overflow-hidden"
+         x-show="showOrg" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
+            <!-- Modal header -->
+            <div class="relative p-3 bg-blue-900 border-opacity-80 w-full">
+                <h1 class="text-lg font-bold text-white text-center">Organization Details</h1>
+                <button @click="showOrg = false" class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 8L16 16M8 16L16 8" stroke="#1e3a8a" class="transition duration-200 hover:stroke-gray-600"/>
+                    </svg>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-10">
+                <div class="grid grid-cols-3 gap-6 mb-5">
+                    <div class="w-full">
+                        <label class="block text-sm font-bold text-zinc-700">Classification</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.type" disabled readonly>
+                    </div>
+                    <div class="w-full">
+                        <label class="block text-sm font-bold text-zinc-700">Registered Name</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.registration_name" disabled readonly>
+                    </div>
+                    <div class="w-full">
+                        <label class="block text-sm font-bold text-zinc-700">Line of Business</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.line_of_business" disabled readonly>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-6 mb-5">
+                    <div class="w-full">
+                        <label class="block text-sm font-bold text-zinc-700">Address Line</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.address_line" disabled readonly>
+                    </div>
+                    <div class="w-full">
+                        <label class="block text-sm font-bold text-zinc-700">Region</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.region" disabled readonly>
+                    </div>
+                    <div class="w-full">
+                        <label class="block text-sm font-bold text-zinc-700">City</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.city" disabled readonly>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-6 mb-5">
+                    <div class="w-full">
+                        <label class="block text-sm font-bold text-zinc-700">Zip Code</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.zip_code" disabled readonly>
+                    </div>
+                    <div class="w-full">
+                        <label class="block text-sm font-bold text-zinc-700">Contact Number</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.contact_number" disabled readonly>
+                    </div>
+                    <div class="w-full">
+                        <label class="block text-sm font-bold text-zinc-700">Email Address</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.email" disabled readonly>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-6 mb-5">
+                    <div class="w-full">
+                        <label class="block text-sm font-bold text-zinc-700">TIN</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.tin" disabled readonly>
+                    </div>
+                    <div class="w-full">
+                        <label class="block text-sm font-bold text-zinc-700">RDO</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.rdo" disabled readonly>
+                    </div>
+                    <div class="w-full">
+                        <label class="block text-sm font-bold text-zinc-700">Tax Type</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.tax_type" disabled readonly>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-6 mb-5">
+                    <div class="w-full">
+                        <label class="block text-sm font-bold text-zinc-700">Start Date</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.start_date" disabled readonly>
+                    </div>
+                    <div class="w-full">
+                        <label class="block text-sm font-bold text-zinc-700">Registration Date</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.registration_date" disabled readonly>
+                    </div>
+                    <div class="w-full">
+                        <label class="block text-sm font-bold text-zinc-700">Financial Year End</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.financial_year_end" disabled readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
+    {{-- Edit Modal: Shows Error with "PUT" + not sure about the action + Selections of Address and RDO --}}
+    <div x-data="{ showEdit: false, organization: {} }"
+        x-show="showEdit"
+        @open-edit-org-modal.window="showEdit = true; organization = $event.detail.organization" 
+        x-on:close-modal.window="showEdit = false"
+        x-effect="document.body.classList.toggle('overflow-hidden', showEdit)"
+        class="fixed z-50 inset-0 flex items-center justify-center m-2 px-6"
+        x-cloak>
+        <!-- Modal background -->
+        <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
+        <!-- Modal container -->
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl mx-auto h-auto z-10 overflow-hidden"
+         x-show="showEdit" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
+            <!-- Modal header -->
+            <div class="relative p-3 bg-blue-900 border-opacity-80 w-full">
+                <h1 class="text-lg font-bold text-white text-center">Edit Organization Details</h1>
+            </div>
+            <!-- Modal body -->
+            <div class="p-10">
+                <form id="editAccountForm" method="POST" :action="'/org-setup/' + organziation.id">
+                    @csrf
+                    @method('PUT')
+    
+                    <div class="grid grid-cols-3 gap-6 mb-5">
+                        <div class="w-full">
+                            <label class="block text-sm font-bold text-zinc-700">Address Line<span class="text-red-500">*</span></label>
+                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-sm font-bold text-zinc-700">Region<span class="text-red-500">*</span></label>
+                            {{-- PLace the region selection here create-org --}}
+                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-sm font-bold text-zinc-700">City<span class="text-red-500">*</span></label>
+                            {{-- Place the city selection here from create-org --}}
+                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6 mb-5">
+                        <div class="w-full">
+                            <label class="block text-sm font-bold text-zinc-700">Zip Code<span class="text-red-500">*</span></label>
+                            {{-- Place the same zip code autofill from create-org --}}
+                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-sm font-bold text-zinc-700">RDO<span class="text-red-500">*</span></label>
+                            {{-- Place the selection of RDO here --}}
+                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6 mb-5">
+                        <div class="w-full">
+                            <label class="block text-sm font-bold text-zinc-700">Contact Number<span class="text-red-500">*</span></label>
+                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-sm font-bold text-zinc-700">Email Address<span class="text-red-500">*</span></label>
+                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
+                        </div>
+                    </div>
+                    
+    
+                    <!-- Submit -->
+                    <div class="flex justify-end my-4">
+                        <button 
+                            x-on:click="$dispatch('close-modal')"
+                            class="mr-2 font-semibold text-zinc-600 px-3 py-1 rounded-md hover:text-zinc-900 transition">
+                            Cancel
+                        </button>
+                        <button 
+                            type="submit" 
+                            class="font-semibold bg-blue-900 text-white text-center px-6 py-1.5 rounded-md hover:bg-blue-950 border-blue-900 hover:text-white transition">
+                            Update
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     {{-- CREATE CLIENT ACCOUNT WITH SUCCESS MODAL NA MABAGAL. I prefer the modal above kasi nakikita na nagpprocess yung submission--}}
     <div x-data="{ open: false, organizationId: null, email: '', success: false, 
                isEmailValid() { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email); } }" 
