@@ -21,6 +21,7 @@ class CoaController extends Controller
     {
         $search = $request->input('search');
         $type = $request->input('type');
+        $perPage = $request->input('perPage', 5);
 
         $organizationId = session('organization_id'); // Using session-based organization ID
 
@@ -40,7 +41,7 @@ class CoaController extends Controller
             $query->where('type', $type);
         }
 
-        $coas = $query->paginate(5);
+        $coas = $query->paginate($perPage);
 
         return view('coa', compact('coas'));
     }
@@ -172,6 +173,7 @@ class CoaController extends Controller
         $organizationId = session('organization_id');
         $search = $request->input('search');
         $type = $request->input('type');
+        $perPage = $request->input('perPage', 5);
 
         $query = Coa::where('status', 'Inactive')
             ->where('organization_id', $organizationId);
@@ -188,7 +190,7 @@ class CoaController extends Controller
             $query->where('type', $type);
         }
 
-        $inactiveCoas = $query->paginate(5);
+        $inactiveCoas = $query->paginate($perPage);
 
         return view('components.coa-archive', compact('inactiveCoas'));
     }

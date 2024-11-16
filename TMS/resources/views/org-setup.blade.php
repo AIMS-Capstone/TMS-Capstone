@@ -237,7 +237,8 @@
     </div>
 
     {{-- View Modal --}}
-    <div x-data="{ showOrg: false, organization: {} }"
+    <div x-data="{ showOrg: false, organization: {}, formatDate(date) {const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(date).toLocaleDateString(undefined, options); } }"
         x-show="showOrg"
         @open-view-org-modal.window="showOrg = true; organization = $event.detail.organization" 
         x-on:close-modal.window="showOrg = false"
@@ -334,12 +335,12 @@
                     <div class="w-full">
                         <label class="block text-sm font-bold text-zinc-700">Start Date</label>
                         <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
-                            x-bind:value="organization.start_date" disabled readonly>
+                            x-bind:value="formatDate(organization.start_date)" disabled readonly>
                     </div>
                     <div class="w-full">
                         <label class="block text-sm font-bold text-zinc-700">Registration Date</label>
                         <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
-                            x-bind:value="organization.registration_date" disabled readonly>
+                            x-bind:value="formatDate(organization.registration_date)" disabled readonly>
                     </div>
                     <div class="w-full">
                         <label class="block text-sm font-bold text-zinc-700">Financial Year End</label>
@@ -443,7 +444,8 @@
         
         <!-- Create Account Modal -->
         <div x-show="open" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
-            <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden" x-show="open" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
                 <!-- Modal header -->
                 <div class="flex bg-blue-900 justify-center rounded-t-lg items-center p-3 border-b border-opacity-80 mx-auto">
                     <h1 class="text-lg font-bold text-white">Create Client Account</h1>
@@ -551,7 +553,6 @@
 
     <script>
         // FOR SORT BUTTON
-
         document.getElementById('sortButton').addEventListener('click', function() {
             const dropdown = document.getElementById('dropdownMenu');
             dropdown.classList.toggle('hidden');

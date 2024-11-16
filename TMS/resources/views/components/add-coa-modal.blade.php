@@ -1,17 +1,20 @@
 <div 
-    x-data="{ show: false }"
+    x-data="{ show: false, success: false }"
     x-show="show"
     x-on:open-add-modal.window="show = true"
     x-on:close-modal.window="show = false"
-    x-effect="document.body.classList.toggle('overflow-hidden', show)"
+    @submit-success.window="show = false; success = true"
+    x-effect="document.body.classList.toggle('overflow-hidden', show || success)"
     class="fixed z-50 inset-0 flex items-center justify-center m-2 px-6"
     x-cloak
     >
     <!-- Modal background -->
-    <div class="fixed inset-0 bg-gray-400 opacity-50"></div>
+    <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
 
     <!-- Modal container -->
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden"
+         x-show="show" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
         <!-- Modal header -->
         <div class="flex bg-blue-900 justify-center rounded-t-lg items-center p-3 border-b border-opacity-80 mx-auto">
             <h1 class="text-lg font-bold text-white">Add New Account</h1>
@@ -82,4 +85,26 @@
             </form>
         </div>
     </div>
+    
 </div>
+
+{{-- <!-- Success Modal -->
+    <div x-show="success" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center" x-cloak>
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto h-auto z-10 overflow-hidden p-10 relative">
+            <!-- Close Button -->
+            <button @click="success = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <!-- Success Modal Header (Centered Image) -->
+            <div class="flex justify-center mb-4">
+                <img src="{{ asset('images/Success.png') }}" alt="Chart of Accounts Added" class="w-28 h-28">
+            </div>
+            <!-- Success Modal Body -->
+            <div class="text-center">
+                <p class="text-emerald-500 font-bold text-3xl mb-2">New Account Added</p>
+                <p class="text-sm text-zinc-700 mb-6">New Account has been successfully<br>added in COA.</p>
+            </div>
+        </div>
+    </div> --}}

@@ -17,7 +17,7 @@
                     </p>
                     <div class="flex justify-between items-center">
                         <div class="flex items-center">            
-                            <p class="font-normal text-sm">This page allows the Admin to efficiently manage all user accounts in Taxuri. The page <br /> displays a list of each type of account.</p>
+                            <p class="text-zinc-700 font-normal text-sm">This page allows the Admin to efficiently manage all user accounts in Taxuri. The page <br /> displays a list of each type of account.</p>
                         </div>
                         <div class="items-end float-end">
                             <button id="add-account-button" type="button" class="text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2" 

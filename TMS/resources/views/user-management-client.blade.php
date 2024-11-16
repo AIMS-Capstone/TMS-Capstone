@@ -18,7 +18,7 @@
 
                     <div class="flex justify-between items-center">
                         <div class="flex items-center">            
-                            <p class="font-normal text-sm">This page allows the Admin to efficiently manage all user accounts in Taxuri. The page <br /> displays a list of each type of account.</p>
+                            <p class="text-zinc-700 font-normal text-sm">This page allows the Admin to efficiently manage all user accounts in Taxuri. The page <br /> displays a list of each type of account.</p>
                         </div>
                     </div> 
 
@@ -128,7 +128,7 @@
                                                     @csrf
                                                     @method('DELETE')
                                                     <input type="hidden" name="organization_id" value="{{ $client->id }}">
-                                                    <td
+                                                    <td>
                                                         <button 
                                                         x-data
                                                         x-on:click="$dispatch('open-view-client-modal', {
@@ -215,12 +215,12 @@
          x-show="showClient" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
          x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
             <!-- Modal header -->
-            <div class="relative p-3 bg-amber-300 border-opacity-80 w-full">
+            <div class="relative p-3 bg-amber-400 border-opacity-80 w-full">
                 <h1 class="text-lg font-bold text-white text-center">Account Details</h1>
-                <button @click="showClient = false" class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200">
+                <button @click="showClient = false" class="absolute right-3 top-4 text-sm text-white hover:text-amber-400">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 8L16 16M8 16L16 8" stroke="#1e3a8a" class="transition duration-200 hover:stroke-gray-600"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 8L16 16M8 16L16 8" stroke="#fbbf24" class="transition duration-200 hover:stroke-amber-400"/>
                     </svg>
                 </button>
             </div>

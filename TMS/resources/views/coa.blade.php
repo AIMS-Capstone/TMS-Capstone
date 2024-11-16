@@ -360,17 +360,18 @@
                                                     <th scope="col" class="p-4">
                                                         <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                                             <div class="relative flex items-center">
-                                                                <input type="checkbox" x-model="checkAll" id="checkAll" @change="toggleAll()" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-black checked:before:bg-black focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
-                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
+                                                                <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"
+                                                                />
+                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                                                 </svg>
                                                             </div>
                                                         </label>
                                                     </th>
-                                                    <th scope="col" class="py-4 px-3">Code</th>
-                                                    <th scope="col" class="py-4 px-3">Name</th>
-                                                    <th scope="col" class="py-4 px-3">Type</th>
-                                                    <th scope="col" class="py-4 px-3">Date Created</th> 
+                                                    <th scope="col" class="text-left py-4 px-4">Code</th>
+                                                    <th scope="col" class="text-left py-4 px-4">Name</th>
+                                                    <th scope="col" class="text-left py-4 px-4">Type</th>
+                                                    <th scope="col" class="text-left py-4 px-4">Date Created</th> 
                                                 </tr>
                                             </thead>
                                             <tbody class="divide-y divide-neutral-300 text-left py-[7px]">
@@ -380,41 +381,43 @@
                                                             <td class="p-4">
                                                                 <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                                                     <div class="relative flex items-center">
-                                                                        <input type="checkbox" @change="toggleCheckbox('{{ $coa->id }}')" id="coa{{ $coa->id }}"  class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-black checked:before:bg-black focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" :checked="selectedRows.includes('{{ $coa->id }}')" />
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
+                                                                        <input type="checkbox" @click="toggleCheckbox('{{ $coa->id }}')" :checked="selectedRows.includes('{{ $coa->id }}')" id="coa{{ $coa->id }}" 
+                                                                            class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"
+                                                                        />
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                                                         </svg>
                                                                     </div>
                                                                 </label>
                                                             </td>
-                                                            <td>
+                                                            <td class="text-left py-3 px-4">
                                                                 <x-view-coa />
-                                                                <button @click="$dispatch('open-view-modal', {{ json_encode($coa) }})" class="underline hover:text-blue-500">
+                                                                <button @click="$dispatch('open-view-modal', {{ json_encode($coa) }})" class="hover:underline hover:text-blue-500">
                                                                     {{ $coa->code }}
                                                                 </button>
                                                             </td>
-                                                            <td>
+                                                            <td class="text-left py-3 px-4">
                                                                 <x-view-coa />
                                                                 <button @click="$dispatch('open-view-modal', {{ json_encode($coa) }})">
                                                                     {{ $coa->name }}
                                                                 </button>
                                                             </td>
-                                                            <td>
+                                                            <td class="text-left py-3 px-4">
                                                                 <b>{{ $coa->type }}</b> <br/> 
                                                                 {{ $coa->sub_type ? $coa->sub_type : '' }} 
                                                                 @if($coa->description)
                                                                     | {{ $coa->description }}
                                                                 @endif
                                                             </td>
-                                                            <td>{{ $coa->created_at }}</td>
+                                                            <td class="text-left py-3 px-4">{{ $coa->created_at->format('F j, Y h:i:s A') }}</td>
                                                         </tr>
                                                     @endforeach
                                                 @else
                                                     <tr>
                                                         <td colspan="6" class="text-center p-4">
-                                                            <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
-                                                            <h1 class="font-extrabold text-lg mt-2">No Chart of Accounts yet</h1>
-                                                            <p class="text-sm text-neutral-500 mt-2">Start adding accounts with the <br> + Add button.</p>
+                                                            <img src="{{ asset('images/Box.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                                            <h1 class="font-extrabold text-neutral-600 text-lg mt-2">No Chart of Accounts yet</h1>
+                                                            <p class="text-sm text-neutral-500 mt-2">Start building organization's financial structure<br> with the + button at the top.</p>
                                                         </td>
                                                     </tr>
                                                 @endif
@@ -467,18 +470,16 @@
 
                                     <!-- Action Buttons -->
                                     <div x-show="showDeleteCancelButtons" class="flex justify-center py-4" x-cloak>
-                                        <button 
-                                            @click="showConfirmArchiveModal = true; showDeleteCancelButtons = true;" 
-                                            :disabled="selectedRows.length === 0"
-                                            class="border px-3 py-2 mx-2 rounded-lg text-sm text-gray-700 bg-gray-200 hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            <i class="fa fa-box"></i> Archive Selected <span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
+                                        <button @click="showConfirmArchiveModal = true; showDeleteCancelButtons = true;" :disabled="selectedRows.length === 0"
+                                            class="border px-3 py-2 rounded-lg text-sm text-gray-800 border-gray-800 bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                                         >
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-zinc-800" viewBox="0 0 24 24">
+                                                <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
+                                            </svg>
+                                            <span class="text-zinc-600 transition group-hover:text-zinc-800">Archive Selected</span><span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
                                         </button>
-                                        <button 
-                                            @click="cancelSelection" 
-                                            class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
-                                        >
-                                        Cancel
+                                        <button @click="cancelSelection" class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
+                                         > Cancel
                                         </button>
                                     </div>
                                     
@@ -511,10 +512,24 @@
         });
 
         function toggleCheckboxes() {
-            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            // Get all checkbox elements inside the table body
+            const rowCheckboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+
+            // Clear or populate the selectedRows array based on checkAll state
+            if (this.checkAll) {
+                // Check all checkboxes and add their IDs to selectedRows
+                this.selectedRows = Array.from(rowCheckboxes).map(checkbox => checkbox.dataset.id);
+            } else {
+                // Uncheck all checkboxes and clear selectedRows
+                this.selectedRows = [];
+            }
+
+            // Update the DOM to reflect the state
+            rowCheckboxes.forEach(checkbox => {
                 checkbox.checked = this.checkAll;
             });
         }
+        
 
         // FOR SORT BUTTON
         document.getElementById('sortButton').addEventListener('click', function() {
@@ -577,21 +592,17 @@
             const form = document.createElement('form');
             form.method = 'GET';
             form.action = "{{ route('coa') }}";
-
             const perPageInput = document.createElement('input');
             perPageInput.type = 'hidden';
             perPageInput.name = 'perPage';
             perPageInput.value = entries;
-
             const searchInput = document.createElement('input');
             searchInput.type = 'hidden';
             searchInput.name = 'search';
             searchInput.value = "{{ request('search') }}";
- 
             form.appendChild(perPageInput);
             form.appendChild(searchInput);
             document.body.appendChild(form);
-
             form.submit();
         }
         
