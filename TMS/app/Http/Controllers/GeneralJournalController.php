@@ -73,11 +73,15 @@ class GeneralJournalController extends Controller
         $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
         $organization = OrgSetup::find($organizationId); // Fetch organization details if needed
 
+        $transactions = Transactions::where('organization_id', $organizationId)->get();
+
+        $contact = $transactions->first()->contactDetails ?? null;
+
         $year = $request->query('year');
         $period = $request->query('period', 'annually');
         $month = ($period === 'monthly') ? $request->query('month') : null;
         $quarter = ($period === 'quarterly') ? $request->query('quarter') : null;
-        $status = $request->query('status', 'draft');
+        $status = $request->query('status');
 
         // Calculate start and end months if quarterly period is selected
         $startMonth = null;
@@ -108,7 +112,7 @@ class GeneralJournalController extends Controller
         $filename = "GeneralJournal_{$organization->registration_name}_{$year}_{$month}.xlsx";
 
         return Excel::download(
-            new GeneralJournalExport($year, $month, $startMonth, $endMonth, $status, $period, $quarter),
+            new GeneralJournalExport($year, $month, $startMonth, $endMonth, $status, $period, $quarter, $organization, $contact),
             $filename
         );
     }
