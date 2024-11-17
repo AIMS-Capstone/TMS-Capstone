@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\GeneralLedgerExport;
 use App\Models\OrgSetup;
+use App\Models\Contacts;
 use App\Models\Transactions;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -73,8 +74,17 @@ class GeneralLedgerController extends Controller
 
     public function exportExcel(Request $request)
     {
-        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
-        $organization = OrgSetup::find($organizationId); // Fetch organization details
+        $organizationId = $this->getOrganizationId($request); // Retrieve organization ID
+        $organization = OrgSetup::find($organizationId); // Get organization details
+
+        if (!$organization) {
+            abort(404, 'Organization not found.');
+        }
+
+        $transactions = Transactions::where('organization_id', $organizationId)->get();
+
+        // Assuming each organization has a contact associated
+        $contact = $transactions->first()->contactDetails ?? null;
 
         $year = $request->query('year');
         $period = $request->query('period', 'annually');
@@ -111,8 +121,19 @@ class GeneralLedgerController extends Controller
         $filename = "GeneralLedger_{$organization->registration_name}_{$year}_{$month}.xlsx";
 
         return Excel::download(
-            new GeneralLedgerExport($year, $month, $startMonth, $endMonth, $status, $period, $quarter),
+            new GeneralLedgerExport(
+                $year,
+                $month,
+                $startMonth,
+                $endMonth,
+                $status,
+                $period,
+                $quarter,
+                $contact,
+                $organization
+            ),
             $filename
         );
     }
+
 }

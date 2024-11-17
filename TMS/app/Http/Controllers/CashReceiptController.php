@@ -38,7 +38,7 @@ class CashReceiptController extends Controller
             ->where('Paidstatus', 'Paid')
             ->where('transaction_type', 'Sales')
             ->where('organization_id', $organizationId) // Filter by organization
-            ->with('contactDetails');
+            ->with('contactDetails', 'taxRows.coaAccount', 'taxRows.atc', 'taxRows.taxType');
 
         if ($year) {
             $query->whereYear('date', $year);
@@ -84,7 +84,7 @@ class CashReceiptController extends Controller
             ->where('Paidstatus', 'Paid')
             ->where('transaction_type', 'Sales')
             ->where('organization_id', $organizationId) // Filter by organization
-            ->with('contactDetails');
+            ->with('contactDetails', 'taxRows.coaAccount', 'taxRows.atc', 'taxRows.taxType');
 
         if ($year) {
             $query->whereYear('date', $year);
@@ -155,8 +155,17 @@ class CashReceiptController extends Controller
 
     public function exportCashReceipt(Request $request)
     {
-        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
-        $organization = OrgSetup::find($organizationId); // Fetch organization details if needed
+        $organizationId = $this->getOrganizationId($request); // Retrieve organization ID
+        $organization = OrgSetup::find($organizationId); // Get organization details
+
+        if (!$organization) {
+            abort(404, 'Organization not found.');
+        }
+
+        $transactions = Transactions::where('organization_id', $organizationId)->get();
+
+        // Assuming each organization has a contact associated
+        $contact = $transactions->first()->contactDetails ?? null;
 
         $year = $request->query('year');
         $period = $request->query('period', 'annually');
@@ -190,15 +199,34 @@ class CashReceiptController extends Controller
 
         $filename = "CashReceipt_Of_{$organization->registration_name}_{$year}_{$month}.xlsx";
         return Excel::download(
-            new CashReceiptExport($year, $month, $startMonth, $endMonth, $status, $period, $quarter),
+            new CashReceiptExport(                
+                $year,
+                $month,
+                $startMonth,
+                $endMonth,
+                $status,
+                $period,
+                $quarter,
+                $contact,
+                $organization),
             $filename
         );
     }
 
     public function exportCashReceiptPosted(Request $request)
     {
-        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
-        $organization = OrgSetup::find($organizationId); // Fetch organization details if needed
+        $organizationId = $this->getOrganizationId($request); // Retrieve organization ID
+        $organization = OrgSetup::find($organizationId); // Get organization details
+
+        if (!$organization) {
+            abort(404, 'Organization not found.');
+        }
+
+        $transactions = Transactions::where('organization_id', $organizationId)->get();
+
+        // Assuming each organization has a contact associated
+        $contact = $transactions->first()->contactDetails ?? null;
+
 
         $year = $request->query('year');
         $period = $request->query('period', 'annually');
@@ -232,7 +260,16 @@ class CashReceiptController extends Controller
 
         $filename = "CashReceiptPosted_Of_{$organization->registration_name}_{$year}_{$month}.xlsx";
         return Excel::download(
-            new CashReceiptPostedExport($year, $month, $startMonth, $endMonth, $status, $period, $quarter),
+            new CashReceiptPostedExport(                
+                $year,
+                $month,
+                $startMonth,
+                $endMonth,
+                $status,
+                $period,
+                $quarter,
+                $contact,
+                $organization),
             $filename
         );
     }

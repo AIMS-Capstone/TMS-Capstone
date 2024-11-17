@@ -37,7 +37,7 @@ class SalesController extends Controller
         $query = Transactions::where('status', 'draft')
             ->where('transaction_type', 'Sales')
             ->where('organization_id', $organizationId) // Filter by organization
-            ->with('contactDetails');
+            ->with('contactDetails', 'taxRows.coaAccount', 'taxRows.atc', 'taxRows.taxType');
 
         if ($year) {
             $query->whereYear('date', $year);
@@ -82,7 +82,7 @@ class SalesController extends Controller
         $query = Transactions::where('status', 'posted')
             ->where('transaction_type', 'Sales')
             ->where('organization_id', $organizationId) // Filter by organization
-            ->with('contactDetails');
+            ->with('contactDetails', 'taxRows.coaAccount', 'taxRows.atc', 'taxRows.taxType');
 
         if ($year) {
             $query->whereYear('date', $year);
@@ -152,8 +152,18 @@ class SalesController extends Controller
 
     public function exportSalesBook(Request $request)
     {
-        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
-        $organization = OrgSetup::find($organizationId); // Fetch organization details
+        $organizationId = $this->getOrganizationId($request); // Retrieve organization ID
+        $organization = OrgSetup::find($organizationId); // Get organization details
+
+        if (!$organization) {
+            abort(404, 'Organization not found.');
+        }
+
+        $transactions = Transactions::where('organization_id', $organizationId)->get();
+
+        // Assuming each organization has a contact associated
+        $contact = $transactions->first()->contactDetails ?? null;
+
 
         $year = $request->query('year');
         $period = $request->query('period', 'annually');
@@ -190,15 +200,34 @@ class SalesController extends Controller
         $filename = "SalesBook_{$organization->registration_name}_{$year}_{$month}.xlsx";
 
         return Excel::download(
-            new SalesBookExport($year, $month, $startMonth, $endMonth, $status, $period, $quarter),
+            new SalesBookExport(
+                $year,
+                $month,
+                $startMonth,
+                $endMonth,
+                $status,
+                $period,
+                $quarter,
+                $contact,
+                $organization),
             $filename
         );
     }
 
     public function exportSalesBookPosted(Request $request)
     {
-        $organizationId = $this->getOrganizationId($request); // Ensure organization ID is in session
-        $organization = OrgSetup::find($organizationId); // Fetch organization details
+        $organizationId = $this->getOrganizationId($request); // Retrieve organization ID
+        $organization = OrgSetup::find($organizationId); // Get organization details
+
+        if (!$organization) {
+            abort(404, 'Organization not found.');
+        }
+
+        $transactions = Transactions::where('organization_id', $organizationId)->get();
+
+        // Assuming each organization has a contact associated
+        $contact = $transactions->first()->contactDetails ?? null;
+
 
         $year = $request->query('year');
         $period = $request->query('period', 'annually');
@@ -235,7 +264,16 @@ class SalesController extends Controller
         $filename = "SalesBookPosted_{$organization->registration_name}_{$year}_{$month}.xlsx";
 
         return Excel::download(
-            new SalesBookPostedExport($year, $month, $startMonth, $endMonth, $status, $period, $quarter),
+            new SalesBookPostedExport(                
+                $year,
+                $month,
+                $startMonth,
+                $endMonth,
+                $status,
+                $period,
+                $quarter,
+                $contact,
+                $organization),
             $filename
         );
     }
