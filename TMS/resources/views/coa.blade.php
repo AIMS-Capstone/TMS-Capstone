@@ -235,7 +235,7 @@
                                         }
                                     }"
                                     class="mb-12 mx-12 overflow-hidden max-w-full rounded-md border-neutral-300"
-                                >
+                                    >
 
                                     <!-- Fourth Header -->
                                     <div class="container mx-auto">

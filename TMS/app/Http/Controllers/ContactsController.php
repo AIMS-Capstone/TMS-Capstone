@@ -11,9 +11,20 @@ class ContactsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        //
+    public function contacts(Request $request) {
+        $contactSearch = $request->input('con_search');
+        $type = $request->input('type');
+        $perPage = $request->input('perPage', 5);
+
+        $organizationId = session('organization_id'); // Using session-based organization ID
+
+        
+    }
+    public function employees(Request $request) {
+
+        $employeeSearch = $request->input('emp_search');
+        $type = $request->input('type');
+        $perPage = $request->input('perPage', 5); //idk if this is rigth; gusto ko sana hiwalay ulit silang page
     }
 
     /**
