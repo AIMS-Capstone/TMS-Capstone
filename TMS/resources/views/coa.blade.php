@@ -295,7 +295,11 @@
                                                     </svg>
                                                     <span class="text-zinc-600 group-hover:text-green-500 transition">Add</span>
                                                 </button>
-                                                <!-- Import COA Modal -->
+                                                                       
+                                                    <!-- Livewire Coa Import -->
+                                                    <livewire:coa-multi-step-import />
+
+                                                <!-- Retain ko tong lumang Import COA Modal -->
                                                 <x-import-coa-modal />     
                                                 <button  
                                                     x-data 
@@ -307,6 +311,7 @@
                                                     </svg>
                                                     <span class="text-zinc-600 group-hover:text-green-500 transition">Import</span>
                                                 </button>
+
                                                 <a href="{{ url('download_coa')}}">
                                                     <button
                                                         type="button"
@@ -605,6 +610,12 @@
             document.body.appendChild(form);
             form.submit();
         }
+
+        document.addEventListener('livewire:load', function () {
+            Livewire.on('openModalCoaImport', () => {
+                Livewire.emit('openModalCoaImport');
+            });
+        });
         
     </script>
 </x-app-layout>

@@ -87,14 +87,15 @@ class CoaController extends Controller
                 return redirect()->back()->withErrors(['account_type_input' => 'Please provide a valid input in the format: "Type | Sub Type".']);
             }
         } elseif ($submitAction === 'import') {
+
             $request->validate([
                 'csv_file' => 'required|file|mimes:csv,xlsx|max:2048',
-            ]);
+                    ]);
 
-            dd("Starting import with organization_id: {$organizationId}");
+                    dd("Starting import with organization_id: {$organizationId}");
 
-            // Pass organization ID when creating CoaImport instance
-            MaatExcel::import(new CoaImport($organizationId), $request->file('csv_file'));
+                    // Pass organization ID when creating CoaImport instance
+                    MaatExcel::import(new CoaImport($organizationId), $request->file('csv_file'));
 
             return redirect()->route('coa')->with('success', 'CSV imported successfully.');
         }
@@ -244,5 +245,19 @@ class CoaController extends Controller
     {
         return MaatExcel::download(new CoaExport, "coa_list.csv");
     }
+
+    public function import(Request $request)
+    {
+        // Validate the file input
+        $request->validate([
+            'file' => 'required|mimes:csv,txt'
+        ]);
+
+        // Import the file
+        MaatExcel::import(new CoaImport, $request->file('file'));
+
+        return back()->with('success', 'COA data imported successfully!');
+    }
+
 
 }
