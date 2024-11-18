@@ -117,6 +117,14 @@
                                     <td class="px-4 py-2 text-right">{{ number_format($nonVatableSales, 2) }}</td>
                                 </tr>
                                 @endif
+                                @if(count($appliedATCs) > 0)
+                                @foreach($appliedATCs as $atc)
+                                <tr>
+                                    <td class="px-4 py-2 taxuri-text">{{ $atc['code'] }} ({{ number_format($atc['rate'], 2) }}%)</td>
+                                    <td class="px-4 py-2 text-right ">{{ number_format($atc['tax_amount'], 2) }}</td>
+                                @endforeach
+                                </tr>
+                                @endif
             
                                 @if($totalAmount > 0)
                                 <tr>

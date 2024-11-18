@@ -6,13 +6,13 @@
 
                     <!-- Navigation Tabs -->
                     <nav class="flex space-x-4 mb-6 border-b border-gray-200 pb-2">
-                        <a href="{{ route('tax_return.slsp_data', $taxReturn->id) }}" class="text-gray-600 hover:text-blue-500 {{ request()->routeIs('tax_return.slsp_data') ? 'border-b-2 border-blue-500' : '' }} px-3 py-2">
+                        <a href="{{ route('percentage_return.slsp_data', $taxReturn->id) }}" class="text-gray-600 hover:text-blue-500 {{ request()->routeIs('percentage_return.slsp_data') ? 'border-b-2 border-blue-500' : '' }} px-3 py-2">
                             SLSP Data
                         </a>
                         <a href="{{ route('summary') }}" class="text-gray-600 hover:text-blue-500 {{ request()->routeIs('summary') ? 'border-b-2 border-blue-500' : '' }} px-3 py-2">
                             Summary
                         </a>
-                        <a href="{{ route('tax_return.report', $taxReturn->id) }}" class="text-gray-600 hover:text-blue-500 {{ request()->routeIs('tax_return.report') ? 'border-b-2 border-blue-500' : '' }} px-3 py-2">
+                        <a href="{{ route('percentage_return.report', $taxReturn->id) }}" class="text-gray-600 hover:text-blue-500 {{ request()->routeIs('percentage_return.report') ? 'border-b-2 border-blue-500' : '' }} px-3 py-2">
                            Report
                         </a>
                         <a href="{{ route('notes_activity') }}" class="text-gray-600 hover:text-blue-500 {{ request()->routeIs('notes_activity') ? 'border-b-2 border-blue-500' : '' }} px-3 py-2">
@@ -194,68 +194,59 @@ class="mb-12 mx-12 overflow-hidden max-w-full rounded-md border-neutral-300 dark
         </thead>
 
         <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
-            @forelse ($transactions as $transaction) 
-                @foreach ($transaction->taxRows as $taxRow) 
-                    <tr>
-                        <td>
-                            <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
-                                <input type="checkbox" @change="toggleCheckbox('{{ $transaction->id }}')" 
-                                    id="transaction{{ $transaction->id }}" 
-                                    class="peer relative cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 
-                                    bg-white before:content[''] before:absolute before:inset-0 checked:border-black checked:before:bg-black 
-                                    focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black 
-                                    active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white 
-                                    dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" 
-                                    :checked="selectedRows.includes('{{ $transaction->id }}')" 
-                                    x-show="showCheckboxes" 
-                                    style="display: none;" 
-                                    x-bind:style="showCheckboxes ? 'display: block;' : 'display: none;'" />
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" 
-                                    stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 
-                                    text-neutral-100 peer-checked:visible dark:text-black">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                </svg>
-                            </label>
-                        </td>
-                        <td>{{ $transaction->contact }}</td>
-                        <td>{{ $transaction->inv_number }}</td>
-                        <td>{{ $transaction->reference }}</td>
-                        <td>{{ $transaction->date }}</td>
-                        <td>{{ $taxRow->description }}</td>
-                        <td>{{ $taxRow->amount }}</td>
-                        <td>{{ $taxRow->tax_amount }}</td>
-                        <td>{{ $taxRow->tax_type }}</td>
-                        <td>{{ $taxRow->tax_code }}</td>
-                        <td>{{ $taxRow->coa }}</td>
-                    </tr>
-                @endforeach
-            @empty <!-- Handle case where no transactions are present -->
+            @foreach ($paginatedTaxRows as $taxRow)
                 <tr>
-                    <td colspan="12" class="text-center p-4">
-                        <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
-                        <h1 class="font-extrabold text-lg mt-2">No Transactions yet</h1>
-                        <p class="text-sm text-neutral-500 mt-2">Start adding transactions with the <br> + Add button.</p>
+                    <td>
+                        <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
+                            <input type="checkbox" @change="toggleCheckbox('{{ $taxRow->transaction_id }}')" 
+                                id="transaction{{ $taxRow->transaction_id }}" 
+                                class="peer relative cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 
+                                bg-white before:content[''] before:absolute before:inset-0 checked:border-black checked:before:bg-black 
+                                focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-800 checked:focus:outline-black 
+                                active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white 
+                                dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" 
+                                :checked="selectedRows.includes('{{ $taxRow->transaction_id }}')" 
+                                x-show="showCheckboxes" 
+                                style="display: none;" 
+                                x-bind:style="showCheckboxes ? 'display: block;' : 'display: none;'" />
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" 
+                                stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 
+                                text-neutral-100 peer-checked:visible dark:text-black">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                            </svg>
+                        </label>
                     </td>
+                    <td>{{ $taxRow->transaction->contact }}</td>
+                    <td>{{ $taxRow->transaction->inv_number }}</td>
+                    <td>{{ $taxRow->transaction->reference }}</td>
+                    <td>{{ $taxRow->transaction->date }}</td>
+                    <td>{{ $taxRow->description }}</td>
+                    <td>{{ $taxRow->amount }}</td>
+                    <td>{{ $taxRow->tax_amount }}</td>
+                    <td>{{ $taxRow->tax_type }}</td>
+                    <td>{{ $taxRow->tax_code }}</td>
+                    <td>{{ $taxRow->coa }}</td>
                 </tr>
-            @endforelse
+            @endforeach
         </tbody>
-    </table>
-</div>
-
         
-    
-<tr>
-    <td colspan="12" class="p-4">
-        <div class="flex justify-between items-center">
-            <div class="text-sm">
-                Showing {{ $transactions->firstItem() }} to {{ $transactions->lastItem() }} of {{ $transactions->total() }} results
-            </div>
-            <div>
-                {{ $transactions->links('pagination::tailwind') }}
-            </div>
-        </div>
-    </td>
-</tr>
+        <!-- Pagination links -->
+        <tr>
+            <td colspan="12" class="p-4">
+                <div class="flex justify-between items-center">
+                    <div class="text-sm">
+                        Showing {{ $paginatedTaxRows->firstItem() }} to {{ $paginatedTaxRows->lastItem() }} of {{ $paginatedTaxRows->total() }} tax rows
+                    </div>
+                    <div>
+                        {{ $paginatedTaxRows->links('vendor.pagination.custom') }}
+                    </div>
+                </div>
+            </td>
+        </tr>
+        
+ 
+        
+        
 
 <!-- Pagination Links -->
 
@@ -276,7 +267,7 @@ class="mb-12 mx-12 overflow-hidden max-w-full rounded-md border-neutral-300 dark
     </button>
 </div>
 
-{{ $transactions->links() }} <!-- Display pagination links -->
+
 
 </div>
 

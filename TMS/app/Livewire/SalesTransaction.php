@@ -7,11 +7,14 @@ use App\Models\ATC;
 use App\Models\TaxType;
 use App\Models\Coa;
 use App\Models\Transactions;
+use Illuminate\Support\Facades\Log;
 
 class SalesTransaction extends Component
 {
     public $type = 'sales';
     public $taxRows = [];
+    public $appliedATCsTotalAmount = 0;
+    public $appliedATCs = [];
     public $totalAmount = 0;
     public $vatableSales = 0;
     public $vatAmount = 0;
@@ -77,45 +80,92 @@ class SalesTransaction extends Component
 
     public function calculateTotals()
     {
-        // Initialize totals to zero
+        // Initialize totals
         $this->vatableSales = 0;
-        $this->vatAmount = 0;
+        $this->vatAmount = 0;  // This will store the VAT amount (not including ATC)
         $this->totalAmount = 0;
-        $this->nonVatableSales = 0; // Reset non-vatable sales
+        $this->nonVatableSales = 0;
+        $this->appliedATCs = [];  // To store ATC details
+        $this->appliedATCsTotalAmount = 0;  // Total ATC tax amount
     
-        // Loop through each tax row to calculate the totals
-        foreach ($this->taxRows as $row) {
-            $taxType = TaxType::find($row['tax_type']);
-            $vatRate = $taxType ? $taxType->VAT : 0; // Get VAT rate (0 or 12)
+        foreach ($this->taxRows as &$row) {
+            $amount = $row['amount']; // Total Amount Due (Gross Sales)
+            $taxTypeId = $row['tax_type'];
+            $taxCode = $row['tax_code'];
     
-            if ($vatRate > 0) {
-                // VATable sales
-                $this->vatableSales += $row['amount'] - $row['tax_amount'];
-                $this->vatAmount += $row['tax_amount'];
+            // Find the tax type and rate
+            $taxType = TaxType::find($taxTypeId);
+            $taxRate = $taxType ? $taxType->VAT : 0; // Get VAT or PT rate
+    
+            // Find ATC and its rate
+            $atc = ATC::find($taxCode);
+            $atcRate = $atc ? $atc->tax_rate : 0;  // ATC rate if applicable
+    
+            // If it's Percentage Tax (PT)
+            if ($taxType && $taxType->short_code == 'PT') {
+                // If there's an ATC, first calculate the net sales (without ATC)
+                if ($atcRate > 0) {
+                    // Step 1: Calculate VATable Sales (Net) before ATC (i.e., remove the ATC portion)
+                    $netSales = $amount / (1 + ($atcRate / 100)); // Net Sales without ATC
+    
+                    // Step 2: Calculate the ATC tax
+                    $atcAmount = $netSales * ($atcRate / 100);
+    
+                    // Step 3: Add to VATable Sales and VAT Amount
+                    $this->vatableSales += $netSales; // Only net amount (VATable Sales)
+                    $this->vatAmount += $netSales * ($taxRate / 100); // VAT is calculated only on net sales, excluding ATC
+    
+                    // Store ATC details
+                    $this->appliedATCs[$taxCode] = [
+                        'code' => $atc->tax_code,
+                        'rate' => $atcRate,
+                        'amount' => $amount,
+                        'tax_amount' => $atcAmount
+                    ];
+                    $row['atc_amount'] = $atcAmount; // Store ATC amount for this row
+                } else {
+                    // No ATC, full amount is VATable
+                    $this->vatableSales += $amount;
+                    $this->vatAmount += $amount * ($taxRate / 100); // Apply VAT on the full amount
+                    $row['atc_amount'] = 0; // No ATC applied
+                }
             } else {
-                // Non-VATable sales
-                $this->nonVatableSales += $row['amount'];
+                // Non-Percentage Tax sales (e.g., VAT or Non-VATable)
+                if ($taxRate > 0) {
+                    // For VAT, calculate net amount and VAT
+                    $netAmount = $amount / (1 + ($taxRate / 100));
+                    $this->vatableSales += $netAmount;
+                    $this->vatAmount += $amount - $netAmount; // Add VAT amount
+                } else {
+                    // Non-VATable sales
+                    $this->nonVatableSales += $amount;
+                    $row['atc_amount'] = 0; // No ATC for non-vatable sales
+                }
             }
-            
-            $this->totalAmount += $row['amount'];
+    
+            // Add the gross amount (Total Amount Due) to total
+            $this->totalAmount += $amount;
         }
+    
+        // Sum up all applied ATC tax amounts
+        $this->appliedATCsTotalAmount = collect($this->appliedATCs)->sum('tax_amount');
+    
+        // Final adjustment to the total amount: VATable Sales + Non-VATable Sales + ATC tax
+        $this->totalAmount = $this->vatableSales + $this->vatAmount + $this->nonVatableSales + $this->appliedATCsTotalAmount; // Total includes ATC tax
     }
+    
     
 
     public function saveTransaction()
     {
         // Validate the required fields
         $this->validate();
-    
+        
         // Retrieve organization ID from the session
-       
-    
-    
-    
+        $this->organization_id = session('organization_id');
+        
         // Create a transaction with 'Sales' type
         try {
-         
-            $this->organization_id = session('organization_id');
             $transaction = Transactions::create([
                 'transaction_type' => 'Sales',
                 'date' => $this->date,
@@ -131,10 +181,22 @@ class SalesTransaction extends Component
             ]);
     
             // Log the transaction ID after saving
-            \Log::info('Transaction saved successfully with ID: ' . $transaction->id);
+            Log::info('Transaction saved successfully with ID: ' . $transaction->id);
     
             // Save each tax row linked to the transaction
             foreach ($this->taxRows as $row) {
+                // If the tax type is 'Percentage Tax' and there is an ATC code
+                if ($row['tax_type'] && $row['tax_type'] == 'PT' && !empty($row['tax_code'])) {
+                    // Calculate and set ATC Amount in the row
+                    $atc = ATC::find($row['tax_code']); // Find the ATC by its code
+                    $atcRate = $atc ? $atc->tax_rate : 0;
+                    if ($atcRate > 0) {
+                        $netSales = $row['amount'] / (1 + ($atcRate / 100)); // Net amount excluding ATC
+                        $row['atc_amount'] = $netSales * ($atcRate / 100); // ATC amount
+                    }
+                }
+    
+                // Insert the tax row, including the atc_amount if applicable
                 TaxRow::create([
                     'transaction_id' => $transaction->id,
                     'description' => $row['description'],
@@ -144,6 +206,7 @@ class SalesTransaction extends Component
                     'tax_amount' => $row['tax_amount'],
                     'net_amount' => $row['net_amount'],
                     'coa' => !empty($row['coa']) ? $row['coa'] : null,
+                    'atc_amount' => isset($row['atc_amount']) ? $row['atc_amount'] : 0,  // Insert the atc_amount
                 ]);
             }
     
@@ -153,10 +216,11 @@ class SalesTransaction extends Component
     
         } catch (\Exception $e) {
             // Log the error for further investigation
-            \Log::error('Error saving transaction: ' . $e->getMessage());
+            Log::error('Error saving transaction: ' . $e->getMessage());
             session()->flash('error', 'There was an error saving the transaction.');
         }
     }
+    
     
     
 

@@ -217,41 +217,50 @@
                     </div>
                 </div>
             
-                <!-- Financial Settings Content -->
-                <div class="tab-content-item">
-                    <p class="p-10 text-zinc-600 font-medium text-lg">Lastly, enter the organization's<br/>Start Date and Financial Year End</p>
-                    <div class="flex flex-col items-center h-full">
-                        <div class="flex flex-col mb-2 w-80">
-                            <div class="flex flex-col">
-                                <x-field-label for="start_date" value="{{ __('Start Date') }}" class="mb-2 text-left" />
-                                <input name="start_date" id="start_date" wire:model="start_date" type="date"
-                                min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" 
-                                max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" 
-                                class="border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-900 focus:border-blue-900 block w-full" placeholder="Enter Start Date">
-                            </div>
-                        </div>
+               <!-- Financial Settings Content -->
+<div class="tab-content-item">
+    <p class="p-10 text-zinc-600 font-medium text-lg">
+        Lastly, enter the organization's<br />Start Date and Financial Year End
+    </p>
+    <div class="flex flex-col items-center h-full">
+        
+       <!-- Start Date (mm/yyyy) -->
+<div class="flex flex-col mb-2 w-80">
+    <div class="flex flex-col">
+        <x-field-label for="start_date" value="{{ __('Start Date') }}" class="mb-2 text-left" />
+        <input name="start_date" id="start_date" wire:model="start_date" type="month" 
+            max="{{ \Carbon\Carbon::now()->format('Y-m') }}" 
+            class="border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-900 focus:border-blue-900 block w-full" 
+            placeholder="Select Start Date (MM/YYYY)" onchange="updateFinancialYearEnd()">
+    </div>
+</div>
 
-                        <div class="flex flex-col mb-2 w-80">
-                            <div class="flex flex-col">
-                                <x-field-label for="registration_date" value="{{ __('Registration Date') }}" class="mb-2 text-left" />
-                                <input name="registration_date" id="registration_date" wire:model="registration_date" type="date" max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" class="border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-900 focus:border-blue-900 block w-full" 
-                                placeholder="Enter Registration Date">
-                            </div>
-                        </div>
+<!-- Registration Date (mm/dd/yy) -->
+<div class="flex flex-col mb-2 w-80">
+    <div class="flex flex-col">
+        <x-field-label for="registration_date" value="{{ __('Registration Date') }}" class="mb-2 text-left" />
+        <input name="registration_date" id="registration_date" wire:model="registration_date" type="date" 
+            max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" 
+            class="border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-900 focus:border-blue-900 block w-full" 
+            placeholder="Select Registration Date (MM/DD/YY)">
+    </div>
+</div>
 
-                        <div class="flex flex-col mb-2 w-80">
-                            <div class="flex flex-col">
-                                <x-field-label for="financial_year_end" value="{{ __('Financial Year End') }}" class="mb-2 text-left" />
-                                <select name="financial_year_end" id="financial_year_end" wire:model="financial_year_end" class="cursor-pointer border rounded-xl px-4 py-2 w-full mb-4 text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
-                                    <option value="" disabled selected>Select Financial Year End</option>
-                                    <option value="Calendar Year">Calendar Year</option>
-                                    <option value="Fiscal Year">Fiscal Year</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                    </div>
-                </div>
+<!-- Financial Year End (mm/dd) -->
+<div class="flex flex-col mb-2 w-80">
+    <div class="flex flex-col">
+        <x-field-label for="financial_year_end" value="{{ __('Financial Year End') }}" class="mb-2 text-left" />
+        <select name="financial_year_end" id="financial_year_end" wire:model="financial_year_end" 
+            class="cursor-pointer border rounded-xl px-4 py-2 w-full mb-4 text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+            <option value="" disabled selected>Select Financial Year End (MM/DD)</option>
+    
+        </select>
+    </div>
+</div>
+        
+    </div>
+</div>
+
             
                 <!-- Back and Next Buttons -->
                 <div class="inset-x-20 bottom-auto flex justify-between mt-auto px-4">
@@ -304,8 +313,57 @@
     </div>
 
 <script>    
-  
+       function updateFinancialYearEnd() {
+    // Get the start date value (YYYY-MM)
+    const startDate = document.getElementById('start_date').value;
+
+    // Check if startDate is valid
+    if (!startDate) {
+        console.error('Start Date is not selected');
+        return;  // Exit if no start date is selected
+    }
+
+    // Split the start date into year and month
+    const [year, month] = startDate.split('-');
+
+    // Create a new Date object for the start date (set to the first day of the month)
+    const startDateObj = new Date(year, month - 1, 1);  // Month is 0-based in JavaScript
+
+    // Add 1 year to the start date to get the Financial Year End year
+    const endDateObj = new Date(startDateObj);
+    endDateObj.setFullYear(startDateObj.getFullYear() + 1);
+
+    // Set the end date to the last day of the same month one year later
+    const lastDayOfMonth = new Date(endDateObj.getFullYear(), endDateObj.getMonth(), 0); // Last day of the month
+
+    // Convert the month number to a month name (e.g., 0 = January, 1 = February, ...)
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    // Get the full month name and day
+    const monthName = monthNames[lastDayOfMonth.getMonth()];
+    const day = lastDayOfMonth.getDate();
+
+    // Format the Financial Year End as "Month Day" (e.g., "October 31")
+    const financialYearEndDisplay = `${monthName} ${day}`;
+
+    // Format the Financial Year End as "MM-DD" for the value (e.g., "10-31")
+    const financialYearEndValue = `${(lastDayOfMonth.getMonth() + 1).toString().padStart(2, '0')}-${lastDayOfMonth.getDate().toString().padStart(2, '0')}`;
+
+    // Update the dropdown with the correct Financial Year End
+    const financialYearEndSelect = document.getElementById('financial_year_end');
+    financialYearEndSelect.innerHTML = `<option value="${financialYearEndValue}" selected>${financialYearEndDisplay}</option>`;
+}
+// Ensure the script runs only after the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function() {
+    // Optionally, trigger the update if there's already a start date pre-filled
+    updateFinancialYearEnd(); 
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+ 
     const tabs = document.querySelectorAll('.tab');
     const tabContents = document.querySelectorAll('.tab-content-item');
     let prevBtn = document.getElementById('prevBtn');
@@ -334,6 +392,7 @@ document.addEventListener('DOMContentLoaded', function() {
             button.classList.add('bg-blue-900', 'text-white');
         }
     }
+    
 
     function updateButtonsVisibility() {
         const activeTabId = tabs[currentTab].id;
@@ -448,6 +507,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Contact Number
     document.addEventListener('DOMContentLoaded', function () {
+        
         const contactNumberInput = document.getElementById('contact_number');
 
         contactNumberInput.addEventListener('input', function () {
@@ -595,6 +655,7 @@ document.addEventListener('DOMContentLoaded', function() {
             zipCodeInput.value = '';
         }
     });
+    
 });
 
 

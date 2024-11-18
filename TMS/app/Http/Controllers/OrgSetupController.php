@@ -65,6 +65,20 @@ class OrgSetupController extends Controller
      */
     public function store(Request $request)
     {
+
+        // Retrieve the start date input
+     $startDate = $request->input('start_date');
+
+    // If the start date is in YYYY-MM format (e.g., '2024-06'), append '-01' to make it a full date (YYYY-MM-DD)
+    if (strlen($startDate) == 7) {  // Format like '2024-06'
+        $startDate .= '-01';  // Append the first day of the month to make it a valid date
+    }
+
+    // Update the start_date input to ensure it has the correct format before validation
+    $request->merge(['start_date' => $startDate]);  // Merges the corrected start_date into the request
+
+
+    
         try {
             // Manually validate the request
             $validatedData = $request->validate([
@@ -82,33 +96,46 @@ class OrgSetupController extends Controller
                 'rdo' => 'required|string|max:20',
                 'tax_type' => 'required|string|max:255',
                 'registration_date' => 'required|date',
-                'start_date' => 'required|date',
-                'financial_year_end' => 'required|string|max:255',
+                'start_date' => 'required|date',  // Now it's guaranteed to be in a full date format (YYYY-MM-DD)
+                'financial_year_end' => 'required|string|max:5',  // Keep this for storing the financial year end as MM-DD
             ]);
-
-
-
-
+    
+         
+            // Parse start date to get the year and month (Now it's in YYYY-MM-DD format)
+            $startDate = Carbon::parse($startDate);
+           
+        
+            // Calculate the financial year end (1 year later)
+            $financialYearEnd = $startDate->addYear()->endOfMonth();  // Default to the last day of the month
+        
+            // If the start date is February, manually set it to February 28 (or 29 for leap years)
+            if ($startDate->month == 2) {
+                $financialYearEnd = $financialYearEnd->month(2)->day(28); // Always set to February 28
+            }
+        
+            // Store the financial year end in 'MM-DD' format as a string (e.g., '02-28')
+            $validatedData['financial_year_end'] = $financialYearEnd->format('m-d');
+        
+            // Save the data in the OrgSetup table
             OrgSetup::create($validatedData);
-
+        
             return redirect()->back()->with('success', 'Organization setup created successfully.');
-
+        
         } catch (ValidationException $e) {
-            // Handle validation errors here
+            // Handle validation errors
             $errors = $e->errors();
             $requestData = request()->all();
-
-            // Dump or log errors to examine them (or handle them as needed)
-            dd([
-                'errors' => $errors,
-                'input_data' => $requestData,
-            ]);
-
+            
+            // Log the errors and input data for debugging
+            dd(['errors' => $errors, 'input_data' => $requestData]);
+        
             // Redirect back with errors if needed
             return redirect()->back()->withErrors($errors)->withInput();
         }
+        
     }
-    /**
+    
+        /**
      * Display the specified resource.
      */
     public function show(OrgSetup $orgSetup)

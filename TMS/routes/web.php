@@ -159,11 +159,12 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
 
         // Tax Return Routes
         Route::resource('tax_return', TaxReturnController::class);
-        Route::get('/vat_return', function () {
-            $organizationId = session('organization_id');
-            $taxReturns = TaxReturn::with('user')->where('organization_id', $organizationId)->get();
-            return view('tax_return/vat_return', compact('taxReturns'));
-        })->name('vat_return');
+        Route::get('/vat_return', [TaxReturnController::class, 'vatReturn'])->name('vat_return');
+        Route::get('/percentage_return/{id}/report', [TaxReturnController::class, 'showPercentageReport'])
+    ->name('percentage_return.report');
+        Route::get('/percentage_return', [TaxReturnController::class, 'percentageReturn'])->name('percentage_return');
+        Route::get('/percentage_return/{taxReturn}/slsp-data', [TaxReturnController::class, 'showPercentageSlspData'])->name('percentage_return.slsp_data');
+        Route::post('/percentage_return', [TaxReturnController::class, 'storePercentage']);
         Route::post('/vat_return', [TaxReturnController::class, 'store']);
         Route::get('/tax_return/{taxReturn}/slsp-data', [TaxReturnController::class, 'showSlspData'])->name('tax_return.slsp_data');
         Route::get('/summary', [TaxReturnController::class, 'showSummary'])->name('summary');

@@ -237,8 +237,19 @@
                                         <td class="px-4 py-2 taxuri-text">Non-VATable Sales</td>
                                         <td class="px-4 py-2 text-right">{{ number_format($transaction->non_vatable_sales, 2) }}</td>
                                     </tr>
+                                    
                                     @endif
-
+                                    @if($transaction->taxRows->isNotEmpty())
+                                    @foreach($transaction->taxRows as $row)
+                                        @if($row->atc && $row->atc_amount > 0) <!-- Check if ATC exists and atc_amount is greater than 0 -->
+                                            <tr>
+                                                <td class="px-4 py-2 taxuri-text">{{ $row->atc->tax_code }} ({{ number_format($row->atc->tax_rate, 2) }}%)</td>
+                                                <td class="px-4 py-2 text-right">{{ number_format($row->atc_amount, 2) }}</td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
+                                @endif
+                                
                                     @if($transaction->total_amount > 0)
                                     <tr>
                                         <td colspan="2">

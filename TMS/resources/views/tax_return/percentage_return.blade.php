@@ -107,9 +107,9 @@ $organizationId = session('organization_id');
 
                    <!-- Filtering Tab/Third Header -->
                    <div x-data="{
-                    selectedTab: '2550M',
+                    selectedTab: '2551M',
                     init() {
-                        this.selectedTab = (new URL(window.location.href)).searchParams.get('type') || '2550M';
+                        this.selectedTab = (new URL(window.location.href)).searchParams.get('type') || '2551M';
                     }
 }" x-init="init" class="w-full p-5">
     <div @keydown.right.prevent="$focus.wrap().next()" 
@@ -119,17 +119,17 @@ $organizationId = session('organization_id');
          aria-label="tab options">
          
         <!-- Tab 1: 2550M/Q -->
-        <button @click="selectedTab = '2550M'; $dispatch('filter', { type: '2550M' })"
-            :aria-selected="selectedTab === '2550M'" 
-            :tabindex="selectedTab === '2550M' ? '0' : '-1'" 
-            :class="selectedTab === '2550M' 
+        <button @click="selectedTab = '2551M'; $dispatch('filter', { type: '2551M' })"
+            :aria-selected="selectedTab === '2551M'" 
+            :tabindex="selectedTab === '2551M' ? '0' : '-1'" 
+            :class="selectedTab === '2551M' 
                 ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
                 : 'text-zinc-600 font-medium hover:text-blue-900'"
             class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
             type="button" 
             role="tab" 
             aria-controls="tabpanelAll">
-            2550M/Q
+            2551M/Q
         </button>
         
         <!-- Tab 2: Capital Goods -->
@@ -165,7 +165,7 @@ $organizationId = session('organization_id');
                                         </label>
                                     </th>
                                     <th scope="col" class="py-4 px-2">Title</th>
-                                    <th scope="col" class="py-4 px-2">Name</th>
+                                    <th scope="col" class="py-4 px-2">Period</th>
                                     <th scope="col" class="py-4 px-4">Created By</th>
                                     <th scope="col" class="py-4 px-3">Date Created</th>
                                     <th scope="col" class="py-4 px-3">Status</th>
@@ -202,7 +202,7 @@ $organizationId = session('organization_id');
                                          
                                             <td class="py-4 px-2">
                                                 <x-edit-coa />
-                                                <a href="{{ route('tax_return.slsp_data', $taxReturn->id) }}" class="hover:border-slate-600 hover:text-slate-600 border px-3 py-2 rounded-lg text-sm">
+                                                <a href="{{ route('percentage_return.slsp_data', $taxReturn->id) }}" class="hover:border-slate-600 hover:text-slate-600 border px-3 py-2 rounded-lg text-sm">
                                                     Show
                                                 </a>
                                                 
@@ -228,13 +228,12 @@ $organizationId = session('organization_id');
             </div>
         </div>
     </div>
-
     <div x-data="{ open: false, selectedTab: '2550M', selectedType: '', month: '' }" @open-generate-modal.window="open = true" x-cloak>
         <div x-show="open" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
             <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
                 <h2 class="text-lg font-semibold mb-4">Generate VAT Return</h2>
                 
-                <form method="POST" action="/vat_return">
+                <form method="POST" action="/percentage_return">
                     @csrf
                     <div class="mb-4">
                         <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
@@ -254,7 +253,7 @@ $organizationId = session('organization_id');
                         <label for="month" class="block text-sm font-medium text-gray-700">Month</label>
                         <select id="month" name="month" class="mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
                             x-model="month" 
-                            @change="selectedType = month.includes('Q') ? '2550Q' : '2550M'" 
+                            @change="selectedType = month.includes('Q') ? '2551Q' : '2551M'" 
                             required>
                             <option value="">Select Month</option>
                             <!-- Monthly options -->
@@ -290,7 +289,7 @@ $organizationId = session('organization_id');
             </div>
         </div>
     </div>
-    
+
     <!-- Script -->
     <script>
         document.addEventListener('search', event => {
