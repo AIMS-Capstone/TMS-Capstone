@@ -331,12 +331,12 @@
                                         {{ $transaction->contactDetails->bus_name ?? 'N/A' }}
                                         </a>
                                     </td>
-                                    <td class="text-left py-3 px-4">{{ \Carbon\Carbon::parse($transaction->date)->format('F j, Y') }}</td>
-                                    <td class="text-left py-3 px-4">{{$transaction ->inv_number}}</td>
-                                    <td class="text-left py-3 px-4">{{$transaction ->reference}}</td>
-                                    <td class="text-left py-3 px-4">{{$transaction ->vat_amount}}</td>
-                                    <td class="text-left py-3 px-4"><span class="bg-zinc-100 text-zinc-800 text-xs font-medium me-2 px-4 py-2 rounded-full">{{$transaction ->transaction_type}}</span></td>
-                                    <td class="text-left py-3 px-4">
+                                    <td class="text-left py-4 px-4">{{ \Carbon\Carbon::parse($transaction->date)->format('F j, Y') }}</td>
+                                    <td class="text-left py-4 px-4">{{$transaction ->inv_number}}</td>
+                                    <td class="text-left py-4 px-4">{{$transaction ->reference}}</td>
+                                    <td class="text-left py-4 px-4">{{$transaction ->vat_amount}}</td>
+                                    <td class="text-left py-4 px-4"><span class="bg-zinc-100 text-zinc-800 text-xs font-medium me-2 px-4 py-2 rounded-full">{{$transaction ->transaction_type}}</span></td>
+                                    <td class="text-left py-4 px-4">
                         
                                         @if($transaction->Paidstatus === 'Unpaid')
                                             Awaiting Payment

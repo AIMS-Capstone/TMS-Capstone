@@ -19,53 +19,53 @@
                     </div>
                     <div class="flex justify-between items-center px-10">
                         <div class="flex items-center">            
-                            <p class="font-normal text-sm">This book houses all the Sales entered in the Transactions Module.</p>
+                            <p class="font-normal taxuri-text text-sm">This book houses all the Sales entered in the Transactions Module.</p>
                         </div>
                     </div>  
-                    <hr class="mt-6">
                     <br>
 
-                        <div class="container mx-auto ps-8">
-                            <div class="flex flex-row space-x-2 items-center justify-center">
-                                <div x-data="{ selectedTab: 'Posted' }" class="w-full">
-                                    <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-24 overflow-x-auto  border-neutral-300" role="tablist" aria-label="tab options">
-                                        <a href="/sales-book">
-                                            <button @click="selectedTab = 'Draft'" :aria-selected="selectedTab === 'Draft'" 
-                                                :tabindex="selectedTab === 'Draft' ? '0' : '-1'" 
-                                                :class="selectedTab === 'Draft' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900'   : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'" 
-                                                class="h-min py-2 text-base" 
-                                                type="button"
-                                                role="tab" 
-                                                aria-controls="tabpanelDraft" >
-                                                Draft
-                                            </button>
-                                        </a>
-                                        <button @click="selectedTab = 'Posted'" :aria-selected="selectedTab === 'Posted'" 
-                                            :tabindex="selectedTab === 'Posted' ? '0' : '-1'" 
-                                            :class="selectedTab === 'Posted' ? 'font-bold box-border text-sky-900 border-b-4 border-sky-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-sky-900 hover:text-sky-900'"
+                    <div class="container mx-auto ps-8">
+                        <div class="flex flex-row space-x-2 items-center justify-center">
+                            <div x-data="{ selectedTab: 'Posted' }" class="w-full">
+                                <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-24 overflow-x-auto  border-neutral-300" role="tablist" aria-label="tab options">
+                                    <a href="/sales-book">
+                                        <button @click="selectedTab = 'Draft'" :aria-selected="selectedTab === 'Draft'" 
+                                            :tabindex="selectedTab === 'Draft' ? '0' : '-1'" 
+                                            :class="selectedTab === 'Draft' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900'   : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'" 
                                             class="h-min py-2 text-base" 
-                                            type="button" 
+                                            type="button"
                                             role="tab" 
-                                            aria-controls="tabpanelPosted" >Posted
+                                            aria-controls="tabpanelDraft" >
+                                            Draft
                                         </button>
-                                    </div>
-                                </div>  
-                            </div>
+                                    </a>
+                                    <button @click="selectedTab = 'Posted'" :aria-selected="selectedTab === 'Posted'" 
+                                        :tabindex="selectedTab === 'Posted' ? '0' : '-1'" 
+                                        :class="selectedTab === 'Posted' ? 'font-bold box-border text-sky-900 border-b-4 border-sky-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-sky-900 hover:text-sky-900'"
+                                        class="h-min py-2 text-base" 
+                                        type="button" 
+                                        role="tab" 
+                                        aria-controls="tabpanelPosted" >Posted
+                                    </button>
+                                </div>
+                            </div>  
                         </div>
+                    </div>
+
                     <hr>
 
                     <!-- Filters Row -->
-                    <div class="bg-white border border-gray-300 rounded-tl-lg rounded-tr-lg grid grid-cols-8 gap-4 mx-10 overflow-x-auto whitespace-nowrap max-w-full">
-                        <div class="flex items-center space-x-8">
-                            <div class="col-span-2 bg-blue-50 p-4 rounded-tl-lg">
-                                <span class="font-bold text-blue-950">{{ $organization->registration_name ?? 'Organization Name' }}</span>
+                    <div class="grid grid-cols-8 gap-4 mx-10 overflow-x-auto whitespace-nowrap max-w-full custom-scrollbar">
+                        <div class="flex items-center space-x-8 ps-6">
+                            <div class="col-span-2 p-4 rounded-tl-lg text-blue-900">
+                                {{-- <span class="font-bold text-blue-950">{{ $organization->registration_name ?? 'Organization Name' }}</span> --}}
                                 <p class="font-normal">Filter: <b>Sales Book Journal</b></p>
                                 <p class="font-normal text-sm" x-text="getFormattedDate()"></p>
                             </div>
 
                             <div class="flex items-center space-x-8">
                                 <div class="flex flex-col w-32">
-                                    <label for="period_select" class="font-bold text-blue-950">Period </label>
+                                    <label for="period_select" class="font-bold text-blue-900">Period </label>
                                     <select id="period_select" x-model="period" @change="updateYearAndMonthOptions" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
                                         <option value="monthly">Monthly</option>
                                         <option value="quarterly">Quarterly</option>
@@ -75,7 +75,7 @@
                                 <div class="h-8 border-l border-gray-200"></div>
                                 <!-- Year -->
                                 <div class="flex flex-col w-32">
-                                    <label for="year_select" class="font-bold text-blue-950">Year</label>
+                                    <label for="year_select" class="font-bold text-blue-900">Year</label>
                                     <select id="year_select" x-model="selectedYear" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
                                         <template x-for="year in years" :key="year">
                                             <option :value="year" x-text="year"></option>
@@ -85,7 +85,7 @@
                                 <div class="h-8 border-l border-gray-200"></div>
                                 <!-- Quarter (Only visible if Quarterly is selected) -->
                                 <div class="flex flex-col w-32" x-show="period === 'quarterly'">
-                                    <label for="quarter_select" class="font-bold text-blue-950">Quarter</label>
+                                    <label for="quarter_select" class="font-bold text-blue-900">Quarter</label>
                                     <select id="quarter_select" x-model="selectedQuarter" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
                                         <option value="Q1">1st Quarter</option>
                                         <option value="Q2">2nd Quarter</option>

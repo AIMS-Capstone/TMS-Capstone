@@ -5,24 +5,27 @@
     @endphp
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg" x-data="filterComponent()">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg" x-data="filterComponent()">
 
                 <div class="container mx-auto my-4 pt-4">
                     <div class="flex justify-between items-center px-10">
                         <p class="font-bold text-3xl text-left taxuri-color">General Ledger Listing</p>
-                        <button type="button" onclick="exportReportExcel()" class="flex items-center text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                                <path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
-                            </svg>
-                            <span>Export Report</span>
-                        </button>
                     </div>
                     <div class="flex justify-between items-center px-10">
                         <div class="flex items-center">            
-                            <p class="font-normal text-sm">This report is the Summary of all transactions entered in Taxuri, whether paid or not.</p>
+                            <p class="taxuri-text font-normal text-sm">This report is the Summary of all transactions entered in Taxuri,<br>whether paid or not.</p>
                         </div>
-                    </div>  
-                    <br>
+                        <div class="items-end float-end relative sm:w-auto">
+                            <button type="button" onclick="exportReportExcel()" class="flex items-center text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                                    <path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
+                                </svg>
+                                <span>Export Report</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr class="mt-6">
 
                         {{-- <div class="container mx-auto ps-8">
                             <div class="flex flex-row space-x-2 items-center justify-center">
@@ -54,16 +57,16 @@
                     <hr class="mb-4"> --}}
 
                     <!-- Filters Row -->
-                    <div class=" grid grid-cols-8 gap-4 mx-10 overflow-x-auto whitespace-nowrap max-w-full">
-                        <div class="flex items-center space-x-8">
-                            <div class="col-span-2 p-4 rounded-tl-lg">
+                    <div class=" grid grid-cols-8 gap-4 mx-6 mt-2 overflow-x-auto whitespace-nowrap max-w-full custom-scrollbar">
+                        <div class="flex items-center space-x-6">
+                            <div class="col-span-2 p-4 rounded-tl-lg taxuri-color">
                                 <p class="font-normal">Filter: <b>General Ledger</b></p>
                                 <p class="font-normal" x-text="getFormattedDate()"></p>
                             </div>
 
-                            <div class="flex items-center space-x-8">
-                                <div class="flex flex-col w-32">
-                                    <label for="period_select" class="font-bold text-blue-950">Period </label>
+                            <div class="flex items-center space-x-3">
+                                <div class="flex flex-col w-32 taxuri-color">
+                                    <label for="period_select" class="font-bold text-blue-900">Period </label>
                                     <select id="period_select" x-model="period" @change="updateYearAndMonthOptions" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
                                         <option value="monthly">Monthly</option>
                                         <option value="quarterly">Quarterly</option>
@@ -73,7 +76,7 @@
                                 <div class="h-8 border-l border-gray-200"></div>
                                 <!-- Year -->
                                 <div class="flex flex-col w-32">
-                                    <label for="year_select" class="font-bold text-blue-950">Year</label>
+                                    <label for="year_select" class="font-bold text-blue-900">Year</label>
                                     <select id="year_select" x-model="selectedYear" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
                                         <template x-for="year in years" :key="year">
                                             <option :value="year" x-text="year"></option>
@@ -83,7 +86,7 @@
                                 <div class="h-8 border-l border-gray-200"></div>
                                 <!-- Quarter (Only visible if Quarterly is selected) -->
                                 <div class="flex flex-col w-32" x-show="period === 'quarterly'">
-                                    <label for="quarter_select" class="font-bold text-blue-950">Quarter</label>
+                                    <label for="quarter_select" class="font-bold text-blue-900">Quarter</label>
                                     <select id="quarter_select" x-model="selectedQuarter" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
                                         <option value="Q1">1st Quarter</option>
                                         <option value="Q2">2nd Quarter</option>
@@ -93,7 +96,7 @@
                                 </div>
                                 <!-- Month (Only visible if Monthly is selected) -->
                                 <div class="flex flex-col w-32" x-show="period === 'monthly'">
-                                    <label for="month_select" class="font-bold text-blue-950">Month</label>
+                                    <label for="month_select" class="font-bold text-blue-900">Month</label>
                                     <select id="month_select" x-model="selectedMonth" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
                                         <template x-for="month in months" :key="month.value">
                                             <option :value="month.value" x-text="month.label"></option>
@@ -102,7 +105,7 @@
                                 </div>
                                 <!-- Status Filter -->
                                 <div class="flex flex-col w-32">
-                                    <label for="status_filter" class="font-bold text-blue-950">Status</label>
+                                    <label for="status_filter" class="font-bold text-blue-900">Status</label>
                                     <select id="status_filter" name="status" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
                                         <option value="">All</option>
                                         <option value="draft">Draft</option>
@@ -126,29 +129,31 @@
                             </div>
                         </div>  
                     </div>
+
                     <hr class="my-4">
 
                     <!-- Start ng function ng table -->
-                        <div class="mt-6 overflow-x-auto" id ="general-table" style="max-height: 300px; overflow-y: auto;">
-                            <table class="w-full text-left text-sm text-neutral-600 dark:text-neutral-300">
-                                <thead class="border-b border-gray-200 bg-gray-100 text-sm text-gray-600">
+                    <div class="mb-12 mt-6 mx-10 overflow-hidden max-w-full max-h-[300px] overflow-y-auto" id ="general-table">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm text-neutral-600">
+                                <thead class="border-b bg-neutral-100 text-sm text-neutral-700">
                                     <tr>
-                                        <th class="p-4">Account Code</th>
-                                        <th class="p-4">Account</th>
-                                        <th class="p-4">Account Type</th>
-                                        <th class="p-4">Debit</th>
-                                        <th class="p-4">Credit</th>
+                                        <th class="text-left py-4 px-4">Account Code</th>
+                                        <th class="text-left py-4 px-4">Account</th>
+                                        <th class="text-left py-4 px-4">Account Type</th>
+                                        <th class="text-left py-4 px-4">Debit</th>
+                                        <th class="text-left py-4 px-4">Credit</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse($transactions as $transaction)
                                         @foreach($transaction->taxRows as $taxRow)
                                             <tr class="border-b hover:bg-gray-50">
-                                                <td class="p-4">{{ $taxRow->coaAccount->code ?? 'N/A' }}</td>
-                                                <td class="p-4">{{ $taxRow->coaAccount->name ?? 'N/A' }}</td>
-                                                <td class="p-4">{{ $taxRow->coaAccount->type ?? 'N/A' }}</td>
-                                                <td class="p-4">{{ number_format($taxRow->debit ?? 0, 2) }}</td>
-                                                <td class="p-4">{{ number_format($taxRow->credit ?? 0, 2) }}</td>
+                                                <td class="text-left py-4 px-4">{{ $taxRow->coaAccount->code ?? 'N/A' }}</td>
+                                                <td class="text-left py-4 px-4">{{ $taxRow->coaAccount->name ?? 'N/A' }}</td>
+                                                <td class="text-left py-4 px-4">{{ $taxRow->coaAccount->type ?? 'N/A' }}</td>
+                                                <td class="text-left py-4 px-4">{{ number_format($taxRow->debit ?? 0, 2) }}</td>
+                                                <td class="text-left py-4 px-4">{{ number_format($taxRow->credit ?? 0, 2) }}</td>
                                             </tr>
                                         @endforeach
                                     @empty
@@ -162,10 +167,13 @@
                                     @endforelse
                                 </tbody>
                                 <hr>
-                                <hr class="font-bold">
+                                
                                 <!-- Totals Row for Debit and Credit -->
                                 @if(count($transactions) > 0)
                                     <tfoot>
+                                        <tr>
+                                            <td colspan="5" class="border-t-4 border-neutral-100"></td>
+                                        </tr>
                                         <tr class=" font-bold">
                                             <td colspan="3" class="p-4 pe-56 text-right">Total</td>
                                             <td class="p-4">{{ number_format($totalDebit, 2) }}</td>
@@ -175,7 +183,7 @@
                                 @endif
                             </table>
                         </div>
-
+                    </div>
                 </div>
             </div>
         </div>
