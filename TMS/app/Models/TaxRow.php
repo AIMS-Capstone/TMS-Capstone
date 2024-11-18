@@ -10,7 +10,7 @@ class TaxRow extends Model
     use HasFactory;
     protected $fillable = ['transaction_id', 'amount', 'tax_code', 'tax_amount', 'net_amount', 'coa', 'tax_type', 'debit', 'credit', 'description', 'atc_amount'];
 
-    public function salesTransaction()
+    public function transaction()
     {
         return $this->belongsTo(Transactions::class, 'transaction_id');
     }

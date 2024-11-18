@@ -103,8 +103,9 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                             </button>
                             <ul x-show="open" x-transition class="py-1 space-y-1 taxuri-color">
                                 <li>
-                                    <a href="#" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group">
-                                        Percentage Tax
+                                    <a href="{{ route('percentage_return') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
+                                    {{ request()->routeIs('percentage_return') ? 'sidebar-submenu-active' : '' }}">
+                                        Percentage Tax Return
                                     </a>
                                 </li>
                                 <li>

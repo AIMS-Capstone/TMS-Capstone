@@ -36,6 +36,63 @@ class TaxReturnController extends Controller
         //
     }
 
+    public function vatReturn()
+    {
+        $organizationId = session('organization_id');
+        $taxReturns = TaxReturn::with('user')
+            ->where('organization_id', $organizationId)
+            ->whereIn('title', ['2550Q', '2550M'])
+            ->get();
+
+        return view('tax_return.vat_return', compact('taxReturns'));
+    }
+    public function showPercentageReport($id)
+{
+    $taxReturn = TaxReturn::findOrFail($id);
+    $organization_id = session("organization_id");
+
+    // Ensure correct relationship loading with lowercase 'rdo'
+    $organization = OrgSetup::with("rdo")
+        ->where('id', $organization_id)
+        ->first();
+
+        $rdoCode = optional($organization->Rdo)->rdo_code ?? '' ;
+
+    // Parse the start_date using Carbon
+    $startDate = Carbon::parse($organization->start_date);
+
+    // Determine the year ended based on the start_date
+    $yearEnded = null;
+    if ($startDate->month == 1 && $startDate->day == 1) {
+        // Calendar year - Ends on December 31 of the next year
+        $yearEnded = $startDate->addYear()->endOfYear();
+    } else {
+        // Fiscal year - Ends on the last day of the same month next year
+        $yearEnded = $startDate->addYear()->lastOfMonth();
+    }
+
+    // Check whether the organization follows a calendar or fiscal period
+    $period = ($startDate->month == 1 && $startDate->day == 1) ? 'calendar' : 'fiscal';
+
+    // Format the year ended date as 'YYYY-MM'
+    $yearEndedFormatted = $yearEnded->format('Y-m');
+    $yearEndedFormattedForDisplay = $yearEnded->format('m/Y'); // e.g., "12/2024"
+   
+
+
+    // Return the view with the necessary data
+    return view('tax_return.percentage_report_preview', compact('taxReturn', 'organization', 'yearEndedFormatted', 'yearEndedFormattedForDisplay', 'period', 'rdoCode'));
+}
+    public function percentageReturn()
+    {
+        $organizationId = session('organization_id');
+        $taxReturns = TaxReturn::with('user')
+            ->where('organization_id', $organizationId)
+            ->whereIn('title', ['2551Q', '2551M'])
+            ->get();
+
+        return view('tax_return.percentage_return', compact('taxReturns'));
+    }
     /**
      * Store a newly created resource in storage.
      */
@@ -44,50 +101,124 @@ class TaxReturnController extends Controller
         // Step 1: Create the tax return
         $taxReturn = TaxReturn::create([
             'title' => $request->type,
-            'year' => $request->year,
+            'year' => $request->year, // This is the tax return's year (from the request)
             'month' => $request->month,
             'created_by' => auth()->id(),
             'organization_id' => $request->organization_id, 
             'status' => 'Unfiled',
         ]);
     
-        // Step 2: Determine the date range based on the selected month/quarter
+        // Step 2: Get the organization's start date
+        $organization = OrgSetup::find($request->organization_id);
+        $organizationStartDate = Carbon::parse($organization->start_date); // Assume start_date is a date field
+    
+        // Step 3: Determine the date range based on the selected month/quarter
         $startDate = null;
         $endDate = null;
     
         // If it's a month selection (1-12)
         if (is_numeric($request->month)) {
+            // Use the tax return's year for month calculation
             $startDate = Carbon::create($request->year, $request->month, 1)->startOfMonth();
             $endDate = Carbon::create($request->year, $request->month, 1)->endOfMonth();
         } 
-        // If it's a quarter (Q1, Q2, Q3, Q4)
-        else if ($request->month == 'Q1') {
-            $startDate = Carbon::create($request->year, 1, 1)->startOfMonth();
-            $endDate = Carbon::create($request->year, 3, 31)->endOfMonth();
-        } else if ($request->month == 'Q2') {
-            $startDate = Carbon::create($request->year, 4, 1)->startOfMonth();
-            $endDate = Carbon::create($request->year, 6, 30)->endOfMonth();
-        } else if ($request->month == 'Q3') {
-            $startDate = Carbon::create($request->year, 7, 1)->startOfMonth();
-            $endDate = Carbon::create($request->year, 9, 30)->endOfMonth();
-        } else if ($request->month == 'Q4') {
-            $startDate = Carbon::create($request->year, 10, 1)->startOfMonth();
-            $endDate = Carbon::create($request->year, 12, 31)->endOfMonth();
+        // If it's a quarter (Q1, Q2, Q3, Q4) and it's based on the organization's start date
+        else {
+            // Determine the quarter based on the organization's start_date
+            $startMonth = $organizationStartDate->month;
+    
+            // Calculate the start and end dates for the quarter based on the organization's start date
+            if ($request->month == 'Q1') {
+                // First quarter starts from the organization's start month, within the tax return's year
+                $startDate = Carbon::create($request->year, $startMonth, 1); // Start of the first quarter
+                $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the third month
+            } else if ($request->month == 'Q2') {
+                $startDate = Carbon::create($request->year, $startMonth + 3, 1); // Start of second quarter (3 months after start month)
+                $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the sixth month
+            } else if ($request->month == 'Q3') {
+                $startDate = Carbon::create($request->year, $startMonth + 6, 1); // Start of third quarter (6 months after start month)
+                $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the ninth month
+            } else if ($request->month == 'Q4') {
+                $startDate = Carbon::create($request->year, $startMonth + 9, 1); // Start of fourth quarter (9 months after start month)
+                $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the twelfth month
+            }
         }
     
-        // Step 3: Fetch transactions based on date range and organization_id
+        // Step 4: Fetch transactions based on date range and organization_id
         $transactions = Transactions::where('organization_id', $request->organization_id)
-                                   ->whereBetween('date', [$startDate, $endDate])
-                                   ->get();
+            ->whereBetween('date', [$startDate, $endDate])
+            ->get();
     
-        // Step 4: Attach transactions to the tax return only if there are any
+        // Step 5: Attach transactions to the tax return only if there are any
         if ($transactions->isNotEmpty()) {
             $taxReturn->transactions()->attach($transactions->pluck('id'));
         }
     
-        // Step 5: Redirect with success message
-        return redirect()->route('vat_return')->with('success', 'Tax Return created successfully.' . ($transactions->isEmpty() ? ' No transactions found for the selected period.' : ' Transactions associated successfully.'));
+        // Step 6: Return back to the same page with success message
+        return back()->with('success', 'Tax Return created successfully.' . ($transactions->isEmpty() ? ' No transactions found for the selected period.' : ' Transactions associated successfully.'));
     }
+    public function storePercentage(StoreTaxReturnRequest $request)
+    {
+        // Step 1: Create the tax return
+        $taxReturn = TaxReturn::create([
+            'title' => $request->type,
+            'year' => $request->year, // This is the tax return's year (from the request)
+            'month' => $request->month,
+            'created_by' => auth()->id(),
+            'organization_id' => $request->organization_id, 
+            'status' => 'Unfiled',
+        ]);
+    
+        // Step 2: Get the organization's start date
+        $organization = OrgSetup::find($request->organization_id);
+        $organizationStartDate = Carbon::parse($organization->start_date); // Assume start_date is a date field
+    
+        // Step 3: Determine the date range based on the selected month/quarter
+        $startDate = null;
+        $endDate = null;
+    
+        // If it's a month selection (1-12)
+        if (is_numeric($request->month)) {
+            // Use the tax return's year for month calculation
+            $startDate = Carbon::create($request->year, $request->month, 1)->startOfMonth();
+            $endDate = Carbon::create($request->year, $request->month, 1)->endOfMonth();
+        } 
+        // If it's a quarter (Q1, Q2, Q3, Q4) and it's based on the organization's start date
+        else {
+            // Determine the quarter based on the organization's start_date
+            $startMonth = $organizationStartDate->month;
+    
+            // Calculate the start and end dates for the quarter based on the organization's start date
+            if ($request->month == 'Q1') {
+                // First quarter starts from the organization's start month, within the tax return's year
+                $startDate = Carbon::create($request->year, $startMonth, 1); // Start of the first quarter
+                $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the third month
+            } else if ($request->month == 'Q2') {
+                $startDate = Carbon::create($request->year, $startMonth + 3, 1); // Start of second quarter (3 months after start month)
+                $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the sixth month
+            } else if ($request->month == 'Q3') {
+                $startDate = Carbon::create($request->year, $startMonth + 6, 1); // Start of third quarter (6 months after start month)
+                $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the ninth month
+            } else if ($request->month == 'Q4') {
+                $startDate = Carbon::create($request->year, $startMonth + 9, 1); // Start of fourth quarter (9 months after start month)
+                $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the twelfth month
+            }
+        }
+    
+        // Step 4: Fetch transactions based on date range and organization_id
+        $transactions = Transactions::where('organization_id', $request->organization_id)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->get();
+    
+        // Step 5: Attach transactions to the tax return only if there are any
+        if ($transactions->isNotEmpty()) {
+            $taxReturn->transactions()->attach($transactions->pluck('id'));
+        }
+    
+        // Step 6: Return back to the same page with success message
+        return back()->with('success', 'Tax Return created successfully.' . ($transactions->isEmpty() ? ' No transactions found for the selected period.' : ' Transactions associated successfully.'));
+    }
+    
     
 
     /**
@@ -102,6 +233,20 @@ class TaxReturnController extends Controller
 
         return view('tax_return.vat_show', compact('taxReturn', 'transactions'));
     }
+    
+    public function showPercentageSlspData(TaxReturn $taxReturn)
+    {
+    
+        $paginatedTaxRows = TaxRow::whereHas('transaction', function ($query) {
+            $query->where('tax_type', 2)
+                  ->where('transaction_type', 'sales');
+        })->paginate(5);
+
+        return view('tax_return.percentage_show', compact('taxReturn', 'paginatedTaxRows'));
+    }
+    
+    
+
 
         public function showReport(TaxReturn $taxReturn)
     {

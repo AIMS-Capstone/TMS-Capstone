@@ -24,6 +24,15 @@ class TaxTypeSeeder extends Seeder
                 'transaction_type' => 'sales'
             ],
             [
+                'tax_type' => 'Percentage Tax',
+                'description' => 'Tax based on gross sales or receipts for non-VAT taxpayers and other specific activities.',
+                'VAT' => 0.00, // Base rate; actual rate comes from ATCs
+                'category' => 'General', 
+                'short_code' => 'PT', 
+                'transaction_type' => 'sales'
+            ],
+            
+            [
                 'tax_type' => 'Sales to Government (Goods)',
                 'description' => 'Sales of goods to the government or any of its political subdivisions, instrumentalities, or agencies including government-owned or controlled corporations', 
                 'VAT' => 12.00, 
