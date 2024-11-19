@@ -80,7 +80,10 @@ Route::middleware([
         $municipalities = json_decode(file_get_contents(public_path('json/municipalities.json')), true);
         return view('components.create-org', compact('rdos', 'regions', 'provinces', 'municipalities'));
     })->name('create-org');
-
+    Route::get('/tax-returns/{taxReturn}/percentage-summary', [TaxReturnController::class, 'showPercentageSummaryPage'])
+    ->name('tax-returns.percentage-summary');
+    Route::post('/tax-return-transaction/sales', [TransactionsController::class, 'getSalesTransactions']);
+    Route::post('/tax-return-transaction/add-percentage', [TransactionsController::class, 'addPercentage'])->name('tax_return_transaction.addPercentage');
     Route::get('/org-setup', [OrgSetupController::class, 'index'])->name('org-setup');
     Route::post('/org-setup', [OrgSetupController::class, 'store'])->name('OrgSetup.store');
     Route::post('/org-delete', [OrgSetupController::class, 'destroy'])->name('orgSetup.destroy');
@@ -91,6 +94,8 @@ Route::middleware([
     Route::get('/export-coa', [CoaController::class, 'exportCoas']);
     Route::get('/export-tax-type/{type}', [TaxTypeController::class, 'exportTaxType']);
     Route::get('/edit-sales/{transaction}', [TransactionsController::class, 'editSales']);
+    Route::get('/tax-return/{taxReturn}/2551q-pdf', [TaxReturnController::class, 'showPercentageReportPDF'])
+    ->name('tax_return.2551q.pdf');
     
     Route::get('/transactions/{id}/edit-sales', [TransactionsController::class, 'edit'])->name('transactions.edit');
     Route::post('/transactions/{id}', [TransactionsController::class, 'update'])->name('transactions.update');
@@ -156,7 +161,10 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
         Route::get('/contacts', function () {
             return view('contacts');
         })->name('contacts');
-
+        Route::post('tax-return/{taxReturn}/2551q', [TaxReturnController::class, 'store2551Q'])
+        ->name('tax_return.store2551Q');
+        Route::post('/tax-return-transaction/deactivate', [TransactionsController::class, 'deactivate'])
+    ->name('tax-return-transaction.deactivate');
         // Tax Return Routes
         Route::resource('tax_return', TaxReturnController::class);
         Route::get('/vat_return', [TaxReturnController::class, 'vatReturn'])->name('vat_return');

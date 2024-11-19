@@ -15,7 +15,7 @@
             <h3 class="font-semibold text-gray-700 text-lg mb-4">Filing Period</h3>
             
             <!-- For the -->
-            <form method="POST" action="{{ route('tax_return.store') }}">
+            <form action="{{ route('tax_return.store2551Q', ['taxReturn' => $taxReturn->id]) }}" method="POST">
                 @csrf
                 <!-- Period -->
                 <div class="mb-4 flex items-start">
@@ -145,67 +145,193 @@
             <div class="flex items-center space-x-4 w-2/3">
             
                 <label class="flex items-center">
-                    <input type="radio" name="tax_relief" value="Graduated" class="mr-2"> Graduated income tax rate on net
+                    <input type="radio" name="availed_tax_rate" value="Graduated" class="mr-2"> Graduated income tax rate on net
                     taxable income 
                 </label>
                 <label class="flex items-center">
-                    <input type="radio" name="tax_relief" value="Flat_rate" class="mr-2"> 8% income tax rate on gross sales/receipts/others
+                    <input type="radio" name="availed_tax_rate" value="Flat_rate" class="mr-2"> 8% income tax rate on gross sales/receipts/others
                 </label>
             </div>
         </div>
     </div>
     <div class="border-b">
         <h3 class="font-semibold text-gray-700 text-lg mb-4">Total Tax Payable</h3>
-        
-        <!-- TIN -->
+    
+        <!-- Total Tax Due (Sum of tax_amount from Schedule 1) -->
         <div class="mb-4 flex items-start">
-            <label class="block text-gray-700 text-sm font-medium w-1/3">     Total Tax Due (From Schedule 1 Item 7)</label>
-            <input type="number" name="tax_due" placeholder="" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-       
+            <label class="block text-gray-700 text-sm font-medium w-1/3">Total Tax Due (From Schedule 1 Item 7)</label>
+            <input 
+                type="number" 
+                name="tax_due" 
+                id="tax_due" 
+                value="{{ number_format($summaryData->sum('tax_due'), 2, '.', '') }}" 
+                readonly 
+                class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
+    
+        <!-- Creditable Percentage Tax Withheld -->
         <div class="mb-4 flex items-start">
-            <label class="block text-gray-700 text-sm font-medium w-1/3">    Creditable Percentage Tax Withheld per BIR Form No. 2307</label>
-            <input type="number" name="creditable_tax" placeholder="" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            <label class="block text-gray-700 text-sm font-medium w-1/3">Creditable Percentage Tax Withheld per BIR Form No. 2307</label>
+            <input 
+                type="number" 
+                name="creditable_tax" 
+                id="creditable_tax" 
+                placeholder="" 
+                class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
+    
+        <!-- Tax Paid in Return Previously Filed -->
         <div class="mb-4 flex items-start">
-            <label class="block text-gray-700 text-sm font-medium w-1/3">   Tax Paid in Return Previously Filed, if this is an Amended Return</label>
-            <input type="number" name="amended_tax" placeholder="" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            <label class="block text-gray-700 text-sm font-medium w-1/3">Tax Paid in Return Previously Filed, if this is an Amended Return</label>
+            <input 
+                type="number" 
+                name="amended_tax" 
+                id="amended_tax" 
+                placeholder="" 
+                class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
+    
+        <!-- Other Tax Credit/Payment -->
         <div class="mb-4 flex items-start">
-            <label class="block text-gray-700 text-sm font-medium w-1/3">  Other Tax Credit/Payment (specify)</label>
-            <input type="text" name="other_tax_specify" placeholder="" class="w-1/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            <input type="number" name="other_tax_amount" placeholder="" class="w-1/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            <label class="block text-gray-700 text-sm font-medium w-1/3">Other Tax Credit/Payment (specify)</label>
+            <input 
+                type="text" 
+                name="other_tax_specify" 
+                id="other_tax_specify" 
+                placeholder="" 
+                class="w-1/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            <input 
+                type="number" 
+                name="other_tax_amount" 
+                id="other_tax_amount" 
+                placeholder="" 
+                class="w-1/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
+    
+        <!-- Total Tax Credits/Payments -->
         <div class="mb-4 flex items-start">
-            <label class="block text-gray-700 text-sm font-medium w-1/3">   Total Tax Credits/Payments (Sum of Items 15 to 17)</label>
-            <input type="number" name="total_tax_credits" placeholder="" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            <label class="block text-gray-700 text-sm font-medium w-1/3">Total Tax Credits/Payments (Sum of Items 15 to 17)</label>
+            <input 
+                type="number" 
+                name="total_tax_credits" 
+                id="total_tax_credits" 
+                readonly 
+                class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
+    
+        <!-- Tax Still Payable/(Overpayment) -->
         <div class="mb-4 flex items-start">
-            <label class="block text-gray-700 text-sm font-medium w-1/3">   Tax Still Payable/(Overpayment) (Item 14 Less Item 18)</label>
-            <input type="number" name="tax_still_payable" placeholder="" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            <label class="block text-gray-700 text-sm font-medium w-1/3">Tax Still Payable/(Overpayment) (Item 14 Less Item 18)</label>
+            <input 
+                type="number" 
+                name="tax_still_payable" 
+                id="tax_still_payable" 
+                readonly 
+                class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
+    
+        <!-- Surcharge -->
         <div class="mb-4 flex items-start">
-            <label class="block text-gray-700 text-sm font-medium w-1/3">  Surcharge</label>
-            <input type="number" name="surcharge" placeholder="" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            <label class="block text-gray-700 text-sm font-medium w-1/3">Surcharge</label>
+            <input 
+                type="number" 
+                name="surcharge" 
+                id="surcharge" 
+                placeholder="" 
+                class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
+    
+        <!-- Interest -->
         <div class="mb-4 flex items-start">
-            <label class="block text-gray-700 text-sm font-medium w-1/3">   Interest</label>
-            <input type="number" name="interest" placeholder="" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            <label class="block text-gray-700 text-sm font-medium w-1/3">Interest</label>
+            <input 
+                type="number" 
+                name="interest" 
+                id="interest" 
+                placeholder="" 
+                class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
+    
+        <!-- Compromise -->
         <div class="mb-4 flex items-start">
-            <label class="block text-gray-700 text-sm font-medium w-1/3">   Compromise</label>
-            <input type="number" name="interest" placeholder="" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            <label class="block text-gray-700 text-sm font-medium w-1/3">Compromise</label>
+            <input 
+                type="number" 
+                name="compromise" 
+                id="compromise" 
+                placeholder="" 
+                class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
+    
+        <!-- Total Penalties -->
         <div class="mb-4 flex items-start">
-            <label class="block text-gray-700 text-sm font-medium w-1/3">   Total Penalties (Sum of Items 20 to 22)</label>
-            <input type="number" name="total_penalties" placeholder="" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            <label class="block text-gray-700 text-sm font-medium w-1/3">Total Penalties (Sum of Items 20 to 22)</label>
+            <input 
+                type="number" 
+                name="total_penalties" 
+                id="total_penalties" 
+                readonly 
+                class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
+    
+        <!-- Total Amount Payable/(Overpayment) -->
         <div class="mb-4 flex items-start">
-            <label class="block text-gray-700 text-sm font-medium w-1/3">    TOTAL AMOUNT PAYABLE/(Overpayment) (Sum of Items 19 and 23)            </label>
-            <input type="number" name="total_amount_payable" placeholder="" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            <label class="block text-gray-700 text-sm font-medium w-1/3">TOTAL AMOUNT PAYABLE/(Overpayment) (Sum of Items 19 and 23)</label>
+            <input 
+                type="number" 
+                name="total_amount_payable" 
+                id="total_amount_payable" 
+                readonly 
+                class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
+    </div>
+    
+<div class="border-b">
+    <h3 class="font-semibold text-gray-700 text-lg mb-4">Schedule 1</h3>
+
+    <div class="grid grid-cols-1 gap-4">
+        @foreach ($summaryData as $atcCode => $data)
+            <div class="grid grid-cols-4 gap-4 items-center">
+                
+                <!-- ATC Code Input -->
+                <div class="flex flex-col">
+                    <label class="text-sm font-medium text-gray-700">ATC</label>
+                    <input type="text" readonly value="{{ $atcCode }}" 
+                           name="schedule[{{ $atcCode }}][atc_code]" 
+                           class="border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                </div>
+
+                <!-- Taxable Amount Input -->
+                <div class="flex flex-col">
+                    <label class="text-sm font-medium text-gray-700">Taxable Amount</label>
+                    <input type="text" readonly value="{{ number_format($data['taxable_amount'], 2) }}" 
+                           name="schedule[{{ $atcCode }}][taxable_amount]" 
+                           class="border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                </div>
+
+                <!-- Tax Rate Input -->
+                <div class="flex flex-col">
+                    <label class="text-sm font-medium text-gray-700">Tax Rate</label>
+                    <input type="text" readonly value="{{ number_format($data['tax_rate'], 2) }}" 
+                           name="schedule[{{ $atcCode }}][tax_rate]" 
+                           class="border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                </div>
+
+                <!-- Tax Due Input -->
+                <div class="flex flex-col">
+                    <label class="text-sm font-medium text-gray-700">Tax Due</label>
+                    <input type="text" readonly value="{{ number_format($data['tax_due'], 2) }}" 
+                           name="schedule[{{ $atcCode }}][tax_due]" 
+                           class="border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                </div>
+
+            </div>
+        @endforeach
+    </div>
 
 </div>
+
+
 
 
         <!-- Submit Button -->
@@ -214,5 +340,63 @@
                 Proceed to Report
             </button>
         </div>
+    </form>
     </div>
 </x-app-layout>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const creditableTax = document.getElementById('creditable_tax');
+        const amendedTax = document.getElementById('amended_tax');
+        const otherTaxAmount = document.getElementById('other_tax_amount');
+        const totalTaxCredits = document.getElementById('total_tax_credits');
+        const taxDue = document.getElementById('tax_due');
+        const taxStillPayable = document.getElementById('tax_still_payable');
+        const surcharge = document.getElementById('surcharge');
+        const interest = document.getElementById('interest');
+        const compromise = document.getElementById('compromise');
+        const totalPenalties = document.getElementById('total_penalties');
+        const totalAmountPayable = document.getElementById('total_amount_payable');
+    
+        function calculateTotalCredits() {
+            const total = 
+                (parseFloat(creditableTax.value) || 0) + 
+                (parseFloat(amendedTax.value) || 0) + 
+                (parseFloat(otherTaxAmount.value) || 0);
+            totalTaxCredits.value = total.toFixed(2);
+            calculateTaxStillPayable();
+        }
+    
+        function calculateTaxStillPayable() {
+            const due = parseFloat(taxDue.value) || 0;
+            const credits = parseFloat(totalTaxCredits.value) || 0;
+            const stillPayable = due - credits;
+            taxStillPayable.value = stillPayable.toFixed(2);
+            calculateTotalAmountPayable();
+        }
+    
+        function calculateTotalPenalties() {
+            const penalties = 
+                (parseFloat(surcharge.value) || 0) + 
+                (parseFloat(interest.value) || 0) + 
+                (parseFloat(compromise.value) || 0);
+            totalPenalties.value = penalties.toFixed(2);
+            calculateTotalAmountPayable();
+        }
+    
+        function calculateTotalAmountPayable() {
+            const stillPayable = parseFloat(taxStillPayable.value) || 0;
+            const penalties = parseFloat(totalPenalties.value) || 0;
+            totalAmountPayable.value = (stillPayable + penalties).toFixed(2);
+        }
+    
+        // Add event listeners for manual input fields
+        [creditableTax, amendedTax, otherTaxAmount].forEach(field => {
+            field.addEventListener('input', calculateTotalCredits);
+        });
+    
+        [surcharge, interest, compromise].forEach(field => {
+            field.addEventListener('input', calculateTotalPenalties);
+        });
+    });
+    </script>
+    
