@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\OrgSetup;
 use App\Models\Transactions;
 use App\Http\Requests\StoreTransactionsRequest;
 use App\Http\Requests\UpdateTransactionsRequest;
@@ -12,9 +13,12 @@ use App\Models\atc;
 use App\Models\coa;
 use App\Models\Contacts;
 use App\Models\Payment;
+use App\Models\TaxReturn;
+use App\Models\TaxReturnTransaction;
 use App\Models\TaxRow as ModelsTaxRow;
 use App\Models\TaxType;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
@@ -86,6 +90,73 @@ class TransactionsController extends Controller
         // Pass the type to the view
         return view('transactions.create', compact('transactionType'));
     }
+    public function getSalesTransactions(Request $request)
+{
+    // Get organization from session
+    $organization = OrgSetup::find(session('organization_id'));
+    $organizationStartDate = Carbon::parse($organization->start_date);
+
+    $startDate = null;
+    $endDate = null;
+
+    // Retrieve year and month from the tax return
+    $year = $request->taxReturnYear;  // Passed from the frontend
+    $monthOrQuarter = $request->taxReturnMonth;  // Passed from the frontend
+
+    // Determine the date range based on the tax return's year and month/quarter
+    if (is_numeric($monthOrQuarter)) {
+        // Month selection
+        $startDate = Carbon::create($year, $monthOrQuarter, 1)->startOfMonth();
+        $endDate = Carbon::create($year, $monthOrQuarter, 1)->endOfMonth();
+    } else {
+        // Quarter selection
+        $startMonth = $organizationStartDate->month;
+
+        if ($monthOrQuarter == 'Q1') {
+            $startDate = Carbon::create($year, $startMonth, 1);
+            $endDate = $startDate->copy()->addMonths(2)->endOfMonth();
+        } else if ($monthOrQuarter == 'Q2') {
+            $startDate = Carbon::create($year, $startMonth + 3, 1);
+            $endDate = $startDate->copy()->addMonths(2)->endOfMonth();
+        } else if ($monthOrQuarter == 'Q3') {
+            $startDate = Carbon::create($year, $startMonth + 6, 1);
+            $endDate = $startDate->copy()->addMonths(2)->endOfMonth();
+        } else if ($monthOrQuarter == 'Q4') {
+            $startDate = Carbon::create($year, $startMonth + 9, 1);
+            $endDate = $startDate->copy()->addMonths(2)->endOfMonth();
+        }
+    }
+
+    // Fetch transactions with type 'sales' within the calculated date range
+    $transactions = Transactions::with("contactDetails")
+    -> where('transaction_type', 'sales')
+        ->where('organization_id', session('organization_id'))
+        ->whereBetween('date', [$startDate, $endDate])
+        ->get();
+
+    return response()->json($transactions);
+}
+
+    public function deactivate(Request $request)
+    {
+        // Get the tax_return_id and transaction_ids from the request
+        $taxReturnId = $request->input('tax_return_id');
+        $transactionIds = $request->input('ids');
+        
+        // Make sure the 'ids' is an array and not empty
+        if (empty($transactionIds)) {
+            return response()->json(['message' => 'No transactions selected'], 400);
+        }
+
+        // Find the specific tax return by ID
+        $taxReturn = TaxReturn::findOrFail($taxReturnId);  // Ensure the tax return exists
+        
+        // Detach the transactions from the tax_return_transactions pivot table
+        $taxReturn->transactions()->detach($transactionIds);
+        
+        // Optionally, you can return a success response
+        return response()->json(['message' => 'Transactions archived successfully']);
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -103,6 +174,31 @@ class TransactionsController extends Controller
     public function store(StoreTransactionsRequest $request)
     {
         //
+    }
+    public function addPercentage(Request $request)
+    {
+        // Validate the incoming request
+      
+        $request->validate([
+            'transaction_id' => 'required|exists:transactions,id',
+            'tax_return_id' => 'required|exists:tax_returns,id',
+        ]);
+
+        // Get the active TaxReturn (you can modify this to get the "currently active" TaxReturn based on your logic)
+        $taxReturn = TaxReturn::find($request->tax_return_id);
+
+        if (!$taxReturn) {
+            return redirect()->back()->with('error', 'Tax return not found.');
+        }
+
+        // Add the transaction to the tax return's tax_return_transactions table
+        $taxReturnTransaction = new TaxReturnTransaction();
+        $taxReturnTransaction->tax_return_id = $taxReturn->id;
+        $taxReturnTransaction->transaction_id = $request->transaction_id;
+        $taxReturnTransaction->save();
+
+        // Return success message and redirect back
+        return redirect()->back()->with('success', 'Transaction added to tax return successfully!');
     }
     public function storeUpload(Request $request)
 {

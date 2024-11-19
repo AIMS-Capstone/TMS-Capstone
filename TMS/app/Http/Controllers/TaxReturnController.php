@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Tax2551QSchedule;
 use App\Models\TaxReturn;
 use App\Http\Requests\StoreTaxReturnRequest;
 use App\Http\Requests\UpdateTaxReturnRequest;
 use App\Models\OrgSetup;
+use App\Models\Tax2551Q;
 use App\Models\TaxReturnTransaction;
 use App\Models\TaxRow;
 use App\Models\Transactions;
@@ -15,7 +17,9 @@ use mikehaertl\pdftk\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use FPDM;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class TaxReturnController extends Controller
 {
@@ -56,7 +60,7 @@ class TaxReturnController extends Controller
         ->where('id', $organization_id)
         ->first();
 
-        $rdoCode = optional($organization->Rdo)->rdo_code ?? '' ;
+    $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
 
     // Parse the start_date using Carbon
     $startDate = Carbon::parse($organization->start_date);
@@ -70,19 +74,61 @@ class TaxReturnController extends Controller
         // Fiscal year - Ends on the last day of the same month next year
         $yearEnded = $startDate->addYear()->lastOfMonth();
     }
-
     // Check whether the organization follows a calendar or fiscal period
-    $period = ($startDate->month == 1 && $startDate->day == 1) ? 'calendar' : 'fiscal';
+    $period = ($yearEnded->month == 12 && $yearEnded->day == 31) ? 'calendar' : 'fiscal';
 
     // Format the year ended date as 'YYYY-MM'
     $yearEndedFormatted = $yearEnded->format('Y-m');
     $yearEndedFormattedForDisplay = $yearEnded->format('m/Y'); // e.g., "12/2024"
-   
 
+    // Get the transaction IDs related to this tax return
+    $transactionIds = $taxReturn->transactions->pluck('id');
 
-    // Return the view with the necessary data
-    return view('tax_return.percentage_report_preview', compact('taxReturn', 'organization', 'yearEndedFormatted', 'yearEndedFormattedForDisplay', 'period', 'rdoCode'));
+    // Get the TaxRows and calculate the summary data
+    $taxRows = TaxRow::whereHas('transaction', function ($query) use ($transactionIds) {
+        $query->where('tax_type', 2)
+              ->where('transaction_type', 'sales')
+              ->where('status', 'draft')
+              ->whereIn('id', $transactionIds);
+    })->with(['transaction.contactDetails', 'atc', 'taxType'])
+      ->get();
+
+    // Group the TaxRows by ATC and calculate the summary
+    $groupedData = $taxRows->groupBy(function ($taxRow) {
+        return $taxRow->atc->tax_code; // Group by ATC code
+    });
+
+    $summaryData = $groupedData->map(function ($group) {
+        $taxableAmount = 0;
+        $taxRate = 0;
+        $taxDue = 0;
+
+        foreach ($group as $taxRow) {
+            $taxableAmount += $taxRow->net_amount;
+            $taxRate = $taxRow->atc->tax_rate;
+            $taxDue += $taxRow->atc_amount;
+        }
+
+        return [
+            'taxable_amount' => $taxableAmount,
+            'tax_rate' => $taxRate,
+            'tax_due' => $taxDue,
+        ];
+    });
+
+    // Pass the summary data to the view
+    return view('tax_return.percentage_report_preview', compact(
+        'taxReturn',
+        'organization',
+        'yearEndedFormatted',
+        'yearEndedFormattedForDisplay',
+        'period',
+        'rdoCode',
+        'summaryData' // Add the summary data to the view
+    ));
 }
+
+
     public function percentageReturn()
     {
         $organizationId = session('organization_id');
@@ -93,6 +139,7 @@ class TaxReturnController extends Controller
 
         return view('tax_return.percentage_return', compact('taxReturns'));
     }
+    
     /**
      * Store a newly created resource in storage.
      */
@@ -224,8 +271,80 @@ class TaxReturnController extends Controller
     /**
      * Display the specified resource.
      */
- 
 
+     public function store2551Q(Request $request, $taxReturn)
+     {
+         // Validate the incoming request data
+         $validatedData = $request->validate([
+             'period' => 'required|string',
+             'year_ended' => 'required|date',
+             'quarter' => 'required|string',
+             'amended_return' => 'required|string',
+             'sheets_attached' => 'required|integer',
+             'tin' => 'required|string',
+             'rdo_code' => 'required|string',
+             'taxpayer_name' => 'required|string',
+             'registered_address' => 'required|string',
+             'zip_code' => 'required|string',
+             'contact_number' => 'required|string',
+             'email_address' => 'required|email',
+             'tax_relief' => 'required|string',
+             'yes_specify' => 'nullable|string',
+             'availed_tax_rate' => 'required|string',
+             'tax_due' => 'required|numeric',
+             'creditable_tax' => 'required|numeric',
+             'amended_tax' => 'nullable|numeric',
+             'other_tax_specify' => 'nullable|string',
+             'other_tax_amount' => 'nullable|numeric',
+             'total_tax_credits' => 'required|numeric',
+             'tax_still_payable' => 'required|numeric',
+             'surcharge' => 'nullable|numeric',
+             'interest' => 'nullable|numeric',
+             'compromise' => 'nullable|numeric',
+             'total_penalties' => 'nullable|numeric',
+             'total_amount_payable' => 'required|numeric',
+             'schedule' => 'nullable|array', // Ensure 'schedule' is an array
+         ]);
+         
+         // Add the tax_return_id to the validated data before creating/updating the record
+         $validatedData['tax_return_id'] = $taxReturn;
+         
+         
+         // Use updateOrCreate to either update the existing Tax2551Q or create a new one
+         $tax2551Q = Tax2551Q::updateOrCreate(
+             ['tax_return_id' => $taxReturn], // Search for a record with the same tax_return_id
+             $validatedData // Update with the new validated data
+         );
+         
+         // Check if 'schedule' data exists and process it
+         if (isset($validatedData['schedule']) && !empty($validatedData['schedule'])) {
+             foreach ($validatedData['schedule'] as $scheduleData) {
+                // Clean and validate tax_base for each schedule item
+              
+            $scheduleData['taxable_amount'] = preg_replace('/[^0-9.]/', '', $scheduleData['taxable_amount']); // Remove commas
+            $scheduleData['taxable_amount'] = (float) $scheduleData['taxable_amount']; // Ensure it's a valid number
+                 // Check if a schedule entry for the same tax_return_id already exists
+                 Tax2551QSchedule::updateOrCreate(
+                     [
+                         '2551q_id' => $tax2551Q->id, // Use the ID of the newly created or updated Tax2551Q
+                         'atc_code' => $scheduleData['atc_code'], // Assuming ATC code is unique
+                     ],
+                     [
+                         'tax_base' => $scheduleData['taxable_amount'],
+                         'tax_rate' => $scheduleData['tax_rate'],
+                         'tax_due' => $scheduleData['tax_due'],
+                     ]
+                 );
+             }
+         }
+         
+         // Redirect back or to a specific page with a success message
+         return redirect()->route('tax_return.2551q.pdf', ['taxReturn' => $taxReturn])
+        ->with('success', 'Tax return successfully submitted and PDF generated.');
+     }
+     
+     
+     
     public function showSlspData(TaxReturn $taxReturn)
     {
       
@@ -236,15 +355,82 @@ class TaxReturnController extends Controller
     
     public function showPercentageSlspData(TaxReturn $taxReturn)
     {
+        // Get the transaction IDs that are linked to this tax return
+        $transactionIds = $taxReturn->transactions->pluck('id'); // Get all the transaction IDs related to the given tax return
     
-        $paginatedTaxRows = TaxRow::whereHas('transaction', function ($query) {
+        $paginatedTaxRows = TaxRow::whereHas('transaction', function ($query) use ($transactionIds) {
             $query->where('tax_type', 2)
-                  ->where('transaction_type', 'sales');
-        })->paginate(5);
-
+                  ->where('transaction_type', 'sales')
+                  ->where('status','draft')
+                  ->whereIn('id', $transactionIds); // Only include transactions that belong to this tax return
+        })->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount'])
+          ->paginate(5);
+    
         return view('tax_return.percentage_show', compact('taxReturn', 'paginatedTaxRows'));
     }
     
+    
+    public function showPercentageSummaryPage(TaxReturn $taxReturn)
+{
+    // Get the transaction IDs that are linked to this tax return
+    $transactionIds = $taxReturn->transactions->pluck('id'); // Get all the transaction IDs related to the given tax return
+
+    // Get the paginated TaxRows with the necessary eager-loaded relationships
+    $paginatedTaxRows = TaxRow::whereHas('transaction', function ($query) use ($transactionIds) {
+        $query->where('tax_type', 2)
+              ->where('transaction_type', 'sales')
+              ->where('status', 'draft')
+              ->whereIn('id', $transactionIds); // Only include transactions that belong to this tax return
+    })->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount'])
+      ->paginate(5);
+
+    // Group the TaxRows by their ATC (Account Type Code)
+    $groupedData = $paginatedTaxRows->groupBy(function ($taxRow) {
+        return $taxRow->atc->tax_code; // Group by ATC code
+    });
+
+    // Calculate the summary data for each ATC
+    $summaryData = $groupedData->map(function ($group) {
+        // Initialize variables to calculate total taxable amount, tax rate, and tax due
+        $taxableAmount = 0;
+        $taxRate = 0;
+        $taxDue = 0;
+
+        // Loop through each row in the group to calculate the totals
+        foreach ($group as $taxRow) {
+            $taxableAmount += $taxRow->net_amount;  // Sum of all taxable amounts
+            $taxRate = $taxRow->atc->tax_rate;     // Get the tax rate from the ATC for this row
+            $taxDue += $taxRow->atc_amount;        // Sum of all tax amounts
+        }
+
+        return [
+            'taxable_amount' => $taxableAmount,
+            'tax_rate' => $taxRate,
+            'tax_due' => $taxDue,
+        ];
+    });
+
+    // Paginate the summary data by converting it into a LengthAwarePaginator
+    $currentPage = LengthAwarePaginator::resolveCurrentPage();
+    $perPage = 5;  // Define how many records you want per page
+
+    // Slice the collection to get the data for the current page
+    $currentPageData = $summaryData->slice(($currentPage - 1) * $perPage, $perPage)->all();
+
+    // Create a LengthAwarePaginator instance
+    $paginatedSummaryData = new LengthAwarePaginator(
+        $currentPageData,
+        $summaryData->count(),
+        $perPage,
+        $currentPage,
+        ['path' => LengthAwarePaginator::resolveCurrentPath()]
+    );
+
+    // Return the view with the paginated TaxRows and the summary data
+    return view('tax_return.percentage_summary', compact('taxReturn', 'paginatedTaxRows', 'paginatedSummaryData'));
+}
+
+
     
 
 
@@ -591,6 +777,124 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
             'pdfPath' => asset('storage/filled_report.pdf'), // Serve the PDF from public storage
         ]);
     }
+    public function showPercentageReportPDF(TaxReturn $taxReturn)
+    {
+        // Get data from the `2551q` table
+        $formData = Tax2551Q::where('tax_return_id', $taxReturn->id)->first();
+        if (!$formData) {
+            return dd('No data found in the 2551q table for this tax return.');
+        }
+    
+        // Get schedules via the relationship
+        $scheduleData = $formData->schedule1;
+        
+    
+        // Initialize fields array
+        $fields = [
+            'YearF' => $formData->year_ended === '2021-12' ? 'X' : '',
+            'YearC' => $formData->year_ended === '2021-12' ? '' : 'X',
+           'MM/YYYY' => implode('/', array_reverse(explode('-', $formData->year_ended))),
+            '1stQtr' => $formData->quarter === '1st' ? 'X' : '',
+            '2ndQtr' => $formData->quarter === '2nd' ? 'X' : '',
+            '3rdQtr' => $formData->quarter === '3rd' ? 'X' : '',
+            '4thQtr' => $formData->quarter === '4th' ? 'X' : '',
+            'amended_yes' => $formData->is_amended ? 'X' : '',
+            'amended_no' => !$formData->is_amended ? 'X' : '',
+            'sheets' => $formData->sheets_attached ?? '',
+            'TIN1' => explode('-', $formData->tin)[0] ?? '',
+            'TIN2' => explode('-', $formData->tin)[1] ?? '',
+            'TIN3' => explode('-', $formData->tin)[2] ?? '',
+            'TIN4' => explode('-', $formData->tin)[3] ?? '',
+            'RDO' => $formData->rdo_code ?? '',
+            'TaxpayerName' => $formData->taxpayer_name ?? '',
+            'address' => $formData->registered_address ?? '',
+            'Zip' => $formData->zip_code ?? '',
+            'PhoneNumber' => $formData->contact_number ?? '',
+            'Email' => $formData->email_address ?? '',
+            'relief_yes' => $formData->tax_relief === 'yes' ? 'X' : '',
+            'relief_no' => !$formData->tax_relief === 'no' ? 'X' : '',
+            'yes_specify' => $formData->yes_specify ?? '',
+            'graduated' => $formData->availed_tax_rate === 'Graduated' ? 'X' : '',
+            'flat_rate' => $formData->availed_tax_rate === 'Flat_rate' ? 'X' : '',
+            '14' => floor($formData->tax_due ?? 0),
+            '14_decimal' => ($formData->tax_due ?? 0) * 100 % 100,
+            '15' => floor($formData->creditable_tax ?? 0),
+            '15_decimal' => ($formData->creditable_tax ?? 0) * 100 % 100,
+            '16' => floor($formData->amended_tax ?? 0),
+            '16_decimal' => ($formData->amended_tax ?? 0) * 100 % 100,
+            'other_specify' => $formData->other_tax_specify ?? '',
+            'other_specify_amount' => floor($formData->other_tax_amount ?? 0),
+            'other_specify_decimal' => ($formData->other_tax_amount ?? 0) * 100 % 100,
+            '18' => floor($formData->total_tax_credits ?? 0),
+            '18_decimal' => ($formData->total_tax_credits ?? 0) * 100 % 100,
+            '19' => floor($formData->tax_still_payable ?? 0),
+            '19_decimal' => ($formData->tax_still_payable ?? 0) * 100 % 100,
+            '20' => floor($formData->surcharge ?? 0),
+            '20_decimal' => ($formData->surcharge ?? 0) * 100 % 100,
+            '21' => floor($formData->interest ?? 0),
+            '21_decimal' => ($formData->interest ?? 0) * 100 % 100,
+            '22' => floor($formData->compromise ?? 0),
+            '22_decimal' => ($formData->compromise ?? 0) * 100 % 100,
+            '23' => floor($formData->total_penalties ?? 0),
+            '23_decimal' => ($formData->total_penalties ?? 0) * 100 % 100,
+            '24' => floor($formData->total_amount_payable ?? 0),
+            '24_decimal' => ($formData->total_amount_payable ?? 0) * 100 % 100,
+        ];
+    
+        // Process schedule data for ATC codes and amounts
+        foreach ($scheduleData as $index => $schedule) {
+            $atcIndex = $index + 1; // Use 1-based index for ATC fields
+            if ($atcIndex > 6) break; // Stop if more than 6 ATCs
+    
+            $fields["ATC{$atcIndex}"] = $schedule->atc_code ?? '';
+            $fields["TaxableAmount{$atcIndex}"] = floor($schedule->tax_base ?? 0);
+            $fields["TaxableAmount_decimal{$atcIndex}"] = ($schedule->tax_base ?? 0) * 100 % 100; // Extract decimals
+            $fields["TaxRate{$atcIndex}"] = isset($schedule->tax_rate) ? intval($schedule->tax_rate) : '';
+            $fields["TaxDue{$atcIndex}"] = floor($schedule->tax_due ?? 0);
+            $fields["TaxDue_decimal{$atcIndex}"] = ($schedule->tax_due ?? 0) * 100 % 100;
+        }
+    
+        // Calculate total tax due
+        $fields['TotalTaxDue'] = floor($formData->tax_due ?? 0);
+        $fields['TotalTaxDue_decimal'] = ($formData->tax_due ?? 0) * 100 % 100;
+    
+        // Define the PDF template path
+        $pdfTemplatePath = public_path('pdfs/2551Q_Editable.pdf');
+    
+        // Check if the PDF template exists
+        if (!file_exists($pdfTemplatePath)) {
+            return dd('PDF template not found at: ' . $pdfTemplatePath);
+        }
+    
+        // Create a new PDF instance
+        $pdf = new \mikehaertl\pdftk\Pdf($pdfTemplatePath);
+    
+        // Fill the PDF with the data
+        $result = $pdf->fillForm($fields)
+            ->needAppearances()
+            ->saveAs(storage_path('app/public/filled_report.pdf'));
+    
+        // Check for errors
+        if (!$result) {
+            Log::error('PDF fill form error: ' . $pdf->getError());
+            return dd('PDF fill form failed: ' . $pdf->getError());
+        }
+    
+        // Check if the output PDF was created successfully
+        $outputPdfPath = storage_path('app/public/filled_report.pdf');
+        if (!file_exists($outputPdfPath)) {
+            return dd('PDF was not created at: ' . $outputPdfPath);
+        }
+    
+        // Serve the filled PDF in a view
+        return view('tax_return.percentage_report', [
+            'taxReturn' => $taxReturn,
+            'pdfPath' => asset('storage/filled_report.pdf'), // Serve the PDF from public storage
+        ]);
+    }
+    
+    
+
 
     
 
