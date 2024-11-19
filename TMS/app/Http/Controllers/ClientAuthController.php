@@ -92,18 +92,19 @@ class ClientAuthController extends Controller
     }
 
     // Handle sending password reset link
+
     public function sendResetLink(Request $request)
-    {
-        $request->validate(['email' => 'required|email']);
+        {
+            $request->validate(['email' => 'required|email']);
 
-        $status = Password::broker('client_accounts')->sendResetLink(
-            $request->only('email')
-        );
+            $status = Password::broker('client_accounts')->sendResetLink(
+                $request->only('email')
+            );
 
-        return $status === Password::RESET_LINK_SENT
-            ? redirect()->route('client.check-mail')->with('status', __($status))
-            : back()->withErrors(['email' => __($status)]);
-    }
+            return $status === Password::RESET_LINK_SENT
+                ? back()->with(['status' => __($status)])
+                : back()->withErrors(['email' => __($status)]);
+        }
 
 
     // Show Reset Password Form
