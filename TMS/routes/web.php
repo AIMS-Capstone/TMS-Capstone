@@ -198,7 +198,7 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
 
         //Sales Book routings
         Route::get('/sales-book', [SalesController::class, 'sales'])->name('sales-book');
-        Route::get('sales-book/posted', [SalesController::class, 'posted'])->name('posted');
+        Route::get('sales-book/posted', [SalesController::class, 'posted'])->name('salesPosted');
         Route::post('/sales-book/post', [SalesController::class, 'updateToPosted'])->name('.updateToPosted');
         Route::post('/sales-book/draft', [SalesController::class, 'updateToDraft'])->name('.updateToDraft');
         Route::get('/sales-book/export', [SalesController::class, 'exportSalesBook'])->name('sales.exportExcel');
@@ -206,7 +206,7 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
 
         //Purchase Book routings
         Route::get('/purchase-book', [PurchaseController::class, 'purchase'])->name('purchase-book');
-        Route::get('purchase-book/posted', [PurchaseController::class, 'posted'])->name('posted');
+        Route::get('purchase-book/posted', [PurchaseController::class, 'posted'])->name('purchasePosted');
         Route::post('/purchase-book/post', [PurchaseController::class, 'updateToPosted'])->name('.updateToPosted');
         Route::post('/purchase-book/draft', [PurchaseController::class, 'updateToDraft'])->name('.updateToDraft');
         Route::get('/purchase-book/export', [PurchaseController::class, 'exportPurchaseBook'])->name('purchase.exportExcel');
@@ -214,7 +214,7 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
 
         //Cash receipt routings
         Route::get('/cash-receipt', [CashReceiptController::class, 'cashReceipt'])->name('cash-receipt');
-        Route::get('cash-receipt/posted', [CashReceiptController::class, 'posted'])->name('posted');
+        Route::get('cash-receipt/posted', [CashReceiptController::class, 'posted'])->name('receiptPosted');
         Route::post('/cash-receipt/post', [CashReceiptController::class, 'updateToPosted'])->name('.updateToPosted');
         Route::post('/cash-receipt/draft', [CashReceiptController::class, 'updateToDraft'])->name('.updateToDraft');
         Route::get('/cash-receipt/export', [CashReceiptController::class, 'exportCashReceipt'])->name('cash_receipt.exportExcel');
@@ -222,7 +222,7 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
 
         //Cash disbursement routings
         Route::get('/cash-disbursement', [CashDisbursementController::class, 'cashDisbursement'])->name('cash-disbursement');
-        Route::get('cash-disbursement/posted', [CashDisbursementController::class, 'posted'])->name('posted');
+        Route::get('cash-disbursement/posted', [CashDisbursementController::class, 'posted'])->name('disbPosted');
         Route::post('/cash-disbursement/post', [CashDisbursementController::class, 'updateToPosted'])->name('.updateToPosted');
         Route::post('/cash-disbursement/draft', [CashDisbursementController::class, 'updateToDraft'])->name('.updateToDraft');
         Route::get('/cash-disbursement/export', [CashDisbursementController::class, 'exportCashDisbursement'])->name('cash_disbursement.exportExcel');

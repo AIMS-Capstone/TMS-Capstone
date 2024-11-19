@@ -172,7 +172,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                 <li>
                                     <a href="{{ route('cash-receipt') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
                                     {{ request()->routeIs('cash-receipt') ? 'sidebar-submenu-active' : '' }}">
-                                        Cash Receipt Journal
+                                        Cash Receipt Book
                                     </a>
                                 </li>
                                 <li>

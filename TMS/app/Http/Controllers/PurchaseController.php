@@ -32,6 +32,7 @@ class PurchaseController extends Controller
         $startMonth = $request->input('start_month');
         $endMonth = $request->input('end_month');
         $search = $request->input('search');
+        $perPage = $request->input('perPage', 5);
 
         // Query to fetch only draft purchase transactions for the organization
         $query = Transactions::where('status', 'draft')
@@ -62,7 +63,7 @@ class PurchaseController extends Controller
                 ->orWhere('reference', 'LIKE', "%{$search}%");
         }
 
-        $transactions = $query->paginate(5);
+        $transactions = $query->paginate($perPage);
 
         return view('purchase-book', compact('transactions'));
     }
@@ -77,6 +78,7 @@ class PurchaseController extends Controller
         $startMonth = $request->input('start_month');
         $endMonth = $request->input('end_month');
         $search = $request->input('search');
+        $perPage = $request->input('perPage', 5);
 
         // Query to fetch only posted purchase transactions for the organization
         $query = Transactions::where('status', 'posted')
@@ -106,7 +108,7 @@ class PurchaseController extends Controller
                 ->orWhere('reference', 'LIKE', "%{$search}%");
         }
 
-        $transactions = $query->paginate(5);
+        $transactions = $query->paginate($perPage);
 
         return view('components.purchase-posted', compact('transactions'));
     }
