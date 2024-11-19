@@ -231,7 +231,7 @@
                                     <b class="taxuri-color">TAXURI</b> is designed to do more than just keep track of your financials—it helps you look ahead.
                                 </p>
                                 <div class="flex justify-center mt-4"> <!-- Added flex container to center the button -->
-                                    <button onclick="location.reload();" class="bg-blue-900 text-white text-sm font-semibold py-2 px-4 rounded-lg flex items-center">
+                                    <button onclick="location.reload();" class="bg-blue-900 hover:bg-blue-950 text-white text-sm font-semibold py-2 px-4 rounded-lg flex items-center">
                                         <span class="mr-2"> <!-- Add margin to the right of the SVG for spacing -->
                                             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
                                                 <path fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4m-4 4a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>

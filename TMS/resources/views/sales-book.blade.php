@@ -39,7 +39,7 @@
                                     <a href="sales-book/posted">
                                         <button @click="selectedTab = 'Posted'" :aria-selected="selectedTab === 'Posted'" 
                                         :tabindex="selectedTab === 'Posted' ? '0' : '-1'" 
-                                        :class="selectedTab === 'Posted' ? 'font-bold box-border text-sky-900 border-b-4 border-sky-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-sky-900 hover:text-sky-900'"
+                                        :class="selectedTab === 'Posted' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'"
                                         class="h-min py-2 text-base" 
                                             type="button" 
                                             role="tab" 
@@ -110,7 +110,7 @@
                                     </svg>
                                     <span class="text-zinc-700 transition group-hover:text-green-500 text-sm">Add Filter</span>
                                 </button>
-                                <button @click="resetFilters" class="text-sm text-zinc-700 whitespace-nowrap">
+                                <button @click="resetFilters" class="text-sm text-zinc-700 hover:text-zinc-900 whitespace-nowrap">
                                     Clear all filters
                                 </button>
                             </div>
@@ -215,7 +215,7 @@
                                             <input 
                                             type="search" 
                                             name="search" 
-                                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900 focus:border-sky-900" 
+                                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900" 
                                             aria-label="Search Term" 
                                             placeholder="Search..." 
                                             @input.debounce="$el.form.requestSubmit()" 

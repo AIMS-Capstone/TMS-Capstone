@@ -213,6 +213,7 @@ class ClientAuthController extends Controller
         $endMonth = $request->input('end_month');
         $search = $request->input('search');
         $status = $request->input('status');
+        $perPage = $request->input('perPage', 5);
 
         $query = TaxReturn::with('user'); 
 
@@ -242,7 +243,7 @@ class ClientAuthController extends Controller
             });
         }
 
-        $taxReturns = $query->paginate(10);
+        $taxReturns = $query->paginate($perPage);
 
         return view('client.forms', compact('taxReturns'));
     }
