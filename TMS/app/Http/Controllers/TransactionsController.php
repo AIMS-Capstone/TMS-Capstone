@@ -136,6 +136,51 @@ class TransactionsController extends Controller
 
     return response()->json($transactions);
 }
+public function getAllTransactions(Request $request)
+{
+    // Get organization from session
+    $organization = OrgSetup::find(session('organization_id'));
+    $organizationStartDate = Carbon::parse($organization->start_date);
+
+    $startDate = null;
+    $endDate = null;
+
+    // Retrieve year and month from the tax return
+    $year = $request->taxReturnYear;  // Passed from the frontend
+    $monthOrQuarter = $request->taxReturnMonth;  // Passed from the frontend
+
+    // Determine the date range based on the tax return's year and month/quarter
+    if (is_numeric($monthOrQuarter)) {
+        // Month selection
+        $startDate = Carbon::create($year, $monthOrQuarter, 1)->startOfMonth();
+        $endDate = Carbon::create($year, $monthOrQuarter, 1)->endOfMonth();
+    } else {
+        // Quarter selection
+        $startMonth = $organizationStartDate->month;
+
+        if ($monthOrQuarter == 'Q1') {
+            $startDate = Carbon::create($year, $startMonth, 1);
+            $endDate = $startDate->copy()->addMonths(2)->endOfMonth();
+        } else if ($monthOrQuarter == 'Q2') {
+            $startDate = Carbon::create($year, $startMonth + 3, 1);
+            $endDate = $startDate->copy()->addMonths(2)->endOfMonth();
+        } else if ($monthOrQuarter == 'Q3') {
+            $startDate = Carbon::create($year, $startMonth + 6, 1);
+            $endDate = $startDate->copy()->addMonths(2)->endOfMonth();
+        } else if ($monthOrQuarter == 'Q4') {
+            $startDate = Carbon::create($year, $startMonth + 9, 1);
+            $endDate = $startDate->copy()->addMonths(2)->endOfMonth();
+        }
+    }
+
+    // Fetch transactions with type 'sales' within the calculated date range
+    $transactions = Transactions::with("contactDetails")
+        ->where('organization_id', session('organization_id'))
+        ->whereBetween('date', [$startDate, $endDate])
+        ->get();
+
+    return response()->json($transactions);
+}
 
     public function deactivate(Request $request)
     {

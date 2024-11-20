@@ -83,6 +83,7 @@ Route::middleware([
     Route::get('/tax-returns/{taxReturn}/percentage-summary', [TaxReturnController::class, 'showPercentageSummaryPage'])
     ->name('tax-returns.percentage-summary');
     Route::post('/tax-return-transaction/sales', [TransactionsController::class, 'getSalesTransactions']);
+    Route::post('/tax-return-transaction/all_transactions', [TransactionsController::class, 'getAllTransactions']);
     Route::post('/tax-return-transaction/add-percentage', [TransactionsController::class, 'addPercentage'])->name('tax_return_transaction.addPercentage');
     Route::get('/org-setup', [OrgSetupController::class, 'index'])->name('org-setup');
     Route::post('/org-setup', [OrgSetupController::class, 'store'])->name('OrgSetup.store');
@@ -163,6 +164,8 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
         })->name('contacts');
         Route::post('tax-return/{taxReturn}/2551q', [TaxReturnController::class, 'store2551Q'])
         ->name('tax_return.store2551Q');
+        Route::post('tax-return/{taxReturn}/2551q', [TaxReturnController::class, 'store2550Q'])
+        ->name('tax_return.store2550Q');
         Route::post('/tax-return-transaction/deactivate', [TransactionsController::class, 'deactivate'])
     ->name('tax-return-transaction.deactivate');
         // Tax Return Routes
@@ -170,13 +173,15 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
         Route::get('/vat_return', [TaxReturnController::class, 'vatReturn'])->name('vat_return');
         Route::get('/percentage_return/{id}/report', [TaxReturnController::class, 'showPercentageReport'])
     ->name('percentage_return.report');
+    Route::get('/vat_return/{id}/report', [TaxReturnController::class, 'showVatReport'])
+    ->name('tax_return.report');
         Route::get('/percentage_return', [TaxReturnController::class, 'percentageReturn'])->name('percentage_return');
         Route::get('/percentage_return/{taxReturn}/slsp-data', [TaxReturnController::class, 'showPercentageSlspData'])->name('percentage_return.slsp_data');
         Route::post('/percentage_return', [TaxReturnController::class, 'storePercentage']);
         Route::post('/vat_return', [TaxReturnController::class, 'store']);
         Route::get('/tax_return/{taxReturn}/slsp-data', [TaxReturnController::class, 'showSlspData'])->name('tax_return.slsp_data');
+        Route::get('/tax_return/{taxReturn}/summary', [TaxReturnController::class, 'showSummary'])->name('tax_return.summary');
         Route::get('/summary', [TaxReturnController::class, 'showSummary'])->name('summary');
-        Route::get('/tax_return/{taxReturn}/report', [TaxReturnController::class, 'showReport'])->name('tax_return.report');
         Route::get('/notes-activity', [TaxReturnController::class, 'showNotesActivity'])->name('notes_activity');
 
         // Charts of Accounts (CoA) Routes
