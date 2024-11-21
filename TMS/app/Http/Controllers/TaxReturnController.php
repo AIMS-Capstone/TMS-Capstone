@@ -128,6 +128,84 @@ class TaxReturnController extends Controller
     ));
 }
 
+public function showVatReport($id)
+{
+    $taxReturn = TaxReturn::findOrFail($id);
+    $organization_id = session("organization_id");
+
+    // Ensure correct relationship loading with lowercase 'rdo'
+    $organization = OrgSetup::with("rdo")
+        ->where('id', $organization_id)
+        ->first();
+
+    $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
+
+    // Parse the start_date using Carbon
+    $startDate = Carbon::parse($organization->start_date);
+
+    // Determine the year ended based on the start_date
+    $yearEnded = null;
+    if ($startDate->month == 1 && $startDate->day == 1) {
+        // Calendar year - Ends on December 31 of the next year
+        $yearEnded = $startDate->addYear()->endOfYear();
+    } else {
+        // Fiscal year - Ends on the last day of the same month next year
+        $yearEnded = $startDate->addYear()->lastOfMonth();
+    }
+    // Check whether the organization follows a calendar or fiscal period
+    $period = ($yearEnded->month == 12 && $yearEnded->day == 31) ? 'calendar' : 'fiscal';
+
+    // Format the year ended date as 'YYYY-MM'
+    $yearEndedFormatted = $yearEnded->format('Y-m');
+    $yearEndedFormattedForDisplay = $yearEnded->format('m/Y'); // e.g., "12/2024"
+
+    // Get the transaction IDs related to this tax return
+    $transactionIds = $taxReturn->transactions->pluck('id');
+
+    // Get the TaxRows and calculate the summary data
+    $taxRows = TaxRow::whereHas('transaction', function ($query) use ($transactionIds) {
+        $query->where('tax_type', 2)
+              ->where('transaction_type', 'sales')
+              ->where('status', 'draft')
+              ->whereIn('id', $transactionIds);
+    })->with(['transaction.contactDetails', 'atc', 'taxType'])
+      ->get();
+
+    // Group the TaxRows by ATC and calculate the summary
+    $groupedData = $taxRows->groupBy(function ($taxRow) {
+        return $taxRow->atc->tax_code; // Group by ATC code
+    });
+
+    $summaryData = $groupedData->map(function ($group) {
+        $taxableAmount = 0;
+        $taxRate = 0;
+        $taxDue = 0;
+
+        foreach ($group as $taxRow) {
+            $taxableAmount += $taxRow->net_amount;
+            $taxRate = $taxRow->atc->tax_rate;
+            $taxDue += $taxRow->atc_amount;
+        }
+
+        return [
+            'taxable_amount' => $taxableAmount,
+            'tax_rate' => $taxRate,
+            'tax_due' => $taxDue,
+        ];
+    });
+
+    // Pass the summary data to the view
+    return view('tax_return.vat_report_preview', compact(
+        'taxReturn',
+        'organization',
+        'yearEndedFormatted',
+        'yearEndedFormattedForDisplay',
+        'period',
+        'rdoCode',
+        'summaryData' // Add the summary data to the view
+    ));
+}
+
 
     public function percentageReturn()
     {
@@ -342,16 +420,119 @@ class TaxReturnController extends Controller
          return redirect()->route('tax_return.2551q.pdf', ['taxReturn' => $taxReturn])
         ->with('success', 'Tax return successfully submitted and PDF generated.');
      }
+     public function showSlspData(TaxReturn $taxReturn, Request $request)
+     {
+         // Retrieve the selected type from the request
+         $type = $request->get('type', 'sales'); // Default to 'sales' if no type is provided
+     
+         // Get the transaction IDs linked to this tax return
+         $transactionIds = $taxReturn->transactions->pluck('id');
+     
+         // Define the query
+         $paginatedTaxRows = TaxRow::where(function ($query) use ($type) {
+             if ($type === 'capital_goods') {
+                 // Filter for Capital Goods
+                 $query->whereHas('taxType', function ($q) {
+                     $q->where('tax_type', 'Capital Goods');
+                 });
+             } elseif ($type === 'importation') {
+                 // Filter for Importation of Goods
+                 $query->whereHas('taxType', function ($q) {
+                     $q->where('tax_type', 'Importation of Goods');
+                 });
+             } elseif ($type === 'sales') {
+                 // Filter for Sales
+                 $query->whereHas('transaction', function ($q) {
+                     $q->where('transaction_type', 'sales');
+                 })->whereHas('taxType', function ($q) {
+                     $q->where('tax_type', '!=', 'Percentage Tax'); // Exclude Percentage Tax
+                 });
+             } elseif ($type === 'purchases') {
+                 // Filter for Purchases
+                 $query->whereHas('transaction', function ($q) {
+                     $q->where('transaction_type', 'purchase');
+                 })->whereDoesntHave('taxType', function ($q) {
+                     $q->whereIn('tax_type', ['Capital Goods', 'Importation of Goods']); // Exclude Capital Goods and Importation
+                 });
+             }
+         })
+         ->whereHas('transaction', function ($query) use ($transactionIds) {
+             $query->whereIn('id', $transactionIds); // Ensure transactions belong to the current tax return
+         })
+         ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load relationships
+         ->paginate(5);
+     
+         return view('tax_return.vat_show', compact('taxReturn', 'paginatedTaxRows', 'type'));
+     }
      
      
+     public function showSummary(TaxReturn $taxReturn, Request $request)
+     {
+         // Get the transaction IDs linked to this tax return
+         $transactionIds = $taxReturn->transactions->pluck('id');
      
-    public function showSlspData(TaxReturn $taxReturn)
-    {
-      
-        $transactions = $taxReturn->transactions()->with('taxRows')->paginate(10); 
-
-        return view('tax_return.vat_show', compact('taxReturn', 'transactions'));
-    }
+         // Get the tax rows and eager load taxType to access tax_rate and transaction_type
+         $taxRows = TaxRow::whereIn('transaction_id', $transactionIds)
+             ->with('taxType') // Eager load taxType to get transaction_type and tax_rate
+             ->get();
+     
+         // Initialize an array to store the summary data, grouped by tax type
+         $summaryData = [];
+     
+         foreach ($taxRows as $taxRow) {
+             $taxType = $taxRow->taxType; // Get the tax type relationship
+             $transactionType = $taxType->transaction_type; // Get transaction_type from taxType
+     
+             // Only process rows with a valid transaction type and tax type
+             if ($taxType && $transactionType) {
+                 // Get the tax rate from the taxType
+                 $tax_rate = $taxType->VAT;
+     
+                 // Initialize the tax type if not already present in the summaryData
+                 if (!isset($summaryData[$taxType->tax_type])) {
+                     $summaryData[$taxType->tax_type] = [
+                         'net_amount' => 0,
+                         'tax_amount' => 0,
+                         'tax_rate' => $tax_rate,
+                         'transaction_type' => $transactionType, // Store transaction type for later use
+                     ];
+                 }
+     
+                 // Aggregate the amounts based on the tax type
+                 $summaryData[$taxType->tax_type]['net_amount'] += $taxRow->net_amount;
+                 $summaryData[$taxType->tax_type]['tax_amount'] += $taxRow->tax_amount;
+             }
+         }
+     
+         // Convert the summary data into a collection
+         $summaryCollection = collect($summaryData)->map(function ($item, $key) {
+             return [
+                 'tax_type' => $key,
+                 'vatable_sales' => $item['net_amount'],
+                 'tax_due' => $item['tax_amount'],
+                 'tax_rate' => $item['tax_rate'],
+             ];
+         });
+     
+         // Paginate the summary data
+         $perPage = 5; // Number of items per page
+         $currentPage = LengthAwarePaginator::resolveCurrentPage();
+         $currentItems = $summaryCollection->slice(($currentPage - 1) * $perPage, $perPage)->all();
+     
+         // Create the LengthAwarePaginator instance
+         $paginatedSummaryData = new LengthAwarePaginator(
+             $currentItems,
+             $summaryCollection->count(),
+             $perPage,
+             $currentPage,
+             ['path' => LengthAwarePaginator::resolveCurrentPath()]
+         );
+     
+         // Return the view with the paginated summary data
+         return view('tax_return.vat_summary', compact('taxReturn', 'paginatedSummaryData'));
+     }
+     
+     
     
     public function showPercentageSlspData(TaxReturn $taxReturn)
     {
