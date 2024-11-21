@@ -117,7 +117,6 @@
                                                         type="checkbox" 
                                                         :checked="selectedRows.includes(@json($transaction->id))" 
                                                         @click="toggleCheckbox(@json($transaction->id))" 
-                                                        aria-label="Select item {{ $transaction->contactDetails->bus_name }}" 
                                                         data-transaction-user-id="{{ $transaction->id }}"
                                                     >
                                                 </td>

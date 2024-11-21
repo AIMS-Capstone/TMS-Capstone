@@ -28,7 +28,7 @@
 
             <div class="flex items-center space-x-4 pl-6">
                 <div class="text-blue-900 text-4xl rounded-full flex items-center justify-center font-bold">
-                    {{$unfiledTaxReturnCount}}
+                    {{$pendingTaxReturnCount}}
                 </div>
 
                 <div>
@@ -83,51 +83,50 @@
                     <button id="tab-completed" onclick="showTab('completed')" class="tab-btn text-blue-900 text-sm font-semibold py-2 px-4 rounded-full focus:outline-none">Completed</button>
                 </div>
                 
-                {{-- Still needs backend here --}}
                 <!-- List of Reminders with Scrollable Sections -->
                 <ul id="today" class="mt-4 space-y-2 overflow-y-auto max-h-64 tab-content">
-                    {{-- @forelse ($todayTaxReturns as $taxReturn) --}}
+                    @forelse ($todayTaxReturns as $taxReturn)
                         <li class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                            {{-- <span class="text-sm font-semibold text-gray-800">{{ $taxReturn->title }}</span>
-                            <span class="text-sm font-semibold text-blue-700">{{ $taxReturn->created_at->format('F d, Y') }}</span> --}}
+                            <span class="text-sm font-semibold text-gray-800">{{ $taxReturn->title }}</span>
+                            <span class="text-sm font-semibold text-blue-700">{{ $taxReturn->created_at->format('F d, Y') }}</span>
                             <a href="#" class="text-sm text-blue-600 hover:underline">View Details</a>
                         </li>
-                    {{-- @empty --}}
+                    @empty
                         <div class="flex flex-col items-center p-8 text-gray-500">
                             <i class="fas fa-info-circle text-3xl mb-2"></i>
                             <p class="text-lg">No tax returns due today.</p>
                         </div>
-                    {{-- @endforelse --}}
+                    @endforelse
                 </ul>
 
                 <ul id="upcoming" class="mt-4 space-y-2 overflow-y-auto max-h-64 tab-content hidden">
-                    {{-- @forelse ($upcomingTaxReturns as $taxReturn) --}}
+                    @forelse ($upcomingTaxReturns as $taxReturn)
                         <li class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                            {{-- <span class="text-sm font-semibold text-gray-800">{{ $taxReturn->title }}</span>
-                            <span class="text-sm font-semibold text-blue-700">{{ $taxReturn->created_at->format('F d, Y') }}</span> --}}
+                            <span class="text-sm font-semibold text-gray-800">{{ $taxReturn->title }}</span>
+                            <span class="text-sm font-semibold text-blue-700">{{ $taxReturn->created_at->format('F d, Y') }}</span>
                             <a href="#" class="text-sm text-blue-600 hover:underline">View Details</a>
                         </li>
-                    {{-- @empty --}}
+                    @empty
                         <div class="flex flex-col items-center p-8 text-gray-500">
                             <i class="fas fa-info-circle text-3xl mb-2"></i>
                             <p class="text-lg">No upcoming tax returns.</p>
                         </div>
-                    {{-- @endforelse --}}
+                    @endforelse
                 </ul>
 
                 <ul id="completed" class="mt-4 space-y-2 overflow-y-auto max-h-64 tab-content hidden">
-                    {{-- @forelse ($completedTaxReturns as $taxReturn) --}}
+                    @forelse ($completedTaxReturns as $taxReturn)
                         <li class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                            {{-- <span class="text-sm font-semibold text-gray-800">{{ $taxReturn->title }}</span>
-                            <span class="text-sm font-semibold text-blue-700">{{ $taxReturn->created_at->format('F d, Y') }}</span> --}}
+                            <span class="text-sm font-semibold text-gray-800">{{ $taxReturn->title }}</span>
+                            <span class="text-sm font-semibold text-blue-700">{{ $taxReturn->created_at->format('F d, Y') }}</span>
                             <a href="#" class="text-sm text-blue-600 hover:underline">View Details</a>
                         </li>
-                    {{-- @empty --}}
+                    @empty
                         <div class="flex flex-col items-center p-8 text-gray-500">
                             <i class="fas fa-info-circle text-3xl mb-2"></i>
                             <p class="text-lg">No completed tax returns.</p>
                         </div>
-                    {{-- @endforelse --}}
+                    @endforelse
                 </ul>
                   
             </div>
@@ -200,21 +199,22 @@
 </div>
 
 <script>
-    function showTab(tabName) {
-        // Hide all tab contents
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
-        // Remove active class from all buttons
-        document.querySelectorAll('.tab-btn').forEach(button => button.classList.remove('bg-blue-900', 'text-white'));
-        
-        // Show the selected tab and add active styles to the button
-        document.getElementById(tabName).classList.remove('hidden');
-        document.getElementById(`tab-${tabName}`).classList.add('bg-blue-900', 'text-white');
-    }
-
-    // Initialize by setting the default tab
-    document.addEventListener("DOMContentLoaded", function() {
-        showTab('today');
+   function showTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+    
+    // Reset all buttons to their inactive state
+    document.querySelectorAll('.tab-btn').forEach(button => {
+        button.classList.remove('bg-blue-900', 'text-white'); // Remove active styles
+        button.classList.add('text-blue-900'); // Add inactive text color
     });
+    
+    // Show the selected tab and apply active styles to the button
+    document.getElementById(tabName).classList.remove('hidden');
+    const activeButton = document.getElementById(`tab-${tabName}`);
+    activeButton.classList.remove('text-blue-900'); // Remove inactive text color
+    activeButton.classList.add('bg-blue-900', 'text-white'); // Add active styles
+}
     // function activateTab(tabId) {
     //     document.querySelectorAll('[role="tabpanel"]').forEach(function(panel) {
     //         panel.classList.add('hidden');
