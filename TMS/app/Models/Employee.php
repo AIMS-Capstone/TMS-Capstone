@@ -8,40 +8,39 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
 
-class Contacts extends Model
+class Employee extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'contact_type',
-        'bus_name',
-        'contact_email',
-        'contact_phone',
-        'contact_tin',
-        'revenue_tax_type',
-        'revenue_atc',
-        'revenue_chart_accounts',
-        'expense_tax_type',
-        'expense_atc',
-        'expense_chart_accounts',
-        'contact_address',
-        'contact_city',
-        'contact_zip',
-        'organization_id', 
+        'first_name',
+        'middle_name',
+        'last_name',
+        'suffix',
+        'date_of_birth',
+        'tin',
+        'nationality',
+        'contact_number',
+        'organization_id',
         'deleted_by',
     ];
 
-    /**
-     * Relationship with Transactions (if needed)
-     */
-    public function transactions()
+    public function address()
     {
-        return $this->hasMany(Transactions::class, 'contact'); // Adjust 'contact_id' if different
+        return $this->morphOne(Address::class, 'addressable');
     }
 
-    /**
-     * Relationship with Organization (if applicable)
-     */
+    public function employments()
+    {
+        return $this->hasMany(Employment::class);
+        
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transactions::class, 'contact'); 
+    }
+
     public function organization()
     {
         return $this->belongsTo(OrgSetup::class, 'organization_id');
@@ -65,4 +64,5 @@ class Contacts extends Model
         });
 
     }
+
 }
