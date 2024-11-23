@@ -31,6 +31,7 @@ class GeneralJournalController extends Controller
         $endMonth = $request->input('end_month');
         $search = $request->input('search');
         $status = $request->input('status'); // New status filter
+        $perPage = $request->input('perPage', 5);
 
         $query = Transactions::with('taxRows.coaAccount')
             ->where('transaction_type', 'Journal')
@@ -63,7 +64,7 @@ class GeneralJournalController extends Controller
                 ->orWhere('reference', 'LIKE', "%{$search}%");
         }
 
-        $transactions = $query->paginate(5);
+        $transactions = $query->paginate($perPage);
 
         return view('general-journal', compact('transactions'));
     }

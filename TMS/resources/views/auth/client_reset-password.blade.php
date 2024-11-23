@@ -7,6 +7,9 @@
 
         <x-validation-errors class="mb-4" />
         <div class="relative w-96 border-b-2 border-blue-950/100 pb-4 mx-auto"></div>
+        <div class="flex justify-center">
+            <span class="bg-yellow-100 mt-4 text-yellow-600 font-bold text-xs px-3 pt-1 rounded-full">Client</span>
+        </div>
         <p class="font-extrabold text-3xl text-center auth-color mt-2">Create New Password</p>
         <p class="font-normal mt-2 text-base text-center taxuri-text mb-6">Your new password must be different<br>from previous used passwords</p>
 
@@ -53,7 +56,7 @@
                     {{ __('Reset Password') }}
                 </x-create-pass-button>
             </div>
-            <div x-show="showModal" x-data="{show: false}" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30" x-cloak>
+            <div x-show="showModal" x-data="{show: false}" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30">
                 <div class="bg-white rounded-lg shadow-lg p-6 text-center max-w-lg w-full">
                     <!-- Centered Image -->
                     <div class="flex justify-center mb-4">
@@ -120,6 +123,7 @@
             document.getElementById('password_confirmation').classList.toggle('border-emerald-500', passwordsMatch);
 
             resetButton.disabled = !isValid;
+            resetButton.classList.toggle('disabled', !isValid);
         }
         </script>
     </x-auth-create-pass>

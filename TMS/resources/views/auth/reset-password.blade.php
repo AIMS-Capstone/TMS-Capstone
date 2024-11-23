@@ -52,7 +52,7 @@
                     {{ __('Reset Password') }}
                 </x-create-pass-button>
             </div>
-            <div x-show="showModal" x-data="{show: false}" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30">
+            <div x-show="showModal" x-data="{show: false}" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30" x-cloak>
                 <div class="bg-white rounded-lg shadow-lg p-6 text-center max-w-lg w-full">
                     <!-- Centered Image -->
                     <div class="flex justify-center mb-4">

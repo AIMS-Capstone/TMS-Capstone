@@ -32,6 +32,7 @@ class CashDisbursementController extends Controller
         $startMonth = $request->input('start_month');
         $endMonth = $request->input('end_month');
         $search = $request->input('search');
+        $perPage = $request->input('perPage', 5);
 
         $query = Transactions::where('status', 'draft')
             ->where('Paidstatus', 'Paid')
@@ -62,7 +63,7 @@ class CashDisbursementController extends Controller
                 ->orWhere('reference', 'LIKE', "%{$search}%");
         }
 
-        $transactions = $query->paginate(5);
+        $transactions = $query->paginate($perPage);
 
         return view('cash-disbursement', compact('transactions'));
     }
@@ -77,6 +78,7 @@ class CashDisbursementController extends Controller
         $startMonth = $request->input('start_month');
         $endMonth = $request->input('end_month');
         $search = $request->input('search');
+        $perPage = $request->input('perPage', 5);
 
         // Query to fetch only posted Cash disbursement transactions for the organization
         $query = Transactions::where('status', 'posted')
@@ -107,7 +109,7 @@ class CashDisbursementController extends Controller
                 ->orWhere('reference', 'LIKE', "%{$search}%");
         }
 
-        $transactions = $query->paginate(5);
+        $transactions = $query->paginate($perPage);
 
         return view('components.cash-disbursement-posted', compact('transactions'));
     }

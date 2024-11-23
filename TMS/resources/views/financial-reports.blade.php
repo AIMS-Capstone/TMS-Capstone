@@ -26,87 +26,89 @@
                     </div>
                     <div class="flex justify-between items-center px-10">
                         <div class="flex items-center">            
-                            <p class="font-normal text-sm">This report is the Summary of all transactions entered in Taxuri, whether paid or not.</p>
+                            <p class="taxuri-text font-normal text-sm">This report is the Summary of all transactions entered in Taxuri, whether paid or not.</p>
                         </div>
                     </div>  
                     <br>
 
-                    <div class="text-sm grid grid-cols-8 gap-4 mx-10 overflow-x-auto whitespace-nowrap max-w-full border">
-                        <div class="flex items-center space-x-8">
-                            <div class="col-span-2 p-4 rounded-tl-lg bg-sky-50">
-                                <p class = "font-bold text-sky-900">{{ $organization->registration_name }}</p>
-                                <p class="font-normal">Income Statement for the year</p>
-                                <p class="font-normal" x-text="getFormattedDate()"></p>
+                    <div class="text-sm grid grid-cols-8 gap-4 mx-8 overflow-x-auto whitespace-nowrap max-w-full border rounded-t-lg">
+                        <div class="flex items-center space-x-6 custom-scrollbar">
+                            <div class="col-span-2 p-4 taxuri-text rounded-tl-lg bg-blue-50">
+                                <p class="text-md font-extrabold text-blue-900">{{ $organization->registration_name }}</p>
+                                <p class="text-sm font-normal">Income Statement for the year</p>
+                                <p class="text-sm font-normal" x-text="getFormattedDate()"></p>
                             </div>
 
-                            <div class="flex items-center space-x-8">
-                            <!-- Period -->
-                            <div class="flex flex-col w-32">
-                                <label for="period_select" class="font-bold text-blue-950">Period</label>
-                                <select id="period_select" x-model="period" @change="updateYearAndMonthOptions"
-                                        class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
-                                    <option value="monthly">Monthly</option>
-                                    <option value="quarterly">Quarterly</option>
-                                    <option value="annually" selected>Annually</option>
-                                </select>
-                            </div>
+                            <div class="flex items-center space-x-3">
+                                <!-- Period -->
+                                <div class="flex flex-col w-32">
+                                    <label for="period_select" class="font-bold text-blue-900">Period</label>
+                                    <select id="period_select" x-model="period" @change="updateYearAndMonthOptions"
+                                            class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        <option value="monthly">Monthly</option>
+                                        <option value="quarterly">Quarterly</option>
+                                        <option value="annually" selected>Annually</option>
+                                    </select>
+                                </div>
 
-                            <!-- Year -->
-                            <div class="flex flex-col w-32">
-                                <label for="year_select" class="font-bold text-blue-950">Year</label>
-                                <select id="year_select" x-model="selectedYear"
-                                        class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
-                                    <template x-for="year in years" :key="year">
-                                        <option :value="year" x-text="year"></option>
-                                    </template>
-                                </select>
-                            </div>
+                                <!-- Year -->
+                                <div class="h-8 border-l border-gray-200"></div>
+                                <div class="flex flex-col w-32">
+                                    <label for="year_select" class="font-bold text-blue-900">Year</label>
+                                    <select id="year_select" x-model="selectedYear"
+                                            class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        <template x-for="year in years" :key="year">
+                                            <option :value="year" x-text="year"></option>
+                                        </template>
+                                    </select>
+                                </div>
 
-                            <!-- Quarter (Only visible if Quarterly is selected) -->
-                            <div class="flex flex-col w-32" x-show="period === 'quarterly'">
-                                <label for="quarter_select" class="font-bold text-blue-950">Quarter</label>
-                                <select id="quarter_select" x-model="selectedQuarter"
-                                        class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
-                                    <option value="Q1">1st Quarter</option>
-                                    <option value="Q2">2nd Quarter</option>
-                                    <option value="Q3">3rd Quarter</option>
-                                    <option value="Q4">4th Quarter</option>
-                                </select>
-                            </div>
+                                <!-- Quarter (Only visible if Quarterly is selected) -->
+                                <div class="h-8 border-l border-gray-200"></div>
+                                <div class="flex flex-col w-32" x-show="period === 'quarterly'">
+                                    <label for="quarter_select" class="font-bold text-blue-900">Quarter</label>
+                                    <select id="quarter_select" x-model="selectedQuarter"
+                                            class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        <option value="Q1">1st Quarter</option>
+                                        <option value="Q2">2nd Quarter</option>
+                                        <option value="Q3">3rd Quarter</option>
+                                        <option value="Q4">4th Quarter</option>
+                                    </select>
+                                </div>
 
-                            <!-- Month (Only visible if Monthly is selected) -->
-                            <div class="flex flex-col w-32" x-show="period === 'monthly'">
-                                <label for="month_select" class="font-bold text-blue-950">Month</label>
-                                <select id="month_select" x-model="selectedMonth"
-                                        class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
-                                    <template x-for="month in months" :key="month.value">
-                                        <option :value="month.value" x-text="month.label"></option>
-                                    </template>
-                                </select>
-                            </div>
+                                <!-- Month (Only visible if Monthly is selected) -->
+                                <div class="flex flex-col w-32" x-show="period === 'monthly'">
+                                    <label for="month_select" class="font-bold text-blue-900">Month</label>
+                                    <select id="month_select" x-model="selectedMonth"
+                                            class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        <template x-for="month in months" :key="month.value">
+                                            <option :value="month.value" x-text="month.label"></option>
+                                        </template>
+                                    </select>
+                                </div>
 
-                            <!-- Status Filter -->
-                            <div class="flex flex-col w-32">
-                                <label for="status_filter" class="font-bold text-blue-950">Status</label>
-                                <select id="status_filter" name="status"
-                                        class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
-                                    
-                                    <option value="draft">Draft</option>
-                                    <option value="posted">Posted</option>
-                                </select>
-                            </div>
+                                <!-- Status Filter -->
+                                <div class="flex flex-col w-32">
+                                    <label for="status_filter" class="font-bold text-blue-900">Status</label>
+                                    <select id="status_filter" name="status"
+                                            class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        
+                                        <option value="draft">Draft</option>
+                                        <option value="posted">Posted</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <!-- Filter Buttons -->
                             <div class="h-8 border-l border-gray-200"></div>
                             <div class="flex items-center space-x-4">
-                                <button @click="applyFilters" class="flex items-center bg-white border border-gray-300 hover:border-green-500 hover:text-green-500 transition rounded-md px-4 py-2 whitespace-nowrap">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 hover:border-green-500 hover:text-green-500 transition" viewBox="0 0 32 32">
-                                        <path fill="#949494" d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5z"/>
+                                <button @click="applyFilters" class="flex items-center bg-white border border-gray-300 hover:border-green-500 hover:bg-green-100 hover:text-green-500 transition rounded-md px-4 py-2 whitespace-nowrap group">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 fill-current group-hover:fill-green-500 hover:border-green-500 hover:text-green-500 transition" viewBox="0 0 32 32">
+                                        <path fill="currentColor" d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5z"/>
                                     </svg>
-                                    <span class="text-sm">Add Filter</span>
+                                    <span class="text-zinc-700 transition group-hover:text-green-500 text-sm">Add Filter</span>
                                 </button>
-                                <button @click="resetFilters" class="text-sm text-gray-600 whitespace-nowrap pe-2">
+                                <button @click="resetFilters" class="text-sm text-zinc-700 hover:text-zinc-900 whitespace-nowrap">
                                     Clear all filters
                                 </button>
                             </div>

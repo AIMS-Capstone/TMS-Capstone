@@ -168,9 +168,9 @@
 
                 </div>
 
-                <div class="grid grid-cols-3 gap-10 mt-6">
+                <div class="grid grid-cols-12 gap-10 mt-6">
                     <!-- Purchases Tax Distribution Chart -->
-                    <div class="bg-white border rounded-lg p-6 h-[345px]">
+                    <div class="col-span-5 bg-white border rounded-lg p-6 h-[345px]">
                         <h2 class="font-semibold text-left text-zinc-700 flex items-center">
                             Purchases Tax Distribution
                             <span class="ml-2 group relative">
@@ -185,8 +185,8 @@
                         <canvas id="donutChart" width="300" height="200"></canvas>
                     </div>
                 
-                    <div class="col-span-2 grid grid-cols-2 gap-10">
-                        <div class="grid grid-rows-2 gap-4">
+                    <div class="col-span-7 flex flex-row space-x-10">
+                        <div class="grid grid-rows-2 gap-4 flex-1">
                             <!-- Projected End-of-Year Tax Liability -->
                             <div class="bg-white border rounded-lg p-6 text-left h-36"> 
                                 <h2 class="text-4xl font-bold text-left taxuri-color flex items-center">
@@ -206,26 +206,26 @@
                                 <span class="mt-4 bg-blue-100 text-blue-900 text-xs py-1 px-2 rounded-full">Full Year Projection</span>
                             </div>
                         
-                     <!-- Quarterly Tax Estimates -->
-<div class="bg-white border rounded-lg p-6 text-zinc-700 h-36 mt-5">
-    <h2 class="font-semibold text-left flex items-center">
-        Quarterly Tax Estimates
-        <span class="ml-2 group relative">
-            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="cursor-pointer group-hover:opacity-100">
-                <path fill="#3f3f46" d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2"/>
-            </svg>
-            <div class="absolute left-1/2 transform -translate-x-1/2 p-4 mt-2 w-48 text-xs font-normal text-zinc-700 bg-white border border-zinc-300 rounded-lg shadow-lg opacity-0 transition-opacity duration-200 tooltip group-hover:opacity-100">
-                This provides tax estimates for each quarter
-            </div>
-        </span>
-    </h2>
-    @foreach ($predictions['projected_quarterly_tax_estimate'] as $index => $estimate)
-        <p class="text-sm">Quarter {{ $index + 1 }} - ₱ {{ number_format($estimate, 2) }}</p>
-    @endforeach
-</div>
-
+                            <!-- Quarterly Tax Estimates -->
+                            <div class="bg-white border rounded-lg p-6 text-zinc-700 h-36 mt-5">
+                                <h2 class="font-semibold text-left flex items-center">
+                                    Quarterly Tax Estimates
+                                    <span class="ml-2 group relative">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="cursor-pointer group-hover:opacity-100">
+                                            <path fill="#3f3f46" d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2"/>
+                                        </svg>
+                                        <div class="absolute left-1/2 transform -translate-x-1/2 p-4 mt-2 w-48 text-xs font-normal text-zinc-700 bg-white border border-zinc-300 rounded-lg shadow-lg opacity-0 transition-opacity duration-200 tooltip group-hover:opacity-100">
+                                            This provides tax estimates for each quarter
+                                        </div>
+                                    </span>
+                                </h2>
+                                @foreach ($predictions['projected_quarterly_tax_estimate'] as $index => $estimate)
+                                    <p class="text-sm">Quarter {{ $index + 1 }} - ₱ {{ number_format($estimate, 2) }}</p>
+                                @endforeach
+                            </div>
                         </div>
-                
+                        
+                        {{-- Refresh Data --}}
                         <div class="flex justify-center items-center w-52 h-[345px]">
                             <div class="bg-blue-50 rounded-lg p-4 text-center">
                                 <div class="flex justify-center">
@@ -235,7 +235,7 @@
                                     <b class="taxuri-color">TAXURI</b> is designed to do more than just keep track of your financials—it helps you look ahead.
                                 </p>
                                 <div class="flex justify-center mt-4"> <!-- Added flex container to center the button -->
-                                    <button class="bg-blue-900 text-white text-sm font-semibold py-2 px-4 rounded-lg flex items-center">
+                                    <button onclick="location.reload();" class="bg-blue-900 hover:bg-blue-950 text-white text-sm font-semibold py-2 px-4 rounded-lg flex items-center">
                                         <span class="mr-2"> <!-- Add margin to the right of the SVG for spacing -->
                                             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
                                                 <path fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4m-4 4a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>
@@ -251,6 +251,8 @@
             </div>
         </div>
     </div>
+
+    
 
     <script>
     const lineLabels = @json($labels); // Pass the PHP array of labels (months)
@@ -389,7 +391,7 @@ const barData = {
                 },
                 title: {
                     display: true,
-                    text: 'Purchase Counts by Category',
+                    text: '',
                     font: {
                         family: 'Inter',
                         size: 16,

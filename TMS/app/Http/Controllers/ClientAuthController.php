@@ -92,18 +92,19 @@ class ClientAuthController extends Controller
     }
 
     // Handle sending password reset link
+
     public function sendResetLink(Request $request)
-    {
-        $request->validate(['email' => 'required|email']);
+        {
+            $request->validate(['email' => 'required|email']);
 
-        $status = Password::broker('client_accounts')->sendResetLink(
-            $request->only('email')
-        );
+            $status = Password::broker('client_accounts')->sendResetLink(
+                $request->only('email')
+            );
 
-        return $status === Password::RESET_LINK_SENT
-            ? redirect()->route('client.check-mail')->with('status', __($status))
-            : back()->withErrors(['email' => __($status)]);
-    }
+            return $status === Password::RESET_LINK_SENT
+                ? back()->with(['status' => __($status)])
+                : back()->withErrors(['email' => __($status)]);
+        }
 
 
     // Show Reset Password Form
@@ -212,6 +213,7 @@ class ClientAuthController extends Controller
         $endMonth = $request->input('end_month');
         $search = $request->input('search');
         $status = $request->input('status');
+        $perPage = $request->input('perPage', 5);
 
         $query = TaxReturn::with('user'); 
 
@@ -241,7 +243,7 @@ class ClientAuthController extends Controller
             });
         }
 
-        $taxReturns = $query->paginate(10);
+        $taxReturns = $query->paginate($perPage);
 
         return view('client.forms', compact('taxReturns'));
     }

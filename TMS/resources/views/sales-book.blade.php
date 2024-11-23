@@ -9,6 +9,11 @@
                 <div class="container mx-auto my-4 pt-4">
                     <div class="flex justify-between items-center px-10">
                         <p class="font-bold text-3xl text-left taxuri-color">Sales Book Journal</p>
+                    </div>
+                    <div class="flex justify-between items-center px-10">
+                        <div class="flex items-center">            
+                            <p class="taxuri-text font-normal text-sm">This book houses all the Sales entered in the Transactions Module.</p>
+                        </div>
                         <button type="button" onclick="exportReportExcel()" class="flex items-center text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24">
                                 <path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
@@ -16,11 +21,7 @@
                             <span>Export Report</span>
                         </button>
                     </div>
-                    <div class="flex justify-between items-center px-10">
-                        <div class="flex items-center">            
-                            <p class="taxuri-text font-normal text-sm">This book houses all the Sales entered in the Transactions Module.</p>
-                        </div>
-                    </div>  
+
                     <br>
 
                     <div class="container mx-auto ps-8">
@@ -39,7 +40,7 @@
                                     <a href="sales-book/posted">
                                         <button @click="selectedTab = 'Posted'" :aria-selected="selectedTab === 'Posted'" 
                                         :tabindex="selectedTab === 'Posted' ? '0' : '-1'" 
-                                        :class="selectedTab === 'Posted' ? 'font-bold box-border text-sky-900 border-b-4 border-sky-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-sky-900 hover:text-sky-900'"
+                                        :class="selectedTab === 'Posted' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'"
                                         class="h-min py-2 text-base" 
                                             type="button" 
                                             role="tab" 
@@ -56,7 +57,7 @@
                     <!-- Filters Row -->
                     <div class="grid grid-cols-8 gap-4 mx-10 overflow-x-auto whitespace-nowrap max-w-full custom-scrollbar">
                         <div class="flex items-center space-x-8 ps-6">
-                            <div class="col-span-2 p-4 rounded-tl-lg text-blue-900">
+                            <div class="col-span-2 p-4 text-blue-900">
                                 <p class="font-normal">Filter: <b>Sales Book Journal</b></p>
                                 <p class="font-normal" x-text="getFormattedDate()"></p>
                             </div>
@@ -110,7 +111,7 @@
                                     </svg>
                                     <span class="text-zinc-700 transition group-hover:text-green-500 text-sm">Add Filter</span>
                                 </button>
-                                <button @click="resetFilters" class="text-sm text-zinc-700 whitespace-nowrap">
+                                <button @click="resetFilters" class="text-sm text-zinc-700 hover:text-zinc-900 whitespace-nowrap">
                                     Clear all filters
                                 </button>
                             </div>
@@ -215,7 +216,7 @@
                                             <input 
                                             type="search" 
                                             name="search" 
-                                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900 focus:border-sky-900" 
+                                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900" 
                                             aria-label="Search Term" 
                                             placeholder="Search..." 
                                             @input.debounce="$el.form.requestSubmit()" 
@@ -335,7 +336,7 @@
                                                 @endforeach
                                             @else
                                                 <tr>
-                                                    <td colspan="9" class="text-center p-6">
+                                                    <td colspan="8" class="text-center p-6">
                                                         <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
                                                         <h1 class="font-extrabold mt-4">No Sales Transactions Available</h1>
                                                         <p class="text-sm text-neutral-500 mt-2">You can start adding new sales transactions by <br> going to the transactions page.</p>
@@ -346,7 +347,7 @@
                                     </table>
                                     @if (count($transactions) > 0)
                                         <div class="mt-4">
-                                            {{ $transactions->links('vendor.pagination.custom') }}
+                                            {{ $transactions->links('vendor.pagination.sales') }}
                                         </div>
                                     @endif
                                     <div x-show="showUpdateStatusButtons" class="flex justify-center py-4" x-cloak>
@@ -370,7 +371,6 @@
                             </div>
                         </div>
 
-                        
                         <!-- Confirm Posted Modal -->
                         <div x-show="showConfirmUpdateModal" 
                             x-cloak 
@@ -399,8 +399,8 @@
                                     <h2 class="text-2xl font-extrabold text-center text-zinc-600 mb-4">Mark as Posted Item(s)</h2>
 
                                     <!-- Description -->
-                                    <p class="text-sm text-gray-600 text-center mb-6">
-                                        You're going to mark as posted the selected<br>item(s) in the Sales Book Journal table. Are you<br>sure?
+                                    <p class="text-sm text-zinc-600 text-center mb-6">
+                                        You're going to mark as posted the selected<br>item(s) in the Sales Book Journal table. <br>Are you sure?
                                     </p>
 
                                     <!-- Actions -->
@@ -431,9 +431,9 @@
                             >
                             <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
 
-                            <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative">
-                                <button @click="showSuccessModal = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2" x-show="showSuccessModal" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
+                            <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative" x-show="showSuccessModal" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
                                 x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
+                                <button @click="showSuccessModal = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2" >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
@@ -449,14 +449,12 @@
 
                                     <!-- Description -->
                                     <p class="text-sm text-zinc-600 text-center mb-6">
-                                        The selected item(s) has been successfully marked<br>as posted.
+                                        The selected item(s) has been successfully <br> marked as posted.
                                     </p>
                                 </div>
                             </div>
                         </div>
-
                     </div>
-
                 </div>
             </div>
         </div>

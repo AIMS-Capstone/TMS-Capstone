@@ -82,7 +82,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                             </a>
                         </li>
 
-                        <li x-data="{ open: {{ request()->routeIs('vat_return') ? 'true' : 'false' }} }">
+                        <li x-data="{ open: {{ request()->routeIs('vat_return', 'percentage_return') ? 'true' : 'false' }} }">
                             <button @click="open = !open" type="button"
                                 :class="{
                                     'flex items-center w-full p-2 text-[14px] ease-in transition-all duration-500 rounded-r-full hover:font-bold px-6 py-2 group': true,
@@ -172,7 +172,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                 <li>
                                     <a href="{{ route('cash-receipt') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
                                     {{ request()->routeIs('cash-receipt') ? 'sidebar-submenu-active' : '' }}">
-                                        Cash Receipt Journal
+                                        Cash Receipt Book
                                     </a>
                                 </li>
                                 <li>

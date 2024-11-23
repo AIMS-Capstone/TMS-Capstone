@@ -164,9 +164,9 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-10 mt-6">
+                <div class="grid grid-cols-12 gap-10 mt-6">
                     <!-- Purchases Tax Distribution Chart -->
-                    <div class="bg-white border rounded-lg p-6 h-[345px]">
+                    <div class="col-span-5 bg-white border rounded-lg p-6 h-[345px]">
                         <h2 class="font-semibold text-left text-zinc-700 flex items-center">
                             Purchases Tax Distribution
                             <span class="ml-2 group relative">
@@ -181,8 +181,8 @@
                         <canvas id="donutChart" width="300" height="200"></canvas>
                     </div>
                 
-                    <div class="col-span-2 grid grid-cols-2 gap-10">
-                        <div class="grid grid-rows-2 gap-4">
+                    <div class="col-span-7 flex flex-row space-x-10">
+                        <div class="grid grid-rows-2 gap-4 flex-1">
                             <!-- Projected End-of-Year Tax Liability -->
                             <div class="bg-white border rounded-lg p-6 text-left h-36"> 
                                 <h2 class="text-4xl font-bold text-left taxuri-color flex items-center">
@@ -231,7 +231,7 @@
                                     <b class="taxuri-color">TAXURI</b> is designed to do more than just keep track of your financials—it helps you look ahead.
                                 </p>
                                 <div class="flex justify-center mt-4"> <!-- Added flex container to center the button -->
-                                    <button onclick="location.reload();" class="bg-blue-900 text-white text-sm font-semibold py-2 px-4 rounded-lg flex items-center">
+                                    <button onclick="location.reload();" class="bg-blue-900 hover:bg-blue-950 text-white text-sm font-semibold py-2 px-4 rounded-lg flex items-center">
                                         <span class="mr-2"> <!-- Add margin to the right of the SVG for spacing -->
                                             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
                                                 <path fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4m-4 4a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>

@@ -5,66 +5,68 @@
         @endphp
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg" x-data="filterComponent()">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg" x-data="filterComponent()">
 
                 <div class="container mx-auto my-4 pt-4">
                     <div class="flex justify-between items-center px-10">
                         <p class="font-bold text-3xl text-left taxuri-color">Cash Disbursement Book</p>
+                    </div>
+                    <div class="flex justify-between items-center px-10">
+                        <div class="flex items-center">            
+                            <p class="taxuri-text font-normal text-sm">This book houses all the invoices that are marked as paid in the Transactions Module.</p>
+                        </div>
                         <button type="button" onclick="exportReportExcel()" class="flex items-center text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24">
                                 <path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
                             </svg>
                             <span>Export Report</span>
                         </button>
-                    </div>
-                    <div class="flex justify-between items-center px-10">
-                        <div class="flex items-center">            
-                            <p class="font-normal text-sm">This book houses all the invoices that are marked as paid in the Transactions Module.</p>
-                        </div>
                     </div>  
+
                     <br>
 
-                        <div class="container mx-auto ps-8">
-                            <div class="flex flex-row space-x-2 items-center justify-center">
-                                <div x-data="{ selectedTab: 'Draft' }" class="w-full">
-                                    <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-24 overflow-x-auto  border-neutral-300" role="tablist" aria-label="tab options">
-                                        <button @click="selectedTab = 'Draft'" :aria-selected="selectedTab === 'Draft'" 
-                                            :tabindex="selectedTab === 'Draft' ? '0' : '-1'" 
-                                            :class="selectedTab === 'Draft' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900'   : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'" 
-                                            class="h-min py-2 text-base" 
-                                            type="button"
+                    <div class="container mx-auto ps-8">
+                        <div class="flex flex-row space-x-2 items-center justify-center">
+                            <div x-data="{ selectedTab: 'Draft' }" class="w-full">
+                                <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-24 overflow-x-auto  border-neutral-300" role="tablist" aria-label="tab options">
+                                    <button @click="selectedTab = 'Draft'" :aria-selected="selectedTab === 'Draft'" 
+                                        :tabindex="selectedTab === 'Draft' ? '0' : '-1'" 
+                                        :class="selectedTab === 'Draft' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900'   : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'" 
+                                        class="h-min py-2 text-base" 
+                                        type="button"
+                                        role="tab" 
+                                        aria-controls="tabpanelDraft" >
+                                        Draft
+                                    </button>
+                                    <a href="cash-disbursement/posted">
+                                        <button @click="selectedTab = 'Posted'" :aria-selected="selectedTab === 'Posted'" 
+                                        :tabindex="selectedTab === 'Posted' ? '0' : '-1'" 
+                                        :class="selectedTab === 'Posted' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'"
+                                        class="h-min py-2 text-base" 
+                                            type="button" 
                                             role="tab" 
-                                            aria-controls="tabpanelDraft" >
-                                            Draft
+                                            aria-controls="tabpanelPosted" >Posted
                                         </button>
-                                        <a href="cash-disbursement/posted">
-                                            <button @click="selectedTab = 'Posted'" :aria-selected="selectedTab === 'Posted'" 
-                                            :tabindex="selectedTab === 'Posted' ? '0' : '-1'" 
-                                            :class="selectedTab === 'Posted' ? 'font-bold box-border text-sky-900 border-b-4 border-sky-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-sky-900 hover:text-sky-900'"
-                                            class="h-min py-2 text-base" 
-                                                type="button" 
-                                                role="tab" 
-                                                aria-controls="tabpanelPosted" >Posted
-                                            </button>
-                                        </a>
-                                    </div>
-                                </div>  
-                            </div>
+                                    </a>
+                                </div>
+                            </div>  
                         </div>
+                    </div>
+
                     <hr class="mb-4">
 
                     <!-- Filters Row -->
-                    <div class=" grid grid-cols-8 gap-4 mx-10 overflow-x-auto whitespace-nowrap max-w-full">
-                        <div class="flex items-center space-x-8">
-                            <div class="col-span-2 p-4 rounded-tl-lg">
+                    <div class=" grid grid-cols-8 gap-4 mx-10 overflow-x-auto whitespace-nowrap max-w-full custom-scrollbar">
+                        <div class="flex items-center space-x-8 ps-6">
+                            <div class="col-span-2 p-4 text-blue-900">
                                 <p class="font-normal">Filter: <b>Cash Disbursement Book</b></p>
                                 <p class="font-normal" x-text="getFormattedDate()"></p>
                             </div>
 
-                            <div class="flex items-center space-x-8">
+                            <div class="flex items-center space-x-4">
                                 <div class="flex flex-col w-32">
-                                    <label for="period_select" class="font-bold text-blue-950">Period </label>
-                                    <select id="period_select" x-model="period" @change="updateYearAndMonthOptions" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+                                    <label for="period_select" class="font-bold text-blue-900">Period </label>
+                                    <select id="period_select" x-model="period" @change="updateYearAndMonthOptions" class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                                         <option value="monthly">Monthly</option>
                                         <option value="quarterly">Quarterly</option>
                                         <option value="annually" selected>Annually</option>
@@ -73,8 +75,8 @@
                                 <div class="h-8 border-l border-gray-200"></div>
                                 <!-- Year -->
                                 <div class="flex flex-col w-32">
-                                    <label for="year_select" class="font-bold text-blue-950">Year</label>
-                                    <select id="year_select" x-model="selectedYear" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+                                    <label for="year_select" class="font-bold text-blue-900">Year</label>
+                                    <select id="year_select" x-model="selectedYear" class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                                         <template x-for="year in years" :key="year">
                                             <option :value="year" x-text="year"></option>
                                         </template>
@@ -83,8 +85,8 @@
                                 <div class="h-8 border-l border-gray-200"></div>
                                 <!-- Quarter (Only visible if Quarterly is selected) -->
                                 <div class="flex flex-col w-32" x-show="period === 'quarterly'">
-                                    <label for="quarter_select" class="font-bold text-blue-950">Quarter</label>
-                                    <select id="quarter_select" x-model="selectedQuarter" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+                                    <label for="quarter_select" class="font-bold text-blue-900">Quarter</label>
+                                    <select id="quarter_select" x-model="selectedQuarter" class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                                         <option value="Q1">1st Quarter</option>
                                         <option value="Q2">2nd Quarter</option>
                                         <option value="Q3">3rd Quarter</option>
@@ -93,8 +95,8 @@
                                 </div>
                                 <!-- Month (Only visible if Monthly is selected) -->
                                 <div class="flex flex-col w-32" x-show="period === 'monthly'">
-                                    <label for="month_select" class="font-bold text-blue-950">Month</label>
-                                    <select id="month_select" x-model="selectedMonth" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+                                    <label for="month_select" class="font-bold text-blue-900">Month</label>
+                                    <select id="month_select" x-model="selectedMonth" class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                                         <template x-for="month in months" :key="month.value">
                                             <option :value="month.value" x-text="month.label"></option>
                                         </template>
@@ -103,21 +105,21 @@
                             </div>
 
                             <!-- Filter Buttons -->
-                            <div class="h-8 border-l border-gray-200"></div>
                             <div class="flex items-center space-x-4">
-                                <button @click="applyFilters" class="flex items-center bg-white border border-gray-300 hover:border-green-500 hover:text-green-500 transition rounded-md px-4 py-2 whitespace-nowrap">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 hover:border-green-500 hover:text-green-500 transition" viewBox="0 0 32 32">
-                                        <path fill="#949494" d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5z"/>
+                                <button @click="applyFilters" class="flex items-center bg-white border border-gray-300 hover:border-green-500 hover:bg-green-100 hover:text-green-500 transition rounded-md px-4 py-2 whitespace-nowrap group">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 fill-current group-hover:fill-green-500 hover:border-green-500 hover:text-green-500 transition" viewBox="0 0 32 32">
+                                        <path fill="currentColor" d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5z"/>
                                     </svg>
-                                    <span class="text-sm">Add Filter</span>
+                                    <span class="text-zinc-700 transition group-hover:text-green-500 text-sm">Add Filter</span>
                                 </button>
-                                <button @click="resetFilters" class="text-sm text-gray-600 whitespace-nowrap">
+                                <button @click="resetFilters" class="text-sm text-zinc-700 hover:text-zinc-900 whitespace-nowrap">
                                     Clear all filters
                                 </button>
                             </div>
                         </div>  
                     </div>
-                    <hr class="my-4">
+
+                    <hr class="mt-2">
 
                     <!-- Start ng function ng table -->
                     <div
@@ -204,222 +206,259 @@
                                 return this.selectedRows.length;
                             }
                         }"
-                        class="mb-12 mx-12 overflow-hidden max-w-full rounded-md border-neutral-300 dark:border-neutral-700"
-                    >
+                        class="container mx-auto pt-2 overflow-hidden"
+                        >
+
                         <div class="container mx-auto">
                             <div class="flex flex-row space-x-2 items-center justify-between">
-                                <!-- Search row -->
-                                <div class="relative w-80 p-4">
-                                    <form x-target="cash-table" action="/cash-disbursement" role="search" aria-label="Table" autocomplete="off">
-                                        <input 
-                                        type="search" 
-                                        name="search" 
-                                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900 focus:border-sky-900" 
-                                        aria-label="Search Term" 
-                                        placeholder="Search..." 
-                                        @input.debounce="$el.form.requestSubmit()" 
-                                        @search="$el.form.requestSubmit()"
-                                        value="{{ request('search') }}"
-                                        >
-                                    </form>
-                                    <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <div class="flex flex-row space-x-2 items-center ps-8">
+                                    <!-- Search row -->
+                                    <div class="relative w-80 p-4">
+                                        <form x-target="cash-table" action="/cash-disbursement" role="search" aria-label="Table" autocomplete="off">
+                                            <input 
+                                            type="search" 
+                                            name="search" 
+                                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900" 
+                                            aria-label="Search Term" 
+                                            placeholder="Search..." 
+                                            @input.debounce="$el.form.requestSubmit()" 
+                                            @search="$el.form.requestSubmit()"
+                                            value="{{ request('search') }}"
+                                            >
+                                        </form>
+                                        <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    </div>
+                                    <!-- Sort by dropdown -->
+                                    <div class="relative inline-block text-left min-w-[150px]">
+                                        <button id="sortButton" class="flex items-center text-zinc-600">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
+                                                <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span id="selectedOption" class="font-normal text-md text-zinc-700 truncate">Sort by</span>
+                                        </button>
+                        
+                                        <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
+                                            <div class="py-2 px-2">
+                                                <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
+                                                <div data-sort="recently-added" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
+                                                <div data-sort="ascending" class="block px-4 py-2 w-full text-sm hover-dropdown">Ascending</div>
+                                                <div data-sort="descending" class="block px-4 py-2 w-full text-sm hover-dropdown">Descending</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <!-- Update Status Button -->
-                                <div class="mb-3">
-                                    <button
-                                        type="button"
+                                <div class="flex space-x-4 items-center pr-10 ml-auto">
+                                    <!-- Update Status Button -->
+                                    <button type="button"
                                         @click="showCheckboxes = !showCheckboxes; showUpdateStatusButtons = !showUpdateStatusButtons; $el.disabled = true;"
                                         :disabled="selectedRows.length === 1"
-                                        class="border px-3 py-2 rounded-lg text-sm hover:border-green-500 hover:text-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <i class="fa-solid fa-circle-check"></i> Mark as Posted
+                                        class="flex items-center border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-green-500 hover:bg-green-100 hover:text-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed group"
+                                        >
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 transition group-hover:text-green-500" viewBox="0 0 24 24"><path fill="currentColor" d="M10.5 15.25A.74.74 0 0 1 10 15l-3-3a.75.75 0 0 1 1-1l2.47 2.47L19 5a.75.75 0 0 1 1 1l-9 9a.74.74 0 0 1-.5.25"/><path fill="currentColor" d="M12 21a9 9 0 0 1-7.87-4.66a8.7 8.7 0 0 1-1.07-3.41a9 9 0 0 1 4.6-8.81a8.7 8.7 0 0 1 3.41-1.07a8.9 8.9 0 0 1 3.55.34a.75.75 0 1 1-.43 1.43a7.6 7.6 0 0 0-3-.28a7.4 7.4 0 0 0-2.84.89a7.5 7.5 0 0 0-2.2 1.84a7.42 7.42 0 0 0-1.64 5.51a7.4 7.4 0 0 0 .89 2.84a7.5 7.5 0 0 0 1.84 2.2a7.42 7.42 0 0 0 5.51 1.64a7.4 7.4 0 0 0 2.84-.89a7.5 7.5 0 0 0 2.2-1.84a7.42 7.42 0 0 0 1.64-5.51a.75.75 0 1 1 1.57-.15a9 9 0 0 1-4.61 8.81A8.7 8.7 0 0 1 12.93 21z"/>
+                                        </svg>
+                                        <span class="text-zinc-600 transition group-hover:text-green-500">Mark as Posted</span>
                                     </button>
+                                    <div class="relative inline-block space-x-4 text-left">
+                                        <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" class="flex items-center text-zinc-500 hover:text-zinc-700" type="button">
+                                            <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
+                                                <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
+                                            </svg>
+                                        </button>
+                                        <div id="dropdownDots" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-44 origin-top-right">
+                                            <div class="py-2 px-2 text-sm text-zinc-700" aria-labelledby="dropdownMenuIconButton">
+                                                <span class="block px-4 py-2 text-sm font-bold text-zinc-700 text-left">Show Entries</span>
+                                                <div onclick="setEntries(5)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">5 per page</div>
+                                                <div onclick="setEntries(25)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">25 per page</div>
+                                                <div onclick="setEntries(50)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">50 per page</div>
+                                                <div onclick="setEntries(100)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">100 per page</div>
+                                                <input type="hidden" name="search" value="{{ request('search') }}">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <hr class="flex w-full mx-auto">
 
-                        <!-- Table for Cashs -->
-                        <div class="mt-6 overflow-x-auto" id="cash-table">
-                            <table class="w-full text-left text-sm text-neutral-600 dark:text-neutral-300">
-                                <thead class="border-b border-gray-200 bg-gray-100 text-sm text-gray-600">
-                                    <tr>
-                                        <th scope="col" class="p-4">
-                                            <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-green-600">
-                                                <div class="relative flex items-center">
-                                                    <input type="checkbox" x-model="checkAll" id="checkAll" @change="toggleAll()" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-green-600 checked:before:bg-green-600 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-green-600 checked:focus:outline-green-600 active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2  peer-checked:visible text-white">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                                    </svg>
-                                                </div>
-                                            </label>
-                                        </th>
-                                        <th scope="col" class="p-4">Contact</th>
-                                        <th scope="col" class="p-2">Date</th>
-                                        <th scope="col" class="p-2">Invoice</th>
-                                        <th scope="col" class="p-2">Reference</th>
-                                        <th scope="col" class="p-2">Description</th>
-                                        <th scope="col" class="p-2">VATable Amount</th>
-                                        <th scope="col" class="p-2">Tax Exempt Amount</th>
-                                        <th scope="col" class="p-2">Zero Rated Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    
-                                    @if (count($transactions) > 0)
-                                        @foreach($transactions as $transaction)
-                                            @foreach($transaction->taxRows as $taxRow)
-                                            <tr class="border-b hover:bg-gray-50">
-                                                <td class="p-4">
-                                                    <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
+                            <hr>
+
+                            <!-- Table for Cash -->
+                            <div x-data="{ checkAll: false, currentPage: 1, perPage: 5 }" class="mb-12 mt-6 mx-12 overflow-hidden max-w-full border-neutral-300" id="cash-table">
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left text-sm text-neutral-600">
+                                        <thead class="bg-neutral-100 text-sm text-neutral-700">
+                                            <tr>
+                                                <th scope="col" class="p-4">
+                                                    <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-green-600">
                                                         <div class="relative flex items-center">
-                                                            <input type="checkbox" @change="toggleCheckbox('{{ $transaction->id }}')" :checked="selectedRows.includes('{{ $transaction->id }}')" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-green-600 checked:before:bg-green-600 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-green-600 checked:focus:outline-green-600 active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
-                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 peer-checked:visible text-white">
+                                                            <input type="checkbox" x-model="checkAll" id="checkAll" @change="toggleAll()" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-green-600 checked:before:bg-green-600 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-green-600 checked:focus:outline-green-600 active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2  peer-checked:visible text-white">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                                             </svg>
                                                         </div>
                                                     </label>
-                                                </td>
-                                                <td class="p-4">
-                                                    <strong>{{ $transaction->contactDetails->bus_name ?? 'N/A' }}</strong><br>
-                                                    {{ $transaction->contactDetails->contact_address ?? 'N/A' }}<br>
-                                                    {{ $transaction->contactDetails->contact_tin ?? 'N/A'}}
-                                                </td>
-                                                <td class="p-4">{{ \Carbon\Carbon::parse($transaction->date)->format('F d, Y') ?? 'N/A' }}</td>
-                                                <td class="p-4">{{ $transaction->inv_number }}</td>
-                                                <td class="p-4">{{ $transaction->reference }}</td>
-                                                <td class="p-4">{{ $taxRow->description }}</td>
-                                                <td class="p-4">{{ $transaction->vat_amount }}</td>
-                                                <td class="p-4">{{ $transaction->tax_exempt_amount ?? '0.00' }}</td>
-                                                <td class="p-4">{{ $transaction->zero_rated_amount ?? '0.00' }}</td>
+                                                </th>
+                                                <th scope="col" class="p-4">Contact</th>
+                                                <th scope="col" class="p-2">Date</th>
+                                                <th scope="col" class="p-2">Invoice</th>
+                                                <th scope="col" class="p-2">Reference</th>
+                                                <th scope="col" class="p-2">Description</th>
+                                                <th scope="col" class="p-2">VATable Amount</th>
+                                                <th scope="col" class="p-2">Tax Exempt Amount</th>
+                                                <th scope="col" class="p-2">Zero Rated Amount</th>
                                             </tr>
-                                            @endforeach
-                                        @endforeach
-                                    @else
-                                        <tr>
-                                            <td colspan="9" class="text-center p-6">
-                                                <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
-                                                <h1 class="font-extrabold mt-4">No Cash Disbursement Transactions Available</h1>
-                                                <p class="text-sm text-neutral-500 mt-2">You can start adding new Cash Disbursement transactions by <br> going to the transactions page.</p>
-                                            </td>
-                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                            
+                                            @if (count($transactions) > 0)
+                                                @foreach($transactions as $transaction)
+                                                    @foreach($transaction->taxRows as $taxRow)
+                                                    <tr class="border-b hover:bg-gray-50">
+                                                        <td class="p-4">
+                                                            <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
+                                                                <div class="relative flex items-center">
+                                                                    <input type="checkbox" @change="toggleCheckbox('{{ $transaction->id }}')" :checked="selectedRows.includes('{{ $transaction->id }}')" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-green-600 checked:before:bg-green-600 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-green-600 checked:focus:outline-green-600 active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 peer-checked:visible text-white">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                                                    </svg>
+                                                                </div>
+                                                            </label>
+                                                        </td>
+                                                        <td class="p-4">
+                                                            <strong>{{ $transaction->contactDetails->bus_name ?? 'N/A' }}</strong><br>
+                                                            {{ $transaction->contactDetails->contact_address ?? 'N/A' }}<br>
+                                                            {{ $transaction->contactDetails->contact_tin ?? 'N/A'}}
+                                                        </td>
+                                                        <td class="p-4">{{ \Carbon\Carbon::parse($transaction->date)->format('F d, Y') ?? 'N/A' }}</td>
+                                                        <td class="p-4">{{ $transaction->inv_number }}</td>
+                                                        <td class="p-4">{{ $transaction->reference }}</td>
+                                                        <td class="p-4">{{ $taxRow->description }}</td>
+                                                        <td class="p-4">{{ $transaction->vat_amount }}</td>
+                                                        <td class="p-4">{{ $transaction->tax_exempt_amount ?? '0.00' }}</td>
+                                                        <td class="p-4">{{ $transaction->zero_rated_amount ?? '0.00' }}</td>
+                                                    </tr>
+                                                    @endforeach
+                                                @endforeach
+                                            @else
+                                                <tr>
+                                                    <td colspan="9" class="text-center p-6">
+                                                        <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                                        <h1 class="font-extrabold mt-4">No Cash Disbursement Transactions Available</h1>
+                                                        <p class="text-sm text-neutral-500 mt-2">You can start adding new Cash Disbursement transactions by <br> going to the transactions page.</p>
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                        </tbody>
+                                    </table>
+                                    @if (count($transactions) > 0)
+                                        <div class="mt-4">
+                                            {{ $transactions->links('vendor.pagination.cash-disbursement') }}
+                                        </div>
                                     @endif
-                                </tbody>
-                            </table>
-                            @if (count($transactions) > 0)
-                                <div class="mt-4">
-                                    {{ $transactions->links('vendor.pagination.custom') }}
-                                </div>
-                            @endif
-                            <div x-show="showUpdateStatusButtons" class="flex justify-center py-4" x-cloak>
-                                <button 
-                                    @click="updateStatus" 
-                                    :disabled="selectedRows.length === 0"
-                                    class="border px-3 py-2 mx-2 rounded-lg text-sm hover:border-green-500 hover:text-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <i class="fa-solid fa-circle-check"></i> Mark as Posted Selected <span x-show="selectedCount > 0" x-text="'(' + selectedCount + ')'"></span>
-                                </button>
-                                <button 
-                                    @click="cancelSelection" 
-                                    class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
-                                >
-                                Cancel
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Confirm Posted Modal -->
-                        <div 
-                                x-show="showConfirmUpdateModal" 
-                                x-cloak 
-                                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                                @click.away="showConfirmUpdateModal = false"
-                            >
-                                <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative">
-                                    <button 
-                                        @click="showConfirmUpdateModal = false" 
-                                        class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
-                                    >
-                                        <i class="fa fa-times"></i>
-                                    </button>
-                                    <div class="flex flex-col items-center">
-                                        <!-- Icon -->
-                                        <div class="mb-6">
-                                            <div class="flex items-center justify-center w-24 h-24 rounded-full bg-green-600">
-                                                <i class="fas fa-question text-white text-6xl"></i>
-                                            </div>
-                                        </div>
-
-                                        <!-- Title -->
-                                        <h2 class="text-xl font-bold text-gray-800 mb-4">Mark as Posted Item/s</h2>
-
-                                        <!-- Description -->
-                                        <p class="text-sm text-gray-600 text-center mb-6">
-                                            You're going to mark as posted the selected item/s in the Cash Disbursement Book table. Are you sure?
-                                        </p>
-
-                                        <!-- Actions -->
-                                        <div class="flex justify-between w-full">
-                                            <button 
-                                                @click="showConfirmUpdateModal = false; showUpdateStatusButtons = true;" 
-                                                class="px-5 py-2 hover:bg-gray-400 rounded-lg text-sm text-gray-700 transition w-1/2 mr-2"
-                                            >
-                                                Cancel
-                                            </button>
-                                            <button 
-                                                @click="confirmUpdateStatus();" 
-                                                class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition w-1/2 ml-2"
-                                            >
-                                                Mark as Posted
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Success Modal -->
-                            <div 
-                                x-show="showSuccessModal" 
-                                x-cloak 
-                                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                                @click.away="showSuccessModal = false"
-                            >
-                                <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative">
-                                    <button 
-                                        @click="showSuccessModal = false" 
-                                        class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
-                                    >
-                                        <i class="fa fa-times"></i>
-                                    </button>
-                                    <div class="flex flex-col items-center">
-                                        <!-- Icon -->
-                                        <div class="mb-6">
-                                            <div class="flex items-center justify-center w-24 h-24 rounded-full bg-green-600">
-                                                <i class="fas fa-check text-white text-6xl"></i>
-                                            </div>
-                                        </div>
-
-                                        <!-- Title -->
-                                        <h2 class="text-xl font-bold text-gray-800 mb-4">Mark as Posted</h2>
-
-                                        <!-- Description -->
-                                        <p class="text-sm text-gray-600 text-center mb-6">
-                                            The selected item(s) has been successfully marked as posted.
-                                        </p>
-
-                                        <!-- Close Button -->
+                                    <div x-show="showUpdateStatusButtons" class="flex justify-center py-4" x-cloak>
                                         <button 
-                                            @click="showSuccessModal = false; cancelSelection();" 
-                                            class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition w-1/2"
-                                        >
-                                            OK
+                                            @click="updateStatus" 
+                                            :disabled="selectedRows.length === 0"
+                                            class="flex items-center border px-3 py-2 mx-2 rounded-lg text-sm text-zinc-600 hover:border-green-500 hover:bg-green-100 hover:text-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed group"
+                                            >
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 transition group-hover:text-green-500" viewBox="0 0 24 24"><path fill="currentColor" d="M10.5 15.25A.74.74 0 0 1 10 15l-3-3a.75.75 0 0 1 1-1l2.47 2.47L19 5a.75.75 0 0 1 1 1l-9 9a.74.74 0 0 1-.5.25"/><path fill="currentColor" d="M12 21a9 9 0 0 1-7.87-4.66a8.7 8.7 0 0 1-1.07-3.41a9 9 0 0 1 4.6-8.81a8.7 8.7 0 0 1 3.41-1.07a8.9 8.9 0 0 1 3.55.34a.75.75 0 1 1-.43 1.43a7.6 7.6 0 0 0-3-.28a7.4 7.4 0 0 0-2.84.89a7.5 7.5 0 0 0-2.2 1.84a7.42 7.42 0 0 0-1.64 5.51a7.4 7.4 0 0 0 .89 2.84a7.5 7.5 0 0 0 1.84 2.2a7.42 7.42 0 0 0 5.51 1.64a7.4 7.4 0 0 0 2.84-.89a7.5 7.5 0 0 0 2.2-1.84a7.42 7.42 0 0 0 1.64-5.51a.75.75 0 1 1 1.57-.15a9 9 0 0 1-4.61 8.81A8.7 8.7 0 0 1 12.93 21z"/>
+                                            </svg>
+                                            <span class="text-zinc-600 transition group-hover:text-green-500">Mark as Posted Selected <span x-show="selectedCount > 0" x-text="'(' + selectedCount + ')'"></span></span>
+                                        </button>
+                                        <button 
+                                            @click="cancelSelection" 
+                                            class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
+                                            >
+                                            Cancel
                                         </button>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
+                        <!-- Confirm Posted Modal -->
+                        <div x-show="showConfirmUpdateModal" 
+                            x-cloak 
+                            class="fixed inset-0 z-50 m-2 px-6 flex items-center justify-center"
+                            x-effect="document.body.classList.toggle('overflow-hidden', showConfirmUpdateModal)"
+                            @click.away="showConfirmUpdateModal = false"
+                            >
+                            <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
+                            
+                            <div class="bg-white rounded-lg shadow-lg p-8 mx-auto overflow-hidden flex justify-center max-w-sm w-full relative" x-show="showConfirmUpdateModal" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
+                                <button @click="showConfirmUpdateModal = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                                <div class="flex flex-col items-center">
+                                    <!-- Icon -->
+                                    <div class="mb-6">
+                                        <div class="flex items-center justify-center w-36 h-36">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#10b981" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m-1-7v2h2v-2zm2-1.645A3.502 3.502 0 0 0 12 6.5a3.5 3.5 0 0 0-3.433 2.813l1.962.393A1.5 1.5 0 1 1 12 11.5a1 1 0 0 0-1 1V14h2z"/></svg>
+                                        </div>
+                                    </div>
+
+                                    <!-- Title -->
+                                    <h2 class="text-2xl font-extrabold text-center text-zinc-600 mb-4">Mark as Posted Item(s)</h2>
+
+                                    <!-- Description -->
+                                    <p class="text-sm text-zinc-600 text-center mb-6">
+                                        You're going to mark as posted the selected<br>item(s) in the Cash Disbursement Book table. Are you sure?
+                                    </p>
+
+                                    <!-- Actions -->
+                                    <div class="flex justify-between -space-x-2 mb-2 w-full">
+                                        <button 
+                                            @click="showConfirmUpdateModal = false; showUpdateStatusButtons = true;" 
+                                            class="px-5 py-2 mr-2 font-semibold text-zinc-600 rounded-md hover:text-zinc-900 transition text-sm n w-1/2 "
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button 
+                                            @click="confirmUpdateStatus();" 
+                                            class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg text-sm transition w-1/2 ml-2"
+                                        >
+                                            Mark as Posted
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Success Modal -->
+                        <div 
+                            x-show="showSuccessModal" 
+                            x-cloak 
+                            class="fixed inset-0 z-50 flex items-center justify-center"
+                            x-effect="document.body.classList.toggle('overflow-hidden', showSuccessModal)"
+                            >
+                            <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
+
+                            <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative" x-show="showSuccessModal" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
+                                <button @click="showSuccessModal = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2" >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                                <div class="flex flex-col items-center">
+                                    <!-- Icon -->
+                                    <div class="flex justify-center align-middle mb-4">
+                                        <img src="{{ asset('images/Success.png') }}" alt="Item(s) Posted" class="w-28 h-28">
+                                    </div>
+
+                                    <!-- Title -->
+                                    <h2 class="text-2xl font-bold text-emerald-500 mb-4">Mark as Posted</h2>
+
+                                    <!-- Description -->
+                                    <p class="text-sm text-zinc-600 text-center mb-6">
+                                        The selected item(s) has been successfully<br>marked as posted.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -589,5 +628,74 @@
             Q4: '12'
         };
         return quarters[quarter] || '';
+    }
+
+     // FOR SORT BUTTON
+     document.getElementById('sortButton').addEventListener('click', function() {
+        const dropdown = document.getElementById('dropdownMenu');
+        dropdown.classList.toggle('hidden');
+    });
+
+    // FOR SORT BY
+    function sortItems(criteria) {
+        const table = document.querySelector('table tbody');
+        const rows = Array.from(table.querySelectorAll('tr')).filter(row => row.querySelector('td')); // Filter rows with data
+        let sortedRows;
+
+        if (criteria === 'recently-added') {
+            // Sort by the order of rows (assuming they are in the order of addition)
+            sortedRows = rows.reverse();
+        } else {
+            // Sort by text content of the 'Contact' column
+            sortedRows = rows.sort((a, b) => {
+                const aText = a.querySelector('td:nth-child(2)').textContent.trim().toLowerCase();
+                const bText = b.querySelector('td:nth-child(2)').textContent.trim().toLowerCase();
+
+                if (criteria === 'ascending') {
+                    return aText.localeCompare(bText);
+                } else if (criteria === 'descending') {
+                    return bText.localeCompare(aText);
+                }
+            });
+        }
+
+        // Append sorted rows back to the table body
+        table.innerHTML = '';
+        sortedRows.forEach(row => table.appendChild(row));
+    }
+
+    // Dropdown event listeners
+    document.querySelectorAll('#dropdownMenu div[data-sort]').forEach(item => {
+        item.addEventListener('click', function() {
+            const criteria = this.getAttribute('data-sort');
+            document.getElementById('selectedOption').textContent = this.textContent; // Update selected option text
+            sortItems(criteria);
+        });
+    });
+
+    // FOR BUTTON OF SHOW ENTRIES
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('dropdownMenuIconButton').addEventListener('click', function () {
+            const dropdown = document.getElementById('dropdownDots');
+            dropdown.classList.toggle('hidden');
+        });
+    });
+
+    function setEntries(entries) {
+        const form = document.createElement('form');
+        form.method = 'GET';
+        form.action = "{{ route('cash-disbursement') }}";
+        const perPageInput = document.createElement('input');
+        perPageInput.type = 'hidden';
+        perPageInput.name = 'perPage';
+        perPageInput.value = entries;
+        const searchInput = document.createElement('input');
+        searchInput.type = 'hidden';
+        searchInput.name = 'search';
+        searchInput.value = "{{ request('search') }}";
+        form.appendChild(perPageInput);
+        form.appendChild(searchInput);
+        document.body.appendChild(form);
+        form.submit();
     }
 </script>

@@ -29,12 +29,15 @@ use App\Http\Controllers\AccountantUsersRecycleBinController;
 use App\Http\Controllers\ClientUsersRecycleBinController;
 use App\Http\Controllers\TransactionsRecycleBinController;
 use App\Http\Controllers\TaxReturnsRecycleBinController;
+use App\Http\Controllers\ContactsRecycleBinController;
+use App\Http\Controllers\EmployeesRecycleBinController;
 
 //Client
 use App\Http\Controllers\ClientAuthController;
 use App\Http\Controllers\ClientFinancialController;
 use App\Http\Controllers\ClientProfileController;
 use App\Http\Controllers\ClientAnalyticsController;
+use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\TaxTypeController;
 use App\Models\rdo;
 use App\Models\TaxReturn;
@@ -134,6 +137,17 @@ Route::middleware([
             Route::get('/tax-returns', [TaxReturnsRecycleBinController::class, 'index'])->name('recycle-bin.tax-returns.index');
             Route::post('/tax-returns/bulk-restore', [TaxReturnsRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.tax-returns.bulkRestore');
             Route::delete('/tax-returns/bulk-delete', [TaxReturnsRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.tax-returns.bulkDelete');
+
+            // Contacts
+            Route::get('/contacts', [ContactsRecycleBinController::class, 'index'])->name('recycle-bin.contacts.index');
+            Route::post('/contacts/bulk-restore', [ContactsRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.contacts.bulkRestore');
+            Route::delete('/contacts/bulk-delete', [ContactsRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.contacts.bulkDelete');
+
+            // Employees
+            Route::get('/employees', [EmployeesRecycleBinController::class, 'index'])->name('recycle-bin.employees.index');
+            Route::post('/employees/bulk-restore', [EmployeesRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.employees.bulkRestore');
+            Route::delete('/employees/bulk-delete', [EmployeesRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.employees.bulkDelete');
+
         });//ending of recycle-bin prefix
     });//ending of auth role middleware
 
@@ -158,13 +172,25 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
         Route::get('/transaction/download', [TransactionsController::class, 'download_transaction']);
         Route::post('/transactions/store/upload', [TransactionsController::class, 'storeUpload'])->name('transactions.storeUpload');
 
-        // Contacts Routes
-        Route::get('/contacts', function () {
-            return view('contacts');
-        })->name('contacts');
 
-        Route::post('percentage_return/{taxReturn}/2551q', [TaxReturnController::class, 'store2551Q'])
-        ->name('tax_return.store2551Q');
+
+
+        Route::controller(ContactsController::class)->group(function () {
+            Route::get('/contacts', 'index')->name('contacts');
+            Route::post('/contacts', 'store')->name('contacts.store');
+            Route::put('/contacts/{contact}', [ContactsController::class, 'update'])->name('contacts.update');
+            Route::delete('/contacts/destroy', 'destroy')->name('contacts.destroy'); 
+        });
+
+        // Employees Routes
+        Route::controller(EmployeesController::class)->group(function(){
+            Route::get('/employees', 'index')->name('employees');
+            Route::post('/employees', 'store')->name('employees.store');
+            Route::put('/employees/{employees}', [EmployeesController::class, 'update'])->name('employees.update');
+            Route::delete('/employees/destroy', 'destroy')->name('employees.destroy');
+        });
+
+          Route::post('percentage_return/{taxReturn}/2551q', [TaxReturnController::class, 'store2551Q']);
         Route::post('tax-return/{taxReturn}/2551q', [TaxReturnController::class, 'store2550Q'])
         ->name('tax_return.store2550Q');
         Route::post('/tax-return-transaction/deactivate', [TransactionsController::class, 'deactivate'])
@@ -177,7 +203,8 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
     Route::get('/vat_return/{id}/report', [TaxReturnController::class, 'showVatReport'])
     ->name('tax_return.report');
         Route::get('/percentage_return', [TaxReturnController::class, 'percentageReturn'])->name('percentage_return');
-        Route::get('/percentage_return/{taxReturn}/slsp-data', [TaxReturnController::class, 'showPercentageSlspData'])->name('percentage_return.slsp_data');
+        Route::get('/
+        }/slsp-data', [TaxReturnController::class, 'showPercentageSlspData'])->name('percentage_return.slsp_data');
         Route::post('/percentage_return', [TaxReturnController::class, 'storePercentage']);
         Route::post('/vat_return', [TaxReturnController::class, 'store']);
         Route::get('/tax_return/{taxReturn}/slsp-data', [TaxReturnController::class, 'showSlspData'])->name('tax_return.slsp_data');
@@ -204,7 +231,7 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
 
         //Sales Book routings
         Route::get('/sales-book', [SalesController::class, 'sales'])->name('sales-book');
-        Route::get('sales-book/posted', [SalesController::class, 'posted'])->name('posted');
+        Route::get('sales-book/posted', [SalesController::class, 'posted'])->name('salesPosted');
         Route::post('/sales-book/post', [SalesController::class, 'updateToPosted'])->name('.updateToPosted');
         Route::post('/sales-book/draft', [SalesController::class, 'updateToDraft'])->name('.updateToDraft');
         Route::get('/sales-book/export', [SalesController::class, 'exportSalesBook'])->name('sales.exportExcel');
@@ -212,7 +239,7 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
 
         //Purchase Book routings
         Route::get('/purchase-book', [PurchaseController::class, 'purchase'])->name('purchase-book');
-        Route::get('purchase-book/posted', [PurchaseController::class, 'posted'])->name('posted');
+        Route::get('purchase-book/posted', [PurchaseController::class, 'posted'])->name('purchasePosted');
         Route::post('/purchase-book/post', [PurchaseController::class, 'updateToPosted'])->name('.updateToPosted');
         Route::post('/purchase-book/draft', [PurchaseController::class, 'updateToDraft'])->name('.updateToDraft');
         Route::get('/purchase-book/export', [PurchaseController::class, 'exportPurchaseBook'])->name('purchase.exportExcel');
@@ -220,7 +247,7 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
 
         //Cash receipt routings
         Route::get('/cash-receipt', [CashReceiptController::class, 'cashReceipt'])->name('cash-receipt');
-        Route::get('cash-receipt/posted', [CashReceiptController::class, 'posted'])->name('posted');
+        Route::get('cash-receipt/posted', [CashReceiptController::class, 'posted'])->name('receiptPosted');
         Route::post('/cash-receipt/post', [CashReceiptController::class, 'updateToPosted'])->name('.updateToPosted');
         Route::post('/cash-receipt/draft', [CashReceiptController::class, 'updateToDraft'])->name('.updateToDraft');
         Route::get('/cash-receipt/export', [CashReceiptController::class, 'exportCashReceipt'])->name('cash_receipt.exportExcel');
@@ -228,7 +255,7 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
 
         //Cash disbursement routings
         Route::get('/cash-disbursement', [CashDisbursementController::class, 'cashDisbursement'])->name('cash-disbursement');
-        Route::get('cash-disbursement/posted', [CashDisbursementController::class, 'posted'])->name('posted');
+        Route::get('cash-disbursement/posted', [CashDisbursementController::class, 'posted'])->name('disbPosted');
         Route::post('/cash-disbursement/post', [CashDisbursementController::class, 'updateToPosted'])->name('.updateToPosted');
         Route::post('/cash-disbursement/draft', [CashDisbursementController::class, 'updateToDraft'])->name('.updateToDraft');
         Route::get('/cash-disbursement/export', [CashDisbursementController::class, 'exportCashDisbursement'])->name('cash_disbursement.exportExcel');

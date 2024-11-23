@@ -32,6 +32,7 @@ class CashReceiptController extends Controller
         $startMonth = $request->input('start_month');
         $endMonth = $request->input('end_month');
         $search = $request->input('search');
+        $perPage = $request->input('perPage', 5);
 
         // Query to fetch only draft Cash Receipt transactions for the organization
         $query = Transactions::where('status', 'draft')
@@ -63,7 +64,7 @@ class CashReceiptController extends Controller
                 ->orWhere('reference', 'LIKE', "%{$search}%");
         }
 
-        $transactions = $query->paginate(5);
+        $transactions = $query->paginate($perPage);
 
         return view('cash-receipt', compact('transactions'));
     }

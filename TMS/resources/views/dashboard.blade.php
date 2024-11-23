@@ -28,7 +28,7 @@
 
             <div class="flex items-center space-x-4 pl-6">
                 <div class="text-blue-900 text-4xl rounded-full flex items-center justify-center font-bold">
-                    {{$unfiledTaxReturnCount}}
+                    {{$pendingTaxReturnCount}}
                 </div>
 
                 <div>
@@ -65,112 +65,76 @@
 </div>
 
 <div class="py-2 h-full">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 mb-8">
         <div class="grid grid-cols-4 gap-4 whitespace-nowrap text-wrap">
             <div class="p-6 col-span-2 bg-white border-gray-200 rounded-lg">
                 <div class="flex items-center space-x-2 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 36 36"><path fill="#1e3a8a" d="M32.25 6h-4v3a2.2 2.2 0 1 1-4.4 0V6H12.2v3a2.2 2.2 0 0 1-4.4 0V6h-4A1.78 1.78 0 0 0 2 7.81v22.38A1.78 1.78 0 0 0 3.75 32h28.5A1.78 1.78 0 0 0 34 30.19V7.81A1.78 1.78 0 0 0 32.25 6M10 26H8v-2h2Zm0-5H8v-2h2Zm0-5H8v-2h2Zm6 10h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Zm6 10h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Zm6 10h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Z" class="clr-i-solid clr-i-solid-path-1"/><path fill="#172554" d="M10 10a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v6a1 1 0 0 0 1 1" class="clr-i-solid clr-i-solid-path-2"/><path fill="#172554" d="M26 10a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v6a1 1 0 0 0 1 1" class="clr-i-solid clr-i-solid-path-3"/><path fill="none" d="M0 0h36v36H0z"/></svg>
-                    <span class="font-bold text-2xl taxuri-color leading-tight">Tax Reminder</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" viewBox="0 0 36 36"><path fill="#1e3a8a" d="M32.25 6h-4v3a2.2 2.2 0 1 1-4.4 0V6H12.2v3a2.2 2.2 0 0 1-4.4 0V6h-4A1.78 1.78 0 0 0 2 7.81v22.38A1.78 1.78 0 0 0 3.75 32h28.5A1.78 1.78 0 0 0 34 30.19V7.81A1.78 1.78 0 0 0 32.25 6M10 26H8v-2h2Zm0-5H8v-2h2Zm0-5H8v-2h2Zm6 10h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Zm6 10h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Zm6 10h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Z" class="clr-i-solid clr-i-solid-path-1"/><path fill="#1e3a8a" d="M10 10a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v6a1 1 0 0 0 1 1" class="clr-i-solid clr-i-solid-path-2"/><path fill="#1e3a8a" d="M26 10a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v6a1 1 0 0 0 1 1" class="clr-i-solid clr-i-solid-path-3"/><path fill="none" d="M0 0h36v36H0z"/></svg>
+                    <span class="font-bold text-3xl taxuri-color leading-tight">Tax Reminder</span>
                 </div>
-                <p class="font-normal text-xs text-zinc-700">Stay updated with essential tax deadlines and obligations. Easily keep track of important
+                <p class="font-normal text-sm text-zinc-600">Stay updated with essential tax deadlines and obligations. Easily keep track of important
                     filling and payment dates to ensure seamless compliance with the BIR regulations.
                 </p>
                 <div class="my-3"><hr /></div>
 
-                <div class="flex">
-                    <div class="flex bg-gray-100 rounded-full transition p-1">
-                        <nav class="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
-                            <button type="button" class="py-3 px-4 inline-flex items-center gap-x-2 text-sm text-zinc-500 transition duration-300 focus:outline-none font-bold rounded-full disabled:opacity-50 disabled:pointer-events-none"
-                            id="tab-today" aria-selected="true" role="tab" onclick="activateTab('tab-today')">
-                                Today
-                            </button>
-                            <button type="button" class="py-3 px-4 inline-flex items-center gap-x-2 text-sm text-zinc-500 transition duration-300 focus:outline-none font-bold rounded-full disabled:opacity-50 disabled:pointer-events-none"
-                            id="tab-upcoming" aria-selected="false" role="tab" onclick="activateTab('tab-upcoming')">
-                                Upcoming
-                            </button>
-                            <button type="button" class="py-3 px-4 inline-flex items-center gap-x-2 text-sm text-zinc-500 transition duration-300 focus:outline-none font-bold rounded-full disabled:opacity-50 disabled:pointer-events-none"
-                            id="tab-completed" aria-selected="false" role="tab" onclick="activateTab('tab-completed')">
-                                Completed
-                            </button>
-                        </nav>
-                    </div>
+                <div class="mt-4 flex space-x-4 bg-gray-100 rounded-full p-2" style="width: max-content;">
+                    <button id="tab-today" onclick="showTab('today')" class="tab-btn text-blue-900 text-sm font-semibold py-2 px-4 rounded-full focus:outline-none">Today</button>
+                    <button id="tab-upcoming" onclick="showTab('upcoming')" class="tab-btn text-blue-900 text-sm font-semibold py-2 px-4 rounded-full focus:outline-none">Upcoming</button>
+                    <button id="tab-completed" onclick="showTab('completed')" class="tab-btn text-blue-900 text-sm font-semibold py-2 px-4 rounded-full focus:outline-none">Completed</button>
                 </div>
                 
-                {{-- TODAY TAB CONTENT --}}
-                <div id="tab-today-content" role="tabpanel" aria-labelledby="tab-today" class="overflow-x-auto px-2">
-                    {{-- Accordion 1 --}}
-                    <div id="accordion-flush-1" data-accordion="collapse" data-active-classes="bg-white text-gray-900" data-inactive-classes="text-gray-500">
-                    <h2 id="accordion-flush-heading-1">
-                        <button type="button" id="accordion-button-1" class="flex items-center justify-between w-full py-5 font-medium rtl:text-right text-blue-900 border-b border-gray-200 gap-3" data-accordion-target="#accordion-flush-body-1" aria-expanded="false" aria-controls="accordion-flush-body-1">
-                        <span>September 11, 2024</span>
-                        <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
-                        </svg>
-                        </button>
-                    </h2>
-                    <div id="accordion-flush-body-1" class="hidden" aria-labelledby="accordion-flush-heading-1">
-                        <div class="py-5 border-b border-gray-200 max-h-40 overflow-y-auto">
-                        <b class="text-blue-900">e-FILING</b>
-                        <p class="mb-2 text-gray-500 text-sm">
-                        <br/>BIR Forms 1601-C (Monthly Remittance Return of Income Taxes Withheld on Compensation) and/or 0619-E (Monthly Remittance Form of Creditable Income Taxes Withheld-Expanded) and/or 0619-F (Monthly Remittance Form of Final Income Taxes Withheld) – eFPS Filers under Group E.  <b>Month of August 2024</b></p>
+                <!-- List of Reminders with Scrollable Sections -->
+                <ul id="today" class="mt-4 space-y-2 overflow-y-auto max-h-64 tab-content">
+                    @forelse ($todayTaxReturns as $taxReturn)
+                        <li class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                            <span class="text-sm font-semibold text-gray-800">{{ $taxReturn->title }}</span>
+                            <span class="text-sm font-semibold text-blue-700">{{ $taxReturn->created_at->format('F d, Y') }}</span>
+                            <a href="#" class="text-sm text-blue-600 hover:underline">View Details</a>
+                        </li>
+                    @empty
+                        <div class="flex flex-col items-center p-8 text-gray-500">
+                            <i class="fas fa-info-circle text-3xl mb-2"></i>
+                            <p class="text-lg">No tax returns due today.</p>
                         </div>
-                    </div>
-                    </div>
-                </div>
+                    @endforelse
+                </ul>
 
-                {{-- UPCOMING TAB CONTENT --}}
-                <div id="tab-upcoming-content" role="tabpanel" aria-labelledby="tab-upcoming" class="hidden overflow-x-auto px-2">
-                    {{-- Accordion 2 --}}
-                    <div id="accordion-flush-2" data-accordion="collapse" data-active-classes="bg-white text-gray-900" data-inactive-classes="text-gray-500">
-                        <h2 id="accordion-flush-heading-2">
-                            <button type="button" id="accordion-button-2" class="flex items-center justify-between w-full py-5 font-medium rtl:text-right text-blue-900 border-b border-gray-200 gap-3" data-accordion-target="#accordion-flush-body-2" aria-expanded="false" aria-controls="accordion-flush-body-2">
-                                <span>September 12, 2024</span>
-                                <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
-                                </svg>
-                            </button>
-                        </h2>
-                        <div id="accordion-flush-body-2" class="hidden" aria-labelledby="accordion-flush-heading-2">
-                            <div class="py-5 border-b border-gray-200 max-h-40 overflow-y-auto">
-                                <b class="text-blue-900">e-FILING</b>
-                                <p class="mb-2 text-gray-500 text-sm">
-                                <br/>BIR Forms 1601-C (Monthly Remittance Return of Income Taxes Withheld on Compensation) and/or 0619-E (Monthly Remittance Form of Creditable Income Taxes Withheld-Expanded) and/or 0619-F (Monthly Remittance Form of Final Income Taxes Withheld) – eFPS Filers under Group D.  <b>Month of August 2024</b></p>
-                            </div>
+                <ul id="upcoming" class="mt-4 space-y-2 overflow-y-auto max-h-64 tab-content hidden">
+                    @forelse ($upcomingTaxReturns as $taxReturn)
+                        <li class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                            <span class="text-sm font-semibold text-gray-800">{{ $taxReturn->title }}</span>
+                            <span class="text-sm font-semibold text-blue-700">{{ $taxReturn->created_at->format('F d, Y') }}</span>
+                            <a href="#" class="text-sm text-blue-600 hover:underline">View Details</a>
+                        </li>
+                    @empty
+                        <div class="flex flex-col items-center p-8 text-gray-500">
+                            <i class="fas fa-info-circle text-3xl mb-2"></i>
+                            <p class="text-lg">No upcoming tax returns.</p>
                         </div>
-                    </div>
-                    {{-- ACCORDION 3 --}}
-                    <div id="accordion-flush-3" data-accordion="collapse" data-active-classes="bg-white text-gray-900" data-inactive-classes="text-gray-500">
-                        <h2 id="accordion-flush-heading-3">
-                            <button type="button" id="accordion-button-3" class="flex items-center justify-between w-full py-5 font-medium rtl:text-right text-blue-900 border-b border-gray-200 gap-3" data-accordion-target="#accordion-flush-body-3" aria-expanded="false" aria-controls="accordion-flush-body-3">
-                                <span>September 13, 2024</span>
-                                <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
-                                </svg>
-                            </button>
-                        </h2>
-                        <div id="accordion-flush-body-3" class="hidden" aria-labelledby="accordion-flush-heading-3">
-                            <div class="py-5 border-b border-gray-200 max-h-40 overflow-y-auto">
-                                <b class="text-blue-900">e-FILING</b>
-                                <p class="mb-2 text-gray-500 text-sm">
-                                <br/>BIR Forms 1601-C (Monthly Remittance Return of Income Taxes Withheld on Compensation) and/or 0619-E (Monthly Remittance Form of Creditable Income Taxes Withheld-Expanded) and/or 0619-F (Monthly Remittance Form of Final Income Taxes Withheld) – eFPS Filers under Group C.<b>Month of August 2024</b></p>
-                            </div>
+                    @endforelse
+                </ul>
+
+                <ul id="completed" class="mt-4 space-y-2 overflow-y-auto max-h-64 tab-content hidden">
+                    @forelse ($completedTaxReturns as $taxReturn)
+                        <li class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                            <span class="text-sm font-semibold text-gray-800">{{ $taxReturn->title }}</span>
+                            <span class="text-sm font-semibold text-blue-700">{{ $taxReturn->created_at->format('F d, Y') }}</span>
+                            <a href="#" class="text-sm text-blue-600 hover:underline">View Details</a>
+                        </li>
+                    @empty
+                        <div class="flex flex-col items-center p-8 text-gray-500">
+                            <i class="fas fa-info-circle text-3xl mb-2"></i>
+                            <p class="text-lg">No completed tax returns.</p>
                         </div>
-                    </div>
-                </div>
-                
-                {{-- COMPLETED TAB CONTENT --}}
-                <div id="tab-completed-content" role="tabpanel" aria-labelledby="tab-completed" class="hidden overflow-x-auto px-10">
-                    <p class="text-gray-500">
-                       
-                    </p>
-                </div>
+                    @endforelse
+                </ul>
                   
             </div>
 
             <div class="p-6 col-span-2 bg-white border-gray-200 rounded-lg">
                 <div class="flex items-center space-x-2 mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" viewBox="0 0 512 512"><path fill="#1e3a8a" d="M258.9 48C141.92 46.42 46.42 141.92 48 258.9c1.56 112.19 92.91 203.54 205.1 205.1c117 1.6 212.48-93.9 210.88-210.88C462.44 140.91 371.09 49.56 258.9 48M351 175.24l-82.24 186.52c-4.79 10.47-20.78 7-20.78-4.56V268a4 4 0 0 0-4-4H154.8c-11.52 0-15-15.87-4.57-20.67L336.76 161A10.73 10.73 0 0 1 351 175.24"/></svg>
-                    <span class="font-bold text-2xl taxuri-color leading-tight">Quick Actions</span>
+                    <span class="font-bold text-3xl taxuri-color leading-tight">Quick Actions</span>
                 </div>
                 <div class="mb-4">
                     <button type="button" class="w-full border border-gray-200 text-zinc-600 hover:text-blue-900 hover:bg-slate-200 focus:ring-4 focus:outline-none font-medium rounded-lg px-5 py-2.5 text-center inline-flex items-center">
@@ -235,49 +199,65 @@
 </div>
 
 <script>
-    function activateTab(tabId) {
-        document.querySelectorAll('[role="tabpanel"]').forEach(function(panel) {
-            panel.classList.add('hidden');
-        });
-
-        document.querySelectorAll('button[role="tab"]').forEach(function(tab) {
-            tab.classList.remove('active-tab-dashboard', 'font-bold'); // Remove active class
-            tab.classList.add('text-zinc-500'); // Add default text color for inactive tab
-            tab.setAttribute('aria-selected', 'false'); // Set aria-selected to false
-        });
-
-        document.getElementById(tabId + '-content').classList.remove('hidden');
-
-        const activeTab = document.getElementById(tabId);
-        activeTab.classList.add('active-tab-dashboard', 'font-bold'); // Add active class
-        activeTab.classList.remove('text-zinc-500'); // Remove default text color for active tab
-        activeTab.setAttribute('aria-selected', 'true'); // Set aria-selected to true
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        activateTab('tab-today'); // Default tab on page load
+   function showTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+    
+    // Reset all buttons to their inactive state
+    document.querySelectorAll('.tab-btn').forEach(button => {
+        button.classList.remove('bg-blue-900', 'text-white'); // Remove active styles
+        button.classList.add('text-blue-900'); // Add inactive text color
     });
+    
+    // Show the selected tab and apply active styles to the button
+    document.getElementById(tabName).classList.remove('hidden');
+    const activeButton = document.getElementById(`tab-${tabName}`);
+    activeButton.classList.remove('text-blue-900'); // Remove inactive text color
+    activeButton.classList.add('bg-blue-900', 'text-white'); // Add active styles
+}
+    // function activateTab(tabId) {
+    //     document.querySelectorAll('[role="tabpanel"]').forEach(function(panel) {
+    //         panel.classList.add('hidden');
+    //     });
 
-    document.querySelectorAll('[id^="accordion-button"]').forEach(button => {
-        button.addEventListener('click', function() {
-            // Get the accordion body
-            var targetId = this.getAttribute('data-accordion-target');
-            var accordionBody = document.querySelector(targetId);
-            var isExpanded = this.getAttribute('aria-expanded') === 'true';
+    //     document.querySelectorAll('button[role="tab"]').forEach(function(tab) {
+    //         tab.classList.remove('active-tab-dashboard', 'font-bold'); // Remove active class
+    //         tab.classList.add('text-zinc-500'); // Add default text color for inactive tab
+    //         tab.setAttribute('aria-selected', 'false'); // Set aria-selected to false
+    //     });
 
-            // Toggle visibility of the accordion body
-            if (isExpanded) {
-                accordionBody.classList.add('hidden');  // Hide
-                this.setAttribute('aria-expanded', 'false');  // Update aria-expanded
-            } else {
-                accordionBody.classList.remove('hidden');  // Show
-                this.setAttribute('aria-expanded', 'true');  // Update aria-expanded
-            }
+    //     document.getElementById(tabId + '-content').classList.remove('hidden');
 
-            // Toggle the icon rotation for visual feedback
-            var icon = this.querySelector('svg');
-            icon.classList.toggle('rotate-180');
-        });
-    });
+    //     const activeTab = document.getElementById(tabId);
+    //     activeTab.classList.add('active-tab-dashboard', 'font-bold'); // Add active class
+    //     activeTab.classList.remove('text-zinc-500'); // Remove default text color for active tab
+    //     activeTab.setAttribute('aria-selected', 'true'); // Set aria-selected to true
+    // }
+
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     activateTab('tab-today'); // Default tab on page load
+    // });
+
+    // document.querySelectorAll('[id^="accordion-button"]').forEach(button => {
+    //     button.addEventListener('click', function() {
+    //         // Get the accordion body
+    //         var targetId = this.getAttribute('data-accordion-target');
+    //         var accordionBody = document.querySelector(targetId);
+    //         var isExpanded = this.getAttribute('aria-expanded') === 'true';
+
+    //         // Toggle visibility of the accordion body
+    //         if (isExpanded) {
+    //             accordionBody.classList.add('hidden');  // Hide
+    //             this.setAttribute('aria-expanded', 'false');  // Update aria-expanded
+    //         } else {
+    //             accordionBody.classList.remove('hidden');  // Show
+    //             this.setAttribute('aria-expanded', 'true');  // Update aria-expanded
+    //         }
+
+    //         // Toggle the icon rotation for visual feedback
+    //         var icon = this.querySelector('svg');
+    //         icon.classList.toggle('rotate-180');
+    //     });
+    // });
 </script>
 </x-app-layout>
