@@ -27,13 +27,15 @@ class DatabaseSeeder extends Seeder
             'password' => static::$hashedPassword,
         ]);
         $this->call([
-            ContactsSeeder::class,
             TaxTypeSeeder::class,
             AtcSeeder::class,
             RdoSeeder::class,
             OrgsetupSeeder::class,
-            CoaSeeder::class
-
+            ContactsSeeder::class,
+            CoaSeeder::class,
+            AddressSeeder::class,
+            EmployeeSeeder::class,
+            EmploymentSeeder::class
         ]);
 
     }
