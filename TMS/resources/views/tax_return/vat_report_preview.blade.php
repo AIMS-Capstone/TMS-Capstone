@@ -1,3 +1,4 @@
+
 <x-app-layout>
     <div class="max-w-6xl mx-auto bg-white shadow-md rounded-lg p-8">
         <!-- Back Button -->
@@ -187,389 +188,391 @@
             <div class="font-semibold text-gray-700 text-sm">A. Sales for the Quarter (Exclusive of VAT)</div>
             <div class="font-semibold text-gray-700 text-sm">B. Output Tax for the Quarter</div>
     
-            <!-- VATable Sales -->
-            <div class="flex items-center">
-                <label class="block text-gray-700 text-sm font-medium">31. VATable Sales</label>
+   <!-- VATable Sales -->
+<div class="flex items-center">
+    <label class="block text-gray-700 text-sm font-medium">31. VATable Sales</label>
+</div>
+<div>
+    <input 
+        type="number" 
+        name="vatable_sales" 
+        id="vatable_sales" 
+        value="{{ $vatOnSalesGoods + $vatOnSalesServices + $salesToGovernmentGoods + $salesToGovernmentServices }}" 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        onchange="calculateTotals()">
+</div>
+<div>
+    <input 
+        type="number" 
+        name="vatable_sales_tax_amount" 
+        id="vatable_sales_tax_amount" 
+        value="{{ $vatOnSalesGoodsTax + $vatOnSalesServicesTax + $salesToGovernmentGoodsTax + $salesToGovernmentServicesTax }}" 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        onchange="calculateTotals()">
+</div>
+
+<!-- Zero-Rated Sales -->
+<div class="flex items-center">
+    <label class="block text-gray-700 text-sm font-medium">32. Zero-Rated Sales</label>
+</div>
+<div>
+    <input 
+        type="number" 
+        name="zero_rated_sales" 
+        id="zero_rated_sales" 
+        value="{{ $zeroRatedSalesGoods + $zeroRatedSalesServices }}" 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        onchange="calculateTotals()">
+</div>
+<div>
+</div>
+<!-- Exempt Sales -->
+<div class="flex items-center">
+    <label class="block text-gray-700 text-sm font-medium">33. Exempt Sales</label>
+</div>
+<div>
+    <input 
+        type="number" 
+        name="exempt_sales" 
+        id="exempt_sales" 
+        value="{{ $taxExemptSalesGoods + $taxExemptSalesServices }}" 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        onchange="calculateTotals()">
+</div>
+<div>
+</div>
+
+<!-- Total Sales & Output Tax Due -->
+<div class="flex items-center font-semibold">
+    <label class="block text-gray-700 text-sm font-medium">
+        34. Total Sales & Output Tax Due (Sum of Items 31A to 33A) / (Item 31B)
+    </label>
+</div>
+<div>
+    <input 
+        type="number" 
+        name="total_sales" 
+        id="total_sales" 
+        readonly 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+</div>
+<div>
+    <input 
+        type="number" 
+        name="total_output_tax" 
+        id="total_output_tax" 
+        readonly 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+
             </div>
-            <div>
-                <input 
-                    type="number" 
-                    name="vatable_sales" 
-                    id="vatable_sales" 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            <div>
-                <input 
-                    type="number" 
-                    name="vatable_output_tax" 
-                    id="vatable_output_tax" 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-    
-            <!-- Zero-Rated Sales -->
-            <div class="flex items-center">
-                <label class="block text-gray-700 text-sm font-medium">32. Zero-Rated Sales</label>
-            </div>
-            <div>
-                <input 
-                    type="number" 
-                    name="zero_rated_sales" 
-                    id="zero_rated_sales" 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-          <div>
-          </div>
-    
-            <!-- Exempt Sales -->
-            <div class="flex items-center">
-                <label class="block text-gray-700 text-sm font-medium">33. Exempt Sales</label>
-            </div>
-            <div>
-                <input 
-                    type="number" 
-                    name="exempt_sales" 
-                    id="exempt_sales" 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            <div>
-         
-                 
-            </div>
-    
-            <!-- Total Sales & Output Tax Due -->
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    34. Total Sales & Output Tax Due (Sum of Items 31A to 33A) / (Item 31B)
-                </label>
-            </div>
-            <div>
-                <input 
-                    type="number" 
-                    name="total_sales" 
-                    id="total_sales" 
-                    readonly 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            <div>
-                <input 
-                    type="number" 
-                    name="total_output_tax" 
-                    id="total_output_tax" 
-                    readonly 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-                  <!-- Total Sales & Output Tax Due -->
-                  <div class="flex items-center font-semibold">
-                    <label class="block text-gray-700 text-sm font-medium">
-                        Less: Output VAT on Uncollected Receivables
-                    </label>
-                </div>
-                <div>
-                  
-                </div>
-                <div>
-                    <input 
-                        type="number" 
-                        name="uncollected_receivable_vat" 
-                        id="uncollected_receivable_vat" 
-                        readonly 
-                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                </div>
-                <div class="flex items-center font-semibold">
-                    <label class="block text-gray-700 text-sm font-medium">
-                        Add: Output VAT on Recovered Uncollected Receivables Previously Deducted
-                    </label>
-                </div>
-                <div>
-                  
-                </div>
-                <div>
-                    <input 
-                        type="number" 
-                        name="recovered_uncollected_receivables" 
-                        id="recovered_uncollected_receivables" 
-                        readonly 
-                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                </div>
-                <div class="flex items-center font-semibold">
-                    <label class="block text-gray-700 text-sm font-medium">
-                        37 Total Adjusted Output Tax Due (Item 34B Less Item 35B Add Item 36B) 
-                    </label>
-                </div>
-                <div>
-                  
-                </div>
-                <div>
-                    <input 
-                        type="number" 
-                        name="total_adjusted_output_tax" 
-                        id="total_adjusted_output_tax" 
-                        readonly 
-                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                </div>
+                <!-- Less: Output VAT on Uncollected Receivables -->
+<div class="flex items-center font-semibold">
+    <label class="block text-gray-700 text-sm font-medium">
+        Less: Output VAT on Uncollected Receivables
+    </label>
+</div>
+<div></div>
+<div>
+    <input 
+        type="number" 
+        name="uncollected_receivable_vat" 
+        id="uncollected_receivable_vat" 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        onchange="calculateAdjustedOutputTax()">
+</div>
+
+<!-- Add: Output VAT on Recovered Uncollected Receivables Previously Deducted -->
+<div class="flex items-center font-semibold">
+    <label class="block text-gray-700 text-sm font-medium">
+        Add: Output VAT on Recovered Uncollected Receivables Previously Deducted
+    </label>
+</div>
+<div></div>
+<div>
+    <input 
+        type="number" 
+        name="recovered_uncollected_receivables" 
+        id="recovered_uncollected_receivables" 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        onchange="calculateAdjustedOutputTax()">
+</div>
+
+<!-- Total Adjusted Output Tax Due -->
+<div class="flex items-center font-semibold">
+    <label class="block text-gray-700 text-sm font-medium">
+        37. Total Adjusted Output Tax Due (Item 34B Less Item 35B Add Item 36B)
+    </label>
+</div>
+<div></div>
+<div>
+    <input 
+        type="number" 
+        name="total_adjusted_output_tax" 
+        id="total_adjusted_output_tax" 
+        readonly 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+</div>
+
                 <div class="font-semibold text-gray-700 text-sm">Less: Allowable Input Tax</div>
                 <div class="font-semibold text-gray-700 text-sm"></div>
                 <div class="font-semibold text-gray-700 text-sm">B. Input Tax</div>
+                <!-- 38 Input Tax Carried Over from Previous Quarter -->
                 <div class="flex items-center font-semibold">
                     <label class="block text-gray-700 text-sm font-medium">
                         38 Input Tax Carried Over from Previous Quarter
                     </label>
                 </div>
-                <div>
-                  
-                </div>
+                <div></div>
                 <div>
                     <input 
                         type="number" 
                         name="input_carried_over" 
                         id="input_carried_over" 
                         readonly 
+                        value="{{ $excessInputTax ?? '' }}" 
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                 </div>
+                
+                <!-- 39 Input Tax Deferred on Capital Goods -->
                 <div class="flex items-center font-semibold">
                     <label class="block text-gray-700 text-sm font-medium">
-                        39 Input Tax Deferred on Capital Goods Exceeding P1 Million from Previous Quarter (From Part V - Schedule 1 Col E) .
+                        39 Input Tax Deferred on Capital Goods Exceeding P1 Million from Previous Quarter (From Part V - Schedule 1 Col E).
                     </label>
                 </div>
-                <div>
-                  
-                </div>
+                <div></div>
                 <div>
                     <input 
                         type="number" 
                         name="input_tax_deferred" 
-                        id="input_tax_deferred" 
-                        readonly 
+                        id="input_tax_deferred"  
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                 </div>
+                
+                <!-- 40 Transitional Input Tax -->
                 <div class="flex items-center font-semibold">
                     <label class="block text-gray-700 text-sm font-medium">
-                        40 Transitional Input Tax 
+                        40 Transitional Input Tax
                     </label>
                 </div>
-                <div>
-                  
-                </div>
+                <div></div>
                 <div>
                     <input 
                         type="number" 
                         name="transitional_input_tax" 
                         id="transitional_input_tax" 
-                    
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                 </div>
+                
+                <!-- 41 Presumptive Input Tax -->
                 <div class="flex items-center font-semibold">
                     <label class="block text-gray-700 text-sm font-medium">
-                        41 Presumptive Input Tax .
+                        41 Presumptive Input Tax
                     </label>
                 </div>
-                <div>
-                  
-                </div>
+                <div></div>
                 <div>
                     <input 
                         type="number" 
                         name="presumptive_input_tax" 
                         id="presumptive_input_tax" 
-        
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                 </div>
+                
+                <!-- 42 Others -->
                 <div class="flex items-center font-semibold">
                     <label class="block text-gray-700 text-sm font-medium">
-                     Others (specify)
+                        42 Others (specify)
                     </label>
                 </div>
                 <div>
                     <input 
-                    type="text" 
-                    name="other_specify" 
-                    id="other_specify" 
-            
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            
+                        type="text" 
+                        name="other_specify" 
+                        id="other_specify" 
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                </div>
                 <div>
                     <input 
                         type="number" 
                         name="other_input_tax" 
                         id="other_input_tax" 
-                
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                 </div>
-      
-      
-        
-    
-    
-      
-    
-            <!-- Total Input Tax -->
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    43. Total (Sum of Items 38B to 42B)
-                </label>
-            </div>
-            <div></div>
-            <div>
-                <input 
-                    type="number" 
-                    name="total_input_tax" 
-                    id="total_input_tax" 
-                    readonly 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
+                
+                <!-- 43 Total Input Tax -->
+                <div class="flex items-center font-semibold">
+                    <label class="block text-gray-700 text-sm font-medium">
+                        43. Total (Sum of Items 38B to 42B)
+                    </label>
+                </div>
+                <div></div>
+                <div>
+                    <input 
+                        type="number" 
+                        name="total_input_tax" 
+                        id="total_input_tax" 
+                        readonly 
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                </div>
              <!-- Empty Cell for Alignment -->
-             <div class="font-semibold text-gray-700 text-sm">Current Transactions           </div>
+             <div class="font-semibold text-gray-700 text-sm">Current Transactions</div>
              <div class="font-semibold text-gray-700 text-sm">A. Purchases</div>
              <div class="font-semibold text-gray-700 text-sm">B. Input Tax</div>
+             
+             <!-- 44. Domestic Purchases (Dynamic Field) -->
              <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    44. Domestic Purchases
-                </label>
-            </div>
-            <div>
-                <input 
-                    type="number" 
-                    name="domestic_purchase" 
-                    id="domestic_purchase" 
-                    readonly 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-          
-            <div>
-                <input 
-                    type="number" 
-                    name="domestic_purchase_input_tax" 
-                    id="domestic_purchase_input_tax" 
-                    readonly 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    45 Services Rendered by Non-Residents
-                </label>
-            </div>
-            <div>
-                <input 
-                    type="number" 
-                    name="services_non_resident" 
-                    id="services_non_resident" 
-            
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-          
-            <div>
-                <input 
-                    type="number" 
-                    name="services_non_resident_input_tax" 
-                    id="services_non_resident_input_tax" 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    46 Importations
-                </label>
-            </div>
-            <div>
-                <input 
-                    type="number" 
-                    name="importations" 
-                    id="importations" 
-            
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-          
-            <div>
-                <input 
-                    type="number" 
-                    name="importations_input_tax" 
-                    id="importations_input_tax" 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    Others (specify)
-                </label>
-                <input 
-                    type="text" 
-                    name="purchases_others_specify" 
-                    id="purchases_others_specify" 
-            
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-       
-            <div>
-                <input 
-                    type="number" 
-                    name="purchases_others_specify_amount" 
-                    id="purchases_others_specify_amount" 
-            
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-          
-            <div>
-                <input 
-                    type="number" 
-                    name="purchases_others_specify_input_tax" 
-                    id="purchases_others_specify_input_tax" 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    48 Domestic Purchases with No Input Tax 
-                </label>
-            </div>
-            <div>
-            </div>
-            <div>
-                <input 
-                    type="number" 
-                    name="domestic_no_input" 
-                    id="domestic_no_input" 
-            
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-          
-      
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    49 VAT-Exempt Importations 
-                </label>
-            </div>
-            <div>
-            </div>
-            <div>
-                <input 
-                    type="number" 
-                    name="vat_exempt_importation" 
-                    id="vat_exempt_importation" 
-            
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-          
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    50Total Current Purchases/Input Tax <br>
-                    (Sum of Items 44A to 49A)/(Sum of Items 44B to 47B)
-                </label>
-            </div>
-            <div>
-                <input 
-                    type="number" 
-                    name="total_current_purchase" 
-                    id="total_current_purchase" 
-                    readonly 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-          
-            <div>
-                <input 
-                    type="number" 
-                    name="total_current_purchase_input_tax" 
-                    id="total_current_purchase_input_tax" 
-                    readonly 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
+                 <label class="block text-gray-700 text-sm font-medium">
+                     44. Domestic Purchases
+                 </label>
+             </div>
+             <div>
+                 <input 
+                     type="number" 
+                     name="domestic_purchase" 
+                     id="domestic_purchase" 
+                     value="{{ $vatOnPurchasesGoods + $vatOnPurchasesServices }}" 
+                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                     onchange="calculateTotals()">
+             </div>
+             
+             <!-- 44B. Domestic Purchases Input Tax (Dynamic Field) -->
+             <div>
+                 <input 
+                     type="number" 
+                     name="domestic_purchase_input_tax" 
+                     id="domestic_purchase_input_tax" 
+                     value="{{ $vatOnPurchasesGoodsTax + $vatOnPurchasesServicesTax }}"  
+                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                     onchange="calculateTotals()">
+             </div>
+             
+             <!-- 45. Services Rendered by Non-Residents (Dynamic Field) -->
+             <div class="flex items-center font-semibold">
+                 <label class="block text-gray-700 text-sm font-medium">
+                     45. Services Rendered by Non-Residents
+                 </label>
+             </div>
+             <div>
+                 <input 
+                     type="number" 
+                     name="services_non_resident" 
+                     id="services_non_resident" 
+                     value="{{ $servicesByNonResidents }}"  
+                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                     onchange="calculateTotals()">
+             </div>
+             
+             <!-- 45B. Services Non-Resident Input Tax (Dynamic Field) -->
+             <div>
+                 <input 
+                     type="number" 
+                     name="services_non_resident_input_tax" 
+                     id="services_non_resident_input_tax" 
+                     value="{{ $servicesByNonResidentsTax }}"  
+                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                     onchange="calculateTotals()">
+             </div>
+             
+             <!-- 46. Importations (Dynamic Field) -->
+             <div class="flex items-center font-semibold">
+                 <label class="block text-gray-700 text-sm font-medium">
+                     46. Importations
+                 </label>
+             </div>
+             <div>
+                 <input 
+                     type="number" 
+                     name="importations" 
+                     id="importations" 
+                     value="{{ $importationOfGoods }}"  
+                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                     onchange="calculateTotals()">
+             </div>
+             
+             <!-- 46B. Importations Input Tax (Dynamic Field) -->
+             <div>
+                 <input 
+                     type="number" 
+                     name="importations_input_tax" 
+                     id="importations_input_tax" 
+                     value="{{ $importationOfGoodsTax }}"  
+                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                     onchange="calculateTotals()">
+             </div>
+             
+             <!-- 47. Others (Specify) (Manual Input Field) -->
+             <div class="flex items-center font-semibold">
+                 <label class="block text-gray-700 text-sm font-medium">
+                     47. Others (Specify)
+                 </label>
+                 <input 
+                     type="text" 
+                     name="purchases_others_specify" 
+                     id="purchases_others_specify" 
+                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                     onchange="calculateTotals()">
+             </div>
+             
+             <!-- 47B. Others (Specify Amount) (Manual Input Field) -->
+             <div>
+                 <input 
+                     type="number" 
+                     name="purchases_others_specify_amount" 
+                     id="purchases_others_specify_amount" 
+                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                     onchange="calculateTotals()">
+             </div>
+             
+             <!-- 47C. Others (Specify Input Tax) (Manual Input Field) -->
+             <div>
+                 <input 
+                     type="number" 
+                     name="purchases_others_specify_input_tax" 
+                     id="purchases_others_specify_input_tax" 
+                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                     onchange="calculateTotals()">
+             </div>
+             
+             <!-- 48. Domestic Purchases with No Input Tax (Dynamic Field) -->
+             <div class="flex items-center font-semibold">
+                 <label class="block text-gray-700 text-sm font-medium">
+                     48. Domestic Purchases with No Input Tax
+                 </label>
+             </div>
+             <div>
+                 <input 
+                     type="number" 
+                     name="domestic_no_input" 
+                     id="domestic_no_input" 
+                     value="{{ $goodsNotQualifiedForInputTax }}"  
+                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                     onchange="calculateTotals()">
+             </div>
+             <div> 
+             </div>
+             <!-- 50. Total Current Purchases/Input Tax (Calculated Field) -->
+             <div class="font-semibold text-gray-700 text-sm">
+                 50. Total Current Purchases/Input Tax
+                 (Sum of Items 44A to 49A)/(Sum of Items 44B to 47B)
+             </div>
+             <div>
+                 <input 
+                     type="number" 
+                     name="total_current_purchase" 
+                     id="total_current_purchase" 
+                     readonly 
+                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+             </div>
+             
+             <div>
+                 <input 
+                     type="number" 
+                     name="total_current_purchase_input_tax" 
+                     id="total_current_purchase_input_tax" 
+                     readonly 
+                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+             </div>
+             
             <div class="flex items-center font-semibold">
                 <label class="block text-gray-700 text-sm font-medium">
                     51 Total Available Input Tax (Sum of Items 43B and 50B) 
@@ -603,7 +606,6 @@
                     type="number" 
                     name="importation_million_deferred_input_tax" 
                     id="importation_million_deferred_input_tax" 
-                    readonly 
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
             <div class="flex items-center font-semibold">
@@ -621,7 +623,6 @@
                     type="number" 
                     name="attributable_vat_exempt_input_tax" 
                     id="attributable_vat_exempt_input_tax" 
-                    readonly 
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
             <div class="flex items-center font-semibold">
@@ -640,7 +641,7 @@
                     type="number" 
                     name="vat_refund_input_tax" 
                     id="vat_refund_input_tax" 
-                    readonly 
+    
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
             <div class="flex items-center font-semibold">
@@ -658,7 +659,7 @@
                     type="number" 
                     name="unpaid_payables_input_tax" 
                     id="unpaid_payables_input_tax" 
-                    readonly 
+              
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
             <div class="flex items-center font-semibold">
@@ -716,7 +717,7 @@
                     type="number" 
                     name="settled_unpaid_input_tax" 
                     id="settled_unpaid_input_tax" 
-                    readonly 
+                     
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
             <div class="flex items-center font-semibold">
@@ -886,51 +887,6 @@
         
     </div>
     
-    
-<div class="border-b">
-    <h3 class="font-semibold text-gray-700 text-lg mb-4">Schedule 1</h3>
-
-    <div class="grid grid-cols-1 gap-4">
-        @foreach ($summaryData as $atcCode => $data)
-            <div class="grid grid-cols-4 gap-4 items-center">
-                
-                <!-- ATC Code Input -->
-                <div class="flex flex-col">
-                    <label class="text-sm font-medium text-gray-700">ATC</label>
-                    <input type="text" readonly value="{{ $atcCode }}" 
-                           name="schedule[{{ $atcCode }}][atc_code]" 
-                           class="border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                </div>
-
-                <!-- Taxable Amount Input -->
-                <div class="flex flex-col">
-                    <label class="text-sm font-medium text-gray-700">Taxable Amount</label>
-                    <input type="text" readonly value="{{ number_format($data['taxable_amount'], 2) }}" 
-                           name="schedule[{{ $atcCode }}][taxable_amount]" 
-                           class="border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                </div>
-
-                <!-- Tax Rate Input -->
-                <div class="flex flex-col">
-                    <label class="text-sm font-medium text-gray-700">Tax Rate</label>
-                    <input type="text" readonly value="{{ number_format($data['tax_rate'], 2) }}" 
-                           name="schedule[{{ $atcCode }}][tax_rate]" 
-                           class="border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                </div>
-
-                <!-- Tax Due Input -->
-                <div class="flex flex-col">
-                    <label class="text-sm font-medium text-gray-700">Tax Due</label>
-                    <input type="text" readonly value="{{ number_format($data['tax_due'], 2) }}" 
-                           name="schedule[{{ $atcCode }}][tax_due]" 
-                           class="border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                </div>
-
-            </div>
-        @endforeach
-    </div>
-
-</div>
 
 
 
@@ -945,58 +901,187 @@
     </div>
 </x-app-layout>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const creditableTax = document.getElementById('creditable_tax');
-        const amendedTax = document.getElementById('amended_tax');
-        const otherTaxAmount = document.getElementById('other_tax_amount');
-        const totalTaxCredits = document.getElementById('total_tax_credits');
-        const taxDue = document.getElementById('tax_due');
-        const taxStillPayable = document.getElementById('tax_still_payable');
-        const surcharge = document.getElementById('surcharge');
-        const interest = document.getElementById('interest');
-        const compromise = document.getElementById('compromise');
-        const totalPenalties = document.getElementById('total_penalties');
-        const totalAmountPayable = document.getElementById('total_amount_payable');
+    // Function to calculate Total Available Input Tax (Sum of Items 43B and 50B)
+    function calculateTotalAvailableInputTax() {
+        // Retrieve values for Total Input Tax and Total Current Purchase Input Tax
+        const totalInputTax = parseFloat(document.getElementById('total_input_tax').value) || 0;
+        const totalCurrentPurchaseInputTax = parseFloat(document.getElementById('total_current_purchase_input_tax').value) || 0;
     
-        function calculateTotalCredits() {
-            const total = 
-                (parseFloat(creditableTax.value) || 0) + 
-                (parseFloat(amendedTax.value) || 0) + 
-                (parseFloat(otherTaxAmount.value) || 0);
-            totalTaxCredits.value = total.toFixed(2);
-            calculateTaxStillPayable();
-        }
+        // Calculate the Total Available Input Tax (Sum of 43B and 50B)
+        const totalAvailableInputTax = totalInputTax + totalCurrentPurchaseInputTax;
     
-        function calculateTaxStillPayable() {
-            const due = parseFloat(taxDue.value) || 0;
-            const credits = parseFloat(totalTaxCredits.value) || 0;
-            const stillPayable = due - credits;
-            taxStillPayable.value = stillPayable.toFixed(2);
-            calculateTotalAmountPayable();
-        }
+        // Update the Total Available Input Tax field
+        document.getElementById('total_available_input_tax').value = totalAvailableInputTax.toFixed(2);
+    }
     
-        function calculateTotalPenalties() {
-            const penalties = 
-                (parseFloat(surcharge.value) || 0) + 
-                (parseFloat(interest.value) || 0) + 
-                (parseFloat(compromise.value) || 0);
-            totalPenalties.value = penalties.toFixed(2);
-            calculateTotalAmountPayable();
-        }
+    // Function to calculate all totals including the Total Input Tax and Adjusted Output Tax
+    function calculateTotals() {
+        const vatableSales = parseFloat(document.getElementById('vatable_sales').value) || 0;
+        const vatableSalesTaxAmount = parseFloat(document.getElementById('vatable_sales_tax_amount').value) || 0;
+        const zeroRatedSales = parseFloat(document.getElementById('zero_rated_sales').value) || 0;
+        const exemptSales = parseFloat(document.getElementById('exempt_sales').value) || 0;
     
-        function calculateTotalAmountPayable() {
-            const stillPayable = parseFloat(taxStillPayable.value) || 0;
-            const penalties = parseFloat(totalPenalties.value) || 0;
-            totalAmountPayable.value = (stillPayable + penalties).toFixed(2);
-        }
+        // Calculate total sales
+        const totalSales = vatableSales + zeroRatedSales + exemptSales;
+        document.getElementById('total_sales').value = totalSales.toFixed(2);
     
-        // Add event listeners for manual input fields
-        [creditableTax, amendedTax, otherTaxAmount].forEach(field => {
-            field.addEventListener('input', calculateTotalCredits);
-        });
+        // Calculate total output tax
+        document.getElementById('total_output_tax').value = vatableSalesTaxAmount.toFixed(2);
     
-        [surcharge, interest, compromise].forEach(field => {
-            field.addEventListener('input', calculateTotalPenalties);
+        // Trigger input tax calculation
+        calculateTotalInputTax();
+    
+        // Trigger adjusted output tax calculation
+        calculateAdjustedOutputTax();
+    
+        // Trigger purchases input tax calculation
+        calculateTotalPurchasesAndInputTax();
+    
+        // Calculate Total Available Input Tax after all other calculations
+        calculateTotalAvailableInputTax();
+        calculateTotalDeductionsInputTax();
+        calculateAdjustedDeductionsInputTax();
+    calculateTotalAllowableInputTax();
+    calculateNetVATPayable();
+    }
+    function calculateAdjustedDeductionsInputTax() {
+    // Retrieve values for total deductions from input tax and settled unpaid input tax
+    const totalDeductionsInputTax = parseFloat(document.getElementById('total_deductions_input_tax').value) || 0; // Item 57B
+    const settledUnpaidInputTax = parseFloat(document.getElementById('settled_unpaid_input_tax').value) || 0; // Item 58B
+
+    // Calculate adjusted deductions from input tax
+    const adjustedDeductionsInputTax = totalDeductionsInputTax + settledUnpaidInputTax;
+
+    // Update the adjusted deductions from input tax field
+    document.getElementById('adjusted_deductions_input_tax').value = adjustedDeductionsInputTax.toFixed(2);
+}
+
+// Function to calculate Total Allowable Input Tax (Item 60B)
+function calculateTotalAllowableInputTax() {
+    // Retrieve values for total available input tax and adjusted deductions from input tax
+    const totalAvailableInputTax = parseFloat(document.getElementById('total_available_input_tax').value) || 0; // Item 51B
+    const adjustedDeductionsInputTax = parseFloat(document.getElementById('adjusted_deductions_input_tax').value) || 0; // Item 59B
+
+    // Calculate total allowable input tax (total available input tax - adjusted deductions)
+    const totalAllowableInputTax = totalAvailableInputTax - adjustedDeductionsInputTax;
+
+    // Update the total allowable input tax field
+    document.getElementById('total_allowable_input_Tax').value = totalAllowableInputTax.toFixed(2);
+}
+
+// Function to calculate Net VAT Payable/(Excess Input Tax) (Item 61B)
+function calculateNetVATPayable() {
+    // Retrieve values for total adjusted output tax and total allowable input tax
+    const totalAdjustedOutputTax = parseFloat(document.getElementById('total_adjusted_output_tax').value) || 0; // Item 37B
+    const totalAllowableInputTax = parseFloat(document.getElementById('total_allowable_input_Tax').value) || 0; // Item 60B
+
+    // Calculate net VAT payable/excess input tax (total adjusted output tax - total allowable input tax)
+    const netVATPayable = totalAdjustedOutputTax - totalAllowableInputTax;
+
+    // Update the net VAT payable field
+    document.getElementById('excess_input_tax').value = netVATPayable.toFixed(2);
+}
+    function calculateTotalDeductionsInputTax() {
+    // Retrieve values for the deduction fields (Items 52B to 56B)
+    const importationMillionDeferredInputTax = parseFloat(document.getElementById('importation_million_deferred_input_tax').value) || 0; // Item 52B
+    const attributableVatExemptInputTax = parseFloat(document.getElementById('attributable_vat_exempt_input_tax').value) || 0;  // Item 53B
+    const vatRefundInputTax = parseFloat(document.getElementById('vat_refund_input_tax').value) || 0; // Item 54B
+    const unpaidPayablesInputTax = parseFloat(document.getElementById('unpaid_payables_input_tax').value) || 0; // Item 55B
+    const otherDeductionSpecifyInputTax = parseFloat(document.getElementById('other_deduction_specify_input_tax').value) || 0; // Item 56B
+
+    // Calculate the total deductions from input tax (sum of 52B to 56B)
+    const totalDeductionsInputTax = importationMillionDeferredInputTax + attributableVatExemptInputTax + vatRefundInputTax + unpaidPayablesInputTax + otherDeductionSpecifyInputTax;
+
+    // Update the total deductions input tax field
+    document.getElementById('total_deductions_input_tax').value = totalDeductionsInputTax.toFixed(2);
+}
+    // Function to calculate Total Input Tax (Sum of Items 38B to 42B)
+    function calculateTotalInputTax() {
+        const inputTaxCarriedOver = parseFloat(document.getElementById('input_carried_over').value) || 0;  // 38B
+        const inputTaxDeferred = parseFloat(document.getElementById('input_tax_deferred').value) || 0;        // 39B
+        const transitionalInputTax = parseFloat(document.getElementById('transitional_input_tax').value) || 0; // 40B
+        const presumptiveInputTax = parseFloat(document.getElementById('presumptive_input_tax').value) || 0;   // 41B
+        const otherInputTax = parseFloat(document.getElementById('other_input_tax').value) || 0;             // 42B
+    
+        const totalInputTax = inputTaxCarriedOver + inputTaxDeferred + transitionalInputTax + presumptiveInputTax + otherInputTax;
+        document.getElementById('total_input_tax').value = totalInputTax.toFixed(2);
+    }
+    
+    // Function to calculate Adjusted Output Tax
+    function calculateAdjustedOutputTax() {
+        const totalOutputTax = parseFloat(document.getElementById('total_output_tax').value) || 0; // Item 34B
+        const uncollectedReceivableVAT = parseFloat(document.getElementById('uncollected_receivable_vat').value) || 0; // Item 35B
+        const recoveredReceivablesVAT = parseFloat(document.getElementById('recovered_uncollected_receivables').value) || 0; // Item 36B
+    
+        const totalAdjustedOutputTax = totalOutputTax - uncollectedReceivableVAT + recoveredReceivablesVAT;
+        document.getElementById('total_adjusted_output_tax').value = totalAdjustedOutputTax.toFixed(2);
+    }
+    
+    // Function to calculate Total Purchases and Input Tax
+    function calculateTotalPurchasesAndInputTax() {
+        const domesticPurchase = parseFloat(document.getElementById('domestic_purchase').value) || 0;
+        const domesticPurchaseInputTax = parseFloat(document.getElementById('domestic_purchase_input_tax').value) || 0;
+        const servicesNonResident = parseFloat(document.getElementById('services_non_resident').value) || 0;
+        const servicesNonResidentInputTax = parseFloat(document.getElementById('services_non_resident_input_tax').value) || 0;
+        const importations = parseFloat(document.getElementById('importations').value) || 0;
+        const importationsInputTax = parseFloat(document.getElementById('importations_input_tax').value) || 0;
+        const domesticNoInput = parseFloat(document.getElementById('domestic_no_input').value) || 0;
+    
+        const othersSpecifyAmount = parseFloat(document.getElementById('purchases_others_specify_amount').value) || 0;
+        const othersSpecifyInputTax = parseFloat(document.getElementById('purchases_others_specify_input_tax').value) || 0;
+    
+        // Calculate total purchases and total input tax
+        const totalPurchases = domesticPurchase + servicesNonResident + importations + othersSpecifyAmount + domesticNoInput;
+        const totalInputTax = domesticPurchaseInputTax + servicesNonResidentInputTax + importationsInputTax + othersSpecifyInputTax;
+    
+        document.getElementById('total_current_purchase').value = totalPurchases.toFixed(2);
+        document.getElementById('total_current_purchase_input_tax').value = totalInputTax.toFixed(2);
+    }
+    
+    // Add event listeners for all input fields
+    document.addEventListener('DOMContentLoaded', () => {
+        // Trigger initial calculations
+        calculateTotals();
+    
+        // List of fields to trigger recalculation
+        const fieldsToWatch = [
+            'vatable_sales', 
+            'vatable_sales_tax_amount', 
+            'zero_rated_sales', 
+            'exempt_sales', 
+            'input_carried_over', 
+            'input_tax_deferred', 
+            'transitional_input_tax', 
+            'presumptive_input_tax', 
+            'other_input_tax',
+            'domestic_purchase', 
+            'domestic_purchase_input_tax',
+            'services_non_resident', 
+            'services_non_resident_input_tax',
+            'importations', 
+            'importations_input_tax', 
+            'domestic_no_input',
+            'purchases_others_specify_amount',
+            'purchases_others_specify_input_tax',
+            'uncollected_receivable_vat', 
+            'recovered_uncollected_receivables',
+            'importation_million_deferred_input_tax',
+        'attributable_vat_exempt_input_tax',
+        'vat_refund_input_tax',
+        'unpaid_payables_input_tax',
+        'other_deduction_specify_input_tax',
+        'total_deductions_input_tax',
+        'settled_unpaid_input_tax',
+        'total_available_input_tax',
+        'total_adjusted_output_tax'
+        ];
+   
+    
+        
+        fieldsToWatch.forEach(fieldId => {
+            document.getElementById(fieldId).addEventListener('input', () => {
+                calculateTotals();  // Update the values when any field changes
+            });
         });
     });
     </script>

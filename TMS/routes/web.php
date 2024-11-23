@@ -162,7 +162,8 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
         Route::get('/contacts', function () {
             return view('contacts');
         })->name('contacts');
-        Route::post('tax-return/{taxReturn}/2551q', [TaxReturnController::class, 'store2551Q'])
+
+        Route::post('percentage_return/{taxReturn}/2551q', [TaxReturnController::class, 'store2551Q'])
         ->name('tax_return.store2551Q');
         Route::post('tax-return/{taxReturn}/2551q', [TaxReturnController::class, 'store2550Q'])
         ->name('tax_return.store2550Q');
