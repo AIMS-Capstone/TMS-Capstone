@@ -347,7 +347,7 @@
                                     </table>
                                     @if (count($transactions) > 0)
                                         <div class="mt-4">
-                                            {{ $transactions->links('vendor.pagination.custom') }}
+                                            {{ $transactions->links('vendor.pagination.sales') }}
                                         </div>
                                     @endif
                                     <div x-show="showUpdateStatusButtons" class="flex justify-center py-4" x-cloak>
