@@ -84,8 +84,7 @@ class CreateTax2550qTable extends Migration
             $table->decimal('compromise', 15, 2);
             $table->decimal('total_penalties', 15, 2);
             $table->decimal('total_amount_payable', 15, 2);
-
-            // Timestamps
+            $table->foreignId('tax_return_id')->constrained('tax_returns')->onDelete('cascade');
             $table->timestamps();
         });
     }
