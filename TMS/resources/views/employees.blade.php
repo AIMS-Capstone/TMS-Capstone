@@ -3,8 +3,8 @@
     $organization = \App\Models\OrgSetup::find($organizationId);
     @endphp
 
-    <x-app-layout>
-        {{-- Wag po guluhin mga div T^T --}}
+<x-app-layout>
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8"> 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -20,32 +20,53 @@
                         <div class="flex items-center">            
                             <p class="font-normal text-sm text-zinc-700">The Contacts page allows quick entry and storage of essential client details to<br>keep records organized and accessible.</p>
                         </div>
-                        <x-add-contacts-modal />
-                        <div 
-                            class="items-end float-end relative sm:w-auto" 
-                            x-data 
-                            x-on:click="$dispatch('open-add-contacts-modal')"   
-                        >
-                            <button type="button"
-                                    class="text-white bg-blue-900 hover:bg-blue-950 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none focus:ring-2 focus:ring-gray-300">
-                                <i class="fas fa-plus-circle mr-1"></i>
-                                Add Contact
-                            </button>
-                        </div>
+                            <div class="items-end float-end relative sm:w-auto">
+                                <!-- Add Contact Button -->
+                                <button 
+                                    type="button" 
+                                    id="dropdownDefaultButton" 
+                                    class="text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none focus:ring-2 focus:ring-gray-300 bg-blue-900 hover:bg-blue-950"
+                                    onclick="toggleDropdown()">
+                                    <i class="fas fa-plus-circle mr-1"></i>
+                                    Add Contact
+                                </button>
+
+                                <!-- Dropdown Menu -->
+                                <div id="dropdown" class="absolute z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-md w-48 mt-2">
+                                    <ul class="py-2 px-2 text-sm text-gray-700" aria-labelledby="dropdownDefaultButton">
+                                        <!-- Add Manual Button -->
+                                        <li>
+                                            <x-add-employees-modal />
+                                            <button 
+                                                x-data 
+                                                x-on:click="$dispatch('open-add-employees-modal')" 
+                                                class="block px-4 py-2 hover-dropdown">
+                                                <span class="text-zinc-600 group-hover:text-green-500 transition">Add manual</span>
+                                            </button>
+                                        </li>
+                                        <!-- Upload CSV Option -->
+                                        <li>
+                                            <livewire:employees-multi-step-import />
+                                            
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                     </div>
                 </div>  
                 <div class="container mx-auto ps-8">
                     <div class="flex flex-row space-x-2 items-center justify-center">
-                        <div x-data="{ selectedTab: 'Contacts' }" class="w-full">
+                        <div x-data="{ selectedTab: 'Employees' }" class="w-full">
                             <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-24 overflow-x-auto  border-neutral-300" role="tablist" aria-label="tab options">
-                                <button @click="selectedTab = 'Contacts'" :aria-selected="selectedTab === 'Contacts'" 
-                                :tabindex="selectedTab === 'Contacts' ? '0' : '-1'" 
-                                :class="selectedTab === 'Contacts' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900'   : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'" 
-                                class="h-min py-2 text-base" 
-                                type="button"
-                                role="tab" 
-                                aria-controls="tabpanelContacts" >Contacts</button>
-                                <a href="/employees">
+                                <a href="/contacts">
+                                    <button @click="selectedTab = 'Contacts'" :aria-selected="selectedTab === 'Contacts'" 
+                                    :tabindex="selectedTab === 'Contacts' ? '0' : '-1'" 
+                                    :class="selectedTab === 'Contacts' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900'   : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'" 
+                                    class="h-min py-2 text-base" 
+                                    type="button"
+                                    role="tab" 
+                                    aria-controls="tabpanelContacts" >Contacts</button>
+                                </a>
                                     <button @click="selectedTab = 'Employees'" :aria-selected="selectedTab === 'Employees'" 
                                     :tabindex="selectedTab === 'Employees' ? '0' : '-1'" 
                                     :class="selectedTab === 'Employees' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900'   : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'"
@@ -53,7 +74,6 @@
                                     type="button" 
                                     role="tab" 
                                     aria-controls="tabpanelEmployees" >Employees</button>
-                                </a>
                             </div>
                         </div>  
                     </div>
@@ -99,7 +119,7 @@
 
 
                                             // Send the request to the backend
-                                            fetch('{{ route("contacts.destroy") }}', {
+                                            fetch('{{ route("employees.destroy") }}', {
                                                 method: 'DELETE',
                                                 headers: {
                                                     'Content-Type': 'application/json',
@@ -146,7 +166,7 @@
                                             <div class="flex space-x-2 items-center">
                                                 <!-- Search bar -->
                                                 <div class="relative w-80 p-4">
-                                                    <form x-target="tableid" action="/contacts" role="search" aria-label="Table" autocomplete="off">
+                                                    <form x-target="tableid" action="/employees" role="search" aria-label="Table" autocomplete="off">
                                                         <input 
                                                             type="search" 
                                                             name="search" 
@@ -232,22 +252,23 @@
                                                         </div>
                                                     </label>
                                                 </th>
-                                                <th scope="col" class="text-left py-4 px-4">Name</th>
+                                                <th scope="col" class="text-left py-4 px-4">Employee Name</th>
                                                 <th scope="col" class="text-left py-4 px-4">TIN</th>
-                                                <th scope="col" class="text-left py-4 px-4">Contact Type</th>
+                                                <th scope="col" class="text-left py-4 px-4">Date of Birth</th>
+                                                <th scope="col" class="text-left py-4 px-4">Contact</th>
+                                                <th scope="col" class="text-left py-4 px-4">Nationality</th>
                                                 <th scope="col" class="text-left py-4 px-4">Address</th>
-                                                <th scope="col" class="text-left py-4 px-4">City</th>
                                                 <th scope="col" class="text-left py-4 px-4">Zip Code</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-neutral-300 text-left py-[7px]">
-                                            @if (count($contacts) > 0)
-                                                @foreach ($contacts as $contact)
+                                            @if (count($employees) > 0)
+                                                @foreach ($employees as $employee)
                                                     <tr class="hover:bg-blue-50 cursor-pointer ease-in-out">
                                                         <td class="p-4">
                                                             <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                                                 <div class="relative flex items-center">
-                                                                    <input type="checkbox" @click="toggleCheckbox('{{ $contact->id }}')" :checked="selectedRows.includes('{{ $contact->id }}')" id="contact{{ $contact->id }}" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition" />
+                                                                    <input type="checkbox" @click="toggleCheckbox('{{ $employee->id }}')" :checked="selectedRows.includes('{{ $employee->id }}')" id="contact{{ $employee->id }}" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition" />
                                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
                                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                                                     </svg>
@@ -255,27 +276,27 @@
                                                             </label>
                                                         </td>
                                                         <td class="text-left py-3 px-4">
-                                                            <x-view-contact />
+                                                            <x-edit-employees />
                                                             <button 
-                                                                @click="$dispatch('open-view-contact-modal', {{ json_encode($contact) }})" 
-                                                                class="hover:underline hover:text-blue-500"
-                                                            >
-                                                                {{ $contact->bus_name }}
+                                                                @click="$dispatch('open-edit-employee-modal', {{ json_encode($employee->load('address', 'employments.address')) }})"
+                                                                class="hover:underline hover:text-blue-500">
+                                                                {{ $employee->first_name }} {{ $employee->last_name }}
                                                             </button>
                                                         </td>
-                                                        <td class="text-left py-3 px-4">{{ $contact->contact_tin }}</td>
-                                                        <td class="text-left py-3 px-4">{{ $contact->contact_type }}</td>
-                                                        <td class="text-left py-3 px-4">{{ $contact->contact_address }}</td>
-                                                        <td class="text-left py-3 px-4">{{ $contact->contact_city }}</td>
-                                                        <td class="text-left py-3 px-4">{{ $contact->contact_zip }}</td>
+                                                        <td class="text-left py-3 px-4">{{ $employee->tin }}</td>
+                                                        <td class="text-left py-3 px-4">{{ \Carbon\Carbon::parse($employee->date_of_birth)->format('F d, Y') }}</td>
+                                                        <td class="text-left py-3 px-4">{{ $employee->contact_number }}</td>
+                                                        <td class="text-left py-3 px-4">{{ $employee->nationality }}</td>
+                                                        <td class="text-left py-3 px-4">{{ $employee->address->address ?? 'N/A' }}</td>
+                                                        <td class="text-left py-3 px-4">{{ $employee->address->zip_code ?? 'N/A' }}</td>
                                                     </tr>
                                                 @endforeach
                                             @else
                                                 <tr>
-                                                    <td colspan="6" class="text-center p-4">
+                                                    <td colspan="8" class="text-center p-4">
                                                         <img src="{{ asset('images/Box.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
-                                                        <h1 class="font-extrabold text-neutral-600 text-lg mt-2">No Contacts Added Yet</h1>
-                                                        <p class="text-sm text-neutral-500 mt-2">Start adding contacts by clicking the add contact button at the top.</p>
+                                                        <h1 class="font-extrabold text-neutral-600 text-lg mt-2">No Employees Added Yet</h1>
+                                                        <p class="text-sm text-neutral-500 mt-2">Start adding Employees by clicking the add contact button at the top.</p>
                                                     </td>
                                                 </tr>
                                             @endif
@@ -340,8 +361,9 @@
                                          > Cancel
                                         </button>
                                     </div>
-                                    
-                                    {{ $contacts->links('vendor.pagination.custom') }}
+                                    @if (count($employees) > 0)
+                                        {{ $employees->links('vendor.pagination.custom') }}
+                                    @endif
                                 </div>
             </div>
         </div>
@@ -385,7 +407,6 @@
             });
         }
         
-
         // FOR SORT BUTTON
         document.getElementById('sortButton').addEventListener('click', function() {
             const dropdown = document.getElementById('dropdownMenu');
@@ -446,7 +467,7 @@
         function setEntries(entries) {
             const form = document.createElement('form');
             form.method = 'GET';
-            form.action = "{{ route('contacts') }}";
+            form.action = "{{ route('employees') }}";
             const perPageInput = document.createElement('input');
             perPageInput.type = 'hidden';
             perPageInput.name = 'perPage';
@@ -462,8 +483,19 @@
         }
 
         document.addEventListener('open-view-contact-modal', event => {
-    console.log(event.detail); // Debug modal data
-});
+            console.log(event.detail); 
+        });
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+            document.addEventListener('livewire:load', function () {
+                Livewire.on('openModalEmployeesImport', () => {
+                    Livewire.emit('openModalEmployeesImport');
+                });
+            });
         
     </script>
 </x-app-layout>

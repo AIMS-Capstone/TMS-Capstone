@@ -29,12 +29,15 @@ use App\Http\Controllers\AccountantUsersRecycleBinController;
 use App\Http\Controllers\ClientUsersRecycleBinController;
 use App\Http\Controllers\TransactionsRecycleBinController;
 use App\Http\Controllers\TaxReturnsRecycleBinController;
+use App\Http\Controllers\ContactsRecycleBinController;
+use App\Http\Controllers\EmployeesRecycleBinController;
 
 //Client
 use App\Http\Controllers\ClientAuthController;
 use App\Http\Controllers\ClientFinancialController;
 use App\Http\Controllers\ClientProfileController;
 use App\Http\Controllers\ClientAnalyticsController;
+use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\TaxTypeController;
 use App\Models\rdo;
 use App\Models\TaxReturn;
@@ -134,6 +137,17 @@ Route::middleware([
             Route::get('/tax-returns', [TaxReturnsRecycleBinController::class, 'index'])->name('recycle-bin.tax-returns.index');
             Route::post('/tax-returns/bulk-restore', [TaxReturnsRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.tax-returns.bulkRestore');
             Route::delete('/tax-returns/bulk-delete', [TaxReturnsRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.tax-returns.bulkDelete');
+
+            // Contacts
+            Route::get('/contacts', [ContactsRecycleBinController::class, 'index'])->name('recycle-bin.contacts.index');
+            Route::post('/contacts/bulk-restore', [ContactsRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.contacts.bulkRestore');
+            Route::delete('/contacts/bulk-delete', [ContactsRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.contacts.bulkDelete');
+
+            // Employees
+            Route::get('/employees', [EmployeesRecycleBinController::class, 'index'])->name('recycle-bin.employees.index');
+            Route::post('/employees/bulk-restore', [EmployeesRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.employees.bulkRestore');
+            Route::delete('/employees/bulk-delete', [EmployeesRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.employees.bulkDelete');
+
         });//ending of recycle-bin prefix
     });//ending of auth role middleware
 
@@ -159,9 +173,21 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
         Route::post('/transactions/store/upload', [TransactionsController::class, 'storeUpload'])->name('transactions.storeUpload');
 
         // Contacts Routes
-        Route::get('/contacts', function () {
-            return view('contacts');
-        })->name('contacts');
+        Route::controller(ContactsController::class)->group(function () {
+            Route::get('/contacts', 'index')->name('contacts');
+            Route::post('/contacts', 'store')->name('contacts.store');
+            Route::put('/contacts/{contact}', [ContactsController::class, 'update'])->name('contacts.update');
+            Route::delete('/contacts/destroy', 'destroy')->name('contacts.destroy'); 
+        });
+
+        // Employees Routes
+        Route::controller(EmployeesController::class)->group(function(){
+            Route::get('/employees', 'index')->name('employees');
+            Route::post('/employees', 'store')->name('employees.store');
+            Route::put('/employees/{employees}', [EmployeesController::class, 'update'])->name('employees.update');
+            Route::delete('/employees/destroy', 'destroy')->name('employees.destroy');
+        });
+
         Route::post('tax-return/{taxReturn}/2551q', [TaxReturnController::class, 'store2551Q'])
         ->name('tax_return.store2551Q');
         Route::post('tax-return/{taxReturn}/2551q', [TaxReturnController::class, 'store2550Q'])
