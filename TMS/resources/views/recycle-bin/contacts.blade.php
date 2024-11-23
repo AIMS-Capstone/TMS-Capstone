@@ -17,7 +17,7 @@
 
                     <!-- Tabs Navigation -->
                     @php
-                        $activeTab = request()->query('tab', 'org');
+                        $activeTab = request()->query('tab', 'contacts');
                     @endphp
                     <nav class="flex gap-x-4 overflow-x-auto justify-center mt-4" aria-label="Tabs">
                         <a href="{{ route('recycle-bin.organization.index') }}" class="py-3 px-4 text-sm font-medium {{ $activeTab === 'org' ? 'text-blue-900 font-extrabold border-b-4 border-blue-900' : 'text-gray-500' }}">Organizations</a>
@@ -31,10 +31,10 @@
 
                     <div x-data="recycleBinHandler">
                         <!-- Search and Sort Options -->
-                        <div class="flex items-center mt-6" >
+                        <div class="flex items-center mt-6">
                             <!-- Search Box -->
                             <div class="relative w-80">
-                                <form x-target="org-table" action="{{ route('recycle-bin.organization.index') }}" method="GET" role="search" aria-label="Table" autocomplete="off">
+                                <form x-target="contacts-table" action="{{ route('recycle-bin.contacts.index') }}" method="GET" role="search" aria-label="Table" autocomplete="off">
                                     <input type="search" name="user_search" value="{{ request('user_search') }}" class="w-full pl-10 pr-4 py-2 text-sm border border-zinc-300 rounded-lg focus:outline-none focus:ring-sky-900 focus:border-sky-900" aria-label="Search Term" placeholder="Search...">
                                 </form>
                                 <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-zinc-400"></i>
@@ -85,66 +85,63 @@
                             </div>
                         </div>
 
-                        <!-- Organizations Table -->
+                        <!-- contacts Table -->
                         <div class="my-4 overflow-y-auto max-h-[500px]">
-                            <table class="min-w-full bg-white" id="org-table">
+                            <table class="min-w-full bg-white" id="contacts-table">
                                 <thead class="bg-zinc-100 text-zinc-700 font-extrabold sticky top-0">
                                     <tr>
                                         <th class="text-left py-3 px-4">
                                             <input type="checkbox" @click="toggleAll()" :checked="checkAll" aria-label="Select all items" />
                                         </th>
+                                        <th class="text-left py-3 px-4 font-semibold text-sm">Organization</th>
                                         <th class="text-left py-3 px-4 font-semibold text-sm">Name</th>
-                                        <th class="text-left py-3 px-4 font-semibold text-sm">Tax Type</th>
-                                        <th class="text-left py-3 px-4 font-semibold text-sm">Classification</th>
-                                        <th class="text-left py-3 px-4 font-semibold text-sm">Account Status</th>
+                                        <th class="text-left py-3 px-4 font-semibold text-sm">Tin</th>
+                                        <th class="text-left py-3 px-4 font-semibold text-sm">Contact Type</th>
+                                        <th class="text-left py-3 px-4 font-semibold text-sm">Address</th>
                                         <th class="text-left py-3 px-4 font-semibold text-sm">Date Deleted</th>
                                         <th class="text-left py-3 px-4 font-semibold text-sm">Deleted by</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-zinc-200 text-sm text-zinc-700">
-                                    @if($trashedOrganizations->isEmpty())
+                                    @if($trashedContacts->isEmpty())
                                         <tr>
                                             <td colspan="7" class="text-center p-4">
                                                 <img src="{{ asset('images/Box.png') }}" alt="No data available" class="mx-auto w-48 h-48" />
-                                                <h1 class="font-extrabold">No Deleted Transactions yet</h1>
+                                                <h1 class="font-extrabold">No Deleted Contacts yet</h1>
                                                 <p class="text-sm text-neutral-500 mt-2">Deleted items will show up here when you need to restore or permanently delete them.</p>
                                             </td>
                                         </tr>
                                     @else
-                                    @foreach($trashedOrganizations as $organization)
-                                        <tr>
-                                            <td class="py-3 px-4">
-                                                <input 
-                                                    type="checkbox" 
-                                                    x-bind:checked="selectedRows.includes({{ $organization->id }})" 
-                                                    @click="toggleCheckbox({{ $organization->id }})" 
-                                                    aria-label="Select item {{ $organization->registration_name }}" 
-                                                    data-organization-id="{{ $organization->id }}"
-                                                >
-                                            </td>
-                                            <td class="py-3 px-4">{{ $organization->registration_name }}</td>
-                                            <td class="py-3 px-4">{{ $organization->tax_type }}</td>
-                                            <td class="py-3 px-4">{{ $organization->type }}</td>
-                                            <td class="text-left py-3 px-4">
-                                                @if ($organization->account) 
-                                                    <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-4 py-2 rounded-full">Account Active</span>
-                                                @else
-                                                    <span class="bg-zinc-100 text-zinc-800 text-xs font-medium me-2 px-4 py-2 rounded-full">No Account Yet</span>
-                                                @endif
-                                            </td>
-                                            <td class="p-4">{{ \Carbon\Carbon::parse($organization->deleted_at )->format('F d, Y') ?? 'N/A' }}</td>
-                                            <td class="py-3 px-4">{{ $organization->deletedByUser->name ?? 'Unknown' }}</td>
-                                        </tr>
-                                    @endforeach
+                                        @foreach($trashedContacts as $contact)
+                                            <tr>
+                                                <td class="py-3 px-4">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        :checked="selectedRows.includes(@json($contact->id))" 
+                                                        @click="toggleCheckbox(@json($contact->id))" 
+                                                        aria-label="Select item {{ $contact->bus_name }}" 
+                                                        data-contact-id="{{ $contact->id }}"
+                                                    >
+                                                </td>
+                                                <td class="py-3 px-4">{{ $contact->organization->registration_name ?? 'N/A' }}</td>
+                                                <td class="py-3 px-4">{{ $contact->bus_name ?? 'N/A' }}</td>
+                                                <td class="py-3 px-4">{{ $contact->contact_tin ?? 'N/A' }}</td>
+                                                <td class="py-3 px-4">{{ $contact->contact_type }}</td>
+                                                <td class="py-3 px-4">{{ $contact->contact_address }}</td>
+                                                <td class="p-4">{{ \Carbon\Carbon::parse($contact->deleted_at)->format('F d, Y') ?? 'N/A' }}</td>
+                                                <td class="py-3 px-4">{{ $contact->deletedByUser->name ?? 'Unknown' }}</td>
+                                            </tr>
+                                        @endforeach
+
                                 </tbody>
                             </table>
-                                <div class="mt-4">
-                                    {{ $trashedOrganizations->links('vendor.pagination.custom') }}
-                                </div>
+                            <div class="mt-4">
+                                {{ $trashedContacts->links('vendor.pagination.custom') }}
+                            </div>
                             @endif
                         </div>
 
-                        <!-- Delete Confirmation Modal -->
+                        <!-- Modals -->
                         <div x-show="showConfirmDeleteModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center" x-cloak>
                             <div class="bg-white p-5 rounded-lg max-w-md w-full text-center">
                                 <p class="text-lg font-semibold mb-4">Are you sure you want to delete the selected items?</p>
@@ -155,7 +152,6 @@
                             </div>
                         </div>
 
-                        <!-- Restore Confirmation Modal -->
                         <div x-show="showConfirmRestoreModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center" x-cloak>
                             <div class="bg-white p-5 rounded-lg max-w-md w-full text-center">
                                 <p class="text-lg font-semibold mb-4">Are you sure you want to restore the selected items?</p>
@@ -189,17 +185,17 @@
 
                 toggleAll() {
                     this.checkAll = !this.checkAll;
-                    this.selectedRows = this.checkAll ? @json($trashedOrganizations->pluck('id')) : [];
+                    this.selectedRows = this.checkAll ? @json($trashedContacts->pluck('id')) : [];
                 },
 
                 bulkRestore() {
-                    axios.post('{{ route("recycle-bin.organization.bulkRestore") }}', { ids: this.selectedRows })
+                    axios.post('{{ route("recycle-bin.contacts.bulkRestore") }}', { ids: this.selectedRows })
                         .then(response => location.reload())
                         .catch(error => console.error(error));
                 },
 
                 bulkDelete() {
-                    axios.post('{{ route("recycle-bin.organization.bulkDelete") }}', { ids: this.selectedRows, _method: "DELETE" })
+                    axios.post('{{ route("recycle-bin.contacts.bulkDelete") }}', { ids: this.selectedRows, _method: "DELETE" })
                         .then(response => location.reload())
                         .catch(error => console.error(error));
                 },
@@ -229,4 +225,5 @@
             document.getElementById("showEntriesDropdown").classList.toggle("hidden");
         });
     </script>
+
 </x-organization-layout>
