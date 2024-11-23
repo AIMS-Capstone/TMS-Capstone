@@ -35,6 +35,9 @@ return new class extends Migration
             $table->string('contact_address')->nullable(); // Address can be null
             $table->string('contact_city');
             $table->string('contact_zip');
+            $table->softDeletes();
+
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
         
             $table->timestamps();
         });

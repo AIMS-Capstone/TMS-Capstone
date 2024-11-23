@@ -25,6 +25,8 @@
                         <a href="{{ route('recycle-bin.client-users.index') }}" class="py-3 px-4 text-sm font-medium {{ $activeTab === 'client' ? 'text-blue-900 font-extrabold border-b-4 border-blue-900' : 'text-gray-500' }}">Client Users</a>
                         <a href="{{ route('recycle-bin.transactions.index') }}" class="py-3 px-4 text-sm font-medium {{ $activeTab === 'transaction' ? 'text-blue-900 font-extrabold border-b-4 border-blue-900' : 'text-gray-500' }}">Transactions</a>
                         <a href="{{ route('recycle-bin.tax-returns.index') }}" class="py-3 px-4 text-sm font-medium {{ $activeTab === 'tax' ? 'text-blue-900 font-extrabold border-b-4 border-blue-900' : 'text-gray-500' }}">Tax Returns</a>
+                        <a href="{{ route('recycle-bin.contacts.index') }}" class="py-3 px-4 text-sm font-medium {{ $activeTab === 'contacts' ? 'text-blue-900 font-extrabold border-b-4 border-blue-900' : 'text-gray-500' }}">Contacts</a>
+                        <a href="{{ route('recycle-bin.employees.index') }}" class="py-3 px-4 text-sm font-medium {{ $activeTab === 'employees' ? 'text-blue-900 font-extrabold border-b-4 border-blue-900' : 'text-gray-500' }}">Employees</a>
                     </nav>
 
                     <div x-data="recycleBinHandler">
