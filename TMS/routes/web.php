@@ -191,7 +191,7 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
         });
 
           Route::post('percentage_return/{taxReturn}/2551q', [TaxReturnController::class, 'store2551Q']);
-        Route::post('tax-return/{taxReturn}/2551q', [TaxReturnController::class, 'store2550Q'])
+        Route::post('tax-return/{taxReturn}/2550q', [TaxReturnController::class, 'store2550Q'])
         ->name('tax_return.store2550Q');
         Route::post('/tax-return-transaction/deactivate', [TransactionsController::class, 'deactivate'])
     ->name('tax-return-transaction.deactivate');
