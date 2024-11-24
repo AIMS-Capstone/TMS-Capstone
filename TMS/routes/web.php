@@ -172,7 +172,9 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
         Route::get('/transaction/download', [TransactionsController::class, 'download_transaction']);
         Route::post('/transactions/store/upload', [TransactionsController::class, 'storeUpload'])->name('transactions.storeUpload');
 
-        // Contacts Routes
+
+
+
         Route::controller(ContactsController::class)->group(function () {
             Route::get('/contacts', 'index')->name('contacts');
             Route::post('/contacts', 'store')->name('contacts.store');
@@ -188,8 +190,7 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
             Route::delete('/employees/destroy', 'destroy')->name('employees.destroy');
         });
 
-        Route::post('tax-return/{taxReturn}/2551q', [TaxReturnController::class, 'store2551Q'])
-        ->name('tax_return.store2551Q');
+          Route::post('percentage_return/{taxReturn}/2551q', [TaxReturnController::class, 'store2551Q']);
         Route::post('tax-return/{taxReturn}/2551q', [TaxReturnController::class, 'store2550Q'])
         ->name('tax_return.store2550Q');
         Route::post('/tax-return-transaction/deactivate', [TransactionsController::class, 'deactivate'])
@@ -202,7 +203,8 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
     Route::get('/vat_return/{id}/report', [TaxReturnController::class, 'showVatReport'])
     ->name('tax_return.report');
         Route::get('/percentage_return', [TaxReturnController::class, 'percentageReturn'])->name('percentage_return');
-        Route::get('/percentage_return/{taxReturn}/slsp-data', [TaxReturnController::class, 'showPercentageSlspData'])->name('percentage_return.slsp_data');
+        Route::get('/
+        }/slsp-data', [TaxReturnController::class, 'showPercentageSlspData'])->name('percentage_return.slsp_data');
         Route::post('/percentage_return', [TaxReturnController::class, 'storePercentage']);
         Route::post('/vat_return', [TaxReturnController::class, 'store']);
         Route::get('/tax_return/{taxReturn}/slsp-data', [TaxReturnController::class, 'showSlspData'])->name('tax_return.slsp_data');

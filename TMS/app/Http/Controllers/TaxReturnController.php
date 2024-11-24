@@ -93,7 +93,8 @@ class TaxReturnController extends Controller
     })->with(['transaction.contactDetails', 'atc', 'taxType'])
       ->get();
 
-    // Group the TaxRows by ATC and calculate the summary
+    $totalZeroRatedSales ="";
+    // Group the TaxRows by ATC and calculate the summary       
     $groupedData = $taxRows->groupBy(function ($taxRow) {
         return $taxRow->atc->tax_code; // Group by ATC code
     });
@@ -127,84 +128,191 @@ class TaxReturnController extends Controller
         'summaryData' // Add the summary data to the view
     ));
 }
-
 public function showVatReport($id)
 {
+    // Fetch the tax return and organization setup data
     $taxReturn = TaxReturn::findOrFail($id);
     $organization_id = session("organization_id");
 
-    // Ensure correct relationship loading with lowercase 'rdo'
+    // Load the organization and its RDO relationship
     $organization = OrgSetup::with("rdo")
         ->where('id', $organization_id)
         ->first();
 
+    // Extract the RDO code from the organization data
     $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
 
-    // Parse the start_date using Carbon
+    // Parse the organization's start date to determine the fiscal year
     $startDate = Carbon::parse($organization->start_date);
+    $yearEnded = $startDate->month == 1 && $startDate->day == 1
+        ? $startDate->addYear()->endOfYear()  // Calendar year end
+        : $startDate->addYear()->lastOfMonth(); // Fiscal year end
 
-    // Determine the year ended based on the start_date
-    $yearEnded = null;
-    if ($startDate->month == 1 && $startDate->day == 1) {
-        // Calendar year - Ends on December 31 of the next year
-        $yearEnded = $startDate->addYear()->endOfYear();
-    } else {
-        // Fiscal year - Ends on the last day of the same month next year
-        $yearEnded = $startDate->addYear()->lastOfMonth();
-    }
-    // Check whether the organization follows a calendar or fiscal period
-    $period = ($yearEnded->month == 12 && $yearEnded->day == 31) ? 'calendar' : 'fiscal';
-
-    // Format the year ended date as 'YYYY-MM'
+    // Determine whether it's a calendar or fiscal year
+    $period = $yearEnded->month == 12 && $yearEnded->day == 31 ? 'calendar' : 'fiscal';
     $yearEndedFormatted = $yearEnded->format('Y-m');
-    $yearEndedFormattedForDisplay = $yearEnded->format('m/Y'); // e.g., "12/2024"
+    $yearEndedFormattedForDisplay = $yearEnded->format('m/Y');
 
-    // Get the transaction IDs related to this tax return
+    // Retrieve current quarter and year
+    $currentQuarter = (int)filter_var($taxReturn->month, FILTER_SANITIZE_NUMBER_INT); // Extract quarter number
+    $currentYear = $taxReturn->year;
+
+    // Initialize previous quarter and year
+    $previousQuarter = null;
+    $previousYear = null;
+
+    // Determine the previous quarter if applicable
+    if ($currentQuarter > 1) {
+        $previousQuarter = $currentQuarter - 1;
+        $previousYear = $currentYear;
+    }
+
+    // Initialize excess input tax for previous quarter (if applicable)
+    $excessInputTax = null;
+    if ($previousQuarter && $previousYear) {
+        $previousTaxReturn = TaxReturn::where('year', $previousYear)
+            ->where('month', $previousQuarter)
+            ->where('organization_id', $organization_id)
+            ->first();
+
+        if ($previousTaxReturn) {
+            $excessInputTax = $previousTaxReturn->related2550q->excess_input_tax ?? null;
+        }
+    }
+
+    // Retrieve the transaction IDs linked to this tax return
     $transactionIds = $taxReturn->transactions->pluck('id');
 
-    // Get the TaxRows and calculate the summary data
+    // Get the TaxRows and load necessary relationships
     $taxRows = TaxRow::whereHas('transaction', function ($query) use ($transactionIds) {
-        $query->where('tax_type', 2)
-              ->where('transaction_type', 'sales')
+        $query->where('tax_type', '!=', 2)
               ->where('status', 'draft')
               ->whereIn('id', $transactionIds);
-    })->with(['transaction.contactDetails', 'atc', 'taxType'])
-      ->get();
+    })->with(['transaction.contactDetails', 'atc', 'taxType'])->get();
 
-    // Group the TaxRows by ATC and calculate the summary
-    $groupedData = $taxRows->groupBy(function ($taxRow) {
-        return $taxRow->atc->tax_code; // Group by ATC code
-    });
+    // Initialize variables for each tax type and tax amount
+    $vatOnSalesGoods = $vatOnSalesServices = $salesToGovernmentGoods = $salesToGovernmentServices = 0;
+    $zeroRatedSalesGoods = $zeroRatedSalesServices = $taxExemptSalesGoods = $taxExemptSalesServices = 0;
+    $vatOnPurchasesGoods = $vatOnPurchasesServices = $capitalGoods = $importationOfGoods = 0;
+    $taxExemptPurchasesImportationOfGoods = 0;
+    $goodsNotQualifiedForInputTax = $servicesNotQualifiedForInputTax = $servicesByNonResidents = $nonTaxSales = $nonTaxPurchases = 0;
 
-    $summaryData = $groupedData->map(function ($group) {
-        $taxableAmount = 0;
-        $taxRate = 0;
-        $taxDue = 0;
+    $vatOnSalesGoodsTax = $vatOnSalesServicesTax = $salesToGovernmentGoodsTax = $salesToGovernmentServicesTax = 0;
+    $zeroRatedSalesGoodsTax = $zeroRatedSalesServicesTax = $taxExemptSalesGoodsTax = $taxExemptSalesServicesTax = 0;
+    $vatOnPurchasesGoodsTax = $vatOnPurchasesServicesTax = $capitalGoodsTax = $importationOfGoodsTax = 0;
+    $taxExemptPurchasesImportationOfGoodsTax = $goodsNotQualifiedForInputTaxTax = $servicesNotQualifiedForInputTaxTax = $servicesByNonResidentsTax = 0;
 
-        foreach ($group as $taxRow) {
-            $taxableAmount += $taxRow->net_amount;
-            $taxRate = $taxRow->atc->tax_rate;
-            $taxDue += $taxRow->atc_amount;
+    // Calculate totals for each tax type
+    foreach ($taxRows as $taxRow) {
+        $taxType = $taxRow->taxType;
+
+        if ($taxType) {
+            switch ($taxType->tax_type) {
+                case 'Vat on Sales (Goods)':
+                    $vatOnSalesGoods += $taxRow->net_amount;
+                    $vatOnSalesGoodsTax += $taxRow->tax_amount;
+                    break;
+                case 'Vat on Sales (Services)':
+                    $vatOnSalesServices += $taxRow->net_amount;
+                    $vatOnSalesServicesTax += $taxRow->tax_amount;
+                    break;
+                case 'Sales to Government (Goods)':
+                    $salesToGovernmentGoods += $taxRow->net_amount;
+                    $salesToGovernmentGoodsTax += $taxRow->tax_amount;
+                    break;
+                case 'Sales to Government (Services)':
+                    $salesToGovernmentServices += $taxRow->net_amount;
+                    $salesToGovernmentServicesTax += $taxRow->tax_amount;
+                    break;
+                case 'Zero Rated Sales (Goods)':
+                    $zeroRatedSalesGoods += $taxRow->net_amount;
+                    $zeroRatedSalesGoodsTax += $taxRow->tax_amount;
+                    break;
+                case 'Zero Rated Sales (Services)':
+                    $zeroRatedSalesServices += $taxRow->net_amount;
+                    $zeroRatedSalesServicesTax += $taxRow->tax_amount;
+                    break;
+                case 'Tax-Exempt Sales (Goods)':
+                    $taxExemptSalesGoods += $taxRow->net_amount;
+                    $taxExemptSalesGoodsTax += $taxRow->tax_amount;
+                    break;
+                case 'Tax-Exempt Sales (Services)':
+                    $taxExemptSalesServices += $taxRow->net_amount;
+                    $taxExemptSalesServicesTax += $taxRow->tax_amount;
+                    break;
+                case 'Non-Tax':
+                    // Distinguish between Non-Tax Sales and Purchases
+                    if ($taxRow->transaction->transaction_type == 'purchase') {
+                        $nonTaxPurchases += $taxRow->net_amount;
+                    } else {
+                        $nonTaxSales += $taxRow->net_amount;
+                    }
+                    break;
+                case 'Vat on Purchases (Goods)':
+                    $vatOnPurchasesGoods += $taxRow->net_amount;
+                    $vatOnPurchasesGoodsTax += $taxRow->tax_amount;
+                    break;
+                case 'Vat on Purchases (Services)':
+                    $vatOnPurchasesServices += $taxRow->net_amount;
+                    $vatOnPurchasesServicesTax += $taxRow->tax_amount;
+                    break;
+                case 'Capital Goods':
+                    $capitalGoods += $taxRow->net_amount;
+                    $capitalGoodsTax += $taxRow->tax_amount;
+                    break;
+                case 'Goods Not Qualified for Input Tax':
+                    $goodsNotQualifiedForInputTax += $taxRow->net_amount;
+                    $goodsNotQualifiedForInputTaxTax += $taxRow->tax_amount;
+                    break;
+                case 'Importation of Goods':
+                    $importationOfGoods += $taxRow->net_amount;
+                    $importationOfGoodsTax += $taxRow->tax_amount;
+                    break;
+                case 'Tax-Exempt Purchases (Importation of Goods)':
+                    $taxExemptPurchasesImportationOfGoods += $taxRow->net_amount;
+                    $taxExemptPurchasesImportationOfGoodsTax += $taxRow->tax_amount;
+                    break;
+                case 'Services Not Qualified for Input Tax':
+                    $servicesNotQualifiedForInputTax += $taxRow->net_amount;
+                    $servicesNotQualifiedForInputTaxTax += $taxRow->tax_amount;
+                    break;
+                case 'Services by Non-Residents':
+                    $servicesByNonResidents += $taxRow->net_amount;
+                    $servicesByNonResidentsTax += $taxRow->tax_amount;
+                    break;
+            }
         }
+    }
 
-        return [
-            'taxable_amount' => $taxableAmount,
-            'tax_rate' => $taxRate,
-            'tax_due' => $taxDue,
-        ];
-    });
-
-    // Pass the summary data to the view
+    // Pass all required variables to the view
     return view('tax_return.vat_report_preview', compact(
-        'taxReturn',
-        'organization',
-        'yearEndedFormatted',
-        'yearEndedFormattedForDisplay',
-        'period',
-        'rdoCode',
-        'summaryData' // Add the summary data to the view
+        'vatOnSalesGoods', 'vatOnSalesGoodsTax',
+        'vatOnSalesServices', 'vatOnSalesServicesTax',
+        'salesToGovernmentGoods', 'salesToGovernmentGoodsTax',
+        'salesToGovernmentServices', 'salesToGovernmentServicesTax',
+        'zeroRatedSalesGoods', 'zeroRatedSalesGoodsTax',
+        'zeroRatedSalesServices', 'zeroRatedSalesServicesTax',
+        'taxExemptSalesGoods', 'taxExemptSalesGoodsTax',
+        'taxExemptSalesServices', 'taxExemptSalesServicesTax',
+        'nonTaxSales', 'nonTaxPurchases',
+        'vatOnPurchasesGoods', 'vatOnPurchasesGoodsTax',
+        'vatOnPurchasesServices', 'vatOnPurchasesServicesTax',
+        'capitalGoods', 'capitalGoodsTax',
+        'importationOfGoods', 'importationOfGoodsTax',
+        'taxExemptPurchasesImportationOfGoods', 'taxExemptPurchasesImportationOfGoodsTax',
+        'goodsNotQualifiedForInputTax', 'goodsNotQualifiedForInputTaxTax',
+        'servicesNotQualifiedForInputTax', 'servicesNotQualifiedForInputTaxTax',
+        'servicesByNonResidents', 'servicesByNonResidentsTax',
+        'rdoCode', 'period', 'yearEndedFormatted', 'taxReturn', 'organization',
+        'yearEndedFormattedForDisplay', 'currentQuarter', 'previousQuarter',
+        'previousYear', 'currentYear'
     ));
 }
+
+
+
+
+
 
 
     public function percentageReturn()
