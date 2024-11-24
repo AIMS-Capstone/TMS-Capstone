@@ -190,7 +190,8 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
             Route::delete('/employees/destroy', 'destroy')->name('employees.destroy');
         });
 
-          Route::post('percentage_return/{taxReturn}/2551q', [TaxReturnController::class, 'store2551Q']);
+          Route::post('percentage_return/{taxReturn}/2551q', [TaxReturnController::class, 'store2551Q'])
+          ->name('tax_return.store2551Q');
         Route::post('tax-return/{taxReturn}/2550q', [TaxReturnController::class, 'store2550Q'])
         ->name('tax_return.store2550Q');
         Route::post('/tax-return-transaction/deactivate', [TransactionsController::class, 'deactivate'])
@@ -198,15 +199,30 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
         // Tax Return Routes
         Route::resource('tax_return', TaxReturnController::class);
         Route::get('/vat_return', [TaxReturnController::class, 'vatReturn'])->name('vat_return');
+        Route::get('/income_return', [TaxReturnController::class, 'incomeReturn'])->name('income_return');
         Route::get('/percentage_return/{id}/report', [TaxReturnController::class, 'showPercentageReport'])
     ->name('percentage_return.report');
     Route::get('/vat_return/{id}/report', [TaxReturnController::class, 'showVatReport'])
     ->name('tax_return.report');
+
+        Route::get('tax_return/{id}/income-input-summary', [TaxReturnController::class, 'showIncomeInputSummary'])->name('tax_return.income_input_summary');
+        
+        // Individual sections
+        Route::get('tax_return/{id}/generate_report', [TaxReturnController::class, 'editTaxOptionRate'])->name('tax_return.generate_report');
+        Route::get('tax_return/{id}/notes_activities', [TaxReturnController::class, 'editTaxOptionRate'])->name('tax_return.notes_activities');
+        Route::get('tax_return/{id}/tax-option-rate', [TaxReturnController::class, 'editTaxOptionRate'])->name('tax_return.tax_option_rate');
+        Route::get('tax_return/{id}/background-information', [TaxReturnController::class, 'editBackgroundInformation'])->name('tax_return.background_information');
+        Route::get('tax_return/{id}/spouse-information', [TaxReturnController::class, 'editSpouseInformation'])->name('tax_return.spouse_information');
+        Route::get('tax_return/{id}/sales-revenue', [TaxReturnController::class, 'editSalesRevenue'])->name('tax_return.sales_revenue');
+
+    Route::post('/tax_return/destroy',[TaxReturnController::class, 'destroy']);
+    Route::get('/income_return/{id}/{type}', [TaxReturnController::class, 'showIncome'])->name('income_return.show');
+
         Route::get('/percentage_return', [TaxReturnController::class, 'percentageReturn'])->name('percentage_return');
-        Route::get('/
-        }/slsp-data', [TaxReturnController::class, 'showPercentageSlspData'])->name('percentage_return.slsp_data');
+        Route::get('/percentage_return/{taxReturn}/slsp-data', [TaxReturnController::class, 'showPercentageSlspData'])->name('percentage_return.slsp_data');
         Route::post('/percentage_return', [TaxReturnController::class, 'storePercentage']);
         Route::post('/vat_return', [TaxReturnController::class, 'store']);
+        Route::post('/income_return', [TaxReturnController::class, 'storeIncome']);
         Route::get('/tax_return/{taxReturn}/slsp-data', [TaxReturnController::class, 'showSlspData'])->name('tax_return.slsp_data');
         Route::get('/tax_return/{taxReturn}/summary', [TaxReturnController::class, 'showSummary'])->name('tax_return.summary');
         Route::get('/summary', [TaxReturnController::class, 'showSummary'])->name('summary');

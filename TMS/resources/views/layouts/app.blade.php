@@ -109,7 +109,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group">
+                                    <a href="{{ route('income_return') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
+                                    {{ request()->routeIs('income_return') ? 'sidebar-submenu-active' : '' }}">
                                         Income Tax Return
                                     </a>
                                 </li>

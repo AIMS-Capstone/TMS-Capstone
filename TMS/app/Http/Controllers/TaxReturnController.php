@@ -51,6 +51,63 @@ class TaxReturnController extends Controller
 
         return view('tax_return.vat_return', compact('taxReturns'));
     }
+    public function incomeReturn()
+    {
+        $organizationId = session('organization_id');
+        
+        // Capture the 'type' query parameter to apply the filter
+        $filterType = request()->query('type', '1701Q');  // Default to '1701Q' if no type is passed
+        $searchTerm = request()->query('search', '');  // Get the search query parameter, default to empty
+        
+        // Start the query for tax returns
+        $taxReturns = TaxReturn::with('user')  // Make sure to eager load the user relation
+            ->where('organization_id', $organizationId)
+            ->whereIn('title', ['1701Q', '1702Q', '1701', '1702RT', '1702MX', '1702EX']);
+        
+           
+        // Apply filter if a specific type is selected
+        if ($filterType) {
+            $taxReturns->where('title', $filterType);
+        }
+    
+        // Apply the search filter if a search term is provided
+        if ($searchTerm) {
+            $taxReturns->where(function($query) use ($searchTerm) {
+                // Search on multiple fields
+                $query->where('title', 'like', '%' . $searchTerm . '%')
+                      ->orWhere('year', 'like', '%' . $searchTerm . '%')
+                      ->orWhere('month', 'like', '%' . $searchTerm . '%')
+                      ->orWhere('status', 'like', '%' . $searchTerm . '%')
+                      ->orWhereDate('created_at', 'like', '%' . $searchTerm . '%');
+            });
+        }
+    
+        // Get the filtered tax returns
+        $taxReturns = $taxReturns->get();  // Execute the query
+        
+        // Return the view with the filtered tax returns and other data
+        return view('tax_return.income_return', compact('taxReturns', 'filterType', 'searchTerm'));
+    }
+    
+
+    public function showIncome($id, $type)
+    {
+        // Retrieve the tax return by its ID
+        $taxReturn = TaxReturn::findOrFail($id);
+
+        // Check if the 'type' (or title) matches '1701Q'
+        if ($taxReturn->title === '1701Q') {
+            // If title is 1701Q, show the specific view for 1701Q
+            return view('tax_return.income_input_summary', compact('taxReturn'));
+        }
+
+        // If title is not 1701Q, you can handle other cases or show a different view
+        // For example, you can use a default view or handle other titles like '1702Q', etc.
+        return view('tax_return.show', compact('taxReturn'));
+    }
+
+    
+    
     public function showPercentageReport($id)
 {
     $taxReturn = TaxReturn::findOrFail($id);
@@ -1298,12 +1355,21 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
     }
 
     //Soft delete
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        $taxreturn = TaxReturn::findOrFail($id);
-        $taxreturn->delete(); // Soft delete the transaction
-
-        return back()->with('success', 'Tax Return deleted successfully!');
+        // Get the array of IDs from the request
+        $ids = $request->input('ids');  // Assuming the IDs are passed as an array
+        
+        // Check if there are IDs to delete
+        if (empty($ids)) {
+            return back()->with('error', 'No rows selected for deletion.');
+        }
+        
+        // Perform the soft delete on the selected IDs
+        TaxReturn::whereIn('id', $ids)->delete();  // Soft delete the tax returns by their IDs
+        
+        return back()->with('success', 'Selected tax returns deleted successfully!');
     }
+    
 }
 
