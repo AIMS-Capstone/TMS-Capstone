@@ -83,6 +83,7 @@ class Tax2550Q extends Model
         'compromise',
         'total_penalties',
         'total_amount_payable',
+        'tax_return_id',
     ];
 
     public function taxReturn()

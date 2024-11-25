@@ -7,6 +7,7 @@ use App\Models\TaxReturn;
 use App\Http\Requests\StoreTaxReturnRequest;
 use App\Http\Requests\UpdateTaxReturnRequest;
 use App\Models\OrgSetup;
+use App\Models\Tax2550Q;
 use App\Models\Tax2551Q;
 use App\Models\TaxReturnTransaction;
 use App\Models\TaxRow;
@@ -50,6 +51,63 @@ class TaxReturnController extends Controller
 
         return view('tax_return.vat_return', compact('taxReturns'));
     }
+    public function incomeReturn()
+    {
+        $organizationId = session('organization_id');
+        
+        // Capture the 'type' query parameter to apply the filter
+        $filterType = request()->query('type', '1701Q');  // Default to '1701Q' if no type is passed
+        $searchTerm = request()->query('search', '');  // Get the search query parameter, default to empty
+        
+        // Start the query for tax returns
+        $taxReturns = TaxReturn::with('user')  // Make sure to eager load the user relation
+            ->where('organization_id', $organizationId)
+            ->whereIn('title', ['1701Q', '1702Q', '1701', '1702RT', '1702MX', '1702EX']);
+        
+           
+        // Apply filter if a specific type is selected
+        if ($filterType) {
+            $taxReturns->where('title', $filterType);
+        }
+    
+        // Apply the search filter if a search term is provided
+        if ($searchTerm) {
+            $taxReturns->where(function($query) use ($searchTerm) {
+                // Search on multiple fields
+                $query->where('title', 'like', '%' . $searchTerm . '%')
+                      ->orWhere('year', 'like', '%' . $searchTerm . '%')
+                      ->orWhere('month', 'like', '%' . $searchTerm . '%')
+                      ->orWhere('status', 'like', '%' . $searchTerm . '%')
+                      ->orWhereDate('created_at', 'like', '%' . $searchTerm . '%');
+            });
+        }
+    
+        // Get the filtered tax returns
+        $taxReturns = $taxReturns->get();  // Execute the query
+        
+        // Return the view with the filtered tax returns and other data
+        return view('tax_return.income_return', compact('taxReturns', 'filterType', 'searchTerm'));
+    }
+    
+
+    public function showIncome($id, $type)
+    {
+        // Retrieve the tax return by its ID
+        $taxReturn = TaxReturn::findOrFail($id);
+
+        // Check if the 'type' (or title) matches '1701Q'
+        if ($taxReturn->title === '1701Q') {
+            // If title is 1701Q, show the specific view for 1701Q
+            return view('tax_return.income_input_summary', compact('taxReturn'));
+        }
+
+        // If title is not 1701Q, you can handle other cases or show a different view
+        // For example, you can use a default view or handle other titles like '1702Q', etc.
+        return view('tax_return.show', compact('taxReturn'));
+    }
+
+    
+    
     public function showPercentageReport($id)
 {
     $taxReturn = TaxReturn::findOrFail($id);
@@ -457,7 +515,99 @@ public function showVatReport($id)
     /**
      * Display the specified resource.
      */
+    public function store2550Q(Request $request, $taxReturn)
+    {
 
+     // Step 1: Validate incoming data
+        $validatedData = $request->validate([
+            'period' => 'required|string',
+            'year_ended' => 'required|date_format:Y-m',
+            'quarter' => 'required|string',
+            'return_from' => 'required|date',
+            'return_to' => 'required|date',
+            'amended_return' => 'required|string|in:yes,no',
+            'short_period_return' => 'required|string|in:yes,no',
+            'tin' => 'required|string|max:20',
+            'rdo_code' => 'required|string|max:5',
+            'taxpayer_name' => 'required|string|max:255',
+            'registered_address' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:10',
+            'contact_number' => 'nullable|string|max:15',
+            'email_address' => 'nullable|email|max:255',
+            'taxpayer_classification' => 'required|string|max:50',
+            'tax_relief' => 'required|string|in:yes,no',
+            'yes_specify' => 'nullable|string|max:255',
+            'creditable_vat_withheld' => 'nullable|numeric',
+            'advance_vat_payment' => 'nullable|numeric',
+            'vat_paid_if_amended' => 'nullable|numeric',
+            'other_credits_specify' => 'nullable|string|max:255',
+            'other_credits_specify_amount' => 'nullable|numeric',
+            'total_tax_credits' => 'nullable|numeric',
+            'tax_still_payable' => 'nullable|numeric',
+            'surcharge' => 'nullable|numeric',
+            'interest' => 'nullable|numeric',
+            'compromise' => 'nullable|numeric',
+            'total_penalties' => 'nullable|numeric',
+            'total_amount_payable' => 'nullable|numeric',
+            'vatable_sales' => 'nullable|numeric',
+            'vatable_sales_tax_amount' => 'nullable|numeric',
+            'zero_rated_sales' => 'nullable|numeric',
+            'exempt_sales' => 'nullable|numeric',
+            'total_sales' => 'nullable|numeric',
+            'total_output_tax' => 'nullable|numeric',
+            'uncollected_receivable_vat' => 'nullable|numeric',
+            'recovered_uncollected_receivables' => 'nullable|numeric',
+            'total_adjusted_output_tax' => 'nullable|numeric',
+            'input_carried_over' => 'nullable|numeric',
+            'input_tax_deferred' => 'nullable|numeric',
+            'transitional_input_tax' => 'nullable|numeric',
+            'presumptive_input_tax' => 'nullable|numeric',
+            'other_specify' => 'nullable|string|max:255',
+            'other_input_tax' => 'nullable|numeric',
+            'total_input_tax' => 'nullable|numeric',
+            'domestic_purchase' => 'nullable|numeric',
+            'domestic_purchase_input_tax' => 'nullable|numeric',
+            'services_non_resident' => 'nullable|numeric',
+            'services_non_resident_input_tax' => 'nullable|numeric',
+            'importations' => 'nullable|numeric',
+            'importations_input_tax' => 'nullable|numeric',
+            'purchases_others_specify' => 'nullable|string|max:255',
+            'purchases_others_specify_amount' => 'nullable|numeric',
+            'purchases_others_specify_input_tax' => 'nullable|numeric',
+            'domestic_no_input' => 'nullable|numeric',
+            'total_current_purchase' => 'nullable|numeric',
+            'total_current_purchase_input_tax' => 'nullable|numeric',
+            'total_available_input_tax' => 'nullable|numeric',
+            'importation_million_deferred_input_tax' => 'nullable|numeric',
+            'attributable_vat_exempt_input_tax' => 'nullable|numeric',
+            'vat_refund_input_tax' => 'nullable|numeric',
+            'unpaid_payables_input_tax' => 'nullable|numeric',
+            'other_deduction_specify' => 'nullable|string|max:255',
+            'other_deduction_specify_input_tax' => 'nullable|numeric',
+            'total_deductions_input_tax' => 'nullable|numeric',
+            'settled_unpaid_input_tax' => 'nullable|numeric',
+            'adjusted_deductions_input_tax' => 'nullable|numeric',
+            'total_allowable_input_Tax' => 'nullable|numeric',
+            'excess_input_tax' => 'nullable|numeric',
+        ]);
+    
+        // Step 2: Attach the tax return ID to the validated data
+        $validatedData['tax_return_id'] = $taxReturn;
+  
+    
+        // Step 3: Create or update the Tax2550Q record
+        $tax2550Q = Tax2550Q::updateOrCreate(
+            ['tax_return_id' => $taxReturn], // Find existing record by tax_return_id
+            $validatedData // Use validated data for creation or update
+        );
+    
+        // Step 4: Return a response
+        return response()->json([
+            'message' => 'Tax2550Q record successfully created or updated.',
+            'data' => $tax2550Q,
+        ], 200);
+    }
+    
      public function store2551Q(Request $request, $taxReturn)
      {
          // Validate the incoming request data
@@ -1205,12 +1355,21 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
     }
 
     //Soft delete
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        $taxreturn = TaxReturn::findOrFail($id);
-        $taxreturn->delete(); // Soft delete the transaction
-
-        return back()->with('success', 'Tax Return deleted successfully!');
+        // Get the array of IDs from the request
+        $ids = $request->input('ids');  // Assuming the IDs are passed as an array
+        
+        // Check if there are IDs to delete
+        if (empty($ids)) {
+            return back()->with('error', 'No rows selected for deletion.');
+        }
+        
+        // Perform the soft delete on the selected IDs
+        TaxReturn::whereIn('id', $ids)->delete();  // Soft delete the tax returns by their IDs
+        
+        return back()->with('success', 'Selected tax returns deleted successfully!');
     }
+    
 }
 

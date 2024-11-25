@@ -7,8 +7,8 @@
         </a>
 
         <!-- Header -->
-        <h1 class="text-2xl font-bold text-blue-700 mb-2">BIR Form No. 2551Q</h1>
-        <h2 class="text-xl font-semibold text-gray-800">Quarterly Percentage Tax Return</h2>
+        <h1 class="text-2xl font-bold text-blue-700 mb-2">BIR Form No. 2550Q</h1>
+        <h2 class="text-xl font-semibold text-gray-800">Quarterly VAT Tax Return</h2>
         <p class="text-gray-600 mb-6">Verify the tax information below, with some fields pre-filled from your organization’s setup. Select options as needed, then click 'Proceed to Report' to generate the BIR form. Hover over icons for additional guidance on specific fields.</p>
 
         <!-- Filing Period Section -->
@@ -139,7 +139,7 @@
      
         <div class="mb-4 flex items-start">
             <label class="block text-gray-700 text-sm font-medium w-1/3">Contact Number</label>
-            <input type="number" name="contact_number" value="{{$organization->contact_number;}}" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            <input type="text" name="contact_number" value="{{$organization->contact_number;}}" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
         <div class="mb-4 flex items-start">
             <label class="block text-gray-700 text-sm font-medium w-1/3">Email Address</label>
@@ -178,11 +178,240 @@
             <label class="block text-gray-700 text-sm font-medium w-1/3">If yes, specify            </label>
             <input type="text" name="yes_specify" placeholder="Specified Tax Treaty" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
-
+        <div class="border-b ">
+            <h3 class="font-semibold text-gray-700 text-lg mb-4">Part II - Total Tax Payables</h3>
+            <div class="grid grid-cols-3 gap-4 border-t border-gray-300 pt-2">
+                <!-- Header Row -->
+               
+        
+       <!-- VATable Sales -->
+    <div class="flex items-center">
+        <label class="block text-gray-700 text-sm font-medium">15 Net VAT Payable/(Excess Input Tax) (From Part IV, Item 61) 
+        </label>
     </div>
-    <div class="border-b">
+    <div>
+    
+    </div>
+    <div>
+        
+        <input 
+            type="text"
+            id="net_vat_payable" 
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+            >
+    </div>
+    <div class="flex items-center">
+        <label class="block text-gray-700 text-sm font-medium">16 Creditable VAT Withheld (From Part V - Schedule 3, Column D) .
+
+        </label>
+    </div>
+    <div>
+    
+    </div>
+    <div>
+        
+        <input 
+            type="text" 
+            name="creditable_vat_withheld" 
+            id="creditable_vat_withheld" 
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+            >
+    </div>
+    <div class="flex items-center">
+        <label class="block text-gray-700 text-sm font-medium">17 Advance VAT Payments (From Part V - Schedule 4) 
+
+
+        </label>
+    </div>
+    <div>
+    
+    </div>
+    <div>
+        
+        <input 
+            type="text" 
+            name="advance_vat_payment" 
+            id="advance_vat_payment" 
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+            >
+    </div>
+    <div class="flex items-center">
+        <label class="block text-gray-700 text-sm font-medium">18 VAT paid in return previously filed, if this is an amended return 
+
+        </label>
+    </div>
+    <div>
+    
+    </div>
+    <div>
+        
+        <input 
+            type="text" 
+            name="vat_paid_if_amended" 
+            id="vat_paid_if_amended" 
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+            >
+    </div>
+    <div class="flex items-center">
+        <label class="block text-gray-700 text-sm font-medium">19 Other Credits/Payment (Specify)
+
+
+        </label>
+    </div>
+    <div>
+        
+        <input 
+            type="text" 
+            name="other_credits_specify" 
+            id="other_credits_specify" 
+         
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+            >
+    </div>
+    <div>
+        
+        <input 
+            type="text" 
+            name="other_credits_specify_amount" 
+            id="other_credits_specify_amount" 
+         
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+            >
+    </div>
+    <div class="flex items-center">
+        <label class="block text-gray-700 text-sm font-medium">20 Total Tax Credits/Payment (Sum of Items 16 to 19) 
+
+        </label>
+    </div>
+    <div>
+    
+    </div>
+    <div>
+        
+        <input 
+            type="text" 
+            name="total_tax_credits" 
+            id="total_tax_credits" 
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+            >
+    </div>
+    <div class="flex items-center">
+        <label class="block text-gray-700 text-sm font-medium">21 Tax Still Payable/(Excess Credits) (Item 15 Less Item 20) 
+
+        </label>
+    </div>
+    <div>
+    
+    </div>
+    <div>
+        
+        <input 
+            type="text" 
+            name="tax_still_payable" 
+            id="tax_still_payable" 
+    
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+            >
+    </div>
+    <div class="flex items-center">
+        <label class="block text-gray-700 text-sm font-medium"> Add: Penalties 22 Surcharge 
+
+
+        </label>
+    </div>
+    <div>
+    
+    </div>
+    <div>
+        
+        <input 
+            type="text" 
+            name="surcharge" 
+            id="surcharge" 
+        
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+            >
+    </div>
+    <div class="flex items-center">
+        <label class="block text-gray-700 text-sm font-medium"> 23 Interest .
+
+
+        </label>
+    </div>
+    <div>
+    
+    </div>
+    <div>
+        
+        <input 
+            type="text" 
+            name="interest" 
+            id="interest" 
+          
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+            >
+    </div>
+    <div class="flex items-center">
+        <label class="block text-gray-700 text-sm font-medium">Compromise
+
+        </label>
+    </div>
+    <div>
+    
+    </div>
+    <div>
+        
+        <input 
+            type="text" 
+            name="compromise" 
+            id="compromise" 
+          
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+            >
+    </div>
+    <div class="flex items-center">
+        <label class="block text-gray-700 text-sm font-medium"> 25 Total Penalties (Sum of Items 22 to 24) .
+
+
+        </label>
+    </div>
+    <div>
+    
+    </div>
+    <div>
+        
+        <input 
+            type="text" 
+            name="total_penalties" 
+            id="total_penalties" 
+           
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+            >
+    </div>
+    <div class="flex items-center">
+        <label class="block text-gray-700 text-sm font-medium">26 TOTAL AMOUNT PAYABLE/(Excess Credits) (Sum of Items 21 and 25) 
+
+        </label>
+    </div>
+    <div>
+    
+    </div>
+    <div>
+        
+        <input 
+            type="text" 
+            name="total_amount_payable" 
+            id="total_amount_payable" 
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+            >
+    </div>
+    
+    </div>
+    
+    
+    <div class="border-b border-t">
         <h3 class="font-semibold text-gray-700 text-lg mb-4">Details of VAT Computation</h3>
-        <div class="grid grid-cols-3 gap-4 border-t border-gray-300 pt-2">
+        <div class="grid grid-cols-3 gap-4  pt-2">
             <!-- Header Row -->
             <div class="font-semibold text-gray-700 text-sm">Total Sales and Output Tax</div>
             <div class="font-semibold text-gray-700 text-sm">A. Sales for the Quarter (Exclusive of VAT)</div>
@@ -194,7 +423,7 @@
 </div>
 <div>
     <input 
-        type="number" 
+        type="text" 
         name="vatable_sales" 
         id="vatable_sales" 
         value="{{ $vatOnSalesGoods + $vatOnSalesServices + $salesToGovernmentGoods + $salesToGovernmentServices }}" 
@@ -203,7 +432,7 @@
 </div>
 <div>
     <input 
-        type="number" 
+        type="text" 
         name="vatable_sales_tax_amount" 
         id="vatable_sales_tax_amount" 
         value="{{ $vatOnSalesGoodsTax + $vatOnSalesServicesTax + $salesToGovernmentGoodsTax + $salesToGovernmentServicesTax }}" 
@@ -217,7 +446,7 @@
 </div>
 <div>
     <input 
-        type="number" 
+        type="text" 
         name="zero_rated_sales" 
         id="zero_rated_sales" 
         value="{{ $zeroRatedSalesGoods + $zeroRatedSalesServices }}" 
@@ -232,7 +461,7 @@
 </div>
 <div>
     <input 
-        type="number" 
+        type="text" 
         name="exempt_sales" 
         id="exempt_sales" 
         value="{{ $taxExemptSalesGoods + $taxExemptSalesServices }}" 
@@ -250,7 +479,7 @@
 </div>
 <div>
     <input 
-        type="number" 
+        type="text" 
         name="total_sales" 
         id="total_sales" 
         readonly 
@@ -258,7 +487,7 @@
 </div>
 <div>
     <input 
-        type="number" 
+        type="text" 
         name="total_output_tax" 
         id="total_output_tax" 
         readonly 
@@ -274,7 +503,7 @@
 <div></div>
 <div>
     <input 
-        type="number" 
+        type="text" 
         name="uncollected_receivable_vat" 
         id="uncollected_receivable_vat" 
         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
@@ -290,7 +519,7 @@
 <div></div>
 <div>
     <input 
-        type="number" 
+        type="text" 
         name="recovered_uncollected_receivables" 
         id="recovered_uncollected_receivables" 
         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
@@ -306,7 +535,7 @@
 <div></div>
 <div>
     <input 
-        type="number" 
+        type="text" 
         name="total_adjusted_output_tax" 
         id="total_adjusted_output_tax" 
         readonly 
@@ -325,11 +554,11 @@
                 <div></div>
                 <div>
                     <input 
-                        type="number" 
+                        type="text" 
                         name="input_carried_over" 
                         id="input_carried_over" 
                         readonly 
-                        value="{{ $excessInputTax ?? '' }}" 
+                        value="{{ $excessInputTax ?? '0' }}" 
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                 </div>
                 
@@ -342,7 +571,7 @@
                 <div></div>
                 <div>
                     <input 
-                        type="number" 
+                        type="text" 
                         name="input_tax_deferred" 
                         id="input_tax_deferred"  
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
@@ -357,7 +586,7 @@
                 <div></div>
                 <div>
                     <input 
-                        type="number" 
+                        type="text" 
                         name="transitional_input_tax" 
                         id="transitional_input_tax" 
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
@@ -372,7 +601,7 @@
                 <div></div>
                 <div>
                     <input 
-                        type="number" 
+                        type="text" 
                         name="presumptive_input_tax" 
                         id="presumptive_input_tax" 
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
@@ -393,7 +622,7 @@
                 </div>
                 <div>
                     <input 
-                        type="number" 
+                        type="text" 
                         name="other_input_tax" 
                         id="other_input_tax" 
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
@@ -408,7 +637,7 @@
                 <div></div>
                 <div>
                     <input 
-                        type="number" 
+                        type="text" 
                         name="total_input_tax" 
                         id="total_input_tax" 
                         readonly 
@@ -427,7 +656,7 @@
              </div>
              <div>
                  <input 
-                     type="number" 
+                     type="text" 
                      name="domestic_purchase" 
                      id="domestic_purchase" 
                      value="{{ $vatOnPurchasesGoods + $vatOnPurchasesServices }}" 
@@ -438,7 +667,7 @@
              <!-- 44B. Domestic Purchases Input Tax (Dynamic Field) -->
              <div>
                  <input 
-                     type="number" 
+                     type="text" 
                      name="domestic_purchase_input_tax" 
                      id="domestic_purchase_input_tax" 
                      value="{{ $vatOnPurchasesGoodsTax + $vatOnPurchasesServicesTax }}"  
@@ -454,7 +683,7 @@
              </div>
              <div>
                  <input 
-                     type="number" 
+                     type="text" 
                      name="services_non_resident" 
                      id="services_non_resident" 
                      value="{{ $servicesByNonResidents }}"  
@@ -465,7 +694,7 @@
              <!-- 45B. Services Non-Resident Input Tax (Dynamic Field) -->
              <div>
                  <input 
-                     type="number" 
+                     type="text" 
                      name="services_non_resident_input_tax" 
                      id="services_non_resident_input_tax" 
                      value="{{ $servicesByNonResidentsTax }}"  
@@ -481,7 +710,7 @@
              </div>
              <div>
                  <input 
-                     type="number" 
+                     type="text" 
                      name="importations" 
                      id="importations" 
                      value="{{ $importationOfGoods }}"  
@@ -492,7 +721,7 @@
              <!-- 46B. Importations Input Tax (Dynamic Field) -->
              <div>
                  <input 
-                     type="number" 
+                     type="text" 
                      name="importations_input_tax" 
                      id="importations_input_tax" 
                      value="{{ $importationOfGoodsTax }}"  
@@ -516,7 +745,7 @@
              <!-- 47B. Others (Specify Amount) (Manual Input Field) -->
              <div>
                  <input 
-                     type="number" 
+                     type="text" 
                      name="purchases_others_specify_amount" 
                      id="purchases_others_specify_amount" 
                      class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
@@ -526,7 +755,7 @@
              <!-- 47C. Others (Specify Input Tax) (Manual Input Field) -->
              <div>
                  <input 
-                     type="number" 
+                     type="text" 
                      name="purchases_others_specify_input_tax" 
                      id="purchases_others_specify_input_tax" 
                      class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
@@ -541,7 +770,7 @@
              </div>
              <div>
                  <input 
-                     type="number" 
+                     type="text" 
                      name="domestic_no_input" 
                      id="domestic_no_input" 
                      value="{{ $goodsNotQualifiedForInputTax }}"  
@@ -557,7 +786,7 @@
              </div>
              <div>
                  <input 
-                     type="number" 
+                     type="text" 
                      name="total_current_purchase" 
                      id="total_current_purchase" 
                      readonly 
@@ -566,7 +795,7 @@
              
              <div>
                  <input 
-                     type="number" 
+                     type="text" 
                      name="total_current_purchase_input_tax" 
                      id="total_current_purchase_input_tax" 
                      readonly 
@@ -584,7 +813,7 @@
           
             <div>
                 <input 
-                    type="number" 
+                    type="text" 
                     name="total_available_input_tax" 
                     id="total_available_input_tax" 
                     readonly 
@@ -603,7 +832,7 @@
           
             <div>
                 <input 
-                    type="number" 
+                    type="text" 
                     name="importation_million_deferred_input_tax" 
                     id="importation_million_deferred_input_tax" 
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
@@ -620,7 +849,7 @@
           
             <div>
                 <input 
-                    type="number" 
+                    type="text" 
                     name="attributable_vat_exempt_input_tax" 
                     id="attributable_vat_exempt_input_tax" 
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
@@ -638,7 +867,7 @@
           
             <div>
                 <input 
-                    type="number" 
+                    type="text" 
                     name="vat_refund_input_tax" 
                     id="vat_refund_input_tax" 
     
@@ -656,7 +885,7 @@
           
             <div>
                 <input 
-                    type="number" 
+                    type="text" 
                     name="unpaid_payables_input_tax" 
                     id="unpaid_payables_input_tax" 
               
@@ -678,7 +907,7 @@
         
             <div>
                 <input 
-                    type="number" 
+                    type="text" 
                     name="other_deduction_specify_input_tax" 
                     id="other_deduction_specify_input_tax" 
             
@@ -696,7 +925,7 @@
           
             <div>
                 <input 
-                    type="number" 
+                    type="text" 
                     name="total_deductions_input_tax" 
                     id="total_deductions_input_tax" 
                     readonly 
@@ -714,7 +943,7 @@
           
             <div>
                 <input 
-                    type="number" 
+                    type="text" 
                     name="settled_unpaid_input_tax" 
                     id="settled_unpaid_input_tax" 
                      
@@ -732,7 +961,7 @@
           
             <div>
                 <input 
-                    type="number" 
+                    type="text" 
                     name="adjusted_deductions_input_tax" 
                     id="adjusted_deductions_input_tax" 
                     readonly 
@@ -750,7 +979,7 @@
           
             <div>
                 <input 
-                    type="number" 
+                    type="text" 
                     name="total_allowable_input_Tax" 
                     id="total_allowable_input_Tax" 
                     readonly 
@@ -768,7 +997,7 @@
           
             <div>
                 <input 
-                    type="number" 
+                    type="text" 
                     name="excess_input_tax" 
                     id="excess_input_tax" 
                     readonly 
@@ -810,19 +1039,19 @@
                                 <input type="text" name="schedule1_description" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                             </td>
                             <td class="border px-2 py-1">
-                                <input type="number" name="schedule1_amount" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                                <input type="text" name="schedule1_amount" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                             </td>
                             <td class="border px-2 py-1">
-                                <input type="number" name="schedule1_estimated_life" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                                <input type="text" name="schedule1_estimated_life" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                             </td>
                             <td class="border px-2 py-1">
-                                <input type="number" name="schedule1_recognized_life" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                                <input type="text" name="schedule1_recognized_life" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                             </td>
                             <td class="border px-2 py-1">
-                                <input type="number" name="schedule1_allowable_input" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                                <input type="text" name="schedule1_allowable_input" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                             </td>
                             <td class="border px-2 py-1">
-                                <input type="number" name="schedule1_balance" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                                <input type="text" name="schedule1_balance" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                             </td>
                         </tr>
                     </tbody>
@@ -837,17 +1066,17 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-gray-700 text-sm font-medium mb-1">Input Tax directly attributable to VAT Exempt Sale</label>
-                        <input type="number" name="input_tax_direct" class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                        <input type="text" name="input_tax_direct" class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                     </div>
                     <div>
                         <label class="block text-gray-700 text-sm font-medium mb-1">Add: Ratable portion of Input Tax not directly attributable</label>
-                        <input type="number" name="input_tax_ratable" class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                        <input type="text" name="input_tax_ratable" class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 gap-4 mt-4">
                     <div>
                         <label class="block text-gray-700 text-sm font-medium mb-1">Total Input Tax attributable to Exempt Sale</label>
-                        <input type="number" name="input_tax_total" readonly class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                        <input type="text" name="input_tax_total" readonly class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                     </div>
                 </div>
             </div>
@@ -873,10 +1102,10 @@
                                 <input type="text" name="withheld_agent" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                             </td>
                             <td class="border px-2 py-1">
-                                <input type="number" name="withheld_income_payment" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                                <input type="text" name="withheld_income_payment" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                             </td>
                             <td class="border px-2 py-1">
-                                <input type="number" name="withheld_tax" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                                <input type="text" name="withheld_tax" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                             </td>
                         </tr>
                     </tbody>
@@ -942,7 +1171,11 @@
         calculateTotalDeductionsInputTax();
         calculateAdjustedDeductionsInputTax();
     calculateTotalAllowableInputTax();
+    calculateTotalTaxCredits();
     calculateNetVATPayable();
+    calculateTaxStillPayable();
+    calculateTotalPenalties();
+    calculateTotalAmountPayable();
     }
     function calculateAdjustedDeductionsInputTax() {
     // Retrieve values for total deductions from input tax and settled unpaid input tax
@@ -962,7 +1195,7 @@ function calculateTotalAllowableInputTax() {
     const totalAvailableInputTax = parseFloat(document.getElementById('total_available_input_tax').value) || 0; // Item 51B
     const adjustedDeductionsInputTax = parseFloat(document.getElementById('adjusted_deductions_input_tax').value) || 0; // Item 59B
 
-    // Calculate total allowable input tax (total available input tax - adjusted deductions)
+    // Calculate total allowable input tax (total available input tax - adjusted deduct231ions)
     const totalAllowableInputTax = totalAvailableInputTax - adjustedDeductionsInputTax;
 
     // Update the total allowable input tax field
@@ -979,7 +1212,8 @@ function calculateNetVATPayable() {
     const netVATPayable = totalAdjustedOutputTax - totalAllowableInputTax;
 
     // Update the net VAT payable field
-    document.getElementById('excess_input_tax').value = netVATPayable.toFixed(2);
+    document.getElementById('excess_input_tax').value = netVATPayable.toFixed(2);   
+     document.getElementById('net_vat_payable').value = netVATPayable.toFixed(2);
 }
     function calculateTotalDeductionsInputTax() {
     // Retrieve values for the deduction fields (Items 52B to 56B)
@@ -1037,7 +1271,18 @@ function calculateNetVATPayable() {
         document.getElementById('total_current_purchase').value = totalPurchases.toFixed(2);
         document.getElementById('total_current_purchase_input_tax').value = totalInputTax.toFixed(2);
     }
-    
+    function calculateTotalTaxCredits() {
+        const creditableVATWithheld = parseFloat(document.getElementById('creditable_vat_withheld').value) || 0; // Item 16
+        const advanceVATPayment = parseFloat(document.getElementById('advance_vat_payment').value) || 0;         // Item 17
+        const vatPaidIfAmended = parseFloat(document.getElementById('vat_paid_if_amended').value) || 0;         // Item 18
+        const otherCreditsSpecifyAmount = parseFloat(document.getElementById('other_credits_specify_amount').value) || 0; // Item 19
+
+        // Calculate total tax credits
+        const totalTaxCredits = creditableVATWithheld + advanceVATPayment + vatPaidIfAmended + otherCreditsSpecifyAmount;
+
+        // Update the total tax credits field
+        document.getElementById('total_tax_credits').value = totalTaxCredits.toFixed(2);
+    }
     // Add event listeners for all input fields
     document.addEventListener('DOMContentLoaded', () => {
         // Trigger initial calculations
@@ -1073,7 +1318,14 @@ function calculateNetVATPayable() {
         'total_deductions_input_tax',
         'settled_unpaid_input_tax',
         'total_available_input_tax',
-        'total_adjusted_output_tax'
+        'creditable_vat_withheld', 
+            'advance_vat_payment', 
+            'vat_paid_if_amended', 
+            'other_credits_specify_amount',
+            'net_vat_payable', 'total_tax_credits',
+        'total_adjusted_output_tax',
+        'tax_still_payable', 'total_penalties',
+        'surcharge', 'interest', 'compromise'
         ];
    
     
@@ -1084,5 +1336,42 @@ function calculateNetVATPayable() {
             });
         });
     });
+
+    function calculateTaxStillPayable() {
+        const netVatPayable = parseFloat(document.getElementById('net_vat_payable').value) || 0;  // Item 15
+        const totalTaxCredits = parseFloat(document.getElementById('total_tax_credits').value) || 0; // Item 20
+
+        // Calculate Tax Still Payable/(Excess Credits)
+        const taxStillPayable = netVatPayable - totalTaxCredits;
+
+        // Update the field for Item 21
+        document.getElementById('tax_still_payable').value = taxStillPayable.toFixed(2);
+    }
+
+    function calculateTotalPenalties() {
+    // Retrieve values for Items 22, 23, and 24
+    const surcharge = parseFloat(document.getElementById('surcharge').value) || 0; // Item 22
+    const interest = parseFloat(document.getElementById('interest').value) || 0; // Item 23
+    const compromise = parseFloat(document.getElementById('compromise').value) || 0; // Item 24
+
+    // Calculate Total Penalties
+    const totalPenalties = surcharge + interest + compromise;
+
+    // Update the field for Item 25
+    document.getElementById('total_penalties').value = totalPenalties.toFixed(2);
+}
+function calculateTotalAmountPayable() {
+    // Retrieve values for Items 21 and 25
+    const taxStillPayable = parseFloat(document.getElementById('tax_still_payable').value) || 0; // Item 21
+    const totalPenalties = parseFloat(document.getElementById('total_penalties').value) || 0; // Item 25
+
+    // Calculate Total Amount Payable
+    const totalAmountPayable = taxStillPayable + totalPenalties;
+
+    // Update the field for Item 26
+    document.getElementById('total_amount_payable').value = totalAmountPayable.toFixed(2);
+}
+      
+
     </script>
     

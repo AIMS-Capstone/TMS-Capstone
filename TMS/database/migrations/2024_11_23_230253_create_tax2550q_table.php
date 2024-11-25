@@ -16,8 +16,8 @@ class CreateTax2550qTable extends Migration
         Schema::create('2550q', function (Blueprint $table) {
             $table->id();
             $table->string('period');
-            $table->integer('year_ended');
-            $table->enum('quarter', [1, 2, 3, 4]); // Quarter 1, 2, 3, or 4
+            $table->string('year_ended');
+            $table->enum('quarter', ['1st', '2md', '3rd', '4th']); // Quarter 1, 2, 3, or 4
             $table->date('return_from');
             $table->date('return_to');
             $table->enum('amended_return', ['yes', 'no']);
