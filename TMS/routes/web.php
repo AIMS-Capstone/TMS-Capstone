@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\BackgroundInformationController;
 use App\Http\Controllers\CoaController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\OrgAccountController;
+use App\Http\Controllers\TaxOptionRateController;
 use App\Http\Controllers\TransactionsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomVerificationController;
@@ -88,6 +90,7 @@ Route::middleware([
     Route::post('/tax-return-transaction/sales', [TransactionsController::class, 'getSalesTransactions']);
     Route::post('/tax-return-transaction/all_transactions', [TransactionsController::class, 'getAllTransactions']);
     Route::post('/tax-return-transaction/add-percentage', [TransactionsController::class, 'addPercentage'])->name('tax_return_transaction.addPercentage');
+    Route::post('/tax-return-transaction/add-transaction', [TransactionsController::class, 'addTransaction'])->name('tax_return_transaction.addTransaction');
     Route::get('/org-setup', [OrgSetupController::class, 'index'])->name('org-setup');
     Route::post('/org-setup', [OrgSetupController::class, 'store'])->name('OrgSetup.store');
     Route::post('/org-delete', [OrgSetupController::class, 'destroy'])->name('orgSetup.destroy');
@@ -196,6 +199,9 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
         ->name('tax_return.store2550Q');
         Route::post('/tax-return-transaction/deactivate', [TransactionsController::class, 'deactivate'])
     ->name('tax-return-transaction.deactivate');
+    // This is for deactivating transactions on Spouse or Individual
+    Route::post('/tax-return-transaction/deactivate_transaction', [TransactionsController::class, 'deactivateTransaction'])
+    ->name('tax-return-transaction.deactivateTransaction');
         // Tax Return Routes
         Route::resource('tax_return', TaxReturnController::class);
         Route::get('/vat_return', [TaxReturnController::class, 'vatReturn'])->name('vat_return');
@@ -204,14 +210,28 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
     ->name('percentage_return.report');
     Route::get('/vat_return/{id}/report', [TaxReturnController::class, 'showVatReport'])
     ->name('tax_return.report');
+    Route::get('/income_return/{id}/report', [TaxReturnController::class, 'showIncomeReport'])
+    ->name('income_return.report');
+
 
         Route::get('tax_return/{id}/income-input-summary', [TaxReturnController::class, 'showIncomeInputSummary'])->name('tax_return.income_input_summary');
         
         // Individual sections
         Route::get('tax_return/{id}/generate_report', [TaxReturnController::class, 'editTaxOptionRate'])->name('tax_return.generate_report');
         Route::get('tax_return/{id}/notes_activities', [TaxReturnController::class, 'editTaxOptionRate'])->name('tax_return.notes_activities');
-        Route::get('tax_return/{id}/tax-option-rate', [TaxReturnController::class, 'editTaxOptionRate'])->name('tax_return.tax_option_rate');
-        Route::get('tax_return/{id}/background-information', [TaxReturnController::class, 'editBackgroundInformation'])->name('tax_return.background_information');
+        Route::get('/tax-return/{id}/tax-option-rate', [TaxOptionRateController::class, 'edit'])
+    ->name('tax_return.tax_option_rate');
+
+    Route::put('/tax-return/{id}/tax-option-rate', [TaxOptionRateController::class, 'update'])->name('tax_return.tax_option_rate.update');
+
+    Route::get('tax-return/{id}/background-information', [BackgroundInformationController::class, 'edit'])
+    ->name('tax_return.background_information')
+    ->where('id', '[0-9]+');  // Ensure the id is a number
+    Route::get('/tax-return/{taxReturn}/income_sales', [TaxReturnController::class, 'showIncomeSalesData'])->name('tax_return.income_show_sales');
+    Route::get('/tax-return/{taxReturn}/income_coa', [TaxReturnController::class, 'showIncomeCoaData'])->name('tax_return.income_show_coa');
+Route::put('tax-return/{id}/background-information', [BackgroundInformationController::class, 'update'])
+    ->name('tax_return.background_information.update')
+    ->where('id', '[0-9]+');  // Ensure the id is a number
         Route::get('tax_return/{id}/spouse-information', [TaxReturnController::class, 'editSpouseInformation'])->name('tax_return.spouse_information');
         Route::get('tax_return/{id}/sales-revenue', [TaxReturnController::class, 'editSalesRevenue'])->name('tax_return.sales_revenue');
 
