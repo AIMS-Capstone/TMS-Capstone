@@ -9,18 +9,19 @@ class TaxOptionRate extends Model
 {
     use HasFactory;
 
-    protected $table = 'tax_option_rates';
+    protected $table = 'tax_option_rate';
 
     protected $fillable = [
         'organization_id', 
-        'tax_return_id', 
-        'rate_type' // 'graduated' or '8_percent'
+        'individual_background_information_id', 
+        'rate_type',  // 'graduated' or '8_percent'
+        'deduction_method',  // New column
     ];
 
     // Relationship to Organization
     public function organization()
     {
-        return $this->belongsTo(Organization::class);
+        return $this->belongsTo(OrgSetup::class);
     }
 
     // Relationship to TaxReturn
