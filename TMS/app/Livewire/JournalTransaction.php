@@ -98,9 +98,11 @@ class JournalTransaction extends Component
 
         // Save each journal row linked to the transaction
         foreach ($this->journalRows as $row) {
+            $amount = $row['debit'] > 0 ? $row['debit'] : ($row['credit'] > 0 ? $row['credit'] : 0);
             TaxRow::create([
                 'transaction_id' => $transaction->id,
                 'debit' => $row['debit'],
+                'amount' => $amount,
                 'credit' => $row['credit'],
                 'description' => $row['description'],
                 'coa' => $row['coa'], // Assuming 'coa' is the ID of the account

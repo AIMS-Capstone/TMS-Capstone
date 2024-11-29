@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\IndividualTransaction;
 use App\Models\OrgSetup;
+use App\Models\SpouseTransaction;
 use App\Models\Transactions;
 use App\Http\Requests\StoreTransactionsRequest;
 use App\Http\Requests\UpdateTransactionsRequest;
@@ -202,6 +204,40 @@ public function getAllTransactions(Request $request)
         // Optionally, you can return a success response
         return response()->json(['message' => 'Transactions archived successfully']);
     }
+    public function deactivateTransaction(Request $request)
+{
+    // Get the tax_return_id, transaction_ids, and activeTab from the request
+    $taxReturnId = $request->input('tax_return_id');
+    $transactionIds = $request->input('ids');
+    $activeTab = $request->input('activeTab');  // Either 'individual' or 'spouse'
+    
+    // Make sure the 'ids' is an array and not empty
+    if (empty($transactionIds)) {
+        return response()->json(['message' => 'No transactions selected'], 400);
+    }
+
+    // Find the specific tax return by ID
+    $taxReturn = TaxReturn::findOrFail($taxReturnId);  // Ensure the tax return exists
+
+    // Check the activeTab to determine whether to deactivate individual or spouse transactions
+    if ($activeTab === 'individual') {
+
+        $taxReturn->individualTransaction()->detach($transactionIds);
+        
+    } elseif ($activeTab === 'spouse') {
+        // Deactivate or remove transactions associated with the spouse
+        // Similarly, use the spouse_transaction table or relationship.
+        $taxReturn->spouseTransactions()->detach($transactionIds);
+        
+    } else {
+        // If an invalid activeTab is passed
+        return response()->json(['message' => 'Invalid activeTab specified'], 400);
+    }
+    
+    // Optionally, return a success response
+    return response()->json(['message' => 'Transactions archived successfully']);
+}
+
 
     /**
      * Store a newly created resource in storage.
@@ -245,6 +281,48 @@ public function getAllTransactions(Request $request)
         // Return success message and redirect back
         return redirect()->back()->with('success', 'Transaction added to tax return successfully!');
     }
+    public function addTransaction(Request $request)
+{
+    $isSpouse = filter_var($request->input('is_spouse'), FILTER_VALIDATE_BOOLEAN);
+
+    // Manually set the 'is_spouse' input to the boolean value
+    $request->merge(['is_spouse' => $isSpouse]);
+    
+    // Now validate
+    $request->validate([
+        'transaction_id' => 'required|exists:transactions,id',
+        'tax_return_id' => 'required|exists:tax_returns,id',
+        'is_spouse' => 'required|boolean',
+    ]);
+    
+    // Get the active TaxReturn
+    $taxReturn = TaxReturn::find($request->tax_return_id);
+
+    if (!$taxReturn) {
+        return redirect()->back()->with('error', 'Tax return not found.');
+    }
+
+    // Check if the transaction is for an individual or spouse
+    if ($request->is_spouse) {
+        // Add the transaction to the spouse's transactions table
+        $spouseTransaction = new SpouseTransaction();
+        $spouseTransaction->tax_return_id = $taxReturn->id;
+        $spouseTransaction->transaction_id = $request->transaction_id;
+    
+        $spouseTransaction->save();
+    } else {
+        // Add the transaction to the individual's transactions table
+        $individualTransaction = new IndividualTransaction();
+        $individualTransaction->tax_return_id = $taxReturn->id;
+        $individualTransaction->transaction_id = $request->transaction_id;
+   
+        $individualTransaction->save();
+    }
+
+    // Return success message and redirect back
+    return redirect()->back()->with('success', 'Transaction added successfully!');
+}
+
     public function storeUpload(Request $request)
 {
  

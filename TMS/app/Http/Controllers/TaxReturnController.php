@@ -367,6 +367,38 @@ public function showVatReport($id)
     ));
 }
 
+public function showIncomeReport($id)
+{
+    // Fetch the tax return and organization setup data
+    $taxReturn = TaxReturn::findOrFail($id);
+    $organization_id = session("organization_id");
+
+    // Load the organization and its RDO relationship
+    $organization = OrgSetup::with("rdo")
+        ->where('id', $organization_id)
+        ->first();
+
+    // Extract the RDO code from the organization data
+    $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
+
+    // Retrieve the individual and spouse background information
+    $individualBackground = $taxReturn->individualBackgroundInformation;
+    $spouseBackground = $individualBackground->spouseInformation ?? null;
+
+    // Additional calculations for individual and spouse (if applicable)
+    $individualIncome = $individualBackground->income ?? 0;
+    $spouseIncome = $spouseBackground ? $spouseBackground->income : 0;
+
+    // Calculate net income (this could be based on your logic for deductions, etc.)
+    $totalDeductions = 0; // You can later add logic for deductions if needed
+    $netIncome = $individualIncome + $spouseIncome - $totalDeductions;
+
+    // Pass all required variables to the view
+    return view('tax_return.income_report_preview', compact(
+        'individualIncome', 'spouseIncome', 'totalDeductions', 'netIncome',
+        'rdoCode', 'taxReturn', 'organization', 'individualBackground'
+    ));
+}
 
 
 
@@ -721,7 +753,178 @@ public function showVatReport($id)
          ->paginate(5);
      
          return view('tax_return.vat_show', compact('taxReturn', 'paginatedTaxRows', 'type'));
+     }// Method to show Income Sales Data
+     public function showIncomeSalesData(TaxReturn $taxReturn, Request $request)
+     {
+         // Get Individual and Spouse Background Information
+         $individualBackground = $taxReturn->individualBackgroundInformation;
+         $spouseBackground = $individualBackground->spouseInformation ?? null;
+         $type = $request->input('type', 'default');
+     
+         // Get search term and active tab
+         $search = $request->input('search', ''); // Default to empty string if no search term
+         $activeTab = $request->get('tab', 'individual'); // Default to 'individual' if no tab is specified
+     
+         // Collect transactions for Individual from individual_transactions table
+         $individualTransactionIds = $taxReturn->individualTransaction()->pluck('transaction_id') ?? collect();
+     
+         // Collect transactions for Spouse from spouse_transactions table, if applicable
+         $spouseTransactionIds = $spouseBackground 
+             ? $taxReturn->spouseTransactions()->pluck('transaction_id') ?? collect() 
+             : collect(); // Empty collection if no spouse information
+     
+         // Query for Individual Sales TaxRows
+         $individualSalesTaxRowsQuery = TaxRow::whereHas('transaction', function ($q) use ($individualTransactionIds, $search) {
+             $q->whereIn('id', $individualTransactionIds)
+               ->where('transaction_type', 'sales');
+     
+             // Apply search filter if search term is provided
+             if (!empty($search)) {
+                 $q->where(function ($query) use ($search) {
+                     $query->where('inv_number', 'like', "%$search%")
+                           ->orWhere('description', 'like', "%$search%")
+                           ->orWhere('reference', 'like', "%$search%")
+                           ->orWhereHas('contactDetails', function ($contactQuery) use ($search) {
+                               $contactQuery->where('bus_name', 'like', "%$search%")
+                                            ->orWhere('contact_address', 'like', "%$search%")
+                                            ->orWhere('contact_tin', 'like', "%$search%");
+                           });
+                 });
+             }
+         });
+     
+         // Query for Spouse Sales TaxRows
+         $spouseSalesTaxRowsQuery = TaxRow::whereHas('transaction', function ($q) use ($spouseTransactionIds, $search) {
+             $q->whereIn('id', $spouseTransactionIds)
+               ->where('transaction_type', 'sales');
+     
+             // Apply search filter if search term is provided
+             if (!empty($search)) {
+                 $q->where(function ($query) use ($search) {
+                     $query->where('inv_number', 'like', "%$search%")
+                           ->orWhere('description', 'like', "%$search%")
+                           ->orWhere('reference', 'like', "%$search%")
+                           ->orWhereHas('contactDetails', function ($contactQuery) use ($search) {
+                               $contactQuery->where('bus_name', 'like', "%$search%")
+                                            ->orWhere('contact_address', 'like', "%$search%")
+                                            ->orWhere('contact_tin', 'like', "%$search%");
+                           });
+                 });
+             }
+         });
+     
+         // Paginate Individual and Spouse Sales TaxRows
+         $individualSalesTaxRows = $individualSalesTaxRowsQuery
+             ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load related data
+             ->paginate(5);
+     
+         $spouseSalesTaxRows = $spouseSalesTaxRowsQuery
+             ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load related data
+             ->paginate(5);
+     
+         // Return to view with paginated data and activeTab
+         return view('tax_return.income_show_sales', [
+             'taxReturn' => $taxReturn,
+             'individualTaxRows' => $individualSalesTaxRows,
+             'spouseTaxRows' => $spouseSalesTaxRows,
+             'type' => $type,
+             'activeTab' => $activeTab, // Pass the activeTab to the view
+             'search' => $search, // Include search term for the view
+         ]);
      }
+     
+
+// Method to show Income COA (Cost of Goods Sold and Allowable Itemized Deduction) Data
+public function showIncomeCoaData(TaxReturn $taxReturn, Request $request)
+{
+    // Get Individual and Spouse Background Information
+    $individualBackground = $taxReturn->individualBackgroundInformation;
+    $spouseBackground = $individualBackground->spouseInformation ?? null;
+    $type = $request->input('type', 'default');
+    $search = $request->input('search'); // Get the search term from the request
+
+    // Collect transactions for Individual from individual_transactions table
+    $individualTransactionIds = $taxReturn->individualTransaction()->pluck('transaction_id') ?? collect();
+
+    // Collect transactions for Spouse from spouse_transactions table, if applicable   
+    $spouseTransactionIds = $spouseBackground
+                               ? $taxReturn->spouseTransactions()->pluck('transaction_id') ?? collect() 
+                               : collect(); // Empty collection if no spouse information
+
+    // Query for Individual COA TaxRows (Cost of Goods Sold and Allowable Itemized Deduction)
+    $individualTaxRowsQuery = TaxRow::whereHas('coaAccount', function ($q) {
+        $q->whereIn('sub_type', ['Cost of Goods Sold', 'Allowable Itemized Deduction']);
+    });
+
+    // Add condition for Individual transactions if applicable (only filter if IDs are provided)
+    $individualTaxRowsQuery->whereHas('transaction', function ($q) use ($individualTransactionIds) {
+        $q->whereIn('id', $individualTransactionIds);
+    });
+
+    // If search term is provided, filter based on description or other relevant fields
+    if ($search) {
+        $individualTaxRowsQuery->where(function ($q) use ($search) {
+            $q->where('description', 'like', "%$search%")
+              ->orWhereHas('transaction.contactDetails', function ($q) use ($search) {
+                  $q->where('bus_name', 'like', "%$search%")
+                    ->orWhere('contact_address', 'like', "%$search%")
+                    ->orWhere('contact_tin', 'like', "%$search%");
+              });
+        });
+    }
+
+    // Query for Spouse COA TaxRows (Cost of Goods Sold and Allowable Itemized Deduction)
+    $spouseTaxRowsQuery = TaxRow::whereHas('coaAccount', function ($q) {
+        $q->whereIn('sub_type', ['Cost of Goods Sold', 'Allowable Itemized Deduction']);
+    });
+
+    // Add condition for Spouse transactions if applicable (only filter if IDs are provided)
+    $spouseTaxRowsQuery->whereHas('transaction', function ($q) use ($spouseTransactionIds) {
+        $q->whereIn('id', $spouseTransactionIds);
+    });
+
+    // If search term is provided, filter based on description or other relevant fields for spouse
+    if ($search) {
+        $spouseTaxRowsQuery->where(function ($q) use ($search) {
+            $q->where('description', 'like', "%$search%")
+              ->orWhereHas('transaction.contactDetails', function ($q) use ($search) {
+                  $q->where('bus_name', 'like', "%$search%")
+                    ->orWhere('contact_address', 'like', "%$search%")
+                    ->orWhere('contact_tin', 'like', "%$search%");
+              });
+        });
+    }
+
+    // Paginate Individual and Spouse TaxRows
+    $individualTaxRows = $individualTaxRowsQuery
+        ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load related data
+        ->paginate(5); // Paginate the results
+
+    $spouseTaxRows = $spouseTaxRowsQuery
+        ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load related data
+        ->paginate(5); // Paginate results for spouse transactions
+
+    // Get the current activeTab from the request, or default to 'individual'
+    $activeTab = $request->get('tab', 'individual');
+
+    // Return to view with paginated data and activeTab
+    return view('tax_return.income_show_coa', [
+        'taxReturn' => $taxReturn,
+        'individualTaxRows' => $individualTaxRows,
+        'spouseTaxRows' => $spouseTaxRows,
+        'type' => $type,
+        'activeTab' => $activeTab, // Pass the activeTab to the view
+    ]);
+}
+
+
+
+
+
+     
+     
+     
+     
      
      
      public function showSummary(TaxReturn $taxReturn, Request $request)
