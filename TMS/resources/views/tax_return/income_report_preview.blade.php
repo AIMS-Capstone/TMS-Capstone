@@ -1,5 +1,9 @@
 
 <x-app-layout>
+    @php
+    $deductionMethod = $individualTaxOptionRate->deduction_method ?? 'default'; // Get deduction method
+@endphp
+
     <div class="max-w-6xl mx-auto bg-white shadow-md rounded-lg p-8">
         <!-- Back Button -->
         <a href="#" class="text-gray-600 hover:text-gray-800 text-sm flex items-center mb-4">
@@ -192,7 +196,7 @@
         <!-- Radio button for Yes (Readonly) -->
         <label class="inline-flex items-center mr-6">
             <input type="radio" name="claiming_foreign_credits" value="1" 
-                   {{ $taxReturn->individualBackgroundInformation->claiming_foreign_credits == 1 ? 'checked' : '' }} 
+                   {{ $taxReturn->individualBackgroundInformation->claiming_foreign_credits == 1 ? 'checked' : 'disabled' }} 
                    readonly class="form-radio text-blue-600">
             <span class="ml-2">Yes</span>
         </label>
@@ -200,148 +204,626 @@
         <!-- Radio button for No (Readonly) -->
         <label class="inline-flex items-center mr-6">
             <input type="radio" name="claiming_foreign_credits" value="0" 
-                   {{ $taxReturn->individualBackgroundInformation->claiming_foreign_credits == 0 ? 'checked' : '' }} 
+                   {{ $taxReturn->individualBackgroundInformation->claiming_foreign_credits == 0 ? 'checked' : 'disabled' }} 
                    readonly class="form-radio text-blue-600">
             <span class="ml-2">No</span>
         </label>
     </div>
 </div>
+<div>
+    <!-- Individual Tax Option Rate Section -->
+ <!-- Individual Tax Option Rate Section -->
+<div class="mb-4">
+    <label class="block text-sm font-medium text-gray-700">Choose Tax Option</label>
+    <div class="mt-2 flex items-center space-x-4">
+        <label class="inline-flex items-center">
+            <input type="radio" name="individual_rate_type" value="graduated_rates"
+                   {{ $individualTaxOptionRate && $individualTaxOptionRate->rate_type === 'graduated_rates' ? 'checked' : 'disabled' }}
+                   class="form-radio text-blue-600">
+            <span class="ml-2">Graduated Rates</span>
+        </label>
+        <label class="inline-flex items-center">
+            <input type="radio" name="individual_rate_type" value="8_percent"
+                   {{ $individualTaxOptionRate && $individualTaxOptionRate->rate_type === '8_percent' ? 'checked' : 'disabled' }}
+                   class="form-radio text-blue-600">
+            <span class="ml-2">8% Gross Sales/Receipts</span>
+        </label>
+    </div>
+    @error('individual_rate_type')
+        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+    @enderror
+</div>
 
-        <div class="border-b ">
-            <h3 class="font-semibold text-gray-700 text-lg mb-4">Part II - Total Tax Payables</h3>
-            <div class="grid grid-cols-3 gap-4 border-t border-gray-300 pt-2">
-                <!-- Header Row -->
+    <!-- Individual Deduction Method Section -->
+    @if($individualTaxOptionRate && $individualTaxOptionRate->rate_type === 'graduated_rates')
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Choose Deduction Method</label>
+            <div class="mt-2 flex items-center space-x-4">
+                <label class="inline-flex items-center">
+                    <input type="radio" name="individual_deduction_method" value="itemized"
+                           {{ $individualTaxOptionRate->deduction_method === 'itemized' ? 'checked' : 'disabled' }}
+                           class="form-radio text-blue-600">
+                    <span class="ml-2">Itemized Deductions</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="radio" name="individual_deduction_method" value="osd"
+                           {{ $individualTaxOptionRate->deduction_method === 'osd' ? 'checked' : 'disabled' }}
+                           class="form-radio text-blue-600">
+                    <span class="ml-2">Optional Standard Deduction (OSD)</span>
+                </label>
+            </div>
+            @error('individual_deduction_method')
+                <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+            @enderror
+        </div>
+    @endif
+
+    <!-- Background Information On Spouse Section -->
+    @if($individualBackground->civil_status === 'married' && $spouseBackground)
+        <div class="border-b">
+            <h3 class="font-semibold text-gray-700 text-lg mb-4">Background Information On Spouse</h3>
+   <!-- Background Information On Spouse Section -->
+   <div class="border-b">
+    <h3 class="font-semibold text-gray-700 text-lg mb-4">Background Information On Spouse</h3>
+    
+    <!-- TIN -->
+    <div class="mb-4 flex items-start">
+        <label class="block text-gray-700 text-sm font-medium w-1/3">17 Spouse's Taxpayer Identification Number (TIN)</label>
+        <input type="text" name="spouse_tin" placeholder="000-000-000-000" value = "{{$spouseBackground->tin;}} "class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+    </div>
+
+    <!-- RDO Code -->
+    <div class="mb-4 flex items-start">
+        <label class="block text-gray-700 text-sm font-medium w-1/3">18 Spouse's Revenue District Office (RDO) Code</label>
+        <input type="text" name="spouse_rdo" value="{{ $spouseBackground->rdo; }}" readonly class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+    </div>
+    
+    <div class="mb-4 flex items-start">
+        <label class="block text-gray-700 text-sm font-medium w-1/3">19 Filer's Spouse Type Taxpayer/Filer Type</label>
+        <div class="w-2/3">
+            <!-- Text input for Filer Type (readonly) -->
+            <input type="text" name="spouse_filer_type" 
+                   value="{{ $spouseBackground->filer_type == 'single_proprietor' ? 'Single Proprietor' : 
+                           ($spouseBackground->filer_type == 'professional' ? 'Professional' : 
+                           ($spouseBackground->filer_type == 'estate' ? 'Estate' : 
+                           'Trust')) }}" 
+                   readonly class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+        </div>
+    </div>
+    <div class="mb-4 flex items-start">
+        <label class="block text-gray-700 text-sm font-medium w-1/3">20 Spouse's Alphanumeric Tax Code (ATC)</label>
+        <div class="w-2/3">
+            <!-- Read-only text field for Alphanumeric Tax Code (ATC) -->
+            <input type="text" name="spouse_alphanumeric_tax_code" value="{{ $spouseBackground->alphanumeric_tax_code }}" 
+                   class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300" readonly>
+        </div>
+    </div>
+    
+    
+    
+    
+    
+
+
+    <!-- Spouse's Name -->
+    <div class="mb-4 flex items-start">
+        <label class="block text-gray-700 text-sm font-medium w-1/3">Spouse's Name</label>
+        <div class="w-2/3">
+            <input type="text" name="spouse_name" 
+                   value="{{ $spouseBackground ? $spouseBackground->last_name . ', ' . $spouseBackground->first_name . ', ' . $spouseBackground->middle_name : '' }}" 
+                   class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                   placeholder="Last Name, First Name, Middle Name">
+        </div>
+    </div>
+    
+    
+
+
+    <div class="mb-4 flex items-start">
+        <label class="block text-gray-700 text-sm font-medium w-1/3">13 Citizenship</label>
+        <div class="w-2/3">
+            <!-- Readonly text input for Spouse Citizenship -->
+            <input type="text" name="spouse_citizenship" 
+                   value="{{ $spouseBackground->citizenship }}" 
+                   readonly class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+        </div>
+    </div>
+<!-- Spouse Foreign Tax Number Field (Readonly) -->
+<div class="mb-4 flex items-start">
+<label class="block text-gray-700 text-sm font-medium w-1/3">14 Foreign Tax Number</label>
+<div class="w-2/3">
+<!-- Readonly text input for Foreign Tax Number -->
+<input type="text" name="spouse_foreign_tax_number" 
+       value="{{ $spouseBackground->foreign_tax_number }}" 
+       readonly class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+</div>
+</div>
+    
+<!--Spouse  Claiming Foreign Tax Credits Field  (Readonly Radio Buttons) -->
+<div class="mb-4 flex items-start">
+<label class="block text-gray-700 text-sm font-medium w-1/3">15 Claiming Foreign Tax Credits?</label>
+<div class="w-2/3">
+<!-- Radio button for Yes (Readonly) -->
+<label class="inline-flex items-center mr-6">
+    <input type="radio" name="spouse_claiming_foreign_credits" value="1" 
+           {{ $spouseBackground->claiming_foreign_credits == 1 ? 'checked' : 'disabled' }} 
+           readonly class="form-radio text-blue-600">
+    <span class="ml-2">Yes</span>
+</label>
+
+<!-- Radio button for No (Readonly) -->
+<label class="inline-flex items-center mr-6">
+    <input type="radio" name="spouse_claiming_foreign_credits" value="0" 
+           {{$spouseBackground->claiming_foreign_credits ==  0 ? 'checked' : 'disabled' }} 
+           readonly class="form-radio text-blue-600">
+    <span class="ml-2">No</span>
+</label>
+</div>
+</div>
+ 
+            <!-- Spouse's Deduction Method (Disabled and Matches Individual's Selection) -->
+            @if($individualTaxOptionRate && $individualTaxOptionRate->rate_type === 'graduated_rates')
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Spouse's Deduction Method</label>
+                    <div class="mt-2 flex items-center space-x-4">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="spouse_deduction_method" value="itemized"
+                                   {{ $individualTaxOptionRate->deduction_method === 'itemized' ? 'checked' : 'disabled' }}
+                                   disabled class="form-radio text-blue-600">
+                            <span class="ml-2">Itemized Deductions</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="spouse_deduction_method" value="osd"
+                                   {{ $individualTaxOptionRate->deduction_method === 'osd' ? 'checked' : 'disabled' }}
+                                   disabled class="form-radio text-blue-600">
+                            <span class="ml-2">Optional Standard Deduction (OSD)</span>
+                        </label>
+                    </div>
+                </div>
+            @endif
+        </div>
+    @endif
+</div>
+
+
+
+
+    @if($individualTaxOptionRate->rate_type === 'graduated_rates')
+            <div class="border-b border-t">
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <!-- Header Row -->
+                    <div class="font-semibold text-gray-700 text-sm">Declaration this Quarter</div>
+                    <div class="font-semibold text-gray-700 text-sm">A) Taxpayer/Filer</div>
+                    <div class="font-semibold text-gray-700 text-sm">B) Spouse</div>
+                </div>
+                <!-- Item 36: Sales/Revenues/Receipts/Fees -->
+           
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <div class="flex items-center font-semibold">
+                        <label class="block text-gray-700 text-sm font-medium">
+                            36. Sales/Revenues/Receipts/Fees (net of sales returns, allowances, and discounts)
+                        </label>
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="sales_revenues" 
+                            id="sales_revenues"
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            value="{{ number_format($individualNetAmount, 2) }}" 
+                            onchange="calculateTotals()">
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="spouse_sales_revenues" 
+                            id="spouse_sales_revenues" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            value="{{ number_format($spouseNetAmount, 2) }}" 
+                            onchange="calculateTotals()">
+                    </div>
+                </div>
+          
+    
+     
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <!-- Item 37: Less: Cost of Sales/Services (Itemized Deductions) -->
+                    <div class="flex items-center font-semibold">
+                        <label class="block text-gray-700 text-sm font-medium">
+                            37. Less: Cost of Sales/Services (if availing Itemized Deductions)
+                        </label>
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="cost_of_sales" 
+                            id="cost_of_sales" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            value="{{ number_format($individualCOGS, 2) }}" 
+                            onchange="calculateTotals()">
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="spouse_cost_of_sales" 
+                            id="spouse_cost_of_sales" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            value="{{ number_format($spouseCOGS, 2) }}" 
+                            onchange="calculateTotals()">
+                    </div>
+                </div>
+                
+                <!-- Item 38: Gross Income/(Loss) from Operation -->
+          
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <div class="flex items-center font-semibold">
+                        <label class="block text-gray-700 text-sm font-medium">
+                            38. Gross Income/(Loss) from Operation (Item 36 Less Item 37)
+                        </label>
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="gross_income" 
+                            id="gross_income" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="spouse_gross_income" 
+                            id="spouse_gross_income" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                </div>
+    
+                <!-- Item 39: Total Allowable Itemized Deductions -->
+       
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <div class="flex items-center font-semibold">
+                        <label class="block text-gray-700 text-sm font-medium">
+                            39. Total Allowable Itemized Deductions
+                        </label>
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="total_itemized_deductions" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            value="{{ number_format($individualItemizedDeduction, 2) }}" 
+                            onchange="calculateTotals()">
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="spouse_total_itemized_deductions" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            value="{{ number_format($spouseItemizedDeduction, 2) }}" 
+                            onchange="calculateTotals()">
+                    </div>
+                </div>
+    
+                <!-- Item 40: Optional Standard Deduction (OSD) -->
+         
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <div class="flex items-center font-semibold">   
+                        <label class="block text-gray-700 text-sm font-medium">
+                            40. Optional Standard Deduction (OSD) (40% of Item 36)
+                        </label>
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="osd" 
+                            id="osd"
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="spouse_osd" 
+                             id="spouse_osd"
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                </div>
+    
+                <!-- Item 41: Net Income/(Loss) This Quarter -->
+          
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <div class="flex items-center font-semibold">
+                        <label class="block text-gray-700 text-sm font-medium">
+                            41 Net Income/(Loss) This Quarter (If Itemized: Item 38 Less Item 39; If OSD: Item 38 Less Item 40)
+                        </label>
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="net_income" 
+                            id="net_income" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="spouse_net_income" 
+                            id="spouse_net_income" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                </div>
+    
+                <!-- Item 42: Taxable Income -->
+          
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <div class="flex items-center font-semibold">
+                        <label class="block text-gray-700 text-sm font-medium">
+                            Add:    42. Taxable Income/(Loss) Previous Quarter/s
+                        </label>
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="taxable_income" 
+                            id="taxable_income"
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="spouse_taxable_income" 
+                            id="spouse_taxable_income" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <div class="flex items-center font-semibold">
+                        <label class="block text-gray-700 text-sm font-medium">
+                              43 Non-Operating Income (specify)
+                        </label>
+                        <div>
+                            <input 
+                                type="text" 
+                                name="graduated_non_op_specify" 
+                                id="taxable_income"
+                                class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                                onchange="calculateTotals()">
+                        </div>
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="graduated_non_op" 
+                            id="graduated_non_op"
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="spouse_graduated_non_op" 
+                            id="spouse_graduated_non_op" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                </div>
+      
+
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <div class="flex items-center font-semibold">
+                        <label class="block text-gray-700 text-sm font-medium">
+                           44 Amount Received/Share in Income by a Partner from General Professional Partnership (GPP)
+                        </label>
                
-        
-       <!-- VATable Sales -->
-    <div class="flex items-center">
-        <label class="block text-gray-700 text-sm font-medium">15 Net VAT Payable/(Excess Input Tax) (From Part IV, Item 61) 
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="partner_gpp" 
+                            id="partner_gpp"
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="spouse_partner_gpp" 
+                            id="spouse_partner_gpp" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <div class="flex items-center font-semibold">
+                        <label class="block text-gray-700 text-sm font-medium">
+                            45 Total Taxable Income/(Loss) To Date (Sum of Items 41 to 44)
+                        </label>
+               
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="graduated_total_taxable_income" 
+                            id="graduated_total_taxable_income"
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="graduated_spouse_total_taxable_income" 
+                            id="graduated_spouse_total_taxable_income" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                </div>
+    
+        <!-- Item 46: TAX DUE (Item 45 x Applicable Tax Rate) -->
+<div class="grid grid-cols-3 gap-4 pt-2">
+    <div class="flex items-center font-semibold">
+        <label class="block text-gray-700 text-sm font-medium">
+            46. TAX DUE (Item 45 x Applicable Tax Rate)
         </label>
     </div>
     <div>
-    
-    </div>
-    <div>
-        
-        <input 
-            type="text"
-            id="net_vat_payable" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            >
-    </div>
-    <div class="flex items-center">
-        <label class="block text-gray-700 text-sm font-medium">16 Creditable VAT Withheld (From Part V - Schedule 3, Column D) .
-
-        </label>
-    </div>
-    <div>
-    
-    </div>
-    <div>
-        
         <input 
             type="text" 
-            name="creditable_vat_withheld" 
-            id="creditable_vat_withheld" 
+            name="graduated_tax_due" 
+            id="graduated_tax_due"
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            >
-    </div>
-    <div class="flex items-center">
-        <label class="block text-gray-700 text-sm font-medium">17 Advance VAT Payments (From Part V - Schedule 4) 
-
-
-        </label>
+            readonly
+        >
     </div>
     <div>
+        <input 
+            type="text" 
+            name="graduated_spouse_tax_due" 
+            id="graduated_spouse_tax_due" 
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+            readonly 
+        >
+    </div>
+</div>
+
     
-    </div>
-    <div>
-        
-        <input 
-            type="text" 
-            name="advance_vat_payment" 
-            id="advance_vat_payment" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            >
-    </div>
-    <div class="flex items-center">
-        <label class="block text-gray-700 text-sm font-medium">18 VAT paid in return previously filed, if this is an amended return 
-
-        </label>
-    </div>
-    <div>
+        <!-- Schedule II - 8% IT Rate (if selected) -->
+        @elseif($individualTaxOptionRate->rate_type === '8_percent')
+            <div class="border-b border-t">
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <!-- Header Row -->
+                    <div class="font-semibold text-gray-700 text-sm">Declaration this Quarter</div>
+                    <div class="font-semibold text-gray-700 text-sm">A) Taxpayer/Filer</div>
+                    <div class="font-semibold text-gray-700 text-sm">B) Spouse</div>
+                </div>
+                <!-- Item 47: Sales/Revenues/Receipts/Fees -->
+                <div class="flex items-center font-semibold">
+                    <label class="block text-gray-700 text-sm font-medium">
+                        47. Sales/Revenues/Receipts/Fees (net of sales returns, allowances, and discounts)
+                    </label>
+                </div>
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <div>
+                        <input 
+                            type="text" 
+                            name="sales_revenues_8" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="spouse_sales_revenues_8" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                </div>
     
-    </div>
-    <div>
-        
-        <input 
-            type="text" 
-            name="vat_paid_if_amended" 
-            id="vat_paid_if_amended" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            >
-    </div>
-    <div class="flex items-center">
-        <label class="block text-gray-700 text-sm font-medium">19 Other Credits/Payment (Specify)
-
-
-        </label>
-    </div>
-    <div>
-        
-        <input 
-            type="text" 
-            name="other_credits_specify" 
-            id="other_credits_specify" 
-         
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            >
-    </div>
-    <div>
-        
-        <input 
-            type="text" 
-            name="other_credits_specify_amount" 
-            id="other_credits_specify_amount" 
-         
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            >
-    </div>
-    <div class="flex items-center">
-        <label class="block text-gray-700 text-sm font-medium">20 Total Tax Credits/Payment (Sum of Items 16 to 19) 
-
-        </label>
-    </div>
-    <div>
+                <!-- Item 48: Add: Non-Operating Income -->
+                <div class="flex items-center font-semibold">
+                    <label class="block text-gray-700 text-sm font-medium">
+                        48. Add: Non-Operating Income (specify)
+                    </label>
+                </div>
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <div>
+                        <input 
+                            type="text" 
+                            name="non_operating_income" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="spouse_non_operating_income" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                </div>
     
-    </div>
-    <div>
-        
-        <input 
-            type="text" 
-            name="total_tax_credits" 
-            id="total_tax_credits" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            >
-    </div>
-    <div class="flex items-center">
-        <label class="block text-gray-700 text-sm font-medium">21 Tax Still Payable/(Excess Credits) (Item 15 Less Item 20) 
-
-        </label>
-    </div>
-    <div>
+                <!-- Item 49: Total Income for the Quarter -->
+       
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <div>
+                        <div class="flex items-center font-semibold">
+                            <label class="block text-gray-700 text-sm font-medium">
+                                49. Total Income for the Quarter (Sum of Items 47 and 48)
+                            </label>
+                        </div>
+                        <input 
+                            type="text" 
+                            name="total_income_8" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="spouse_total_income_8" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                    
+                </div>
     
-    </div>
-    <div>
-        
-        <input 
-            type="text" 
-            name="tax_still_payable" 
-            id="tax_still_payable" 
+                <!-- Item 53: Taxable Income To Date -->
+              
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <div class="flex items-center font-semibold">
+                        <label class="block text-gray-700 text-sm font-medium">
+                            53. Taxable Income/(Loss) To Date (Item 51 Less Item 52)
+                        </label>
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="taxable_income_8" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="spouse_taxable_income_8" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                </div>
     
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            >
+                <!-- Item 54: Tax Due -->
+             
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <div class="flex items-center font-semibold">
+                        <label class="block text-gray-700 text-sm font-medium">
+                            54. TAX DUE (Item 53 x 8% Tax Rate)
+                        </label>
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="tax_due_8" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            name="spouse_tax_due_8" 
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            onchange="calculateTotals()">
+                    </div>
+                </div>
+            </div>
+            @endif
+        </div>
     </div>
+    
     <div class="flex items-center">
         <label class="block text-gray-700 text-sm font-medium"> Add: Penalties 22 Surcharge 
 
@@ -417,733 +899,14 @@
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
             >
     </div>
-    <div class="flex items-center">
-        <label class="block text-gray-700 text-sm font-medium">26 TOTAL AMOUNT PAYABLE/(Excess Credits) (Sum of Items 21 and 25) 
-
-        </label>
-    </div>
-    <div>
-    
-    </div>
-    <div>
-        
-        <input 
-            type="text" 
-            name="total_amount_payable" 
-            id="total_amount_payable" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            >
-    </div>
-    
-    </div>
-    
-    
-    <div class="border-b border-t">
-        <h3 class="font-semibold text-gray-700 text-lg mb-4">Details of VAT Computation</h3>
-        <div class="grid grid-cols-3 gap-4  pt-2">
-            <!-- Header Row -->
-            <div class="font-semibold text-gray-700 text-sm">Total Sales and Output Tax</div>
-            <div class="font-semibold text-gray-700 text-sm">A. Sales for the Quarter (Exclusive of VAT)</div>
-            <div class="font-semibold text-gray-700 text-sm">B. Output Tax for the Quarter</div>
-    
-   <!-- VATable Sales -->
-<div class="flex items-center">
-    <label class="block text-gray-700 text-sm font-medium">31. VATable Sales</label>
-</div>
-<div>
-    <input 
-        type="text" 
-        name="vatable_sales" 
-        id="vatable_sales" 
-
-        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-        onchange="calculateTotals()">
-</div>
-<div>
-    <input 
-        type="text" 
-        name="vatable_sales_tax_amount" 
-        id="vatable_sales_tax_amount" 
-
-        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-        onchange="calculateTotals()">
-</div>
-
-<!-- Zero-Rated Sales -->
-<div class="flex items-center">
-    <label class="block text-gray-700 text-sm font-medium">32. Zero-Rated Sales</label>
-</div>
-<div>
-    <input 
-        type="text" 
-        name="zero_rated_sales" 
-        id="zero_rated_sales" 
-   
-        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-        onchange="calculateTotals()">
-</div>
-<div>
-</div>
-<!-- Exempt Sales -->
-<div class="flex items-center">
-    <label class="block text-gray-700 text-sm font-medium">33. Exempt Sales</label>
-</div>
-<div>
-    <input 
-        type="text" 
-        name="exempt_sales" 
-        id="exempt_sales" 
-
-        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-        onchange="calculateTotals()">
-</div>
-<div>
-</div>
-
-<!-- Total Sales & Output Tax Due -->
-<div class="flex items-center font-semibold">
-    <label class="block text-gray-700 text-sm font-medium">
-        34. Total Sales & Output Tax Due (Sum of Items 31A to 33A) / (Item 31B)
-    </label>
-</div>
-<div>
-    <input 
-        type="text" 
-        name="total_sales" 
-        id="total_sales" 
-        readonly 
-        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-</div>
-<div>
-    <input 
-        type="text" 
-        name="total_output_tax" 
-        id="total_output_tax" 
-        readonly 
-        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-
-            </div>
-                <!-- Less: Output VAT on Uncollected Receivables -->
-<div class="flex items-center font-semibold">
-    <label class="block text-gray-700 text-sm font-medium">
-        Less: Output VAT on Uncollected Receivables
-    </label>
-</div>
-<div></div>
-<div>
-    <input 
-        type="text" 
-        name="uncollected_receivable_vat" 
-        id="uncollected_receivable_vat" 
-        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-        onchange="calculateAdjustedOutputTax()">
-</div>
-
-<!-- Add: Output VAT on Recovered Uncollected Receivables Previously Deducted -->
-<div class="flex items-center font-semibold">
-    <label class="block text-gray-700 text-sm font-medium">
-        Add: Output VAT on Recovered Uncollected Receivables Previously Deducted
-    </label>
-</div>
-<div></div>
-<div>
-    <input 
-        type="text" 
-        name="recovered_uncollected_receivables" 
-        id="recovered_uncollected_receivables" 
-        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-        onchange="calculateAdjustedOutputTax()">
-</div>
-
-<!-- Total Adjusted Output Tax Due -->
-<div class="flex items-center font-semibold">
-    <label class="block text-gray-700 text-sm font-medium">
-        37. Total Adjusted Output Tax Due (Item 34B Less Item 35B Add Item 36B)
-    </label>
-</div>
-<div></div>
-<div>
-    <input 
-        type="text" 
-        name="total_adjusted_output_tax" 
-        id="total_adjusted_output_tax" 
-        readonly 
-        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-</div>
-
-                <div class="font-semibold text-gray-700 text-sm">Less: Allowable Input Tax</div>
-                <div class="font-semibold text-gray-700 text-sm"></div>
-                <div class="font-semibold text-gray-700 text-sm">B. Input Tax</div>
-                <!-- 38 Input Tax Carried Over from Previous Quarter -->
-                <div class="flex items-center font-semibold">
-                    <label class="block text-gray-700 text-sm font-medium">
-                        38 Input Tax Carried Over from Previous Quarter
-                    </label>
-                </div>
-                <div></div>
-                <div>
-                    <input 
-                        type="text" 
-                        name="input_carried_over" 
-                        id="input_carried_over" 
-                        readonly 
-                        value="{{ $excessInputTax ?? '0' }}" 
-                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                </div>
-                
-                <!-- 39 Input Tax Deferred on Capital Goods -->
-                <div class="flex items-center font-semibold">
-                    <label class="block text-gray-700 text-sm font-medium">
-                        39 Input Tax Deferred on Capital Goods Exceeding P1 Million from Previous Quarter (From Part V - Schedule 1 Col E).
-                    </label>
-                </div>
-                <div></div>
-                <div>
-                    <input 
-                        type="text" 
-                        name="input_tax_deferred" 
-                        id="input_tax_deferred"  
-                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                </div>
-                
-                <!-- 40 Transitional Input Tax -->
-                <div class="flex items-center font-semibold">
-                    <label class="block text-gray-700 text-sm font-medium">
-                        40 Transitional Input Tax
-                    </label>
-                </div>
-                <div></div>
-                <div>
-                    <input 
-                        type="text" 
-                        name="transitional_input_tax" 
-                        id="transitional_input_tax" 
-                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                </div>
-                
-                <!-- 41 Presumptive Input Tax -->
-                <div class="flex items-center font-semibold">
-                    <label class="block text-gray-700 text-sm font-medium">
-                        41 Presumptive Input Tax
-                    </label>
-                </div>
-                <div></div>
-                <div>
-                    <input 
-                        type="text" 
-                        name="presumptive_input_tax" 
-                        id="presumptive_input_tax" 
-                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                </div>
-                
-                <!-- 42 Others -->
-                <div class="flex items-center font-semibold">
-                    <label class="block text-gray-700 text-sm font-medium">
-                        42 Others (specify)
-                    </label>
-                </div>
-                <div>
-                    <input 
-                        type="text" 
-                        name="other_specify" 
-                        id="other_specify" 
-                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                </div>
-                <div>
-                    <input 
-                        type="text" 
-                        name="other_input_tax" 
-                        id="other_input_tax" 
-                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                </div>
-                
-                <!-- 43 Total Input Tax -->
-                <div class="flex items-center font-semibold">
-                    <label class="block text-gray-700 text-sm font-medium">
-                        43. Total (Sum of Items 38B to 42B)
-                    </label>
-                </div>
-                <div></div>
-                <div>
-                    <input 
-                        type="text" 
-                        name="total_input_tax" 
-                        id="total_input_tax" 
-                        readonly 
-                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                </div>
-             <!-- Empty Cell for Alignment -->
-             <div class="font-semibold text-gray-700 text-sm">Current Transactions</div>
-             <div class="font-semibold text-gray-700 text-sm">A. Purchases</div>
-             <div class="font-semibold text-gray-700 text-sm">B. Input Tax</div>
-             
-             <!-- 44. Domestic Purchases (Dynamic Field) -->
-             <div class="flex items-center font-semibold">
-                 <label class="block text-gray-700 text-sm font-medium">
-                     44. Domestic Purchases
-                 </label>
-             </div>
-             <div>
-                 <input 
-                     type="text" 
-                     name="domestic_purchase" 
-                     id="domestic_purchase" 
-
-                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                     onchange="calculateTotals()">
-             </div>
-             
-             <!-- 44B. Domestic Purchases Input Tax (Dynamic Field) -->
-             <div>
-                 <input 
-                     type="text" 
-                     name="domestic_purchase_input_tax" 
-                     id="domestic_purchase_input_tax" 
-              
-                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                     onchange="calculateTotals()">
-             </div>
-             
-             <!-- 45. Services Rendered by Non-Residents (Dynamic Field) -->
-             <div class="flex items-center font-semibold">
-                 <label class="block text-gray-700 text-sm font-medium">
-                     45. Services Rendered by Non-Residents
-                 </label>
-             </div>
-             <div>
-                 <input 
-                     type="text" 
-                     name="services_non_resident" 
-                     id="services_non_resident" 
-               
-                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                     onchange="calculateTotals()">
-             </div>
-             
-             <!-- 45B. Services Non-Resident Input Tax (Dynamic Field) -->
-             <div>
-                 <input 
-                     type="text" 
-                     name="services_non_resident_input_tax" 
-                     id="services_non_resident_input_tax" 
-               
-                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                     onchange="calculateTotals()">
-             </div>
-             
-             <!-- 46. Importations (Dynamic Field) -->
-             <div class="flex items-center font-semibold">
-                 <label class="block text-gray-700 text-sm font-medium">
-                     46. Importations
-                 </label>
-             </div>
-             <div>
-                 <input 
-                     type="text" 
-                     name="importations" 
-                     id="importations" 
-             
-                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                     onchange="calculateTotals()">
-             </div>
-             
-             <!-- 46B. Importations Input Tax (Dynamic Field) -->
-             <div>
-                 <input 
-                     type="text" 
-                     name="importations_input_tax" 
-                     id="importations_input_tax" 
-         
-                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                     onchange="calculateTotals()">
-             </div>
-             
-             <!-- 47. Others (Specify) (Manual Input Field) -->
-             <div class="flex items-center font-semibold">
-                 <label class="block text-gray-700 text-sm font-medium">
-                     47. Others (Specify)
-                 </label>
-                 <input 
-                     type="text" 
-                     name="purchases_others_specify" 
-                     id="purchases_others_specify" 
-                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                     onchange="calculateTotals()">
-             </div>
-             
-             <!-- 47B. Others (Specify Amount) (Manual Input Field) -->
-             <div>
-                 <input 
-                     type="text" 
-                     name="purchases_others_specify_amount" 
-                     id="purchases_others_specify_amount" 
-                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                     onchange="calculateTotals()">
-             </div>
-             
-             <!-- 47C. Others (Specify Input Tax) (Manual Input Field) -->
-             <div>
-                 <input 
-                     type="text" 
-                     name="purchases_others_specify_input_tax" 
-                     id="purchases_others_specify_input_tax" 
-                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                     onchange="calculateTotals()">
-             </div>
-             
-             <!-- 48. Domestic Purchases with No Input Tax (Dynamic Field) -->
-             <div class="flex items-center font-semibold">
-                 <label class="block text-gray-700 text-sm font-medium">
-                     48. Domestic Purchases with No Input Tax
-                 </label>
-             </div>
-             <div>
-                 <input 
-                     type="text" 
-                     name="domestic_no_input" 
-                     id="domestic_no_input" 
-             
-                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                     onchange="calculateTotals()">
-             </div>
-             <div> 
-             </div>
-             <!-- 50. Total Current Purchases/Input Tax (Calculated Field) -->
-             <div class="font-semibold text-gray-700 text-sm">
-                 50. Total Current Purchases/Input Tax
-                 (Sum of Items 44A to 49A)/(Sum of Items 44B to 47B)
-             </div>
-             <div>
-                 <input 
-                     type="text" 
-                     name="total_current_purchase" 
-                     id="total_current_purchase" 
-                     readonly 
-                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-             </div>
-             
-             <div>
-                 <input 
-                     type="text" 
-                     name="total_current_purchase_input_tax" 
-                     id="total_current_purchase_input_tax" 
-                     readonly 
-                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-             </div>
-             
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    51 Total Available Input Tax (Sum of Items 43B and 50B) 
-
-                </label>
-            </div>
-            <div>
-            </div>
-          
-            <div>
-                <input 
-                    type="text" 
-                    name="total_available_input_tax" 
-                    id="total_available_input_tax" 
-                    readonly 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                 52   Input Tax on Purchases/Importation of Capital Goods exceeding P1 Million deferred for the succeeding period
-                    (From Part V Schedule 1, Column I)
-
-                </label>
-            </div>
-            <div>
-            </div>
-          
-            <div>
-                <input 
-                    type="text" 
-                    name="importation_million_deferred_input_tax" 
-                    id="importation_million_deferred_input_tax" 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    53 Input Tax Attributable to VAT Exempt Sales (From Part V - Schedule 2) 
-
-
-                </label>
-            </div>
-            <div>
-            </div>
-          
-            <div>
-                <input 
-                    type="text" 
-                    name="attributable_vat_exempt_input_tax" 
-                    id="attributable_vat_exempt_input_tax" 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    54 VAT Refund/TCC Claimed
-
-
-
-                </label>
-            </div>
-            <div>
-            </div>
-          
-            <div>
-                <input 
-                    type="text" 
-                    name="vat_refund_input_tax" 
-                    id="vat_refund_input_tax" 
-    
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    55 Input VAT on Unpaid Payables 
-
-
-                </label>
-            </div>
-            <div>
-            </div>
-          
-            <div>
-                <input 
-                    type="text" 
-                    name="unpaid_payables_input_tax" 
-                    id="unpaid_payables_input_tax" 
-              
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                 Others (specify)
-                </label>
-            </div>
-            <div>
-                <input 
-                type="text" 
-                name="other_deduction_specify" 
-                id="other_deduction_specify" 
-        
-                class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-        </div>
-        
-            <div>
-                <input 
-                    type="text" 
-                    name="other_deduction_specify_input_tax" 
-                    id="other_deduction_specify_input_tax" 
-            
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    57 Total Deductions from Input Tax (Sum of Items 52B to 56B)  
-
-
-                </label>
-            </div>
-            <div>
-            </div>
-          
-            <div>
-                <input 
-                    type="text" 
-                    name="total_deductions_input_tax" 
-                    id="total_deductions_input_tax" 
-                    readonly 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    58 Add: Input VAT on Settled Unpaid Payables Previously Deducted 
-
-
-                </label>
-            </div>
-            <div>
-            </div>
-          
-            <div>
-                <input 
-                    type="text" 
-                    name="settled_unpaid_input_tax" 
-                    id="settled_unpaid_input_tax" 
-                     
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    59 Adjusted Deductions from Input Tax (Sum of Items 57B and 58B) 
-
-
-                </label>
-            </div>
-            <div>
-            </div>
-          
-            <div>
-                <input 
-                    type="text" 
-                    name="adjusted_deductions_input_tax" 
-                    id="adjusted_deductions_input_tax" 
-                    readonly 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    60 Total Allowable Input Tax (Item 51B Less Item 59B) 
-
-
-                </label>
-            </div>
-            <div>
-            </div>
-          
-            <div>
-                <input 
-                    type="text" 
-                    name="total_allowable_input_Tax" 
-                    id="total_allowable_input_Tax" 
-                    readonly 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
-            <div class="flex items-center font-semibold">
-                <label class="block text-gray-700 text-sm font-medium">
-                    61 Net VAT Payable/(Excess Input Tax) (Item 37B Less Item 60B) (To Part II, Item 15) .
-
-
-                </label>
-            </div>
-            <div>
-            </div>
-          
-            <div>
-                <input 
-                    type="text" 
-                    name="excess_input_tax" 
-                    id="excess_input_tax" 
-                    readonly 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            </div>
   
-        
-        
-            
-        </div>
-        {{-- <div class="border-t border-gray-300 py-4">
-            <h3 class="font-semibold text-gray-700 text-lg mb-4">Part V – Schedules</h3>
-        
-            <!-- Schedule 1: Amortized Input Tax from Capital Goods -->
-            <div>
-                <h4 class="font-semibold text-gray-700 text-base mb-2">Schedule 1 – Amortized Input Tax from Capital Goods</h4>
-                <table class="w-full table-auto border border-gray-300 text-sm">
-                    <thead>
-                        <tr class="bg-gray-200 text-gray-700">
-                            <th class="border px-2 py-1">Date Purchased/ Imported (MM/DD/YYYY)</th>
-                            <th class="border px-2 py-1">Source Code*</th>
-                            <th class="border px-2 py-1">Description</th>
-                            <th class="border px-2 py-1">Amount of Purchases/ Importation of Capital Goods Exceeding P1 M</th>
-                            <th class="border px-2 py-1">Estimated Life (in months)</th>
-                            <th class="border px-2 py-1">Recognized Life (in Months) Remaining Life</th>
-                            <th class="border px-2 py-1">Allowable Input Tax for the Period**</th>
-                            <th class="border px-2 py-1">Balance of Input Tax to be carried to Next Period</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="border px-2 py-1">
-                                <input type="date" name="schedule1_date" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                            </td>
-                            <td class="border px-2 py-1">
-                                <input type="text" name="schedule1_source_code" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                            </td>
-                            <td class="border px-2 py-1">
-                                <input type="text" name="schedule1_description" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                            </td>
-                            <td class="border px-2 py-1">
-                                <input type="text" name="schedule1_amount" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                            </td>
-                            <td class="border px-2 py-1">
-                                <input type="text" name="schedule1_estimated_life" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                            </td>
-                            <td class="border px-2 py-1">
-                                <input type="text" name="schedule1_recognized_life" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                            </td>
-                            <td class="border px-2 py-1">
-                                <input type="text" name="schedule1_allowable_input" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                            </td>
-                            <td class="border px-2 py-1">
-                                <input type="text" name="schedule1_balance" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <p class="text-sm text-gray-500 mt-1">* D for Domestic Purchase; I for Importation</p>
-                <p class="text-sm text-gray-500">** Divide B by G multiplied by the Number of months in use during the quarter</p>
-            </div>
-        
-            <!-- Schedule 2: Input Tax Attributable to VAT Exempt Sales -->
-            <div class="mt-6">
-                <h4 class="font-semibold text-gray-700 text-base mb-2">Schedule 2 – Input Tax Attributable to VAT Exempt Sales</h4>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-gray-700 text-sm font-medium mb-1">Input Tax directly attributable to VAT Exempt Sale</label>
-                        <input type="text" name="input_tax_direct" class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 text-sm font-medium mb-1">Add: Ratable portion of Input Tax not directly attributable</label>
-                        <input type="text" name="input_tax_ratable" class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 gap-4 mt-4">
-                    <div>
-                        <label class="block text-gray-700 text-sm font-medium mb-1">Total Input Tax attributable to Exempt Sale</label>
-                        <input type="text" name="input_tax_total" readonly class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                    </div>
-                </div>
-            </div>
-        
-            <!-- Schedule 3: Creditable VAT Withheld -->
-            <div class="mt-6">
-                <h4 class="font-semibold text-gray-700 text-base mb-2">Schedule 3 – Creditable VAT Withheld</h4>
-                <table class="w-full table-auto border border-gray-300 text-sm">
-                    <thead>
-                        <tr class="bg-gray-200 text-gray-700">
-                            <th class="border px-2 py-1">Period Covered</th>
-                            <th class="border px-2 py-1">Name of Withholding Agent</th>
-                            <th class="border px-2 py-1">Income Payment</th>
-                            <th class="border px-2 py-1">Total Tax Withheld</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="border px-2 py-1">
-                                <input type="text" name="withheld_period" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                            </td>
-                            <td class="border px-2 py-1">
-                                <input type="text" name="withheld_agent" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                            </td>
-                            <td class="border px-2 py-1">
-                                <input type="text" name="withheld_income_payment" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                            </td>
-                            <td class="border px-2 py-1">
-                                <input type="text" name="withheld_tax" class="w-full p-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div> --}}
-        
-        
+    <div>
+    
     </div>
+  
+    
+    </div>
+    
     
 
 
@@ -1159,248 +922,206 @@
     </div>
 </x-app-layout>
 <script>
-    // Function to calculate Total Available Input Tax (Sum of Items 43B and 50B)
-    function calculateTotalAvailableInputTax() {
-        // Retrieve values for Total Input Tax and Total Current Purchase Input Tax
-        const totalInputTax = parseFloat(document.getElementById('total_input_tax').value) || 0;
-        const totalCurrentPurchaseInputTax = parseFloat(document.getElementById('total_current_purchase_input_tax').value) || 0;
-    
-        // Calculate the Total Available Input Tax (Sum of 43B and 50B)
-        const totalAvailableInputTax = totalInputTax + totalCurrentPurchaseInputTax;
-    
-        // Update the Total Available Input Tax field
-        document.getElementById('total_available_input_tax').value = totalAvailableInputTax.toFixed(2);
-    }
-    
-    // Function to calculate all totals including the Total Input Tax and Adjusted Output Tax
-    function calculateTotals() {
-        const vatableSales = parseFloat(document.getElementById('vatable_sales').value) || 0;
-        const vatableSalesTaxAmount = parseFloat(document.getElementById('vatable_sales_tax_amount').value) || 0;
-        const zeroRatedSales = parseFloat(document.getElementById('zero_rated_sales').value) || 0;
-        const exemptSales = parseFloat(document.getElementById('exempt_sales').value) || 0;
-    
-        // Calculate total sales
-        const totalSales = vatableSales + zeroRatedSales + exemptSales;
-        document.getElementById('total_sales').value = totalSales.toFixed(2);
-    
-        // Calculate total output tax
-        document.getElementById('total_output_tax').value = vatableSalesTaxAmount.toFixed(2);
-    
-        // Trigger input tax calculation
-        calculateTotalInputTax();
-    
-        // Trigger adjusted output tax calculation
-        calculateAdjustedOutputTax();
-    
-        // Trigger purchases input tax calculation
-        calculateTotalPurchasesAndInputTax();
-    
-        // Calculate Total Available Input Tax after all other calculations
-        calculateTotalAvailableInputTax();
-        calculateTotalDeductionsInputTax();
-        calculateAdjustedDeductionsInputTax();
-    calculateTotalAllowableInputTax();
-    calculateTotalTaxCredits();
-    calculateNetVATPayable();
-    calculateTaxStillPayable();
-    calculateTotalPenalties();
-    calculateTotalAmountPayable();
-    }
-    function calculateAdjustedDeductionsInputTax() {
-    // Retrieve values for total deductions from input tax and settled unpaid input tax
-    const totalDeductionsInputTax = parseFloat(document.getElementById('total_deductions_input_tax').value) || 0; // Item 57B
-    const settledUnpaidInputTax = parseFloat(document.getElementById('settled_unpaid_input_tax').value) || 0; // Item 58B
+    // Fetch the deduction method value passed from backend (Laravel Blade)
+    const deductionMethod = "{{ $deductionMethod }}"; // This value comes from backend
 
-    // Calculate adjusted deductions from input tax
-    const adjustedDeductionsInputTax = totalDeductionsInputTax + settledUnpaidInputTax;
-
-    // Update the adjusted deductions from input tax field
-    document.getElementById('adjusted_deductions_input_tax').value = adjustedDeductionsInputTax.toFixed(2);
-}
-
-// Function to calculate Total Allowable Input Tax (Item 60B)
-function calculateTotalAllowableInputTax() {
-    // Retrieve values for total available input tax and adjusted deductions from input tax
-    const totalAvailableInputTax = parseFloat(document.getElementById('total_available_input_tax').value) || 0; // Item 51B
-    const adjustedDeductionsInputTax = parseFloat(document.getElementById('adjusted_deductions_input_tax').value) || 0; // Item 59B
-
-    // Calculate total allowable input tax (total available input tax - adjusted deduct231ions)
-    const totalAllowableInputTax = totalAvailableInputTax - adjustedDeductionsInputTax;
-
-    // Update the total allowable input tax field
-    document.getElementById('total_allowable_input_Tax').value = totalAllowableInputTax.toFixed(2);
-}
-
-// Function to calculate Net VAT Payable/(Excess Input Tax) (Item 61B)
-function calculateNetVATPayable() {
-    // Retrieve values for total adjusted output tax and total allowable input tax
-    const totalAdjustedOutputTax = parseFloat(document.getElementById('total_adjusted_output_tax').value) || 0; // Item 37B
-    const totalAllowableInputTax = parseFloat(document.getElementById('total_allowable_input_Tax').value) || 0; // Item 60B
-
-    // Calculate net VAT payable/excess input tax (total adjusted output tax - total allowable input tax)
-    const netVATPayable = totalAdjustedOutputTax - totalAllowableInputTax;
-
-    // Update the net VAT payable field
-    document.getElementById('excess_input_tax').value = netVATPayable.toFixed(2);   
-     document.getElementById('net_vat_payable').value = netVATPayable.toFixed(2);
-}
-    function calculateTotalDeductionsInputTax() {
-    // Retrieve values for the deduction fields (Items 52B to 56B)
-    const importationMillionDeferredInputTax = parseFloat(document.getElementById('importation_million_deferred_input_tax').value) || 0; // Item 52B
-    const attributableVatExemptInputTax = parseFloat(document.getElementById('attributable_vat_exempt_input_tax').value) || 0;  // Item 53B
-    const vatRefundInputTax = parseFloat(document.getElementById('vat_refund_input_tax').value) || 0; // Item 54B
-    const unpaidPayablesInputTax = parseFloat(document.getElementById('unpaid_payables_input_tax').value) || 0; // Item 55B
-    const otherDeductionSpecifyInputTax = parseFloat(document.getElementById('other_deduction_specify_input_tax').value) || 0; // Item 56B
-
-    // Calculate the total deductions from input tax (sum of 52B to 56B)
-    const totalDeductionsInputTax = importationMillionDeferredInputTax + attributableVatExemptInputTax + vatRefundInputTax + unpaidPayablesInputTax + otherDeductionSpecifyInputTax;
-
-    // Update the total deductions input tax field
-    document.getElementById('total_deductions_input_tax').value = totalDeductionsInputTax.toFixed(2);
-}
-    // Function to calculate Total Input Tax (Sum of Items 38B to 42B)
-    function calculateTotalInputTax() {
-        const inputTaxCarriedOver = parseFloat(document.getElementById('input_carried_over').value) || 0;  // 38B
-        const inputTaxDeferred = parseFloat(document.getElementById('input_tax_deferred').value) || 0;        // 39B
-        const transitionalInputTax = parseFloat(document.getElementById('transitional_input_tax').value) || 0; // 40B
-        const presumptiveInputTax = parseFloat(document.getElementById('presumptive_input_tax').value) || 0;   // 41B
-        const otherInputTax = parseFloat(document.getElementById('other_input_tax').value) || 0;             // 42B
-    
-        const totalInputTax = inputTaxCarriedOver + inputTaxDeferred + transitionalInputTax + presumptiveInputTax + otherInputTax;
-        document.getElementById('total_input_tax').value = totalInputTax.toFixed(2);
-    }
-    
-    // Function to calculate Adjusted Output Tax
-    function calculateAdjustedOutputTax() {
-        const totalOutputTax = parseFloat(document.getElementById('total_output_tax').value) || 0; // Item 34B
-        const uncollectedReceivableVAT = parseFloat(document.getElementById('uncollected_receivable_vat').value) || 0; // Item 35B
-        const recoveredReceivablesVAT = parseFloat(document.getElementById('recovered_uncollected_receivables').value) || 0; // Item 36B
-    
-        const totalAdjustedOutputTax = totalOutputTax - uncollectedReceivableVAT + recoveredReceivablesVAT;
-        document.getElementById('total_adjusted_output_tax').value = totalAdjustedOutputTax.toFixed(2);
-    }
-    
-    // Function to calculate Total Purchases and Input Tax
-    function calculateTotalPurchasesAndInputTax() {
-        const domesticPurchase = parseFloat(document.getElementById('domestic_purchase').value) || 0;
-        const domesticPurchaseInputTax = parseFloat(document.getElementById('domestic_purchase_input_tax').value) || 0;
-        const servicesNonResident = parseFloat(document.getElementById('services_non_resident').value) || 0;
-        const servicesNonResidentInputTax = parseFloat(document.getElementById('services_non_resident_input_tax').value) || 0;
-        const importations = parseFloat(document.getElementById('importations').value) || 0;
-        const importationsInputTax = parseFloat(document.getElementById('importations_input_tax').value) || 0;
-        const domesticNoInput = parseFloat(document.getElementById('domestic_no_input').value) || 0;
-    
-        const othersSpecifyAmount = parseFloat(document.getElementById('purchases_others_specify_amount').value) || 0;
-        const othersSpecifyInputTax = parseFloat(document.getElementById('purchases_others_specify_input_tax').value) || 0;
-    
-        // Calculate total purchases and total input tax
-        const totalPurchases = domesticPurchase + servicesNonResident + importations + othersSpecifyAmount + domesticNoInput;
-        const totalInputTax = domesticPurchaseInputTax + servicesNonResidentInputTax + importationsInputTax + othersSpecifyInputTax;
-    
-        document.getElementById('total_current_purchase').value = totalPurchases.toFixed(2);
-        document.getElementById('total_current_purchase_input_tax').value = totalInputTax.toFixed(2);
-    }
-    function calculateTotalTaxCredits() {
-        const creditableVATWithheld = parseFloat(document.getElementById('creditable_vat_withheld').value) || 0; // Item 16
-        const advanceVATPayment = parseFloat(document.getElementById('advance_vat_payment').value) || 0;         // Item 17
-        const vatPaidIfAmended = parseFloat(document.getElementById('vat_paid_if_amended').value) || 0;         // Item 18
-        const otherCreditsSpecifyAmount = parseFloat(document.getElementById('other_credits_specify_amount').value) || 0; // Item 19
-
-        // Calculate total tax credits
-        const totalTaxCredits = creditableVATWithheld + advanceVATPayment + vatPaidIfAmended + otherCreditsSpecifyAmount;
-
-        // Update the total tax credits field
-        document.getElementById('total_tax_credits').value = totalTaxCredits.toFixed(2);
-    }
-    // Add event listeners for all input fields
-    document.addEventListener('DOMContentLoaded', () => {
-        // Trigger initial calculations
-        calculateTotals();
-    
-        // List of fields to trigger recalculation
-        const fieldsToWatch = [
-            'vatable_sales', 
-            'vatable_sales_tax_amount', 
-            'zero_rated_sales', 
-            'exempt_sales', 
-            'input_carried_over', 
-            'input_tax_deferred', 
-            'transitional_input_tax', 
-            'presumptive_input_tax', 
-            'other_input_tax',
-            'domestic_purchase', 
-            'domestic_purchase_input_tax',
-            'services_non_resident', 
-            'services_non_resident_input_tax',
-            'importations', 
-            'importations_input_tax', 
-            'domestic_no_input',
-            'purchases_others_specify_amount',
-            'purchases_others_specify_input_tax',
-            'uncollected_receivable_vat', 
-            'recovered_uncollected_receivables',
-            'importation_million_deferred_input_tax',
-        'attributable_vat_exempt_input_tax',
-        'vat_refund_input_tax',
-        'unpaid_payables_input_tax',
-        'other_deduction_specify_input_tax',
-        'total_deductions_input_tax',
-        'settled_unpaid_input_tax',
-        'total_available_input_tax',
-        'creditable_vat_withheld', 
-            'advance_vat_payment', 
-            'vat_paid_if_amended', 
-            'other_credits_specify_amount',
-            'net_vat_payable', 'total_tax_credits',
-        'total_adjusted_output_tax',
-        'tax_still_payable', 'total_penalties',
-        'surcharge', 'interest', 'compromise'
-        ];
-   
-    
+    function calculateTaxDue() {
+        const totalTaxableIncome = parseFloat(document.getElementById('graduated_total_taxable_income')?.value) || 0;
+        const spouseTotalTaxableIncome = parseFloat(document.getElementById('graduated_spouse_total_taxable_income')?.value) || 0;
         
+        // Calculate Tax Due for the individual
+        let taxDue = 0;
+        if (totalTaxableIncome <= 250000) {
+            taxDue = 0;
+        } else if (totalTaxableIncome > 250000 && totalTaxableIncome <= 400000) {
+            taxDue = (totalTaxableIncome - 250000) * 0.15;
+        } else if (totalTaxableIncome > 400000 && totalTaxableIncome <= 800000) {
+            taxDue = 22500 + (totalTaxableIncome - 400000) * 0.20;
+        } else if (totalTaxableIncome > 800000 && totalTaxableIncome <= 2000000) {
+            taxDue = 102500 + (totalTaxableIncome - 800000) * 0.25;
+        } else if (totalTaxableIncome > 2000000 && totalTaxableIncome <= 8000000) {
+            taxDue = 402500 + (totalTaxableIncome - 2000000) * 0.30;
+        } else if (totalTaxableIncome > 8000000) {
+            taxDue = 2202500 + (totalTaxableIncome - 8000000) * 0.35;
+        }
+
+        // Update the Tax Due for the individual
+        const taxDueElement = document.getElementById('graduated_tax_due');
+        if (taxDueElement) {
+            taxDueElement.value = taxDue.toFixed(2);
+        }
+
+        // Calculate Tax Due for the spouse (same logic)
+        let spouseTaxDue = 0;
+        if (spouseTotalTaxableIncome <= 250000) {
+            spouseTaxDue = 0;
+        } else if (spouseTotalTaxableIncome > 250000 && spouseTotalTaxableIncome <= 400000) {
+            spouseTaxDue = (spouseTotalTaxableIncome - 250000) * 0.15;
+        } else if (spouseTotalTaxableIncome > 400000 && spouseTotalTaxableIncome <= 800000) {
+            spouseTaxDue = 22500 + (spouseTotalTaxableIncome - 400000) * 0.20;
+        } else if (spouseTotalTaxableIncome > 800000 && spouseTotalTaxableIncome <= 2000000) {
+            spouseTaxDue = 102500 + (spouseTotalTaxableIncome - 800000) * 0.25;
+        } else if (spouseTotalTaxableIncome > 2000000 && spouseTotalTaxableIncome <= 8000000) {
+            spouseTaxDue = 402500 + (spouseTotalTaxableIncome - 2000000) * 0.30;
+        } else if (spouseTotalTaxableIncome > 8000000) {
+            spouseTaxDue = 2202500 + (spouseTotalTaxableIncome - 8000000) * 0.35;
+        }
+
+        // Update the Tax Due for the spouse
+        const spouseTaxDueElement = document.getElementById('graduated_spouse_tax_due');
+        if (spouseTaxDueElement) {
+            spouseTaxDueElement.value = spouseTaxDue.toFixed(2);
+        }
+    }
+    // Function to calculate and update Gross Income from operation
+
+    function calculateTotalTaxableIncome() {
+        const netIncome = parseFloat(document.getElementById('net_income')?.value) || 0; // Item 41 (Net Income)
+        const spouseNetIncome = parseFloat(document.getElementById('spouse_net_income')?.value) || 0; // Item 41 for Spouse
+        const taxableIncome = parseFloat(document.getElementById('taxable_income')?.value) || 0; // Item 42 (Taxable Income)
+        const spouseTaxableIncome = parseFloat(document.getElementById('spouse_taxable_income')?.value) || 0; // Item 42 for Spouse
+        const nonOperatingIncome = parseFloat(document.getElementById('graduated_non_op')?.value) || 0; // Item 43 (Non-Operating Income)
+        const spouseNonOperatingIncome = parseFloat(document.getElementById('spouse_graduated_non_op')?.value) || 0; // Item 43 for Spouse
+        const partnerGPP = parseFloat(document.getElementById('partner_gpp')?.value) || 0; // Item 44 (Partner GPP)
+        const spousePartnerGPP = parseFloat(document.getElementById('spouse_partner_gpp')?.value) || 0; // Item 44 for Spouse
+
+        // Calculate Total Taxable Income for individual and spouse
+        const totalTaxableIncome = netIncome + taxableIncome + nonOperatingIncome + partnerGPP;
+        const spouseTotalTaxableIncome = spouseNetIncome + spouseTaxableIncome + spouseNonOperatingIncome + spousePartnerGPP;
+
+        // Update the Total Taxable Income fields
+        const totalTaxableIncomeElement = document.getElementById('graduated_total_taxable_income');
+        if (totalTaxableIncomeElement) {
+            totalTaxableIncomeElement.value = totalTaxableIncome.toFixed(2);
+        }
+
+        const spouseTotalTaxableIncomeElement = document.getElementById('graduated_spouse_total_taxable_income');
+        if (spouseTotalTaxableIncomeElement) {
+            spouseTotalTaxableIncomeElement.value = spouseTotalTaxableIncome.toFixed(2);
+        }
+    }
+
+    function calculateGrossIncome() {
+        const salesRevenues = parseFloat(document.getElementById('sales_revenues')?.value) || 0; // Item 36
+        const costOfSales = parseFloat(document.getElementById('cost_of_sales')?.value) || 0; // Item 37
+
+        // Calculate Gross Income/(Loss) from Operation
+        const grossIncome = salesRevenues - costOfSales;
+
+        // Update the Gross Income field
+        const grossIncomeElement = document.getElementById('gross_income');
+        if (grossIncomeElement) {
+            grossIncomeElement.value = grossIncome.toFixed(2);
+        }
+    }
+
+    // Function to calculate and update Spouse Gross Income from operation
+    function calculateSpouseGrossIncome() {
+        const spouseSalesRevenues = parseFloat(document.getElementById('spouse_sales_revenues')?.value) || 0; // Item 36 for Spouse
+        const spouseCostOfSales = parseFloat(document.getElementById('spouse_cost_of_sales')?.value) || 0; // Item 37 for Spouse
+
+        // Calculate Spouse Gross Income/(Loss) from Operation
+        const spouseGrossIncome = spouseSalesRevenues - spouseCostOfSales;
+
+        // Update the Spouse Gross Income field
+        const spouseGrossIncomeElement = document.getElementById('spouse_gross_income');
+        if (spouseGrossIncomeElement) {
+            spouseGrossIncomeElement.value = spouseGrossIncome.toFixed(2);
+        }
+    }
+
+    // Function to calculate Optional Standard Deduction (OSD) based on Item 36 (Sales Revenues)
+    function calculateOSD() {
+        const salesRevenues = parseFloat(document.getElementById('sales_revenues')?.value) || 0; // Item 36 (Sales Revenues)
+        const spouseSalesRevenues = parseFloat(document.getElementById('spouse_sales_revenues')?.value) || 0; // Item 36 for Spouse
+
+        if (deductionMethod === 'osd') {
+            // Calculate OSD (40% of Item 36 for individual and spouse)
+            const osd = (salesRevenues * 0.40).toFixed(2); // 40% of Item 36 for individual
+            const spouseOsd = (spouseSalesRevenues * 0.40).toFixed(2); // 40% of Item 36 for spouse
+
+            // Update OSD fields if they exist
+            const osdElement = document.getElementById('osd');
+            if (osdElement) {
+                osdElement.value = osd;
+            }
+
+            const spouseOsdElement = document.getElementById('spouse_osd');
+            if (spouseOsdElement) {
+                spouseOsdElement.value = spouseOsd;
+            }
+        }
+    }
+
+    // Function to calculate Net Income/(Loss) This Quarter
+    function calculateNetIncome() {
+        const grossIncome = parseFloat(document.getElementById('gross_income')?.value) || 0; // Item 38
+        const spouseGrossIncome = parseFloat(document.getElementById('spouse_gross_income')?.value) || 0; // Item 38 for Spouse
+
+        let netIncome = 0;
+        let spouseNetIncome = 0;
+
+        // If OSD method, subtract Item 40 (OSD); If itemized, subtract Item 39 (deduction)
+        if (deductionMethod === 'osd') {
+            const osd = parseFloat(document.getElementById('osd')?.value) || 0; // Item 40 (OSD)
+            const spouseOsd = parseFloat(document.getElementById('spouse_osd')?.value) || 0; // Item 40 (OSD)
+            netIncome = grossIncome - osd;
+            spouseNetIncome = spouseGrossIncome - spouseOsd; // Subtract same OSD for spouse
+        } else {
+            const deduction = parseFloat(document.getElementById('deduction')?.value) || 0; // Item 39 (Deduction)
+            netIncome = grossIncome - deduction;
+            spouseNetIncome = spouseGrossIncome - deduction; // Subtract same Deduction for spouse
+        }
+
+        // Update the Net Income fields
+        const netIncomeElement = document.getElementById('net_income');
+        if (netIncomeElement) {
+            netIncomeElement.value = netIncome.toFixed(2);
+        }
+
+        const spouseNetIncomeElement = document.getElementById('spouse_net_income');
+        if (spouseNetIncomeElement) {
+            spouseNetIncomeElement.value = spouseNetIncome.toFixed(2);
+        }
+    }
+
+    // Function to calculate totals for all fields
+    function calculateTotals() {
+        calculateGrossIncome();      // Calculate individual Gross Income
+        calculateSpouseGrossIncome(); // Calculate spouse Gross Income
+        calculateOSD();              // Calculate OSD (Optional Standard Deduction)
+        calculateNetIncome();        // Calculate Net Income
+        calculateTotalTaxableIncome(); // Calculate Total Taxable Income (Item 45)
+        calculateTaxDue();           // Calculate Tax Due (Item 46)
+    }
+
+
+    // Event listener to trigger calculations after the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        calculateTotals(); // Trigger initial calculations
+
+        // Watch for changes in fields
+        const fieldsToWatch = [
+            'sales_revenues', 
+            'cost_of_sales', 
+            'spouse_sales_revenues', 
+            'spouse_cost_of_sales',
+            'deduction', // Deduction field for itemized calculation
+            'graduated_non_op', 
+            'spouse_graduated_non_op', 
+            'partner_gpp', 
+            'spouse_partner_gpp', 
+            'taxable_income',
+            'spouse_taxable_income',
+        ];
+
         fieldsToWatch.forEach(fieldId => {
-            document.getElementById(fieldId).addEventListener('input', () => {
-                calculateTotals();  // Update the values when any field changes
-            });
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.addEventListener('input', () => {
+                    calculateTotals();  // Update all calculations on any input change
+                });
+            }
         });
     });
-
-    function calculateTaxStillPayable() {
-        const netVatPayable = parseFloat(document.getElementById('net_vat_payable').value) || 0;  // Item 15
-        const totalTaxCredits = parseFloat(document.getElementById('total_tax_credits').value) || 0; // Item 20
-
-        // Calculate Tax Still Payable/(Excess Credits)
-        const taxStillPayable = netVatPayable - totalTaxCredits;
-
-        // Update the field for Item 21
-        document.getElementById('tax_still_payable').value = taxStillPayable.toFixed(2);
-    }
-
-    function calculateTotalPenalties() {
-    // Retrieve values for Items 22, 23, and 24
-    const surcharge = parseFloat(document.getElementById('surcharge').value) || 0; // Item 22
-    const interest = parseFloat(document.getElementById('interest').value) || 0; // Item 23
-    const compromise = parseFloat(document.getElementById('compromise').value) || 0; // Item 24
-
-    // Calculate Total Penalties
-    const totalPenalties = surcharge + interest + compromise;
-
-    // Update the field for Item 25
-    document.getElementById('total_penalties').value = totalPenalties.toFixed(2);
-}
-function calculateTotalAmountPayable() {
-    // Retrieve values for Items 21 and 25
-    const taxStillPayable = parseFloat(document.getElementById('tax_still_payable').value) || 0; // Item 21
-    const totalPenalties = parseFloat(document.getElementById('total_penalties').value) || 0; // Item 25
-
-    // Calculate Total Amount Payable
-    const totalAmountPayable = taxStillPayable + totalPenalties;
-
-    // Update the field for Item 26
-    document.getElementById('total_amount_payable').value = totalAmountPayable.toFixed(2);
-}
-      
-
-    </script>
-    
+</script>

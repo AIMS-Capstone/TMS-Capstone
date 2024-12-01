@@ -30,6 +30,10 @@ class SpouseInformation extends Model
         'first_name',
         'middle_name',
         'filer_type',
+        'alphanumeric_tax_code',  
+        'citizenship',            
+        'foreign_tax_number',     
+        'claiming_foreign_credits',
     ];
 
     /**
@@ -42,6 +46,10 @@ class SpouseInformation extends Model
     public function spouseTransactions()
     {
         return $this->hasMany(SpouseTransaction::class);
+    }
+    public function taxOptionRate()
+    {
+        return $this->hasOne(SpouseTaxOptionRate::class, 'spouse_information_id');
     }
     
 

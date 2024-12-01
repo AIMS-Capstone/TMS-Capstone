@@ -40,7 +40,7 @@ class TaxReturnController extends Controller
     {
         //
     }
-
+// Function for showing 2550Q Returns Table
     public function vatReturn()
     {
         $organizationId = session('organization_id');
@@ -51,6 +51,7 @@ class TaxReturnController extends Controller
 
         return view('tax_return.vat_return', compact('taxReturns'));
     }
+    // Function for showing Income Returns Table
     public function incomeReturn()
     {
         $organizationId = session('organization_id');
@@ -89,7 +90,7 @@ class TaxReturnController extends Controller
         return view('tax_return.income_return', compact('taxReturns', 'filterType', 'searchTerm'));
     }
     
-
+// Function for showing detailed view of Income Returns
     public function showIncome($id, $type)
     {
         // Retrieve the tax return by its ID
@@ -107,7 +108,7 @@ class TaxReturnController extends Controller
     }
 
     
-    
+    // Function for showing Percentage Report Preview
     public function showPercentageReport($id)
 {
     $taxReturn = TaxReturn::findOrFail($id);
@@ -186,6 +187,7 @@ class TaxReturnController extends Controller
         'summaryData' // Add the summary data to the view
     ));
 }
+  // Function for showing Value Added Tax Report Preview
 public function showVatReport($id)
 {
     // Fetch the tax return and organization setup data
@@ -366,8 +368,8 @@ public function showVatReport($id)
         'previousYear', 'currentYear'
     ));
 }
-
-public function showIncomeReport($id)
+  // Function for showing Income Tax (1701Q) Report Preview
+  public function showIncomeReport($id)
 {
     // Fetch the tax return and organization setup data
     $taxReturn = TaxReturn::findOrFail($id);
@@ -385,26 +387,112 @@ public function showIncomeReport($id)
     $individualBackground = $taxReturn->individualBackgroundInformation;
     $spouseBackground = $individualBackground->spouseInformation ?? null;
 
-    // Additional calculations for individual and spouse (if applicable)
-    $individualIncome = $individualBackground->income ?? 0;
-    $spouseIncome = $spouseBackground ? $spouseBackground->income : 0;
+    // Fetch tax option rate for individual background information
+    $individualTaxOptionRate = $individualBackground->taxOptionRate()->first();
 
-    // Calculate net income (this could be based on your logic for deductions, etc.)
-    $totalDeductions = 0; // You can later add logic for deductions if needed
-    $netIncome = $individualIncome + $spouseIncome - $totalDeductions;
+    // Fetch tax option rate for spouse background information if spouse exists
+    $spouseTaxOptionRate = $spouseBackground
+        ? $spouseBackground->taxOptionRate()->first()
+        : null;
+
+    // Collect transactions for Individual from individual_transactions table
+    $individualTransactionIds = $taxReturn->individualTransaction()->pluck('transaction_id') ?? collect();
+
+    // Collect transactions for Spouse from spouse_transactions table, if applicable
+    $spouseTransactionIds = $spouseBackground
+        ? $taxReturn->spouseTransactions()->pluck('transaction_id') ?? collect()
+        : collect(); // Empty collection if no spouse information
+
+    // Query and collect all Individual Sales TaxRows
+    $individualSalesTaxRows = TaxRow::whereHas('transaction', function ($q) use ($individualTransactionIds) {
+        $q->whereIn('id', $individualTransactionIds)
+            ->where('transaction_type', 'sales');
+    })
+    ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load related data
+    ->get();
+
+    // Query and collect all Spouse Sales TaxRows
+    $spouseSalesTaxRows = TaxRow::whereHas('transaction', function ($q) use ($spouseTransactionIds) {
+        $q->whereIn('id', $spouseTransactionIds)
+            ->where('transaction_type', 'sales');
+    })
+    ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load related data
+    ->get();
+
+    // Combine individual and spouse sales data
+    $combinedSalesTaxRows = $individualSalesTaxRows->merge($spouseSalesTaxRows);
+
+    // Calculate the total net amount for individual and spouse
+    $individualNetAmount = $individualSalesTaxRows->sum('net_amount');
+    $spouseNetAmount = $spouseSalesTaxRows->sum('net_amount');
+    $totalNetAmount = $individualNetAmount + $spouseNetAmount;
+
+    // Initialize cost of sales variables for COGS and Allowable Itemized Deduction
+    $individualCOGS = 0;
+    $spouseCOGS = 0;
+    $individualItemizedDeduction = 0;
+    $spouseItemizedDeduction = 0;
+
+    // Check if the deduction method for individual is itemized
+    if ($individualTaxOptionRate && $individualTaxOptionRate->deduction_method === 'itemized') {
+        // Get individual deductible tax rows (Cost of Goods Sold and Itemized Deduction)
+        $individualTaxRowsForDeductions = TaxRow::whereHas('coaAccount', function ($q) {
+            $q->whereIn('sub_type', ['Cost of Goods Sold', 'Allowable Itemized Deduction']);
+        })
+        ->whereHas('transaction', function ($q) use ($individualTransactionIds) {
+            $q->whereIn('id', $individualTransactionIds);
+        })
+        ->get();
+
+        // Separate COGS and Itemized Deduction for individual
+        $individualCOGS = $individualTaxRowsForDeductions->where('coaAccount.sub_type', 'Cost of Goods Sold')->sum('amount');
+        $individualItemizedDeduction = $individualTaxRowsForDeductions->where('coaAccount.sub_type', 'Allowable Itemized Deduction')->sum('amount');
+    }
+
+    // Check if the deduction method for spouse is itemized (if spouse exists)
+    if ($spouseTaxOptionRate && $spouseTaxOptionRate->deduction_method === 'itemized') {
+        // Get spouse deductible tax rows (Cost of Goods Sold and Itemized Deduction)
+        $spouseTaxRowsForDeductions = TaxRow::whereHas('coaAccount', function ($q) {
+            $q->whereIn('sub_type', ['Cost of Goods Sold', 'Allowable Itemized Deduction']);
+        })
+        ->whereHas('transaction', function ($q) use ($spouseTransactionIds) {
+            $q->whereIn('id', $spouseTransactionIds);
+        })
+        ->get();
+
+        // Separate COGS and Itemized Deduction for spouse
+        $spouseCOGS = $spouseTaxRowsForDeductions->where('coaAccount.sub_type', 'Cost of Goods Sold')->sum('amount');
+        $spouseItemizedDeduction = $spouseTaxRowsForDeductions->where('coaAccount.sub_type', 'Allowable Itemized Deduction')->sum('amount');
+    }
 
     // Pass all required variables to the view
     return view('tax_return.income_report_preview', compact(
-        'individualIncome', 'spouseIncome', 'totalDeductions', 'netIncome',
-        'rdoCode', 'taxReturn', 'organization', 'individualBackground'
+        'rdoCode', 
+        'taxReturn', 
+        'organization', 
+        'individualBackground', 
+        'spouseBackground', 
+        'individualTaxOptionRate', 
+        'spouseTaxOptionRate', 
+        'combinedSalesTaxRows',
+        'individualNetAmount',
+        'spouseNetAmount',     
+        'totalNetAmount',
+        'individualCOGS',  
+        'spouseCOGS',
+        'individualItemizedDeduction', 
+        'spouseItemizedDeduction'       
     ));
 }
 
+  
+
+  
 
 
 
 
-
+  // Function for showing Percentage Tax Return Table
     public function percentageReturn()
     {
         $organizationId = session('organization_id');
@@ -416,9 +504,8 @@ public function showIncomeReport($id)
         return view('tax_return.percentage_return', compact('taxReturns'));
     }
     
-    /**
-     * Store a newly created resource in storage.
-     */
+
+        // Function for VAT Tax Return
     public function store(StoreTaxReturnRequest $request)
     {
         // Step 1: Create the tax return
@@ -480,6 +567,7 @@ public function showIncomeReport($id)
         // Step 6: Return back to the same page with success message
         return back()->with('success', 'Tax Return created successfully.' . ($transactions->isEmpty() ? ' No transactions found for the selected period.' : ' Transactions associated successfully.'));
     }
+      // Function for Creating Percentage Tax Return
     public function storePercentage(StoreTaxReturnRequest $request)
     {
         // Step 1: Create the tax return
@@ -544,9 +632,7 @@ public function showIncomeReport($id)
     
     
 
-    /**
-     * Display the specified resource.
-     */
+       // Function for Creating 2550Q Value Added Tax Return Report
     public function store2550Q(Request $request, $taxReturn)
     {
 
@@ -640,6 +726,7 @@ public function showIncomeReport($id)
         ], 200);
     }
     
+      // Function for Creating 2551Q Percentage Tax Return Report
      public function store2551Q(Request $request, $taxReturn)
      {
          // Validate the incoming request data
@@ -710,6 +797,7 @@ public function showIncomeReport($id)
          return redirect()->route('tax_return.2551q.pdf', ['taxReturn' => $taxReturn])
         ->with('success', 'Tax return successfully submitted and PDF generated.');
      }
+     // Function for showing SLSP Data of Value Added Tax Return
      public function showSlspData(TaxReturn $taxReturn, Request $request)
      {
          // Retrieve the selected type from the request
@@ -753,7 +841,8 @@ public function showIncomeReport($id)
          ->paginate(5);
      
          return view('tax_return.vat_show', compact('taxReturn', 'paginatedTaxRows', 'type'));
-     }// Method to show Income Sales Data
+     }
+     // Function to show Income Sales Data
      public function showIncomeSalesData(TaxReturn $taxReturn, Request $request)
      {
          // Get Individual and Spouse Background Information
@@ -834,7 +923,7 @@ public function showIncomeReport($id)
      }
      
 
-// Method to show Income COA (Cost of Goods Sold and Allowable Itemized Deduction) Data
+   // Function to show Income Sales Data
 public function showIncomeCoaData(TaxReturn $taxReturn, Request $request)
 {
     // Get Individual and Spouse Background Information
@@ -924,7 +1013,7 @@ public function showIncomeCoaData(TaxReturn $taxReturn, Request $request)
      
      
      
-     
+        // Function to show Summary Report on Value-Added Tax Return 2550Q
      
      
      public function showSummary(TaxReturn $taxReturn, Request $request)
@@ -993,7 +1082,8 @@ public function showIncomeCoaData(TaxReturn $taxReturn, Request $request)
          return view('tax_return.vat_summary', compact('taxReturn', 'paginatedSummaryData'));
      }
      
-     
+         
+        // Function to show Percentage Tax SLSP Data 2551Q
     
     public function showPercentageSlspData(TaxReturn $taxReturn)
     {
@@ -1011,6 +1101,7 @@ public function showIncomeCoaData(TaxReturn $taxReturn, Request $request)
         return view('tax_return.percentage_show', compact('taxReturn', 'paginatedTaxRows'));
     }
     
+            // Function to show Percentage Tax Summary Page 2551Q
     
     public function showPercentageSummaryPage(TaxReturn $taxReturn)
 {
@@ -1075,6 +1166,7 @@ public function showIncomeCoaData(TaxReturn $taxReturn, Request $request)
 
     
 
+            // Function to show Value Added Tax Return Report 
 
         public function showReport(TaxReturn $taxReturn)
     {
@@ -1419,6 +1511,7 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
             'pdfPath' => asset('storage/filled_report.pdf'), // Serve the PDF from public storage
         ]);
     }
+                // Function to show Percentage Tax Report (PDF)
     public function showPercentageReportPDF(TaxReturn $taxReturn)
     {
         // Get data from the `2551q` table
@@ -1541,21 +1634,7 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
     
 
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(TaxReturn $taxReturn)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateTaxReturnRequest $request, TaxReturn $taxReturn)
-    {
-        //
-    }
 
     //Soft delete
     public function destroy(Request $request)

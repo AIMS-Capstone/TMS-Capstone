@@ -38,7 +38,7 @@
                     
                     <!-- Tab Content for Input Summary -->
                     <div x-show="selectedTab === 'input-summary'" class="space-y-6">
-                        <!-- Card for Tax Option Rate -->
+             
                         <!-- Card for Background Information -->
 <div class="p-4 bg-white rounded-lg shadow-md">
     <h3 class="text-lg font-semibold">Background Information</h3>

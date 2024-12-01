@@ -23,6 +23,11 @@ class TaxOptionRate extends Model
     {
         return $this->belongsTo(OrgSetup::class);
     }
+    public function individualBackgroundInformation()
+    {
+        return $this->belongsTo(IndividualBackgroundInformation::class, 'individual_background_information_id');
+    }
+
 
     // Relationship to TaxReturn
     public function taxReturn()

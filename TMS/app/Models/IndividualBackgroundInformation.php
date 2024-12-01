@@ -43,6 +43,10 @@ class IndividualBackgroundInformation extends Model
     {
         return $this->hasMany(IndividualTransaction::class);
     }
+    public function taxOptionRate()
+    {
+        return $this->hasOne(TaxOptionRate::class, 'individual_background_information_id');
+    }
 
     /**
      * Get the spouse information associated with this individual.

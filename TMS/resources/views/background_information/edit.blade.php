@@ -134,19 +134,43 @@
                 <input type="radio" name="alphanumeric_tax_code" value="011" 
                     {{ old('alphanumeric_tax_code', $backgroundInfo->alphanumeric_tax_code) == '011' ? 'checked' : '' }}
                     class="mr-2 border-gray-300 text-blue-500 focus:ring-blue-500">
-                Compensation (011)
+                    II011 Compensation Income
             </label>
             <label class="flex items-center">
                 <input type="radio" name="alphanumeric_tax_code" value="012" 
                     {{ old('alphanumeric_tax_code', $backgroundInfo->alphanumeric_tax_code) == '012' ? 'checked' : '' }}
                     class="mr-2 border-gray-300 text-blue-500 focus:ring-blue-500">
-                Business (012)
+                    II012 Business Income-Graduated IT Rates
             </label>
             <label class="flex items-center">
                 <input type="radio" name="alphanumeric_tax_code" value="013" 
                     {{ old('alphanumeric_tax_code', $backgroundInfo->alphanumeric_tax_code) == '013' ? 'checked' : '' }}
                     class="mr-2 border-gray-300 text-blue-500 focus:ring-blue-500">
-                Mixed Income (013)
+                    II013 Mixed Income - Graduated IT Rates
+            </label>
+            <label class="flex items-center">
+                <input type="radio" name="alphanumeric_tax_code" value="014" 
+                    {{ old('alphanumeric_tax_code', $backgroundInfo->alphanumeric_tax_code) == '014' ? 'checked' : '' }}
+                    class="mr-2 border-gray-300 text-blue-500 focus:ring-blue-500">
+                    II014 Income from Profession-Graduated IT Rates
+            </label>
+            <label class="flex items-center">
+                <input type="radio" name="alphanumeric_tax_code" value="015" 
+                    {{ old('alphanumeric_tax_code', $backgroundInfo->alphanumeric_tax_code) == '015' ? 'checked' : '' }}
+                    class="mr-2 border-gray-300 text-blue-500 focus:ring-blue-500">
+                    II015 Business Income - 8% IT Rate 
+            </label>
+            <label class="flex items-center">
+                <input type="radio" name="alphanumeric_tax_code" value="016" 
+                    {{ old('alphanumeric_tax_code', $backgroundInfo->alphanumeric_tax_code) == '016' ? 'checked' : '' }}
+                    class="mr-2 border-gray-300 text-blue-500 focus:ring-blue-500">
+                    II016 Mixed Income - 8% IT Rate
+            </label>
+            <label class="flex items-center">
+                <input type="radio" name="alphanumeric_tax_code" value="017" 
+                    {{ old('alphanumeric_tax_code', $backgroundInfo->alphanumeric_tax_code) == '017' ? 'checked' : '' }}
+                    class="mr-2 border-gray-300 text-blue-500 focus:ring-blue-500">
+                    II017 Income from Profession - 8% IT Rate
             </label>
         </div>
         @error('alphanumeric_tax_code')
@@ -273,6 +297,97 @@
         </label>
     </div>
     @error('spouse_type')
+        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+    @enderror
+</div>
+<div class="col-span-12 text-sm font-medium text-gray-700 mt-4">
+    <label>Spouse's Alphanumeric Tax Code</label>
+    <div class="mt-1 text-sm text-gray-600">
+        Choose the appropriate Alphanumeric Tax Code that matches for the individual's spouse.
+    </div>
+</div>
+
+<div class="col-span-12">
+    <div class="space-y-4">
+        <label class="flex items-center">
+            <input type="radio" name="spouse_alphanumeric_tax_code" value="011" 
+                {{ old('spouse_alphanumeric_tax_code', $spouseInfo->alphanumeric_tax_code) == '011' ? 'checked' : '' }}
+                class="mr-2 border-gray-300 text-blue-500 focus:ring-blue-500">
+                II011 Compensation Income
+        </label>
+        <label class="flex items-center">
+            <input type="radio" name="spouse_alphanumeric_tax_code" value="012" 
+                {{ old('spouse_alphanumeric_tax_code', $spouseInfo->alphanumeric_tax_code) == '012' ? 'checked' : '' }}
+                class="mr-2 border-gray-300 text-blue-500 focus:ring-blue-500">
+                II012 Business Income-Graduated IT Rates
+        </label>
+        <label class="flex items-center">
+            <input type="radio" name="spouse_alphanumeric_tax_code" value="013" 
+                {{ old('spouse_alphanumeric_tax_code', $spouseInfo->alphanumeric_tax_code) == '013' ? 'checked' : '' }}
+                class="mr-2 border-gray-300 text-blue-500 focus:ring-blue-500">
+                II013 Mixed Income - Graduated IT Rates
+        </label>
+        <label class="flex items-center">
+            <input type="radio" name="spouse_alphanumeric_tax_code" value="014" 
+                {{ old('spouse_alphanumeric_tax_code', $spouseInfo->alphanumeric_tax_code) == '014' ? 'checked' : '' }}
+                class="mr-2 border-gray-300 text-blue-500 focus:ring-blue-500">
+                II014 Income from Profession-Graduated IT Rates
+        </label>
+        <label class="flex items-center">
+            <input type="radio" name="spouse_alphanumeric_tax_code" value="015" 
+                {{ old('spouse_alphanumeric_tax_code', $spouseInfo->alphanumeric_tax_code) == '015' ? 'checked' : '' }}
+                class="mr-2 border-gray-300 text-blue-500 focus:ring-blue-500">
+                II015 Business Income - 8% IT Rate 
+        </label>
+        <label class="flex items-center">
+            <input type="radio" name="spouse_alphanumeric_tax_code" value="016" 
+                {{ old('spouse_alphanumeric_tax_code', $spouseInfo->alphanumeric_tax_code) == '016' ? 'checked' : '' }}
+                class="mr-2 border-gray-300 text-blue-500 focus:ring-blue-500">
+                II016 Mixed Income - 8% IT Rate
+        </label>
+        <label class="flex items-center">
+            <input type="radio" name="spouse_alphanumeric_tax_code" value="017" 
+                {{ old('spouse_alphanumeric_tax_code', $spouseInfo->alphanumeric_tax_code) == '017' ? 'checked' : '' }}
+                class="mr-2 border-gray-300 text-blue-500 focus:ring-blue-500">
+                II017 Income from Profession - 8% IT Rate
+        </label>
+    </div>
+    @error('spouse_alphanumeric_tax_code')
+        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+    @enderror
+</div>
+<div class="col-span-12">
+    <label class="block text-sm font-medium text-gray-700">Spouse’s Citizeship</label>
+    <input type="text" name="spouse_citizenship" value="{{ old('spouse_citizenship', $spouseInfo?->citizenship) }}" 
+           class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+</div>
+<div class="col-span-12">
+    <label class="block text-sm font-medium text-gray-700">Spouse’s Foreign Tax Number</label>
+    <input type="text" name="spouse_foreign_tax_number" value="{{ old('spouse_foreign_tax_number', $spouseInfo?->foreign_tax_number) }}" 
+           class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+</div>
+<div class="col-span-4 text-sm font-medium text-gray-700 mt-4">
+    <label>Claiming Foreign Tax Credits</label>
+    <div class="mt-1 text-sm text-gray-600">
+        Are you claiming foreign tax credits? (Yes/No)
+    </div>
+</div>
+<div class="col-span-8">
+    <div class="space-x-4">
+        <label class="inline-flex items-center">
+            <input type="radio" name="spouse_foreign_tax_credits" value="Yes" 
+                {{ old('spouse_foreign_tax_credits', $spouseInfo->claiming_foreign_credits) == '1' ? 'checked' : '' }}
+                class="mr-2 border-gray-300 text-blue-500 focus:ring-blue-500">
+            Yes
+        </label>
+        <label class="inline-flex items-center">
+            <input type="radio" name="spouse_foreign_tax_credits" value="No" 
+                {{ old('spouse_foreign_tax_credits', $spouseInfo->claiming_foreign_credits) == '0' ? 'checked' : '' }}
+                class="mr-2 border-gray-300 text-blue-500 focus:ring-blue-500">
+            No
+        </label>
+    </div>
+    @error('spouse_foreign_tax_credits')
         <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
     @enderror
 </div>
