@@ -98,7 +98,7 @@ class PurchaseImport implements ToCollection, WithHeadingRow
                 // Get amount from row
                 $amount = floatval($row['amount'] ?? 0);
 
-                // Group by reference and invoice
+                // Group by reference
                 $key = $this->generateKey($row);
                 Log::info("Generated key for row {$index}: {$key}");
                 
@@ -140,19 +140,24 @@ class PurchaseImport implements ToCollection, WithHeadingRow
             'contact_zip' => $row['zip_code'] ?? null,
         ];
     
-        $contactData['contact_type'] = !empty($row['contact_name']) ? 'Non-Individual' : 'Individual';
-        
-        $contactData['bus_name'] = !empty($row['contact_name']) 
-            ? trim($row['contact_name']) 
-            : trim(sprintf(
+        if (!empty($row['contact_name'])) {
+            // Use Contact Name if provided
+            $contactData['contact_type'] = 'Non-Individual';
+            $contactData['bus_name'] = trim($row['contact_name']);
+        } else {
+            // Construct Full Name for Individual
+            $contactData['contact_type'] = 'Individual';
+            $contactData['bus_name'] = trim(sprintf(
                 '%s %s %s',
                 $row['first_name'] ?? '',
                 $row['last_name'] ?? '',
                 $row['middle_name'] ?? ''
             ));
+        }
     
         return $contactData;
     }
+    
 
     protected function getTaxType($row)
     {
@@ -317,7 +322,7 @@ class PurchaseImport implements ToCollection, WithHeadingRow
 
                 // Create or update contact
                 $contact = Contacts::firstOrCreate(
-                    ['contact_tin' => $data['Contact TIN']],
+                    ['contact_tin' => $data['Contact TIN'], 'bus_name' => $data['contactData']['bus_name']],
                     $data['contactData']
                 );
                 Log::info("Created/Updated contact ID: {$contact->id}");

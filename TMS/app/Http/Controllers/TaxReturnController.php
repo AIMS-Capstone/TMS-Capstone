@@ -370,121 +370,148 @@ public function showVatReport($id)
 }
   // Function for showing Income Tax (1701Q) Report Preview
   public function showIncomeReport($id)
-{
-    // Fetch the tax return and organization setup data
-    $taxReturn = TaxReturn::findOrFail($id);
-    $organization_id = session("organization_id");
+  {
+      // Fetch the tax return and organization setup data
+      $taxReturn = TaxReturn::findOrFail($id);
+      $organization_id = session("organization_id");
+  
+      // Load the organization and its RDO relationship
+      $organization = OrgSetup::with("rdo")
+          ->where('id', $organization_id)
+          ->first();
+  
+      // Extract the RDO code from the organization data
+      $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
+  
+      // Retrieve the individual and spouse background information
+      $individualBackground = $taxReturn->individualBackgroundInformation;
+      $spouseBackground = $individualBackground->spouseInformation ?? null;
+  
+      // Fetch tax option rate for individual background information
+      $individualTaxOptionRate = $individualBackground->taxOptionRate()->first();
+  
+      // Fetch tax option rate for spouse background information if spouse exists
+      $spouseTaxOptionRate = $spouseBackground
+          ? $spouseBackground->taxOptionRate()->first()
+          : null;
+  
+      // Collect transactions for Individual from individual_transactions table
+      $individualTransactionIds = $taxReturn->individualTransaction()->pluck('transaction_id') ?? collect();
+  
+      // Collect transactions for Spouse from spouse_transactions table, if applicable
+      $spouseTransactionIds = $spouseBackground
+          ? $taxReturn->spouseTransactions()->pluck('transaction_id') ?? collect()
+          : collect(); // Empty collection if no spouse information
+  
+      // Query and collect all Individual Sales TaxRows
+      $individualSalesTaxRows = TaxRow::whereHas('transaction', function ($q) use ($individualTransactionIds) {
+          $q->whereIn('id', $individualTransactionIds)
+              ->where('transaction_type', 'sales');
+      })
+      ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load related data
+      ->get();
+  
+      // Query and collect all Spouse Sales TaxRows
+      $spouseSalesTaxRows = TaxRow::whereHas('transaction', function ($q) use ($spouseTransactionIds) {
+          $q->whereIn('id', $spouseTransactionIds)
+              ->where('transaction_type', 'sales');
+      })
+      ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load related data
+      ->get();
+  
+      // Combine individual and spouse sales data
+      $combinedSalesTaxRows = $individualSalesTaxRows->merge($spouseSalesTaxRows);
+  
+      // Calculate the total net amount for individual and spouse
+      $individualNetAmount = $individualSalesTaxRows->sum('net_amount');
+      $spouseNetAmount = $spouseSalesTaxRows->sum('net_amount');
+      $totalNetAmount = $individualNetAmount + $spouseNetAmount;
+  
+      // Initialize cost of sales variables for COGS and Allowable Itemized Deduction
+      $individualCOGS = 0;
+      $spouseCOGS = 0;
+      $individualItemizedDeduction = 0;
+      $spouseItemizedDeduction = 0;
+  
+      // Check if the deduction method for individual is itemized
+      if ($individualTaxOptionRate && $individualTaxOptionRate->deduction_method === 'itemized') {
+          // Get individual deductible tax rows (Cost of Goods Sold and Itemized Deduction)
+          $individualTaxRowsForDeductions = TaxRow::whereHas('coaAccount', function ($q) {
+              $q->whereIn('sub_type', ['Cost of Goods Sold', 'Allowable Itemized Deduction']);
+          })
+          ->whereHas('transaction', function ($q) use ($individualTransactionIds) {
+              $q->whereIn('id', $individualTransactionIds);
+          })
+          ->get();
+  
+          // Separate COGS and Itemized Deduction for individual
+          $individualCOGS = $individualTaxRowsForDeductions->where('coaAccount.sub_type', 'Cost of Goods Sold')->sum('amount');
+          $individualItemizedDeduction = $individualTaxRowsForDeductions->where('coaAccount.sub_type', 'Allowable Itemized Deduction')->sum('amount');
+      }
+  
+      // Check if the deduction method for spouse is itemized (if spouse exists)
+      if ($spouseTaxOptionRate && $spouseTaxOptionRate->deduction_method === 'itemized') {
+          // Get spouse deductible tax rows (Cost of Goods Sold and Itemized Deduction)
+          $spouseTaxRowsForDeductions = TaxRow::whereHas('coaAccount', function ($q) {
+              $q->whereIn('sub_type', ['Cost of Goods Sold', 'Allowable Itemized Deduction']);
+          })
+          ->whereHas('transaction', function ($q) use ($spouseTransactionIds) {
+              $q->whereIn('id', $spouseTransactionIds);
+          })
+          ->get();
+  
+          // Separate COGS and Itemized Deduction for spouse
+          $spouseCOGS = $spouseTaxRowsForDeductions->where('coaAccount.sub_type', 'Cost of Goods Sold')->sum('amount');
+          $spouseItemizedDeduction = $spouseTaxRowsForDeductions->where('coaAccount.sub_type', 'Allowable Itemized Deduction')->sum('amount');
+      }
+  
+      // Determine the current and previous quarters
+      $month = $taxReturn->month;
+      $currentQuarter = 'Q' . ceil((int)$month / 3); // Convert $month to an integer before division
 
-    // Load the organization and its RDO relationship
-    $organization = OrgSetup::with("rdo")
-        ->where('id', $organization_id)
-        ->first();
+      $previousQuarter = $currentQuarter === 'Q1' ? null : 'Q' . (ceil((int)$month / 3) - 1);
 
-    // Extract the RDO code from the organization data
-    $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
-
-    // Retrieve the individual and spouse background information
-    $individualBackground = $taxReturn->individualBackgroundInformation;
-    $spouseBackground = $individualBackground->spouseInformation ?? null;
-
-    // Fetch tax option rate for individual background information
-    $individualTaxOptionRate = $individualBackground->taxOptionRate()->first();
-
-    // Fetch tax option rate for spouse background information if spouse exists
-    $spouseTaxOptionRate = $spouseBackground
-        ? $spouseBackground->taxOptionRate()->first()
-        : null;
-
-    // Collect transactions for Individual from individual_transactions table
-    $individualTransactionIds = $taxReturn->individualTransaction()->pluck('transaction_id') ?? collect();
-
-    // Collect transactions for Spouse from spouse_transactions table, if applicable
-    $spouseTransactionIds = $spouseBackground
-        ? $taxReturn->spouseTransactions()->pluck('transaction_id') ?? collect()
-        : collect(); // Empty collection if no spouse information
-
-    // Query and collect all Individual Sales TaxRows
-    $individualSalesTaxRows = TaxRow::whereHas('transaction', function ($q) use ($individualTransactionIds) {
-        $q->whereIn('id', $individualTransactionIds)
-            ->where('transaction_type', 'sales');
-    })
-    ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load related data
-    ->get();
-
-    // Query and collect all Spouse Sales TaxRows
-    $spouseSalesTaxRows = TaxRow::whereHas('transaction', function ($q) use ($spouseTransactionIds) {
-        $q->whereIn('id', $spouseTransactionIds)
-            ->where('transaction_type', 'sales');
-    })
-    ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load related data
-    ->get();
-
-    // Combine individual and spouse sales data
-    $combinedSalesTaxRows = $individualSalesTaxRows->merge($spouseSalesTaxRows);
-
-    // Calculate the total net amount for individual and spouse
-    $individualNetAmount = $individualSalesTaxRows->sum('net_amount');
-    $spouseNetAmount = $spouseSalesTaxRows->sum('net_amount');
-    $totalNetAmount = $individualNetAmount + $spouseNetAmount;
-
-    // Initialize cost of sales variables for COGS and Allowable Itemized Deduction
-    $individualCOGS = 0;
-    $spouseCOGS = 0;
-    $individualItemizedDeduction = 0;
-    $spouseItemizedDeduction = 0;
-
-    // Check if the deduction method for individual is itemized
-    if ($individualTaxOptionRate && $individualTaxOptionRate->deduction_method === 'itemized') {
-        // Get individual deductible tax rows (Cost of Goods Sold and Itemized Deduction)
-        $individualTaxRowsForDeductions = TaxRow::whereHas('coaAccount', function ($q) {
-            $q->whereIn('sub_type', ['Cost of Goods Sold', 'Allowable Itemized Deduction']);
-        })
-        ->whereHas('transaction', function ($q) use ($individualTransactionIds) {
-            $q->whereIn('id', $individualTransactionIds);
-        })
-        ->get();
-
-        // Separate COGS and Itemized Deduction for individual
-        $individualCOGS = $individualTaxRowsForDeductions->where('coaAccount.sub_type', 'Cost of Goods Sold')->sum('amount');
-        $individualItemizedDeduction = $individualTaxRowsForDeductions->where('coaAccount.sub_type', 'Allowable Itemized Deduction')->sum('amount');
-    }
-
-    // Check if the deduction method for spouse is itemized (if spouse exists)
-    if ($spouseTaxOptionRate && $spouseTaxOptionRate->deduction_method === 'itemized') {
-        // Get spouse deductible tax rows (Cost of Goods Sold and Itemized Deduction)
-        $spouseTaxRowsForDeductions = TaxRow::whereHas('coaAccount', function ($q) {
-            $q->whereIn('sub_type', ['Cost of Goods Sold', 'Allowable Itemized Deduction']);
-        })
-        ->whereHas('transaction', function ($q) use ($spouseTransactionIds) {
-            $q->whereIn('id', $spouseTransactionIds);
-        })
-        ->get();
-
-        // Separate COGS and Itemized Deduction for spouse
-        $spouseCOGS = $spouseTaxRowsForDeductions->where('coaAccount.sub_type', 'Cost of Goods Sold')->sum('amount');
-        $spouseItemizedDeduction = $spouseTaxRowsForDeductions->where('coaAccount.sub_type', 'Allowable Itemized Deduction')->sum('amount');
-    }
-
-    // Pass all required variables to the view
-    return view('tax_return.income_report_preview', compact(
-        'rdoCode', 
-        'taxReturn', 
-        'organization', 
-        'individualBackground', 
-        'spouseBackground', 
-        'individualTaxOptionRate', 
-        'spouseTaxOptionRate', 
-        'combinedSalesTaxRows',
-        'individualNetAmount',
-        'spouseNetAmount',     
-        'totalNetAmount',
-        'individualCOGS',  
-        'spouseCOGS',
-        'individualItemizedDeduction', 
-        'spouseItemizedDeduction'       
-    ));
-}
-
+  
+      // Initialize previous quarter's cumulative income
+      $previousCumulativeIncome = 0;
+      $spousePreviousCumulativeIncome = 0;
+  
+    //   // Fetch previous quarter's tax return if applicable
+    //   if ($previousQuarter) {
+    //       $previousTaxReturn1701Q = Tax1701Q::where('organization_id', $organization_id)
+    //           ->where('year', $taxReturn->year) // Same year
+    //           ->where('quarter', $previousQuarter) // Previous quarter
+    //           ->first();
+  
+    //       if ($previousTaxReturn1701Q) {
+    //           // Extract Item 51 (Cumulative Taxable Income/(Loss))
+    //           $previousCumulativeIncome = $previousTaxReturn1701Q->cumulative_taxable_income ?? 0;
+    //           $spousePreviousCumulativeIncome = $previousTaxReturn1701Q->spouse_cumulative_taxable_income ?? 0;
+    //       }
+    //   }
+  
+      // Pass all required variables to the view
+      return view('tax_return.income_report_preview', compact(
+          'rdoCode', 
+          'taxReturn', 
+          'organization', 
+          'individualBackground', 
+          'spouseBackground', 
+          'individualTaxOptionRate', 
+          'spouseTaxOptionRate', 
+          'combinedSalesTaxRows',
+          'individualNetAmount',
+          'spouseNetAmount',     
+          'totalNetAmount',
+          'individualCOGS',  
+          'spouseCOGS',
+          'individualItemizedDeduction', 
+          'spouseItemizedDeduction',
+        //   'previousCumulativeIncome', // Pass previous quarter cumulative income
+        //   'spousePreviousCumulativeIncome' // Pass spouse's previous quarter cumulative income
+      ));
+  }
+  
   
 
   

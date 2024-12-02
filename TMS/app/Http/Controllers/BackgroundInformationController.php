@@ -24,10 +24,13 @@ class BackgroundInformationController extends Controller
         $spouseInfo = null;
         if ($backgroundInfo->civil_status === 'married') {
             $spouseInfo = SpouseInformation::firstOrNew(['individual_background_information_id' => $backgroundInfo->id]);
+        } else {
+            $spouseInfo = new SpouseInformation(); // Provide an empty object for non-married cases
         }
     
         return view('background_information.edit', compact('taxReturn', 'backgroundInfo', 'spouseInfo'));
     }
+    
     
     /**
      * Handle the update request for Background Information.

@@ -40,6 +40,7 @@ use App\Http\Controllers\ClientFinancialController;
 use App\Http\Controllers\ClientProfileController;
 use App\Http\Controllers\ClientAnalyticsController;
 use App\Http\Controllers\EmployeesController;
+use App\Http\Controllers\Tax1701QController;
 use App\Http\Controllers\TaxTypeController;
 use App\Models\rdo;
 use App\Models\TaxReturn;
@@ -176,7 +177,7 @@ Route::post('/transactions/mark-as-paid/{transaction}', [TransactionsController:
         Route::post('/transactions/store/upload', [TransactionsController::class, 'storeUpload'])->name('transactions.storeUpload');
 
 
-
+Route::post('/tax-return/store1701Q/{taxReturn}', [Tax1701QController::class, 'store1701Q'])->name('tax_return.store1701Q');
 
         Route::controller(ContactsController::class)->group(function () {
             Route::get('/contacts', 'index')->name('contacts');
