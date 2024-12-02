@@ -27,22 +27,34 @@
                             <div class="container mx-auto ps-8">
                                 <div class="flex flex-row space-x-2 items-center justify-center">
                                     <div x-data="{ selectedTab: 'Accounts' }" class="w-full">
-                                        <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-24 overflow-x-auto  border-neutral-300" role="tablist" aria-label="tab options">
-                                            <button @click="selectedTab = 'Accounts'" :aria-selected="selectedTab === 'Accounts'" 
-                                            :tabindex="selectedTab === 'Accounts' ? '0' : '-1'" 
-                                            :class="selectedTab === 'Accounts' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900'   : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'" 
-                                            class="h-min py-2 text-base" 
-                                            type="button"
-                                            role="tab" 
-                                            aria-controls="tabpanelAccounts" >Accounts</button>
-                                            <a href="/coa/archive">
-                                                <button @click="selectedTab = 'Archive'" :aria-selected="selectedTab === 'Archive'" 
-                                                :tabindex="selectedTab === 'Archive' ? '0' : '-1'" 
-                                                :class="selectedTab === 'Archive' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'"
-                                                class="h-min py-2 text-base" 
+                                        <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-24 border-neutral-300" role="tablist" aria-label="tab options">
+                                            <button 
+                                                @click="selectedTab = 'Accounts'" 
+                                                :aria-selected="selectedTab === 'Accounts'" 
+                                                :tabindex="selectedTab === 'Accounts' ? '0' : '-1'" 
+                                                :class="selectedTab === 'Accounts' ? 'font-bold text-blue-900 ' : 'text-neutral-600 font-medium hover:border-b-blue-900 hover:text-blue-900 hover:font-bold'" 
+                                                class="h-min py-2 text-base relative" 
                                                 type="button" 
                                                 role="tab" 
-                                                aria-controls="tabpanelArchive" >Archive</button>
+                                                aria-controls="tabpanelAccounts">
+                                                <span class="block">Accounts</span>
+                                                <span 
+                                                    :class="selectedTab === 'Accounts' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
+                                                </span>
+                                            </button>
+                                            <a href="/coa/archive">
+                                                <button @click="selectedTab = 'Archive'" :aria-selected="selectedTab === 'Archive'" 
+                                                    :tabindex="selectedTab === 'Archive' ? '0' : '-1'" 
+                                                    :class="selectedTab === 'Archive' ? 'font-bold text-blue-900' : 'text-neutral-600 font-medium hover:border-b-blue-900 hover:text-blue-900 hover:font-bold'"
+                                                    class="h-min py-2 text-base relative" 
+                                                    type="button" 
+                                                    role="tab" 
+                                                    aria-controls="tabpanelArchive" >
+                                                    <span class="block">Archive</span>
+                                                    <span 
+                                                        :class="selectedTab === 'Archive' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
+                                                    </span>
+                                                </button>
                                             </a>
                                         </div>
                                     </div>  
@@ -234,7 +246,7 @@
                                             return this.selectedRows.length;
                                         }
                                     }"
-                                    class="mb-12 mx-12 overflow-hidden max-w-full rounded-md border-neutral-300"
+                                    class="mb-12 mx-10 overflow-hidden max-w-full rounded-md border-neutral-300"
                                     >
 
                                     <!-- Fourth Header -->
@@ -286,7 +298,7 @@
                                                     x-data 
                                                     x-on:click="$dispatch('open-add-modal')" 
                                                     class="border px-3 py-2 rounded-lg text-sm hover:border-green-500 hover:text-green-500 hover:bg-green-100 transition flex items-center space-x-1 group"
-                                                >
+                                                    >
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5 text-zinc-600 group-hover:text-green-500 transition">
                                                         <g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd">
                                                             <path d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12m10-8a8 8 0 1 0 0 16a8 8 0 0 0 0-16"/>
@@ -296,27 +308,14 @@
                                                     <span class="text-zinc-600 group-hover:text-green-500 transition">Add</span>
                                                 </button>
                                                                        
-                                                    <!-- Livewire Coa Import -->
-                                                    <livewire:coa-multi-step-import />
-
-                                                <!-- Retain ko tong lumang Import COA Modal -->
-                                                <x-import-coa-modal />     
-                                                <button  
-                                                    x-data 
-                                                    x-on:click="$dispatch('open-import-modal')" 
-                                                    class="border px-3 py-2 rounded-lg text-sm hover:border-green-500 hover:text-green-500 hover:bg-green-100 transition flex items-center space-x-1 group"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5 text-zinc-600 group-hover:text-green-500 transition">
-                                                        <path fill="currentColor" fill-rule="evenodd" d="M8 3.25A2.756 2.756 0 0 0 5.25 6v12A2.756 2.756 0 0 0 8 20.75h8A2.756 2.756 0 0 0 18.75 18V9.5a.75.75 0 0 0-.22-.53l-5.5-5.5a.75.75 0 0 0-.53-.22zM6.75 6c0-.686.564-1.25 1.25-1.25h3.75V9.5c0 .414.336.75.75.75h4.75V18c0 .686-.564 1.25-1.25 1.25H8c-.686 0-1.25-.564-1.25-1.25zm9.44 2.75l-2.94-2.94v2.94zM15.25 15a.75.75 0 0 1-.75.75h-1.75v1.75a.75.75 0 0 1-1.5 0v-1.75H9.5a.75.75 0 0 1 0-1.5h1.75V12.5a.75.75 0 0 1 1.5 0v1.75h1.75a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
-                                                    </svg>
-                                                    <span class="text-zinc-600 group-hover:text-green-500 transition">Import</span>
-                                                </button>
+                                                <!-- Livewire Coa Import -->
+                                                <livewire:coa-multi-step-import />
 
                                                 <a href="{{ url('download_coa')}}">
                                                     <button
                                                         type="button"
                                                         class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-green-500 hover:text-green-500 hover:bg-green-100 transition flex items-center space-x-1 group"
-                                                    > 
+                                                        > 
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-green-500" viewBox="0 0 24 24">
                                                             <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
                                                         </svg> 
@@ -328,7 +327,7 @@
                                                     @click="showCheckboxes = !showCheckboxes; showDeleteCancelButtons = !showDeleteCancelButtons; $el.disabled = true;" 
                                                     :disabled="selectedRows.length === 1"
                                                     class="border px-3 py-2 rounded-lg text-sm text-gray-600 hover:border-gray-800 hover:text-gray-800 hover:bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
-                                                >
+                                                    >
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-zinc-500" viewBox="0 0 24 24">
                                                         <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
                                                     </svg>
@@ -488,7 +487,9 @@
                                         </button>
                                     </div>
                                     
-                                    {{ $coas->links('vendor.pagination.custom') }}
+                                    @if (count($coas) > 0)
+                                        {{ $coas->links('vendor.pagination.custom') }}
+                                    @endif
                                 </div>
 
                             </div>

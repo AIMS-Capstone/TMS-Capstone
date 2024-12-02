@@ -52,7 +52,7 @@ class EmployeesController extends Controller
                 'last_name' => 'required|string|max:255',
                 'suffix' => 'nullable|string|max:10',
                 'date_of_birth' => 'required|date',
-                'tin' => 'required|string|max:15|unique:employees,tin',
+                'tin' => 'required|string|max:17|unique:employees,tin',
                 'nationality' => 'nullable|string|max:255',
                 'contact_number' => 'nullable|string|max:15',
 
@@ -144,7 +144,7 @@ class EmployeesController extends Controller
                 'last_name' => 'required|string|max:255',
                 'suffix' => 'nullable|string|max:10',
                 'date_of_birth' => 'required|date',
-                'tin' => 'required|string|max:15|unique:employees,tin,' . $id,
+                'tin' => 'required|string|max:17|unique:employees,tin,' . $id,
                 'nationality' => 'nullable|string|max:255',
                 'contact_number' => 'nullable|string|max:15',
 

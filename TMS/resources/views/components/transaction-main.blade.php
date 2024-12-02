@@ -164,7 +164,7 @@
                                                 @click="showCheckboxes = !showCheckboxes;    showDeleteCancelButtons: false, showDeleteCancelButtons = !showDeleteCancelButtons; $el.disabled = true;" 
                                                 :disabled="selectedRows.length === 1"
                                                 class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-red-800 hover:text-red-800 hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
-                                            >
+                                                >
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
                                                 <span class="text-zinc-600 transition group-hover:text-red-500">Delete</span>
                                             </button>
@@ -365,7 +365,7 @@
               x-cloak 
               class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
               x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
-          >
+                >
               <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
                   <div class="flex flex-col items-center">
                       <!-- Icon -->
@@ -419,9 +419,11 @@
                 Cancel
                 </button>
             </div>
-            <nav aria-label="pagination">
-                {{ $transactions->links('vendor.pagination.custom') }}
-            </nav>
+            @if (count($transactions) > 0)
+                <div class="mt-4">
+                    {{ $transactions->links('vendor.pagination.custom') }}
+                </div>
+            @endif
         </div>
     </div>
 </div>

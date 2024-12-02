@@ -39,7 +39,7 @@
                                             <button 
                                                 x-data 
                                                 x-on:click="$dispatch('open-add-employees-modal')" 
-                                                class="block px-4 py-2 hover-dropdown">Add manual
+                                                class="w-full text-left block px-4 py-2 hover-dropdown">Add manual
                                             </button>
                                         </li>
                                         <!-- Upload CSV Option -->
@@ -59,19 +59,27 @@
                                 <a href="/contacts">
                                     <button @click="selectedTab = 'Contacts'" :aria-selected="selectedTab === 'Contacts'" 
                                     :tabindex="selectedTab === 'Contacts' ? '0' : '-1'" 
-                                    :class="selectedTab === 'Contacts' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900'   : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'" 
-                                    class="h-min py-2 text-base" 
+                                    :class="selectedTab === 'Contacts' ? 'font-bold text-blue-900'   : 'text-neutral-600 font-medium hover:text-blue-900 hover:font-bold'" 
+                                    class="h-min py-2 text-base relative" 
                                     type="button"
                                     role="tab" 
-                                    aria-controls="tabpanelContacts" >Contacts</button>
+                                    aria-controls="tabpanelContacts" ><span class="block">Contacts</span>
+                                    <span 
+                                        :class="selectedTab === 'Contacts' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
+                                    </span>
+                                </button>
                                 </a>
                                     <button @click="selectedTab = 'Employees'" :aria-selected="selectedTab === 'Employees'" 
                                     :tabindex="selectedTab === 'Employees' ? '0' : '-1'" 
-                                    :class="selectedTab === 'Employees' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900'   : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'"
-                                    class="h-min py-2 text-base" 
+                                    :class="selectedTab === 'Employees' ? 'font-bold text-blue-900'   : 'text-neutral-600 font-medium hover:text-blue-900 hover:font-bold'"
+                                    class="h-min py-2 text-base relative" 
                                     type="button" 
                                     role="tab" 
-                                    aria-controls="tabpanelEmployees" >Employees</button>
+                                    aria-controls="tabpanelEmployees" ><span class="block">Employees</span>
+                                    <span 
+                                        :class="selectedTab === 'Employees' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
+                                    </span>
+                                </button>
                             </div>
                         </div>  
                     </div>
@@ -206,9 +214,7 @@
                                     :disabled="selectedRows.length === 1"
                                     class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-red-500 hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
                                     >
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
-                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
                                     <span class="text-zinc-600 transition group-hover:text-red-500">Delete</span>
                                 </button>
                                 
@@ -257,7 +263,7 @@
                                             <th scope="col" class="text-left py-4 px-4">Contact</th>
                                             <th scope="col" class="text-left py-4 px-4">Nationality</th>
                                             <th scope="col" class="text-left py-4 px-4">Address</th>
-                                            <th scope="col" class="text-left py-4 px-4">Zip Code</th>
+                                            <th scope="col" class="text-left py-4 px-4">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-neutral-300 text-left py-[7px]">
@@ -275,9 +281,9 @@
                                                         </label>
                                                     </td>
                                                     <td class="text-left py-3 px-4">
-                                                        <x-edit-employees />
+                                                        <x-view-employees />
                                                         <button 
-                                                            @click="$dispatch('open-edit-employee-modal', {{ json_encode($employee->load('address', 'employments.address')) }})"
+                                                            x-data x-on:click="$dispatch('open-view-employee-modal', { employee: {{ $employee->toJson() }} })"
                                                             class="hover:underline hover:text-blue-500">
                                                             {{ $employee->first_name }} {{ $employee->last_name }}
                                                         </button>
@@ -287,7 +293,13 @@
                                                     <td class="text-left py-3 px-4">{{ $employee->contact_number }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->nationality }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->address->address ?? 'N/A' }}</td>
-                                                    <td class="text-left py-3 px-4">{{ $employee->address->zip_code ?? 'N/A' }}</td>
+                                                    <td class="text-left py-3 px-4">
+                                                        <x-edit-employees />
+                                                        <button 
+                                                            @click="$dispatch('open-edit-employee-modal', {{ json_encode($employee->load('address', 'employments.address')) }})"
+                                                            class="hover:underline hover:text-blue-500">Edit
+                                                        </button>
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         @else
@@ -306,9 +318,7 @@
                                     <button @click="showConfirmDeleteModal = true; showDeleteCancelButtons = true;" :disabled="selectedRows.length === 0"
                                         class="border px-3 py-2 rounded-lg text-sm text-red-600 border-red-600 bg-red-100 hover:bg-red-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
                                         >
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24">
-                                            <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
-                                        </svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
                                         <span class="text-red-600 transition group-hover:text-red-600">Delete Selected</span><span class="transition group-hover:text-red-500" x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
                                     </button>
                                     <button @click="cancelSelection" class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
@@ -323,7 +333,6 @@
                     </div>
 
                     <!-- Modal -->
-
                     <!-- Delete Confirmation Modal -->
                     <div 
                         x-show="showConfirmDeleteModal" 
@@ -335,7 +344,7 @@
                             <div class="flex flex-col items-center">
                                 <!-- Icon -->
                                 <div class="mb-4">
-                                    <i class="fas fa-exclamation-triangle text-red-700 text-8xl"></i>
+                                    <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>
                                 </div>
 
                                 <!-- Title -->
@@ -343,21 +352,21 @@
 
                                 <!-- Description -->
                                 <p class="text-sm text-zinc-700 text-center">
-                                    You're going to Delete the selected item(s) in the Charts of Account table. Are you sure?
+                                    You're going to Delete the selected item(s) in the Employees table. Are you sure?
                                 </p>
 
                                 <!-- Actions -->
                                 <div class="flex justify-center space-x-8 mt-6 w-full">
                                     <button 
-                                        @click="showConfirmDeleteModal = false; showDeleteCancelButtons = true;" 
-                                        class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
-                                    > 
+                                        @click="showConfirmDeleteModal = false; enableButtons(); enableButtons(); showDeleteCancelButtons = true; disableButtons();" 
+                                        class="px-4 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-900 font-bold transition"
+                                    >
                                         Cancel
                                     </button>
                                     <button 
                                         @click="deleteRows(); showConfirmDeleteModal = false;" 
-                                        class="px-5 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg text-sm font-medium transition"
-                                    > 
+                                        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition"
+                                    >
                                         Delete
                                     </button>
                                 </div>
@@ -482,7 +491,7 @@
             form.submit();
         }
 
-        document.addEventListener('open-view-contact-modal', event => {
+        document.addEventListener('open-view-epmloyee-modal', event => {
             console.log(event.detail); 
         });
 
