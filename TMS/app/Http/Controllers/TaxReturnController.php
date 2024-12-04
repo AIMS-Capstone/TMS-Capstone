@@ -584,6 +584,7 @@ public function showVatReport($id)
         // Function for VAT Tax Return
     public function store(StoreTaxReturnRequest $request)
     {
+      
         // Step 1: Create the tax return
         $taxReturn = TaxReturn::create([
             'title' => $request->type,
@@ -769,6 +770,7 @@ public function showVatReport($id)
             'purchases_others_specify_amount' => 'nullable|numeric',
             'purchases_others_specify_input_tax' => 'nullable|numeric',
             'domestic_no_input' => 'nullable|numeric',
+            'tax_exempt_importation' => 'nullable|numeric',
             'total_current_purchase' => 'nullable|numeric',
             'total_current_purchase_input_tax' => 'nullable|numeric',
             'total_available_input_tax' => 'nullable|numeric',
@@ -796,10 +798,8 @@ public function showVatReport($id)
         );
     
         // Step 4: Return a response
-        return response()->json([
-            'message' => 'Tax2550Q record successfully created or updated.',
-            'data' => $tax2550Q,
-        ], 200);
+        return redirect()->route('tax_return.2550q.pdf', ['taxReturn' => $taxReturn])
+        ->with('success', 'Tax return successfully submitted and PDF generated.');
     }
     
       // Function for Creating 2551Q Percentage Tax Return Report
@@ -879,11 +879,17 @@ public function showVatReport($id)
          // Retrieve the selected type from the request
          $type = $request->get('type', 'sales'); // Default to 'sales' if no type is provided
      
+         // Retrieve the 'perPage' value from the request, defaulting to 5 if not provided
+         $perPage = $request->get('perPage', 5);
+     
+         // Retrieve the search query from the request
+         $search = $request->get('search', '');
+     
          // Get the transaction IDs linked to this tax return
          $transactionIds = $taxReturn->transactions->pluck('id');
      
          // Define the query
-         $paginatedTaxRows = TaxRow::where(function ($query) use ($type) {
+         $paginatedTaxRows = TaxRow::where(function ($query) use ($type, $search) {
              if ($type === 'capital_goods') {
                  // Filter for Capital Goods
                  $query->whereHas('taxType', function ($q) {
@@ -909,15 +915,34 @@ public function showVatReport($id)
                      $q->whereIn('tax_type', ['Capital Goods', 'Importation of Goods']); // Exclude Capital Goods and Importation
                  });
              }
+     
+             // Apply search filter if search term is provided
+             if ($search) {
+                 $query->where(function ($q) use ($search) {
+                     $q->whereHas('transaction.contactDetails', function ($q) use ($search) {
+                         $q->where('bus_name', 'like', '%' . $search . '%')
+                           ->orWhere('contact_address', 'like', '%' . $search . '%')
+                           ->orWhere('contact_tin', 'like', '%' . $search . '%');
+                     })
+                     ->orWhere('description', 'like', '%' . $search . '%')
+                     ->orWhereHas('transaction', function ($q) use ($search) {
+                         $q->where('inv_number', 'like', '%' . $search . '%');
+                     })
+                     ->orWhereHas('atc', function ($q) use ($search) {
+                         $q->where('tax_code', 'like', '%' . $search . '%');
+                     });
+                 });
+             }
          })
          ->whereHas('transaction', function ($query) use ($transactionIds) {
              $query->whereIn('id', $transactionIds); // Ensure transactions belong to the current tax return
          })
          ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load relationships
-         ->paginate(5);
+         ->paginate($perPage); // Use perPage to control pagination size
      
-         return view('tax_return.vat_show', compact('taxReturn', 'paginatedTaxRows', 'type'));
+         return view('tax_return.vat_show', compact('taxReturn', 'paginatedTaxRows', 'type', 'search'));
      }
+     
      // Function to show Income Sales Data
      public function showIncomeSalesData(TaxReturn $taxReturn, Request $request)
      {
@@ -1092,72 +1117,85 @@ public function showIncomeCoaData(TaxReturn $taxReturn, Request $request)
         // Function to show Summary Report on Value-Added Tax Return 2550Q
      
      
-     public function showSummary(TaxReturn $taxReturn, Request $request)
-     {
-         // Get the transaction IDs linked to this tax return
-         $transactionIds = $taxReturn->transactions->pluck('id');
-     
-         // Get the tax rows and eager load taxType to access tax_rate and transaction_type
-         $taxRows = TaxRow::whereIn('transaction_id', $transactionIds)
-             ->with('taxType') // Eager load taxType to get transaction_type and tax_rate
-             ->get();
-     
-         // Initialize an array to store the summary data, grouped by tax type
-         $summaryData = [];
-     
-         foreach ($taxRows as $taxRow) {
-             $taxType = $taxRow->taxType; // Get the tax type relationship
-             $transactionType = $taxType->transaction_type; // Get transaction_type from taxType
-     
-             // Only process rows with a valid transaction type and tax type
-             if ($taxType && $transactionType) {
-                 // Get the tax rate from the taxType
-                 $tax_rate = $taxType->VAT;
-     
-                 // Initialize the tax type if not already present in the summaryData
-                 if (!isset($summaryData[$taxType->tax_type])) {
-                     $summaryData[$taxType->tax_type] = [
-                         'net_amount' => 0,
-                         'tax_amount' => 0,
-                         'tax_rate' => $tax_rate,
-                         'transaction_type' => $transactionType, // Store transaction type for later use
-                     ];
-                 }
-     
-                 // Aggregate the amounts based on the tax type
-                 $summaryData[$taxType->tax_type]['net_amount'] += $taxRow->net_amount;
-                 $summaryData[$taxType->tax_type]['tax_amount'] += $taxRow->tax_amount;
-             }
-         }
-     
-         // Convert the summary data into a collection
-         $summaryCollection = collect($summaryData)->map(function ($item, $key) {
-             return [
-                 'tax_type' => $key,
-                 'vatable_sales' => $item['net_amount'],
-                 'tax_due' => $item['tax_amount'],
-                 'tax_rate' => $item['tax_rate'],
-             ];
-         });
-     
-         // Paginate the summary data
-         $perPage = 5; // Number of items per page
-         $currentPage = LengthAwarePaginator::resolveCurrentPage();
-         $currentItems = $summaryCollection->slice(($currentPage - 1) * $perPage, $perPage)->all();
-     
-         // Create the LengthAwarePaginator instance
-         $paginatedSummaryData = new LengthAwarePaginator(
-             $currentItems,
-             $summaryCollection->count(),
-             $perPage,
-             $currentPage,
-             ['path' => LengthAwarePaginator::resolveCurrentPath()]
-         );
-     
-         // Return the view with the paginated summary data
-         return view('tax_return.vat_summary', compact('taxReturn', 'paginatedSummaryData'));
-     }
-     
+        public function showSummary(TaxReturn $taxReturn, Request $request)
+        {
+            // Get the transaction IDs linked to this tax return
+            $transactionIds = $taxReturn->transactions->pluck('id');
+        
+            // Get the tax rows and eager load taxType to access tax_rate and transaction_type
+            $taxRows = TaxRow::whereIn('transaction_id', $transactionIds)
+                ->with('taxType') // Eager load taxType to get transaction_type and tax_rate
+                ->get();
+        
+            // Initialize an array to store the summary data, grouped by tax type
+            $summaryData = [];
+        
+            foreach ($taxRows as $taxRow) {
+                $taxType = $taxRow->taxType; // Get the tax type relationship
+                $transactionType = $taxType->transaction_type; // Get transaction_type from taxType
+        
+                // Only process rows with a valid transaction type and tax type
+                if ($taxType && $transactionType) {
+                    // Get the tax rate from the taxType
+                    $tax_rate = $taxType->VAT;
+        
+                    // Initialize the tax type if not already present in the summaryData
+                    if (!isset($summaryData[$taxType->tax_type])) {
+                        $summaryData[$taxType->tax_type] = [
+                            'net_amount' => 0,
+                            'tax_amount' => 0,
+                            'tax_rate' => $tax_rate,
+                            'transaction_type' => $transactionType, // Store transaction type for later use
+                        ];
+                    }
+        
+                    // Aggregate the amounts based on the tax type
+                    $summaryData[$taxType->tax_type]['net_amount'] += $taxRow->net_amount;
+                    $summaryData[$taxType->tax_type]['tax_amount'] += $taxRow->tax_amount;
+                }
+            }
+        
+            // Convert the summary data into a collection
+            $summaryCollection = collect($summaryData)->map(function ($item, $key) {
+                return [
+                    'tax_type' => $key,
+                    'vatable_sales' => $item['net_amount'],
+                    'tax_due' => $item['tax_amount'],
+                    'tax_rate' => $item['tax_rate'],
+                ];
+            });
+        
+            // Apply search filter if provided
+            $searchTerm = $request->input('search');
+            if ($searchTerm) {
+                $summaryCollection = $summaryCollection->filter(function ($item) use ($searchTerm) {
+                    return stripos($item['tax_type'], $searchTerm) !== false ||
+                           stripos((string)$item['vatable_sales'], $searchTerm) !== false ||
+                           stripos((string)$item['tax_due'], $searchTerm) !== false ||
+                           stripos((string)$item['tax_rate'], $searchTerm) !== false;
+                });
+            }
+        
+            // Determine per page
+            $perPage = $request->input('perPage', 5); // Default to 5 if not specified
+            $currentPage = LengthAwarePaginator::resolveCurrentPage();
+            $currentItems = $summaryCollection->slice(($currentPage - 1) * $perPage, $perPage)->all();
+        
+            // Create the LengthAwarePaginator instance
+            $paginatedSummaryData = new LengthAwarePaginator(
+                $currentItems,
+                $summaryCollection->count(),
+                $perPage,
+                $currentPage,
+                ['path' => LengthAwarePaginator::resolveCurrentPath()]
+            );
+        
+            // Add query parameters to pagination links
+            $paginatedSummaryData->appends($request->only(['search', 'perPage']));
+        
+            // Return the view with the paginated summary data
+            return view('tax_return.vat_summary', compact('taxReturn', 'paginatedSummaryData'));
+        }
          
         // Function to show Percentage Tax SLSP Data 2551Q
     
@@ -1701,6 +1739,192 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
         return view('tax_return.percentage_report', [
             'taxReturn' => $taxReturn,
             'pdfPath' => asset('storage/filled_report.pdf'), // Serve the PDF from public storage
+        ]);
+    }
+    
+    public function showVatReportPDF(TaxReturn $taxReturn)
+    {
+        // Get data from the `2551q` table
+        $formData = Tax2550Q::where('tax_return_id', $taxReturn->id)->first();
+        if (!$formData) {
+            return dd('No data found in the 2550q table for this tax return.');
+        }
+ 
+        // Initialize fields array
+        $fields = [
+            '1A' => $formData->year_ended === '2021-12' ? 'X' : '',
+            '1B' => $formData->year_ended === '2021-12' ? '' : 'X',
+           '1C' => implode('/', array_reverse(explode('-', $formData->year_ended))),
+            '3A' => $formData->quarter === '1st' ? 'X' : '',
+            '3B' => $formData->quarter === '2nd' ? 'X' : '',
+            '3C' => $formData->quarter === '3rd' ? 'X' : '',
+            '3D' => $formData->quarter === '4th' ? 'X' : '',
+            '4A' =>$formData->return_from ?? '',
+            '4B' =>$formData->return_to ?? '',
+            '5Y' => $formData->amended_return === 'yes' ? 'X' : '',
+            '5N' => $formData->amended_return === 'no' ? 'X' : '',
+            '6Y' => $formData->short_period_return === 'yes' ? 'X' : '',
+            '6N' => $formData->short_period_return === 'no' ? 'X' : '',
+            '7A' => explode('-', $formData->tin)[0] ?? '',
+            '7B' => explode('-', $formData->tin)[1] ?? '',
+            '7C' => explode('-', $formData->tin)[2] ?? '',
+            '7D' => explode('-', $formData->tin)[3] ?? '',
+            '8' => $formData->rdo_code ?? '',
+            '9' => $formData->taxpayer_name ?? '',
+            '10' => $formData->registered_address ?? '',
+            '10A' => $formData->zip_code ?? '',
+            '11' => $formData->contact_number ?? '',
+            '12' => $formData->email_address ?? '',
+            '13A' => $formData->taxpayer_classification === 'Micro' ? 'X' : '',
+            '13B' => $formData->taxpayer_classification === 'Small' ? 'X' : '',
+            '13C' => $formData->taxpayer_classification === 'Medium' ? 'X' : '',
+            '13D' => $formData->taxpayer_classification === 'Large' ? 'X' : '',
+            '14Y' => $formData->tax_relief === 'yes' ? 'X' : '',
+            '14N' => $formData->tax_relief === 'no' ? 'X' : '',
+            '14A' => $formData->yes_specify ?? '',
+            '15' => floor($formData->excess_input_tax ?? 0),
+            '15D' => ($formData->excess_input_tax ?? 0) * 100 % 100,
+            '16' => floor($formData->creditable_vat_withheld ?? 0),
+            '16D' => ($formData->creditable_vat_withheld ?? 0) * 100 % 100,
+            '17' => floor($formData->advance_vat_payment ?? 0),
+            '17D' => ($formData->advance_vat_payment ?? 0) * 100 % 100,
+            '18' => floor($formData->vat_paid_if_amended ?? 0),
+            '18D' => ($formData->vat_paid_if_amended ?? 0) * 100 % 100,
+            '19S' => $formData->other_credits_specify ?? '',
+            '19' => floor($formData->other_credits_specify_amount ?? 0),
+            '19D' => ($formData->other_credits_specify_amount ?? 0) * 100 % 100,
+            '20' => floor($formData->total_tax_credits ?? 0),
+            '20D' => ($formData->total_tax_credits ?? 0) * 100 % 100,
+            '21' => floor($formData->tax_still_payable ?? 0),
+            '21D' => ($formData->tax_still_payable ?? 0) * 100 % 100,
+            '22' => floor($formData->surcharge ?? 0),
+            '22D' => ($formData->surcharge ?? 0) * 100 % 100,
+            '23' => floor($formData->interest ?? 0),
+            '23D' => ($formData->interest ?? 0) * 100 % 100,
+            '24' => floor($formData->compromise ?? 0),
+            '24D' => ($formData->compromise ?? 0) * 100 % 100,
+            '25' => floor($formData->total_penalties ?? 0),
+            '25D' => ($formData->total_penalties ?? 0) * 100 % 100,
+            '26' => floor($formData->total_amount_payable ?? 0),
+            '26D' => ($formData->total_amount_payable ?? 0) * 100 % 100,
+            'TINRow1' => $formData->tin ?? '',
+            '31A' => floor($formData->vatable_sales ?? 0),
+            '31AD' => ($formData->vatable_sales ?? 0) * 100 % 100,
+            '31B' => floor($formData->vatable_sales_tax_amount ?? 0),
+            '31BD' => ($formData->vatable_sales_tax_amount ?? 0) * 100 % 100,
+            '32A' => floor($formData->zero_rated_sales ?? 0),
+            '32AD' => ($formData->zero_rated_sales ?? 0) * 100 % 100,
+            '33A' => floor($formData->exempt_sales ?? 0),
+            '33AD' => ($formData->exempt_sales ?? 0) * 100 % 100,
+            '34A' => floor($formData->total_sales ?? 0),
+            '34AD' => ($formData->total_sales ?? 0) * 100 % 100,
+            '34B' => floor($formData->total_output_tax ?? 0),
+            '34BD' => ($formData->total_output_tax ?? 0) * 100 % 100,
+            '35B' => floor($formData->uncollected_receivable_vat ?? 0),
+            '35BD' => ($formData->uncollected_receivable_vat ?? 0) * 100 % 100,
+            '36B' => floor($formData->recovered_uncollected_receivables ?? 0),
+            '36BD' => ($formData->recovered_uncollected_receivables ?? 0) * 100 % 100,
+            '37B' => floor($formData->total_adjusted_output_tax ?? 0),
+            '37BD' => ($formData->total_adjusted_output_tax ?? 0) * 100 % 100,
+            '38B' => floor($formData->input_carried_over ?? 0),
+            '38BD' => ($formData->input_carried_over ?? 0) * 100 % 100,
+            '39B' => floor($formData->input_tax_deferred ?? 0),
+            '39BD' => ($formData->input_tax_deferred ?? 0) * 100 % 100,
+            '40B' => floor($formData->transitional_input_tax ?? 0),
+            '40BD' => ($formData->transitional_input_tax ?? 0) * 100 % 100,
+            '41B' => floor($formData->presumptive_input_tax ?? 0),
+            '41BD' => ($formData->presumptive_input_tax ?? 0) * 100 % 100,
+            '42S' => $formData->other_specify ?? '',
+            '42B' => floor($formData->other_input_tax ?? 0),
+            '42BD' => ($formData->other_input_tax ?? 0) * 100 % 100,
+            '43B' => floor($formData->total_input_tax ?? 0),
+            '43BD' => ($formData->total_input_tax ?? 0) * 100 % 100,
+            '44A' => floor($formData->domestic_purchase ?? 0),
+            '44AD' => ($formData->domestic_purchase ?? 0) * 100 % 100,
+            '44B' => floor($formData->domestic_purchase_input_tax ?? 0),
+            '44BD' => ($formData->domestic_purchase_input_tax ?? 0) * 100 % 100,
+            '45A' => floor($formData->services_non_resident ?? 0),
+            '45AD' => ($formData->services_non_resident ?? 0) * 100 % 100,
+            '45B' => floor($formData->services_non_resident_input_tax ?? 0),
+            '45BD' => ($formData->services_non_resident_input_tax ?? 0) * 100 % 100,
+            '46A' => floor($formData->importations ?? 0),
+            '46AD' => ($formData->importations ?? 0) * 100 % 100,
+            '46B' => floor($formData->importations_input_tax ?? 0),
+            '46BD' => ($formData->importations_input_tax ?? 0) * 100 % 100,
+            '47S' => $formData->purchases_others_specify ?? '',
+            '47A' => floor($formData->purchases_others_specify_amount ?? 0),
+            '47AD' => ($formData->purchases_others_specify_amount ?? 0) * 100 % 100,
+            '47B' => floor($formData->purchases_others_specify_input_tax ?? 0),
+            '47BD' => ($formData->purchases_others_specify_input_tax ?? 0) * 100 % 100,
+            '48A' => floor($formData->domestic_no_input ?? 0),
+            '48AD' => ($formData->domestic_no_input ?? 0) * 100 % 100,
+            '49A' => floor($formData->tax_exempt_importation ?? 0),
+            '49AD' => ($formData->tax_exempt_importation ?? 0) * 100 % 100,
+            '50A' => floor($formData->total_current_purchase ?? 0),
+            '50AD' => ($formData->total_current_purchase ?? 0) * 100 % 100,
+            '50B' => floor($formData->total_current_purchase_input_tax ?? 0),
+            'fill_67' => ($formData->total_current_purchase_input_tax ?? 0) * 100 % 100,
+            '51B' => floor($formData->total_available_input_tax ?? 0),
+            '51BD' => ($formData->total_available_input_tax ?? 0) * 100 % 100,
+            '52B' => floor($formData->importation_million_deferred_input_tax	 ?? 0),
+            '52BD' => ($formData->importation_million_deferred_input_tax	 ?? 0) * 100 % 100,
+            '53B' => floor($formData->attributable_vat_exempt_input_tax ?? 0),
+            '53BD' => ($formData->attributable_vat_exempt_input_tax ?? 0) * 100 % 100,
+            '54B' => floor($formData->vat_refund_input_tax ?? 0),
+            '54BD' => ($formData->vat_refund_input_tax ?? 0) * 100 % 100,
+            '55B' => floor($formData->unpaid_payables_input_tax ?? 0),
+            '55BD' => ($formData->unpaid_payables_input_tax ?? 0) * 100 % 100,
+            '56S' => $formData->other_deduction_specify ?? '',
+            '56B' => floor($formData->other_deduction_specify_input_tax ?? 0),
+            '56BD' => ($formData->other_deduction_specify_input_tax ?? 0) * 100 % 100,
+            '57B' => floor($formData->total_deductions_input_tax ?? 0),
+            '57BD' => ($formData->total_deductions_input_tax ?? 0) * 100 % 100,
+            '58B' => floor($formData->settled_unpaid_input_tax ?? 0),
+            '58BD' => ($formData->settled_unpaid_input_tax ?? 0) * 100 % 100,
+            '59B' => floor($formData->adjusted_deductions_input_tax ?? 0),
+            '59BD' => ($formData->adjusted_deductions_input_tax ?? 0) * 100 % 100,
+            '60B' => floor($formData->total_allowable_input_Tax ?? 0),
+            '60BD' => ($formData->total_allowable_input_Tax ?? 0) * 100 % 100,
+            '61B' => floor($formData->excess_input_tax ?? 0),
+            '61BD' => ($formData->excess_input_tax ?? 0) * 100 % 100,
+            
+            
+        ];
+    
+
+    
+        // Define the PDF template path
+        $pdfTemplatePath = public_path('pdfs/2550Q_2024_Updated.pdf');
+    
+        // Check if the PDF template exists
+        if (!file_exists($pdfTemplatePath)) {
+            return dd('PDF template not found at: ' . $pdfTemplatePath);
+        }
+    
+        // Create a new PDF instance
+        $pdf = new \mikehaertl\pdftk\Pdf($pdfTemplatePath);
+    
+        // Fill the PDF with the data
+        $result = $pdf->fillForm($fields)
+            ->needAppearances()
+            ->saveAs(storage_path('app/public/2550Q.pdf'));
+    
+        // Check for errors
+        if (!$result) {
+            Log::error('PDF fill form error: ' . $pdf->getError());
+            return dd('PDF fill form failed: ' . $pdf->getError());
+        }
+    
+        // Check if the output PDF was created successfully
+        $outputPdfPath = storage_path('app/public/2550Q.pdf');
+        if (!file_exists($outputPdfPath)) {
+            return dd('PDF was not created at: ' . $outputPdfPath);
+        }
+    
+        // Serve the filled PDF in a view
+        return view('tax_return.vat_report', [
+            'taxReturn' => $taxReturn,
+            'pdfPath' => asset('storage/2550Q.pdf'), // Serve the PDF from public storage
         ]);
     }
     

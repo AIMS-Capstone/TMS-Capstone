@@ -37,7 +37,9 @@ $organizationId = session('organization_id');
                     showCheckboxes: false, 
                     checkAll: false, 
                     selectedRows: [],
+                        showConfirmDeleteModal: false,
                     showDeleteCancelButtons: false,
+                
 
                     // Toggle a single row
                     toggleCheckbox(id) {
@@ -55,7 +57,7 @@ $organizationId = session('organization_id');
                             return;
                         }
 
-                        fetch('/vat_return/destroy', {
+                        fetch('/tax_return/destroy', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -350,7 +352,7 @@ $organizationId = session('organization_id');
 
                     <!-- Action Buttons -->
                     <div x-show="showDeleteCancelButtons" class="flex justify-center py-4" x-cloak>
-                        <button @click="showConfirmDeleteModal" = true; showDeleteCancelButtons = true;" :disabled="selectedRows.length === 0"
+                        <button @click="showConfirmDeleteModal = true; showDeleteCancelButtons = true;" :disabled="selectedRows.length === 0"
                             class="border px-3 py-2 rounded-lg text-sm text-red-600 border-red-600 bg-red-100 hover:bg-red-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
                             >
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
@@ -400,7 +402,7 @@ $organizationId = session('organization_id');
 
                             <div class="w-full">
                                 <label for="month" class="block font-semibold text-sm text-gray-700">Month</label>
-                                <select id="month" name="month" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
+                                <select id="month" name="month" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
                                     x-model="month" 
                                     @change="selectedType = month.includes('Q') ? '2550Q' : '2550M'" 
                                     required>
@@ -427,7 +429,7 @@ $organizationId = session('organization_id');
                             </div>
                         </div>
                         <!-- Hidden inputs -->
-                        <input type="hidden" name="type" x-model="selectedType"> <!-- Dynamically set type -->
+                        <input type="hidden" name="type" x-model="selectedType">
                         <input type="hidden" name="organization_id" value="{{ $organizationId }}">
         
                         <div class="flex justify-end mt-4">

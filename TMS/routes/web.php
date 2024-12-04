@@ -104,6 +104,8 @@ Route::middleware([
     Route::get('/edit-sales/{transaction}', [TransactionsController::class, 'editSales']);
     Route::get('/tax-return/{taxReturn}/2551q-pdf', [TaxReturnController::class, 'showPercentageReportPDF'])
     ->name('tax_return.2551q.pdf');
+    Route::get('/tax-return/{taxReturn}/2550q-pdf', [TaxReturnController::class, 'showVatReportPDF'])
+    ->name('tax_return.2550q.pdf');
     
     Route::get('/transactions/{id}/edit-sales', [TransactionsController::class, 'edit'])->name('transactions.edit');
     Route::post('/transactions/{id}', [TransactionsController::class, 'update'])->name('transactions.update');

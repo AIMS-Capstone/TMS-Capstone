@@ -42,16 +42,16 @@
                         <!-- Search row -->
                         <div class="flex flex-row space-x-2 items-center ps-6">
                             <div class="relative w-80 p-4">
-                                <form x-target="tableid" action="/transactions" role="search" aria-label="Table" autocomplete="off">
+                                <form role="search" aria-label="Table" autocomplete="off" method="GET" action="{{ route('tax_return.summary', $taxReturn->id) }}">
                                     <input 
                                         type="search" 
                                         name="search" 
                                         class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900" 
                                         aria-label="Search Term" 
                                         placeholder="Search..." 
-                                        @input.debounce="$el.form.requestSubmit()" 
-                                        @search="$el.form.requestSubmit()"
+                                        value="{{ request('search') }}"
                                     >
+                                    <input type="hidden" name="perPage" value="{{ request('perPage', 5) }}">
                                 </form>
                                 <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                             </div>
@@ -120,11 +120,7 @@
                                  Report
                              </a>
                              
-                             <a href="{{ route('notes_activity') }}" 
-                                class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap 
-                                {{ request()->routeIs('notes_activity') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }}">
-                                 Notes & Activity
-                             </a>
+                           
                         </nav>
                     </div>
 
@@ -217,25 +213,29 @@
         });
         // FOR SHOWING/SETTING ENTRIES
         function setEntries(entries) {
-            const form = document.createElement('form');
-            form.method = 'GET';
-            form.action = "{{ route('transactions') }}"; //where??
-            // Create a hidden input for perPage
-            const perPageInput = document.createElement('input');
-            perPageInput.type = 'hidden';
-            perPageInput.name = 'perPage';
-            perPageInput.value = entries;
-            // Add search input value if needed
-            const searchInput = document.createElement('input');
-            searchInput.type = 'hidden';
-            searchInput.name = 'search';
-            searchInput.value = "{{ request('search') }}";
-            // Append inputs to form
-            form.appendChild(perPageInput);
-            form.appendChild(searchInput);
-            // Append the form to the body and submit
-            document.body.appendChild(form);
-            form.submit();
-        }
+    const form = document.createElement('form');
+    form.method = 'GET';
+    form.action = "{{ route('tax_return.summary', $taxReturn->id) }}";
+
+    // Create a hidden input for perPage
+    const perPageInput = document.createElement('input');
+    perPageInput.type = 'hidden';
+    perPageInput.name = 'perPage';
+    perPageInput.value = entries;
+
+    // Add search input value if it exists
+    const searchInput = document.createElement('input');
+    searchInput.type = 'hidden';
+    searchInput.name = 'search';
+    searchInput.value = document.querySelector('input[name="search"]')?.value || '';
+
+    // Append inputs to form
+    form.appendChild(perPageInput);
+    form.appendChild(searchInput);
+
+    // Append the form to the body and submit
+    document.body.appendChild(form);
+    form.submit();
+}
     </script>
 </x-app-layout>

@@ -37,22 +37,115 @@
 
             <hr>
 
-            <div class="container mx-auto">
+            <div
+            x-data="{
+                showCheckboxes: false, 
+                checkAll: false, 
+                selectedRows: [], 
+                showDeleteCancelButtons: false,
+                showConfirmDeleteModal: false,
+
+                selectedType: '',
+                
+                // Toggle a single row
+                toggleCheckbox(id) {
+                    if (this.selectedRows.includes(id)) {
+                        this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
+                    } else {
+                        this.selectedRows.push(id);
+                    }
+                },
+
+                // Toggle all rows
+                toggleAll() {
+                    if (this.checkAll) {
+                    this.selectedRows = {{ json_encode($paginatedTaxRows->pluck('transaction_id')->toArray()) }};
+
+                    } else {
+                        this.selectedRows = []; 
+                    }
+                    console.log(this.selectedRows); // For debugging
+                },
+
+                // Handle deletion
+             
+deleteRows() {
+          
+
+                        fetch('/tax-return-transaction/deactivate', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ ids: this.selectedRows,
+                            tax_return_id: {{ $taxReturn->id }}
+                            }),
+                            
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                location.reload();  
+                            } else {
+                                alert('Error deleting transactions.');
+                            }
+                        });
+                    }
+                ,
+                // Cancel selection
+                cancelSelection() {
+                    this.selectedRows = []; 
+                    this.checkAll = false; 
+                    this.showCheckboxes = false; 
+                    this.showDeleteCancelButtons = false;
+                },
+
+                get selectedCount() {
+                    return this.selectedRows.length;
+                },
+
+                // Handle filter change
+                filterTransactions() {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('type', this.selectedType);
+                    window.location.href = url.toString();
+                }
+            }" 
+            class="container mx-auto">
                 <div class="flex flex-row space-x-2 items-center justify-between">
                     <!-- Search row -->
                     <div class="flex flex-row space-x-2 items-center ps-6">
                         <div class="relative w-80 p-4">
-                            <form x-target="tableid" action="/transactions" role="search" aria-label="Table" autocomplete="off">
-                                <input 
-                                    type="search" 
-                                    name="search" 
-                                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900" 
-                                    aria-label="Search Term" 
-                                    placeholder="Search..." 
-                                    @input.debounce="$el.form.requestSubmit()" 
-                                    @search="$el.form.requestSubmit()"
-                                >
-                            </form>
+                            <form 
+                            x-data="{
+                                search: '{{ request('search', '') }}',
+                                type: '{{ request('type', 'sales') }}',
+                                perPage: {{ request('perPage', 10) }},
+                                updateSearch() {
+                                    this.$refs.searchForm.submit();
+                                }
+                            }"
+                            x-ref="searchForm"
+                            action="{{ route('tax_return.slsp_data', $taxReturn->id) }}" 
+                            method="GET" 
+                            role="search" 
+                            aria-label="Table" 
+                            autocomplete="off"
+                        >
+                            <input 
+                                type="search" 
+                                name="search" 
+                                x-model="search"
+                                x-on:input.debounce.500ms="updateSearch"
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
+                                aria-label="Search Term" 
+                                placeholder="Search..." 
+                            >
+                            
+                            <input type="hidden" name="type" x-model="type">
+                            <input type="hidden" name="perPage" x-model="perPage">
+                        </form>
+                            
                             <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                         </div>
                         <!-- Sort by dropdown -->
@@ -147,82 +240,7 @@
                 <hr>
                 
                 <div 
-                    x-data="{
-                        showCheckboxes: false, 
-                        checkAll: false, 
-                        selectedRows: [], 
-                        showDeleteCancelButtons: false,
-
-                        selectedType: '',
-                        
-                        // Toggle a single row
-                        toggleCheckbox(id) {
-                            if (this.selectedRows.includes(id)) {
-                                this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
-                            } else {
-                                this.selectedRows.push(id);
-                            }
-                        },
-
-                        // Toggle all rows
-                        toggleAll() {
-                            if (this.checkAll) {
-                            this.selectedRows = {{ json_encode($paginatedTaxRows->pluck('transaction_id')->toArray()) }};
-
-                            } else {
-                                this.selectedRows = []; 
-                            }
-                            console.log(this.selectedRows); // For debugging
-                        },
-
-                        // Handle deletion
-                        deleteRows() {
-                            if (this.selectedRows.length === 0) {
-                                alert('No rows selected for deletion.');
-                                return;
-                            }
-
-                            if (confirm('Are you sure you want to archive the selected transaction(s)?')) {
-                                fetch('/tax-return-transaction/deactivate', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                    },
-                                    body: JSON.stringify({ ids: this.selectedRows,
-                                    tax_return_id: {{ $taxReturn->id }}
-                                    }),
-                                    
-                                })
-                                .then(response => {
-                                    if (response.ok) {
-                                        location.reload();  
-                                    } else {
-                                        alert('Error deleting transactions.');
-                                    }
-                                });
-                            }
-                        },
-
-                        // Cancel selection
-                        cancelSelection() {
-                            this.selectedRows = []; 
-                            this.checkAll = false; 
-                            this.showCheckboxes = false; 
-                            this.showDeleteCancelButtons = false;
-                        },
-
-                        get selectedCount() {
-                            return this.selectedRows.length;
-                        },
-
-                        // Handle filter change
-                        filterTransactions() {
-                            const url = new URL(window.location.href);
-                            url.searchParams.set('type', this.selectedType);
-                            window.location.href = url.toString();
-                        }
-                    }"
+                 
                     class="container mx-auto pt-2 overflow-hidden">
 
                     <!-- Transactions Header -->
@@ -369,45 +387,47 @@
                         </div>
                     </div>
 
-                    <div 
-                        x-show="showConfirmDeleteModal" 
-                        x-cloak 
-                        class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
-                        x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
-                            >
-                        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
-                            <div class="flex flex-col items-center">
-                                <!-- Icon -->
-                                <div class="mb-4">
-                                    <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>
-                                </div>
+                  <!-- Delete Confirmation Modal -->
+                  <div 
+                  x-show="showConfirmDeleteModal" 
+                  x-cloak 
+                  class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
+                  x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)">
+                  
+                  <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
+                      <div class="flex flex-col items-center">
+                          <!-- Icon -->
+                          <div class="mb-4">
+                              <i class="fas fa-exclamation-triangle text-red-700 text-8xl"></i>
+                          </div>
 
-                                <!-- Title -->
-                                <h2 class="text-2xl font-extrabold text-zinc-800 mb-2">Delete Item(s)</h2>
+                          <!-- Title -->
+                          <h2 class="text-2xl font-extrabold text-zinc-700 mb-2">Delete Item(s)</h2>
 
-                                <!-- Description -->
-                                <p class="text-sm text-zinc-700 text-center">
-                                    You're going to Delete the selected item(s) in the Sales table. Are you sure?
-                                </p>
+                          <!-- Description -->
+                          <p class="text-sm text-zinc-700 text-center">
+                              You're going to Delete the selected item(s) in the Value Added Tax Return table. Are you sure?
+                          </p>
 
-                                <!-- Actions -->
-                                <div class="flex justify-center space-x-8 mt-6 w-full">
-                                    <button 
-                                        @click="showConfirmDeleteModal = false; showDeleteCancelButtons = true;" 
-                                        class="px-4 py-2 rounded-lg text-sm text-zinc-500 hover:text-zinc-800 font-bold transition"
-                                        > 
-                                        Cancel
-                                    </button>
-                                    <button 
-                                        @click="deleteRows(); showConfirmDeleteModal = false;" 
-                                        class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition"
-                                        > 
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                          <!-- Actions -->
+                          <div class="flex justify-center space-x-8 mt-6 w-full">
+                              <button 
+                                  @click="showConfirmDeleteModal = false; showDeleteCancelButtons = true;" 
+                                  class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
+                                  > 
+                                  Cancel
+                              </button>
+                              <button 
+                                  @click="deleteRows(); showConfirmDeleteModal = false;" 
+                                  class="px-5 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg text-sm font-medium transition"
+                                  > 
+                                  Delete
+                              </button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
 
                     <!-- Action Buttons -->
                     <div x-show="showDeleteCancelButtons" class="flex justify-center py-4" x-cloak>
@@ -432,6 +452,7 @@
                         {{ $paginatedTaxRows->appends(['type' => $type])->links('vendor.pagination.custom') }}
                     </div>
                 </div>
+               
 
                 <div 
                     x-data="{
@@ -523,10 +544,9 @@
 
 <!-- Script -->
 <script>
-    document.addEventListener('search', event => {
-        window.location.href = `?search=${event.detail.search}`;
-    });
-
+document.addEventListener('search', event => {
+    window.location.href = `?search=${event.detail.search}`;
+});
     document.addEventListener('filter', event => {
         const url = new URL(window.location.href);
         url.searchParams.set('type', event.detail.type);
@@ -588,26 +608,35 @@
     });
     // FOR SHOWING/SETTING ENTRIES
     function setEntries(entries) {
-        const form = document.createElement('form');
-        form.method = 'GET';
-        form.action = "{{ route('transactions') }}"; //where??
-        // Create a hidden input for perPage
-        const perPageInput = document.createElement('input');
-        perPageInput.type = 'hidden';
-        perPageInput.name = 'perPage';
-        perPageInput.value = entries;
-        // Add search input value if needed
-        const searchInput = document.createElement('input');
-        searchInput.type = 'hidden';
-        searchInput.name = 'search';
-        searchInput.value = "{{ request('search') }}";
-        // Append inputs to form
-        form.appendChild(perPageInput);
-        form.appendChild(searchInput);
-        // Append the form to the body and submit
-        document.body.appendChild(form);
-        form.submit();
-    }
+    const form = document.createElement('form');
+    form.method = 'GET';
+    form.action = "{{ route('tax_return.slsp_data', ['taxReturn' => $taxReturn->id]) }}";
+
+    // Retrieve selectedType from URL parameter as a fallback
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedType = urlParams.get('type') || 'sales'; // Default to 'sales' if not found
+
+    // Create hidden inputs
+    const inputs = [
+        { name: 'perPage', value: entries },
+        { name: 'search', value: document.querySelector('input[name="search"]')?.value || '' },
+        { name: 'type', value: selectedType }
+    ];
+
+    inputs.forEach(input => {
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = input.name;
+        hiddenInput.value = input.value;
+        form.appendChild(hiddenInput);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
+
+    
 
 </script>
 

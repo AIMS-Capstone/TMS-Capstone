@@ -726,8 +726,28 @@
                      class="w-full p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
                      onchange="calculateTotals()">
              </div>
+       
+
              <div> 
              </div>
+                 <!-- 48. Domestic Purchases with No Input Tax (Dynamic Field) -->
+                 <div class="flex items-center">
+                    <label class="block text-zinc-700 text-sm"><span class="font-bold mr-2">49</span>VAT-Exmept Importation</label>
+                </div>
+                <div>
+                    <input 
+                        type="text" 
+                        name="tax_exempt_importation" 
+                        id="tax_exempt_importation" 
+                        value="{{ $taxExemptPurchasesImportationOfGoods }}"  
+                        class="w-full p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                        onchange="calculateTotals()">
+                </div>
+          
+   
+                <div> 
+                </div>
+             
              <!-- 50. Total Current Purchases/Input Tax (Calculated Field) -->
              <div class="flex items-center">
                 <label class="block text-zinc-700 text-sm"><span class="font-bold mr-2">50</span>Total Current Purchases/Input Tax (Sum of Items 44A to 49A)/(Sum of Items 44B to 47B)</label>
@@ -1157,12 +1177,13 @@ function calculateNetVATPayable() {
         const importations = parseFloat(document.getElementById('importations').value) || 0;
         const importationsInputTax = parseFloat(document.getElementById('importations_input_tax').value) || 0;
         const domesticNoInput = parseFloat(document.getElementById('domestic_no_input').value) || 0;
+        const tax_exempt_importation = parseFloat(document.getElementById('tax_exempt_importation').value) || 0;
     
         const othersSpecifyAmount = parseFloat(document.getElementById('purchases_others_specify_amount').value) || 0;
         const othersSpecifyInputTax = parseFloat(document.getElementById('purchases_others_specify_input_tax').value) || 0;
     
         // Calculate total purchases and total input tax
-        const totalPurchases = domesticPurchase + servicesNonResident + importations + othersSpecifyAmount + domesticNoInput;
+        const totalPurchases = domesticPurchase + servicesNonResident + importations + othersSpecifyAmount + domesticNoInput + tax_exempt_importation;
         const totalInputTax = domesticPurchaseInputTax + servicesNonResidentInputTax + importationsInputTax + othersSpecifyInputTax;
     
         document.getElementById('total_current_purchase').value = totalPurchases.toFixed(2);

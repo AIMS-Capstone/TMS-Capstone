@@ -57,6 +57,7 @@ class Tax2550Q extends Model
         'purchases_others_specify_amount',
         'purchases_others_specify_input_tax',
         'domestic_no_input',
+        'tax_exempt_importation',
         'total_current_purchase',
         'total_current_purchase_input_tax',
         'total_available_input_tax',
