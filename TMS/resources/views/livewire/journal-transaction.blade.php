@@ -21,20 +21,20 @@
         <div class="grid grid-cols-4 gap-6 mb-4">
             <!-- Date Field -->
             <div class="mt-5 px-6">
-                <x-transaction-label for="date" :value="__('Date')" />
+                <x-transaction-label for="date" :value="__('Invoice Date')" />
                 <x-transaction-input id="date" type="date" class="mt-1 block w-full" wire:model.defer="date" />
             </div>
 
             <!-- Reference Field -->
             <div class="mt-5">
-                <x-transaction-label for="reference" :value="__('Reference')" />
+                <x-transaction-label for="reference" :value="__('Reference Number')" />
                 <x-transaction-input id="reference" type="text" class="mt-1 block w-full" wire:model.defer="reference" />
             </div>
 
             <!-- Total Amount Field -->
             <div class="col-span-2 bg-blue-50 p-4 rounded-tr-sm">
                 <x-transaction-label for="total_amount" :value="__('Total Amount')" />
-                <x-transaction-input id="total_amount" type="text" class="mt-1 block w-full bg-white border-0" value="{{ $totalAmount }}" wire:model.defer="totalAmount" readonly />
+                <x-transaction-input id="total_amount" type="text" class="mt-1 block w-full text-blue-900 font-bold bg-blue-50 border-0" value="{{ $totalAmount }}" wire:model.defer="totalAmount" readonly />
             </div>
         </div>
 

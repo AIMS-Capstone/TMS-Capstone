@@ -37,113 +37,114 @@
                     <!-- Sales Options Menu -->
                     <div id="salesOptions" class="hidden absolute right-0 z-10 mt-2 w-44 rounded-md shadow-lg bg-white ring-opacity-5">
                         <div class="py-2 px-4" role="menu" aria-orientation="vertical" aria-labelledby="salesOptionsButton">
-                            <div class="py-2 px-4" role="menu" aria-orientation="vertical" aria-labelledby="purchaseOptionsButton">
-                                <div x-data="{
-         showPaymentModal: false,
-         transactionTotalAmount: '{{ $transaction->total_amount }}',  // Pass the total amount from backend to Alpine.js
-         paymentDate: '',
-         referenceNumber: '',
-         bankAccount: '',
-         markAsPaid() {
-             // Make an AJAX request or send form data to the backend to mark as paid
-             fetch('/transactions/mark-as-paid/{{ $transaction->id }}', {
-                 method: 'POST',
-                 headers: {
-                     'Content-Type': 'application/json',
-                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                 },
-                 body: JSON.stringify({
-                     payment_date: this.paymentDate,
-                     reference_number: this.referenceNumber,
-                     bank_account: this.bankAccount,
-                     total_amount_paid: this.transactionTotalAmount  // Send total_amount_paid automatically
-                 })
-             })
-             .then(response => response.json())
-             .then(data => {
-                 if (data.successPayment) {
-                    // Show success modal
-                    this.showPaymentModal = false;
-                    this.showSuccessPaymentModal = true;
-                    // Hide modal after a timeout (5 seconds)
-                    setTimeout(() => { this.showSuccessPaymentModal = false }, 5000);
-                 } else {
-                  
-                 }
-             });
-         }
-     }">
+                            <div x-data="{
+                                showPaymentModal: false,
+                                transactionTotalAmount: '{{ $transaction->total_amount }}',  // Pass the total amount from backend to Alpine.js
+                                paymentDate: '',
+                                referenceNumber: '',
+                                bankAccount: '',
+                                markAsPaid() {
+                                    // Make an AJAX request or send form data to the backend to mark as paid
+                                    fetch('/transactions/mark-as-paid/{{ $transaction->id }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                        },
+                                        body: JSON.stringify({
+                                            payment_date: this.paymentDate,
+                                            reference_number: this.referenceNumber,
+                                            bank_account: this.bankAccount,
+                                            total_amount_paid: this.transactionTotalAmount  // Send total_amount_paid automatically
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.successPayment) {
+                                            // Show success modal
+                                            this.showPaymentModal = false;
+                                            this.showSuccessPaymentModal = true;
+                                            // Hide modal after a timeout (5 seconds)
+                                            setTimeout(() => { this.showSuccessPaymentModal = false }, 5000);
+                                        } else {
+                                        
+                                        }
+                                    });
+                                }
+                            }">
          
-         <!-- Add a Payment Link (Trigger the Modal) -->
-         <a @click.prevent="showPaymentModal = true" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">
-             Add a Payment
-         </a>
-     
-         <!-- Payment Modal -->
-         <div x-show="showPaymentModal" x-transition @click.away="showPaymentModal = false" 
-              class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-     
-             <!-- Modal Content -->
-             <div class="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full relative">
-     
-                 <!-- Close Button -->
-                 <button @click="showPaymentModal = false" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition">
-                     <i class="fa fa-times"></i>
-                 </button>
-     
-                 <!-- Modal Title -->
-                 <h2 class="text-xl font-bold text-gray-800 mb-4">Mark as Paid</h2>
-     
-                 <!-- Modal Body -->
-                 <div class="grid grid-cols-2 gap-4">
-     
-                     <!-- Left Side -->
-                     <div>
-                         <p class="text-sm text-gray-600">
-                             You are about to pay: <span class="font-bold">$<span x-text="transactionTotalAmount"></span></span>
-                         </p>
-                         <p class="text-sm text-gray-600 mt-4">
-                             Please enter the required fields and mark this transaction as Paid. Make sure that you are entering correct information to match your Sales/Purchases transaction. 
-                             You may also do a partial payment by entering a lower amount.
-                         </p>
-                     </div>
-     
-                     <!-- Right Side: Payment Form -->
-                     <div>
-                         <div class="mb-4">
-                             <label for="payment-date" class="block text-sm font-medium text-gray-700">Payment Date</label>
-                             <input type="date" id="payment-date" x-model="paymentDate" class="mt-1 block w-full border px-3 py-2 rounded-md" required />
-                         </div>
-                         <div class="mb-4">
-                             <label for="reference-number" class="block text-sm font-medium text-gray-700">Reference Number</label>
-                             <input type="text" id="reference-number" x-model="referenceNumber" class="mt-1 block w-full border px-3 py-2 rounded-md" required />
-                         </div>
-                         <div class="mb-4">
-                             <label for="bank-account" class="block text-sm font-medium text-gray-700">Bank Account</label>
-                             <input type="text" id="bank-account" x-model="bankAccount" class="mt-1 block w-full border px-3 py-2 rounded-md" required />
-                         </div>
-     
-                         <!-- Hidden Total Amount Paid -->
-                         <input type="hidden" id="total-amount-paid" :value="transactionTotalAmount" name="total_amount_paid" />
-                     </div>
-                 </div>
-     
-                 <!-- Action Buttons -->
-                 <div class="mt-6 flex justify-between">
-                     <button @click="markAsPaid" class="px-6 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600">
-                         Mark as Paid
-                     </button>
-                     <button @click="showPaymentModal = false" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-400">
-                         Cancel
-                     </button>
-                 </div>
-                </div>
-            </div>
-        </div>
-     
-    </div>
-     
-     
+                            <!-- Add a Payment Link (Trigger the Modal) -->
+                            <a @click.prevent="showPaymentModal = true" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">
+                                Add a Payment
+                            </a>
+                        
+                            <!-- Payment Modal -->
+                            <div x-show="showPaymentModal" x-transition @click.away="showPaymentModal = false" 
+                                class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50">
+                        
+                                <!-- Modal Content -->
+                                <div class="bg-white rounded-lg shadow-lg w-full max-w-xl mx-auto h-auto z-10 overflow-hidden">
+                                    <div class="relative flex bg-blue-900 justify-center rounded-t-lg items-center p-3 border-b border-opacity-80 mx-auto">
+                                        <h1 class="text-lg font-bold text-white">Mark as Paid</h1>
+                                        <button 
+                                            @click="showPaymentModal = false"
+                                            class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200 z-50">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                                                      d="M8 8L16 16M8 16L16 8" 
+                                                      stroke="#1e3a8a" 
+                                                      class="transition duration-200 hover:stroke-gray-600" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                        
+                                    <!-- Modal Body -->
+                                    <div class="p-10 grid grid-cols-2 space-x-6 gap-8">
+                        
+                                        <!-- Left Side -->
+                                        <div>
+                                            <p class="text-sm font-bold text-zinc-600">
+                                                You are about to pay: <span class="font-bold text-blue-900 text-xl">₱<span x-text="transactionTotalAmount"></span></span>
+                                            </p>
+                                            <p class="text-xs text-zinc-600 mt-4">
+                                                Please enter the required fields and mark this transaction as Paid. Make sure that you are entering correct information to match your Sales/Purchases transaction. 
+                                                You may also do a partial payment by entering a lower amount.
+                                            </p>
+                                        </div>
+                        
+                                        <!-- Right Side: Payment Form -->
+                                        <div>
+                                            <div class="mb-4">
+                                                <label for="payment-date" class="block text-sm font-medium text-gray-700">Payment Date</label>
+                                                <input type="date" id="payment-date" x-model="paymentDate" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required />
+                                            </div>
+                                            <div class="mb-4">
+                                                <label for="reference-number" class="block text-sm font-medium text-gray-700">Reference Number</label>
+                                                <input type="text" id="reference-number" x-model="referenceNumber" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required />
+                                            </div>
+                        
+                                            <!-- Hidden Total Amount Paid -->
+                                            <input type="hidden" id="total-amount-paid" :value="transactionTotalAmount" name="total_amount_paid" />
+                                        </div>
+
+                                        <!-- Action Buttons -->
+                                        <div class="col-span-2 flex justify-end mt-6">
+                                            <button @click="markAsPaid" class="px-8 py-2 bg-blue-900 text-white rounded-lg text-sm font-semibold hover:bg-blue-950">
+                                                Apply Payment
+                                            </button>
+                                            {{-- <button @click="showPaymentModal = false" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-400">
+                                                Cancel
+                                            </button> --}}
+                                        </div>
+                                    </div>
+                        
+                                    
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- other options --}}
                             <a href="{{ route('transactions.edit', $transaction->id) }}" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Edit Sales</a>
                             <a href="{{route('transactions.mark', $transaction->id)}}" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Mark as Posted</a>
                         </div>
@@ -163,7 +164,7 @@
                     </div>
                     <!-- Date Display -->
                     <div class="mt-5 mb-8">
-                        <x-transaction-label for="date" :value="__('Date')" />
+                        <x-transaction-label for="date" :value="__('Invoice Date')" />
                         <div class="mt-1 text-zinc-700">{{ \Carbon\Carbon::parse($transaction->date)->format('F j, Y') }}</div>
                     </div>
                     <!-- Invoice Number Display -->
@@ -305,70 +306,76 @@
                     <div id="purchaseOptions" class="hidden absolute right-0 z-10 mt-2 w-44 rounded-md shadow-lg bg-white ring-opacity-5">
                         <div class="py-2 px-4" role="menu" aria-orientation="vertical" aria-labelledby="purchaseOptionsButton">
                            <div x-data="{
-    showPaymentModal: false,
-    transactionTotalAmount: '{{ $transaction->total_amount }}',  // Pass the total amount from backend to Alpine.js
-    paymentDate: '',
-    referenceNumber: '',
-    bankAccount: '',
-    markAsPaid() {
-        // Make an AJAX request or send form data to the backend to mark as paid
-        fetch('/transactions/mark-as-paid/{{ $transaction->id }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            },
-            body: JSON.stringify({
-                payment_date: this.paymentDate,
-                reference_number: this.referenceNumber,
-                bank_account: this.bankAccount,
-                total_amount_paid: this.transactionTotalAmount  // Send total_amount_paid automatically
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-           if (data.successPayment) {
-                    // Show success modal
-                    this.showPaymentModal = false;
-                    this.showSuccessPaymentModal = true;
-                    // Hide modal after a timeout (5 seconds)
-                    setTimeout(() => { this.showSuccessPaymentModal = false }, 5000);
-            } else {
-             
-            }
-        });
-    }
-}">
+                                showPaymentModal: false,
+                                transactionTotalAmount: '{{ $transaction->total_amount }}',  // Pass the total amount from backend to Alpine.js
+                                paymentDate: '',
+                                referenceNumber: '',
+                                bankAccount: '',
+                                markAsPaid() {
+                                    // Make an AJAX request or send form data to the backend to mark as paid
+                                    fetch('/transactions/mark-as-paid/{{ $transaction->id }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                        },
+                                        body: JSON.stringify({
+                                            payment_date: this.paymentDate,
+                                            reference_number: this.referenceNumber,
+                                            bank_account: this.bankAccount,
+                                            total_amount_paid: this.transactionTotalAmount  // Send total_amount_paid automatically
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                    if (data.successPayment) {
+                                                // Show success modal
+                                                this.showPaymentModal = false;
+                                                this.showSuccessPaymentModal = true;
+                                                // Hide modal after a timeout (5 seconds)
+                                                setTimeout(() => { this.showSuccessPaymentModal = false }, 5000);
+                                        } else {
+                                        
+                                        }
+                                    });
+                                }
+                            }">
     
     <!-- Add a Payment Link (Trigger the Modal) -->
-    <a @click.prevent="showPaymentModal = true" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">
+    <a @click.prevent="showPaymentModal = true" class="block w-full px-4 py-2 text-sm text-zinc-700 hover-dropdown">
         Add a Payment
     </a>
 
     <!-- Payment Modal -->
     <div x-show="showPaymentModal" x-transition @click.away="showPaymentModal = false" 
-         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+         class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50">
 
         <!-- Modal Content -->
-        <div class="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full relative">
-
-            <!-- Close Button -->
-            <button @click="showPaymentModal = false" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition">
-                <i class="fa fa-times"></i>
-            </button>
-
-            <!-- Modal Title -->
-            <h2 class="text-xl font-bold text-gray-800 mb-4">Mark as Paid</h2>
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-xl mx-auto h-auto z-10 overflow-hidden">
+            <div class="relative flex bg-blue-900 justify-center rounded-t-lg items-center p-3 border-b border-opacity-80 mx-auto">
+                <h1 class="text-lg font-bold text-white">Mark as Paid</h1>
+                <button 
+                    @click="showPaymentModal = false"
+                    class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200 z-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                              d="M8 8L16 16M8 16L16 8" 
+                              stroke="#1e3a8a" 
+                              class="transition duration-200 hover:stroke-gray-600" />
+                    </svg>
+                </button>
+            </div>
 
             <!-- Modal Body -->
-            <div class="grid grid-cols-2 gap-4">
+            <div class="p-10 grid grid-cols-2 space-x-6 gap-8">
 
                 <!-- Left Side -->
                 <div>
-                    <p class="text-sm text-gray-600">
-                        You are about to pay: <span class="font-bold">$<span x-text="transactionTotalAmount"></span></span>
+                    <p class="text-sm font-bold text-zinc-600">
+                        You are about to pay: <span class="font-bold text-blue-900 text-xl">₱<span x-text="transactionTotalAmount"></span></span>
                     </p>
-                    <p class="text-sm text-gray-600 mt-4">
+                    <p class="text-xs text-zinc-600 mt-4">
                         Please enter the required fields and mark this transaction as Paid. Make sure that you are entering correct information to match your Sales/Purchases transaction. 
                         You may also do a partial payment by entering a lower amount.
                     </p>
@@ -378,32 +385,27 @@
                 <div>
                     <div class="mb-4">
                         <label for="payment-date" class="block text-sm font-medium text-gray-700">Payment Date</label>
-                        <input type="date" id="payment-date" x-model="paymentDate" class="mt-1 block w-full border px-3 py-2 rounded-md" required />
+                        <input type="date" id="payment-date" x-model="paymentDate" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required />
                     </div>
                     <div class="mb-4">
                         <label for="reference-number" class="block text-sm font-medium text-gray-700">Reference Number</label>
-                        <input type="text" id="reference-number" x-model="referenceNumber" class="mt-1 block w-full border px-3 py-2 rounded-md" required />
-                    </div>
-                    <div class="mb-4">
-                        <label for="bank-account" class="block text-sm font-medium text-gray-700">Bank Account</label>
-                        <input type="text" id="bank-account" x-model="bankAccount" class="mt-1 block w-full border px-3 py-2 rounded-md" required />
+                        <input type="text" id="reference-number" x-model="referenceNumber" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required />
                     </div>
 
                     <!-- Hidden Total Amount Paid -->
                     <input type="hidden" id="total-amount-paid" :value="transactionTotalAmount" name="total_amount_paid" />
                 </div>
-            </div>
 
-            <!-- Action Buttons -->
-            <div class="mt-6 flex justify-between">
-                <button @click="markAsPaid" class="px-6 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600">
-                    Mark as Paid
-                </button>
-                <button @click="showPaymentModal = false" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-400">
-                    Cancel
-                </button>
+                <!-- Action Buttons -->
+                <div class="col-span-2 flex justify-end mt-6">
+                    <button @click="markAsPaid" class="px-8 py-2 bg-blue-900 text-white rounded-lg text-sm font-semibold hover:bg-blue-950">
+                        Apply Payment
+                    </button>
+                    {{-- <button @click="showPaymentModal = false" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-400">
+                        Cancel
+                    </button> --}}
+                </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -427,7 +429,7 @@
                     </div>
                     <!-- Date Display -->
                     <div class="mt-5 mb-8">
-                        <x-transaction-label for="date" :value="__('Date')" />
+                        <x-transaction-label for="date" :value="__('Invoice Date')" />
                         <div class="mt-1 text-zinc-700">{{ \Carbon\Carbon::parse($transaction->date)->format('F j, Y') }}</div>
                     </div>
                     <!-- Reference Display -->
@@ -572,7 +574,7 @@
                     </div>
                     <!-- Date Field -->
                     <div class="mt-5">
-                        <x-transaction-label for="date" :value="__('Date')" />
+                        <x-transaction-label for="date" :value="__('Invoice Date')" />
                         <div class="mt-1 text-zinc-700">{{ \Carbon\Carbon::parse($transaction->date)->format('F j, Y') }}</div>
                     </div>
                     <!-- Total Amount Field -->
@@ -643,40 +645,32 @@
              x-init="setTimeout(() => showSuccessModal = false, 5000)" 
              x-show="showSuccessModal" 
              x-cloak 
-             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+             x-effect="document.body.classList.toggle('overflow-hidden', showSuccessModal || success)"
+             class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
              @click.away="showSuccessModal = false">
             
             <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative">
-                <button 
-                    @click="showSuccessModal = false" 
-                    class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
-                >
-                    <i class="fa fa-times"></i>
+                <!-- Close Button -->
+                <button @click="showSuccessModal = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                 </button>
                 
                 <div class="flex flex-col items-center">
-                    <!-- Icon -->
-                    <div class="mb-6">
-                        <div class="flex items-center justify-center w-24 h-24 rounded-full bg-green-600">
-                            <i class="fas fa-check text-white text-6xl"></i>
-                        </div>
+
+                    <div class="flex justify-center mb-4">
+                        <img src="{{ asset('images/Success.png') }}" alt="Organization Added" class="w-28 h-28">
                     </div>
 
                     <!-- Title -->
-                    <a href="{{route('transactions.mark', $transaction->id)}}" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Mark as Posted</a>
+                    <p class="text-emerald-500 font-bold text-3xl mb-2">Mark as Posted</p>
 
                     <!-- Description -->
                     <p class="text-sm text-gray-600 text-center mb-6">
                         {{ session('success') }}
                     </p>
 
-                    <!-- Close Button -->
-                    <button 
-                        @click="showSuccessModal = false" 
-                        class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition w-1/2"
-                    >
-                        OK
-                    </button>
                 </div>
             </div>
         </div>

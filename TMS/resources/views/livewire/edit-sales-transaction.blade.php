@@ -35,7 +35,7 @@
 
             <!-- Date Field -->
             <div class="mt-5 mb-8">
-                <x-transaction-label for="date" :value="__('Date')" />
+                <x-transaction-label for="date" :value="__('Invoice Date')" />
                 <x-transaction-input id="date" type="date" class="mt-1 block w-full" wire:model="date" />
             </div>
 
@@ -54,7 +54,7 @@
             <!-- Total Amount Field (readonly) -->
             <div class="col-span-1 bg-blue-50 p-4 rounded-tr-sm">
                 <x-transaction-label for="total_amount" :value="__('Total Amount')" />
-                <x-transaction-input id="total_amount" type="text" class="font-bold text-blue-900 mt-1 block w-full" value="{{ $totalAmount }}" wire:model.defer="totalAmount" readonly />
+                <x-transaction-input id="total_amount" type="text" class="font-bold bg-blue-50 text-blue-900 mt-1 block w-full" value="{{ $totalAmount }}" wire:model.defer="totalAmount" readonly />
             </div>
         </div>
 

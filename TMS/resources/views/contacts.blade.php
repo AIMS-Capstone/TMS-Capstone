@@ -329,7 +329,7 @@
 
                                 <!-- Description -->
                                 <p class="text-sm text-zinc-700 text-center">
-                                    You're going to Delete the selected item(s) in the Charts of Account table. Are you sure?
+                                    You're going to Delete the selected item(s) in the Contacts table. Are you sure?
                                 </p>
 
                                 <!-- Actions -->
