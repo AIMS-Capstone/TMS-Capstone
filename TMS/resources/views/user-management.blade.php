@@ -31,23 +31,31 @@
 
                     <div class="flex gap-x-4 overflow-x-auto justify-center mt-4">
                         <div x-data="{ selectedTab: 'Accountant Users' }" class="w-full">
-                            <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-24 overflow-x-auto  border-neutral-300" role="tablist" aria-label="tab options">
+                            <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-24 border-neutral-300" role="tablist" aria-label="tab options">
                                 <button @click="selectedTab = 'Accountant Users'" :aria-selected="selectedTab === 'Accountant Users'" 
-                                :tabindex="selectedTab === 'Accountant Users' ? '0' : '-1'" 
-                                :class="selectedTab === 'Accountant Users' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900'   : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'" 
-                                class="h-min py-2 text-base" 
-                                type="button"
-                                role="tab" 
-                                aria-controls="tabpanelAccountantUsers" >Accountant Users</button>
+                                    :tabindex="selectedTab === 'Accountant Users' ? '0' : '-1'" 
+                                    :class="selectedTab === 'Accountant Users' ? 'font-bold text-blue-900' : 'text-neutral-600 font-medium hover:text-blue-900 hover:font-bold'" 
+                                    class="h-min py-2 text-base relative" 
+                                    type="button"
+                                    role="tab" 
+                                    aria-controls="tabpanelAccountantUsers" ><span class="block">Accountant Users</span>
+                                    <span 
+                                        :class="selectedTab === 'Accountant Users' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
+                                    </span>
+                                </button>
 
                                 <a href="{{ route('user-management.client') }}">
                                     <button @click="selectedTab = 'Client Users'" :aria-selected="selectedTab === 'Client Users'" 
-                                    :tabindex="selectedTab === 'Client Users' ? '0' : '-1'" 
-                                    :class="selectedTab === 'Client Users' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900'   : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'"
-                                    class="h-min py-2 text-base" 
-                                    type="button" 
-                                    role="tab" 
-                                    aria-controls="tabpanelClientUsers" >Client Users</button>
+                                        :tabindex="selectedTab === 'Client Users' ? '0' : '-1'" 
+                                        :class="selectedTab === 'Client Users' ? 'font-bold text-blue-900' : 'text-neutral-600 font-medium hover:text-blue-900 hover:font-bold'"
+                                        class="h-min py-2 text-base relative" 
+                                        type="button" 
+                                        role="tab" 
+                                        aria-controls="tabpanelClientUsers" ><span class="block">Client Users</span>
+                                        <span 
+                                            :class="selectedTab === 'Client Users' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
+                                        </span>
+                                    </button>
                                 </a>
                             </div>
                         </div>  
@@ -176,7 +184,9 @@
                                         @endforelse
                                     </tbody>
                                 </table>
-                                {{ $users->appends(request()->input())->links('vendor.pagination.custom') }}
+                                @if (count($users) > 0)
+                                    {{ $users->links('vendor.pagination.custom') }}
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -197,6 +207,17 @@
             <!-- Modal header -->
             <div class="relative p-3 bg-blue-900 border-opacity-80 w-full">
                 <h1 class="text-lg font-bold text-white text-center">Add Accountant User</h1>
+                <button 
+                    @click="openCreate = false" 
+                    class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200 z-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                            d="M8 8L16 16M8 16L16 8" 
+                            stroke="#1e3a8a" 
+                            class="transition duration-200 hover:stroke-gray-600" />
+                    </svg>
+                </button>
             </div>
             <div class="p-10">
                 <form id="addAccountForm" method="POST" action="{{ route('users.store') }}">

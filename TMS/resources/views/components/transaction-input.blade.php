@@ -15,7 +15,6 @@
                     p-0
                     border-0
                     border-b
-                   
                     border-b-gray-200
                      ' . ($disabled ? 'bg-gray-200 cursor-not-allowed' : '')
     ]) !!}

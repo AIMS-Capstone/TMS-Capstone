@@ -369,6 +369,12 @@
             <!-- Modal header -->
             <div class="relative p-3 bg-blue-900 border-opacity-80 w-full">
                 <h1 class="text-lg font-bold text-white text-center">Edit Organization Details</h1>
+                <button @click="showEdit = false" class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 8L16 16M8 16L16 8" stroke="#1e3a8a" class="transition duration-200 hover:stroke-gray-600"/>
+                    </svg>
+                </button>
             </div>
             <!-- Modal body -->
             <div class="p-10">
@@ -443,12 +449,18 @@
         x-cloak>
         
         <!-- Create Account Modal -->
-        <div x-show="open" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
+        <div x-show="open" class="fixed inset-0 bg-gray-200 bg-opacity-50 z-50 flex items-center justify-center">
             <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden" x-show="open" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
             x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
                 <!-- Modal header -->
-                <div class="flex bg-blue-900 justify-center rounded-t-lg items-center p-3 border-b border-opacity-80 mx-auto">
+                <div class="relative flex bg-blue-900 justify-center rounded-t-lg items-center p-3 border-b border-opacity-80 mx-auto">
                     <h1 class="text-lg font-bold text-white">Create Client Account</h1>
+                    <button @click="open = false" class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 8L16 16M8 16L16 8" stroke="#1e3a8a" class="transition duration-200 hover:stroke-gray-600"/>
+                        </svg>
+                    </button>
                 </div>
                 <!-- Modal Body -->
                 <div class="p-10">
@@ -467,7 +479,7 @@
                         </div>
 
                         <div class="flex justify-end mt-10">
-                            <button type="button" @click="open = false" class="mr-4 font-semibold text-zinc-700 px-3 py-1 rounded-md hover:text-zinc-900 transition">Cancel</button>
+                            <button type="button" @click="open = false" class="mr-4 font-semibold text-zinc-600 px-3 py-1 rounded-md hover:text-zinc-900 transition">Cancel</button>
                             <button type="submit" 
                                     :disabled="!isEmailValid()"
                                     class="font-semibold bg-blue-900 text-white text-center px-6 py-1.5 rounded-md hover:bg-blue-950 border-blue-900 hover:text-white transition disabled:bg-gray-300 disabled:cursor-not-allowed">
@@ -508,7 +520,7 @@
         @open-delete-modal.window="open = true; organizationId = $event.detail.organizationId; organizationName = $event.detail.organizationName"
         x-effect="document.body.classList.toggle('overflow-hidden', open)" 
         x-cloak>
-        <div x-show="open" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
+        <div x-show="open" class="fixed inset-0 bg-gray-200 bg-opacity-50 z-50 flex items-center justify-center">
             <div class="bg-white p-10 rounded-lg shadow-lg max-w-lg w-full relative" x-show="open" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
             x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
                 <!-- Close Button -->

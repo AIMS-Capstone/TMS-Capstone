@@ -24,23 +24,31 @@
 
                     <div class="flex gap-x-4 overflow-x-auto justify-center mt-4">
                         <div x-data="{ selectedTab: 'Client Users' }" class="w-full">
-                            <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-24 overflow-x-auto  border-neutral-300 dark:border-neutral-700" role="tablist" aria-label="tab options">
+                            <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-24 border-neutral-300 dark:border-neutral-700" role="tablist" aria-label="tab options">
                                 <a href="{{ route('user-management.user') }}">
                                     <button @click="selectedTab = 'Accountant Users'" :aria-selected="selectedTab === 'Accountant Users'" 
-                                    :tabindex="selectedTab === 'Accountant Users' ? '0' : '-1'" 
-                                    :class="selectedTab === 'Accountant Users' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'" 
-                                    class="h-min py-2 text-base" 
-                                    type="button"
-                                    role="tab" 
-                                    aria-controls="tabpanelAccountantUsers" >Accountant Users</button>
+                                        :tabindex="selectedTab === 'Accountant Users' ? '0' : '-1'" 
+                                        :class="selectedTab === 'Accountant Users' ? 'font-bold text-blue-900' : 'text-neutral-600 font-medium hover:text-blue-900 hover:font-bold'" 
+                                        class="h-min py-2 text-base relative" 
+                                        type="button"
+                                        role="tab" 
+                                        aria-controls="tabpanelAccountantUsers" ><span class="block">Accountant Users</span>
+                                        <span 
+                                            :class="selectedTab === 'Accountant Users' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
+                                        </span>
+                                    </button>
                                 </a>
                                 <button @click="selectedTab = 'Client Users'" :aria-selected="selectedTab === 'Client Users'" 
-                                :tabindex="selectedTab === 'Client Users' ? '0' : '-1'" 
-                                :class="selectedTab === 'Client Users' ? 'font-bold box-border text-blue-900 border-b-4 border-blue-900 dark:border-white dark:text-white'   : 'text-neutral-600 font-medium dark:text-neutral-300 dark:hover:border-b-neutral-300 dark:hover:text-white hover:border-b-2 hover:border-b-blue-900 hover:text-blue-900'"
-                                class="h-min py-2 text-base" 
-                                type="button" 
-                                role="tab" 
-                                aria-controls="tabpanelClientUsers" >Client Users</button>
+                                    :tabindex="selectedTab === 'Client Users' ? '0' : '-1'" 
+                                    :class="selectedTab === 'Client Users' ? 'font-bold text-blue-900' : 'text-neutral-600 font-medium hover:text-blue-900 hover:font-bold'"
+                                    class="h-min py-2 text-base relative" 
+                                    type="button" 
+                                    role="tab" 
+                                    aria-controls="tabpanelClientUsers" ><span class="block">Client Users</span>
+                                    <span 
+                                        :class="selectedTab === 'Client Users' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
+                                    </span>
+                            </button>
                             </div>
                         </div>  
                     </div>
@@ -190,8 +198,9 @@
                                         @endif
                                     </tbody>
                                 </table>
-                            
-                                {{ $clients->appends(request()->input())->links('vendor.pagination.custom') }}
+                                @if (count($clients) > 0)
+                                    {{ $clients->links('vendor.pagination.custom') }}
+                                @endif
                             </div>
                         </div>
                     </div>

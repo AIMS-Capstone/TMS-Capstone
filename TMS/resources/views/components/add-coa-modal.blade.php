@@ -16,8 +16,19 @@
          x-show="show" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
          x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
         <!-- Modal header -->
-        <div class="flex bg-blue-900 justify-center rounded-t-lg items-center p-3 border-b border-opacity-80 mx-auto">
+        <div class="relative flex bg-blue-900 justify-center rounded-t-lg items-center p-3 border-b border-opacity-80 mx-auto">
             <h1 class="text-lg font-bold text-white">Add New Account</h1>
+            <button 
+                x-on:click="$dispatch('close-modal')" 
+                class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200 z-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                          d="M8 8L16 16M8 16L16 8" 
+                          stroke="#1e3a8a" 
+                          class="transition duration-200 hover:stroke-gray-600" />
+                </svg>
+            </button>
         </div>
 
         <!-- Modal body -->
@@ -88,7 +99,7 @@
     
 </div>
 
-{{-- <!-- Success Modal -->
+{{-- <!-- Success Modal: Not appearing -->
     <div x-show="success" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center" x-cloak>
         <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto h-auto z-10 overflow-hidden p-10 relative">
             <!-- Close Button -->
