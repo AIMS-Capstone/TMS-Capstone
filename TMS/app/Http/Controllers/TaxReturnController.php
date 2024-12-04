@@ -95,11 +95,60 @@ class TaxReturnController extends Controller
     {
         // Retrieve the tax return by its ID
         $taxReturn = TaxReturn::findOrFail($id);
+        $organization_id = session("organization_id");
 
         // Check if the 'type' (or title) matches '1701Q'
         if ($taxReturn->title === '1701Q') {
             // If title is 1701Q, show the specific view for 1701Q
             return view('tax_return.income_input_summary', compact('taxReturn'));
+        }
+        if ($taxReturn->title === '1702Q') {
+            // If title is 1701Q, show the specific view for 1701Q
+            $organization = OrgSetup::with("rdo")
+            ->where('id', $organization_id)
+            ->first();
+    
+        $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
+    
+        // Parse the start_date using Carbon
+        $startDate = Carbon::parse($organization->start_date);
+    
+        // Determine the year ended based on the start_date
+        $yearEnded = null;
+        if ($startDate->month == 1 && $startDate->day == 1) {
+            // Calendar year - Ends on December 31 of the next year
+            $yearEnded = $startDate->addYear()->endOfYear();
+        } else {
+            // Fiscal year - Ends on the last day of the same month next year
+            $yearEnded = $startDate->addYear()->lastOfMonth();
+        }
+        // Check whether the organization follows a calendar or fiscal period
+        $period = ($yearEnded->month == 12 && $yearEnded->day == 31) ? 'calendar' : 'fiscal';
+    
+        // Format the year ended date as 'YYYY-MM'
+        $yearEndedFormatted = $yearEnded->format('Y-m');
+        $yearEndedFormattedForDisplay = $yearEnded->format('m/Y'); // e.g., "12/2024"
+    
+        // Get the transaction IDs related to this tax return
+        $transactionIds = $taxReturn->transactions->pluck('id');
+        $taxRows = TaxRow::whereHas('transaction', function ($query) use ($transactionIds) {
+            $query->where('tax_type', 2)
+                  ->where('transaction_type', 'sales')
+                  ->where('status', 'draft')
+                  ->whereIn('id', $transactionIds);
+        })->with(['transaction.contactDetails', 'atc', 'taxType'])
+          ->get();
+
+          return view('1702q.preview', compact(
+            'taxReturn',
+            'organization',
+            'yearEndedFormatted',
+            'yearEndedFormattedForDisplay',
+            'period',
+            'rdoCode',
+    
+        ));
+            
         }
 
         // If title is not 1701Q, you can handle other cases or show a different view
