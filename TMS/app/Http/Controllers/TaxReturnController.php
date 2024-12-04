@@ -40,7 +40,7 @@ class TaxReturnController extends Controller
     {
         //
     }
-
+// Function for showing 2550Q Returns Table
     public function vatReturn()
     {
         $organizationId = session('organization_id');
@@ -51,6 +51,7 @@ class TaxReturnController extends Controller
 
         return view('tax_return.vat_return', compact('taxReturns'));
     }
+    // Function for showing Income Returns Table
     public function incomeReturn()
     {
         $organizationId = session('organization_id');
@@ -89,16 +90,65 @@ class TaxReturnController extends Controller
         return view('tax_return.income_return', compact('taxReturns', 'filterType', 'searchTerm'));
     }
     
-
+// Function for showing detailed view of Income Returns
     public function showIncome($id, $type)
     {
         // Retrieve the tax return by its ID
         $taxReturn = TaxReturn::findOrFail($id);
+        $organization_id = session("organization_id");
 
         // Check if the 'type' (or title) matches '1701Q'
         if ($taxReturn->title === '1701Q') {
             // If title is 1701Q, show the specific view for 1701Q
             return view('tax_return.income_input_summary', compact('taxReturn'));
+        }
+        if ($taxReturn->title === '1702Q') {
+            // If title is 1701Q, show the specific view for 1701Q
+            $organization = OrgSetup::with("rdo")
+            ->where('id', $organization_id)
+            ->first();
+    
+        $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
+    
+        // Parse the start_date using Carbon
+        $startDate = Carbon::parse($organization->start_date);
+    
+        // Determine the year ended based on the start_date
+        $yearEnded = null;
+        if ($startDate->month == 1 && $startDate->day == 1) {
+            // Calendar year - Ends on December 31 of the next year
+            $yearEnded = $startDate->addYear()->endOfYear();
+        } else {
+            // Fiscal year - Ends on the last day of the same month next year
+            $yearEnded = $startDate->addYear()->lastOfMonth();
+        }
+        // Check whether the organization follows a calendar or fiscal period
+        $period = ($yearEnded->month == 12 && $yearEnded->day == 31) ? 'calendar' : 'fiscal';
+    
+        // Format the year ended date as 'YYYY-MM'
+        $yearEndedFormatted = $yearEnded->format('Y-m');
+        $yearEndedFormattedForDisplay = $yearEnded->format('m/Y'); // e.g., "12/2024"
+    
+        // Get the transaction IDs related to this tax return
+        $transactionIds = $taxReturn->transactions->pluck('id');
+        $taxRows = TaxRow::whereHas('transaction', function ($query) use ($transactionIds) {
+            $query->where('tax_type', 2)
+                  ->where('transaction_type', 'sales')
+                  ->where('status', 'draft')
+                  ->whereIn('id', $transactionIds);
+        })->with(['transaction.contactDetails', 'atc', 'taxType'])
+          ->get();
+
+          return view('1702q.preview', compact(
+            'taxReturn',
+            'organization',
+            'yearEndedFormatted',
+            'yearEndedFormattedForDisplay',
+            'period',
+            'rdoCode',
+    
+        ));
+            
         }
 
         // If title is not 1701Q, you can handle other cases or show a different view
@@ -107,7 +157,7 @@ class TaxReturnController extends Controller
     }
 
     
-    
+    // Function for showing Percentage Report Preview
     public function showPercentageReport($id)
 {
     $taxReturn = TaxReturn::findOrFail($id);
@@ -186,6 +236,7 @@ class TaxReturnController extends Controller
         'summaryData' // Add the summary data to the view
     ));
 }
+  // Function for showing Value Added Tax Report Preview
 public function showVatReport($id)
 {
     // Fetch the tax return and organization setup data
@@ -366,13 +417,158 @@ public function showVatReport($id)
         'previousYear', 'currentYear'
     ));
 }
+  // Function for showing Income Tax (1701Q) Report Preview
+  public function showIncomeReport($id)
+  {
+      // Fetch the tax return and organization setup data
+      $taxReturn = TaxReturn::findOrFail($id);
+      $organization_id = session("organization_id");
+  
+      // Load the organization and its RDO relationship
+      $organization = OrgSetup::with("rdo")
+          ->where('id', $organization_id)
+          ->first();
+  
+      // Extract the RDO code from the organization data
+      $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
+  
+      // Retrieve the individual and spouse background information
+      $individualBackground = $taxReturn->individualBackgroundInformation;
+      $spouseBackground = $individualBackground->spouseInformation ?? null;
+  
+      // Fetch tax option rate for individual background information
+      $individualTaxOptionRate = $individualBackground->taxOptionRate()->first();
+  
+      // Fetch tax option rate for spouse background information if spouse exists
+      $spouseTaxOptionRate = $spouseBackground
+          ? $spouseBackground->taxOptionRate()->first()
+          : null;
+  
+      // Collect transactions for Individual from individual_transactions table
+      $individualTransactionIds = $taxReturn->individualTransaction()->pluck('transaction_id') ?? collect();
+  
+      // Collect transactions for Spouse from spouse_transactions table, if applicable
+      $spouseTransactionIds = $spouseBackground
+          ? $taxReturn->spouseTransactions()->pluck('transaction_id') ?? collect()
+          : collect(); // Empty collection if no spouse information
+  
+      // Query and collect all Individual Sales TaxRows
+      $individualSalesTaxRows = TaxRow::whereHas('transaction', function ($q) use ($individualTransactionIds) {
+          $q->whereIn('id', $individualTransactionIds)
+              ->where('transaction_type', 'sales');
+      })
+      ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load related data
+      ->get();
+  
+      // Query and collect all Spouse Sales TaxRows
+      $spouseSalesTaxRows = TaxRow::whereHas('transaction', function ($q) use ($spouseTransactionIds) {
+          $q->whereIn('id', $spouseTransactionIds)
+              ->where('transaction_type', 'sales');
+      })
+      ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load related data
+      ->get();
+  
+      // Combine individual and spouse sales data
+      $combinedSalesTaxRows = $individualSalesTaxRows->merge($spouseSalesTaxRows);
+  
+      // Calculate the total net amount for individual and spouse
+      $individualNetAmount = $individualSalesTaxRows->sum('net_amount');
+      $spouseNetAmount = $spouseSalesTaxRows->sum('net_amount');
+      $totalNetAmount = $individualNetAmount + $spouseNetAmount;
+  
+      // Initialize cost of sales variables for COGS and Allowable Itemized Deduction
+      $individualCOGS = 0;
+      $spouseCOGS = 0;
+      $individualItemizedDeduction = 0;
+      $spouseItemizedDeduction = 0;
+  
+      // Check if the deduction method for individual is itemized
+      if ($individualTaxOptionRate && $individualTaxOptionRate->deduction_method === 'itemized') {
+          // Get individual deductible tax rows (Cost of Goods Sold and Itemized Deduction)
+          $individualTaxRowsForDeductions = TaxRow::whereHas('coaAccount', function ($q) {
+              $q->whereIn('sub_type', ['Cost of Goods Sold', 'Allowable Itemized Deduction']);
+          })
+          ->whereHas('transaction', function ($q) use ($individualTransactionIds) {
+              $q->whereIn('id', $individualTransactionIds);
+          })
+          ->get();
+  
+          // Separate COGS and Itemized Deduction for individual
+          $individualCOGS = $individualTaxRowsForDeductions->where('coaAccount.sub_type', 'Cost of Goods Sold')->sum('amount');
+          $individualItemizedDeduction = $individualTaxRowsForDeductions->where('coaAccount.sub_type', 'Allowable Itemized Deduction')->sum('amount');
+      }
+  
+      // Check if the deduction method for spouse is itemized (if spouse exists)
+      if ($spouseTaxOptionRate && $spouseTaxOptionRate->deduction_method === 'itemized') {
+          // Get spouse deductible tax rows (Cost of Goods Sold and Itemized Deduction)
+          $spouseTaxRowsForDeductions = TaxRow::whereHas('coaAccount', function ($q) {
+              $q->whereIn('sub_type', ['Cost of Goods Sold', 'Allowable Itemized Deduction']);
+          })
+          ->whereHas('transaction', function ($q) use ($spouseTransactionIds) {
+              $q->whereIn('id', $spouseTransactionIds);
+          })
+          ->get();
+  
+          // Separate COGS and Itemized Deduction for spouse
+          $spouseCOGS = $spouseTaxRowsForDeductions->where('coaAccount.sub_type', 'Cost of Goods Sold')->sum('amount');
+          $spouseItemizedDeduction = $spouseTaxRowsForDeductions->where('coaAccount.sub_type', 'Allowable Itemized Deduction')->sum('amount');
+      }
+  
+      // Determine the current and previous quarters
+      $month = $taxReturn->month;
+      $currentQuarter = 'Q' . ceil((int)$month / 3); // Convert $month to an integer before division
+
+      $previousQuarter = $currentQuarter === 'Q1' ? null : 'Q' . (ceil((int)$month / 3) - 1);
+
+  
+      // Initialize previous quarter's cumulative income
+      $previousCumulativeIncome = 0;
+      $spousePreviousCumulativeIncome = 0;
+  
+    //   // Fetch previous quarter's tax return if applicable
+    //   if ($previousQuarter) {
+    //       $previousTaxReturn1701Q = Tax1701Q::where('organization_id', $organization_id)
+    //           ->where('year', $taxReturn->year) // Same year
+    //           ->where('quarter', $previousQuarter) // Previous quarter
+    //           ->first();
+  
+    //       if ($previousTaxReturn1701Q) {
+    //           // Extract Item 51 (Cumulative Taxable Income/(Loss))
+    //           $previousCumulativeIncome = $previousTaxReturn1701Q->cumulative_taxable_income ?? 0;
+    //           $spousePreviousCumulativeIncome = $previousTaxReturn1701Q->spouse_cumulative_taxable_income ?? 0;
+    //       }
+    //   }
+  
+      // Pass all required variables to the view
+      return view('tax_return.income_report_preview', compact(
+          'rdoCode', 
+          'taxReturn', 
+          'organization', 
+          'individualBackground', 
+          'spouseBackground', 
+          'individualTaxOptionRate', 
+          'spouseTaxOptionRate', 
+          'combinedSalesTaxRows',
+          'individualNetAmount',
+          'spouseNetAmount',     
+          'totalNetAmount',
+          'individualCOGS',  
+          'spouseCOGS',
+          'individualItemizedDeduction', 
+          'spouseItemizedDeduction',
+        //   'previousCumulativeIncome', // Pass previous quarter cumulative income
+        //   'spousePreviousCumulativeIncome' // Pass spouse's previous quarter cumulative income
+      ));
+  }
+  
+  
+
+  
 
 
 
 
-
-
-
+  // Function for showing Percentage Tax Return Table
     public function percentageReturn()
     {
         $organizationId = session('organization_id');
@@ -384,11 +580,11 @@ public function showVatReport($id)
         return view('tax_return.percentage_return', compact('taxReturns'));
     }
     
-    /**
-     * Store a newly created resource in storage.
-     */
+
+        // Function for VAT Tax Return
     public function store(StoreTaxReturnRequest $request)
     {
+      
         // Step 1: Create the tax return
         $taxReturn = TaxReturn::create([
             'title' => $request->type,
@@ -448,6 +644,7 @@ public function showVatReport($id)
         // Step 6: Return back to the same page with success message
         return back()->with('success', 'Tax Return created successfully.' . ($transactions->isEmpty() ? ' No transactions found for the selected period.' : ' Transactions associated successfully.'));
     }
+      // Function for Creating Percentage Tax Return
     public function storePercentage(StoreTaxReturnRequest $request)
     {
         // Step 1: Create the tax return
@@ -512,9 +709,7 @@ public function showVatReport($id)
     
     
 
-    /**
-     * Display the specified resource.
-     */
+       // Function for Creating 2550Q Value Added Tax Return Report
     public function store2550Q(Request $request, $taxReturn)
     {
 
@@ -575,6 +770,7 @@ public function showVatReport($id)
             'purchases_others_specify_amount' => 'nullable|numeric',
             'purchases_others_specify_input_tax' => 'nullable|numeric',
             'domestic_no_input' => 'nullable|numeric',
+            'tax_exempt_importation' => 'nullable|numeric',
             'total_current_purchase' => 'nullable|numeric',
             'total_current_purchase_input_tax' => 'nullable|numeric',
             'total_available_input_tax' => 'nullable|numeric',
@@ -602,12 +798,11 @@ public function showVatReport($id)
         );
     
         // Step 4: Return a response
-        return response()->json([
-            'message' => 'Tax2550Q record successfully created or updated.',
-            'data' => $tax2550Q,
-        ], 200);
+        return redirect()->route('tax_return.2550q.pdf', ['taxReturn' => $taxReturn])
+        ->with('success', 'Tax return successfully submitted and PDF generated.');
     }
     
+      // Function for Creating 2551Q Percentage Tax Return Report
      public function store2551Q(Request $request, $taxReturn)
      {
          // Validate the incoming request data
@@ -678,16 +873,23 @@ public function showVatReport($id)
          return redirect()->route('tax_return.2551q.pdf', ['taxReturn' => $taxReturn])
         ->with('success', 'Tax return successfully submitted and PDF generated.');
      }
+     // Function for showing SLSP Data of Value Added Tax Return
      public function showSlspData(TaxReturn $taxReturn, Request $request)
      {
          // Retrieve the selected type from the request
          $type = $request->get('type', 'sales'); // Default to 'sales' if no type is provided
      
+         // Retrieve the 'perPage' value from the request, defaulting to 5 if not provided
+         $perPage = $request->get('perPage', 5);
+     
+         // Retrieve the search query from the request
+         $search = $request->get('search', '');
+     
          // Get the transaction IDs linked to this tax return
          $transactionIds = $taxReturn->transactions->pluck('id');
      
          // Define the query
-         $paginatedTaxRows = TaxRow::where(function ($query) use ($type) {
+         $paginatedTaxRows = TaxRow::where(function ($query) use ($type, $search) {
              if ($type === 'capital_goods') {
                  // Filter for Capital Goods
                  $query->whereHas('taxType', function ($q) {
@@ -713,84 +915,289 @@ public function showVatReport($id)
                      $q->whereIn('tax_type', ['Capital Goods', 'Importation of Goods']); // Exclude Capital Goods and Importation
                  });
              }
+     
+             // Apply search filter if search term is provided
+             if ($search) {
+                 $query->where(function ($q) use ($search) {
+                     $q->whereHas('transaction.contactDetails', function ($q) use ($search) {
+                         $q->where('bus_name', 'like', '%' . $search . '%')
+                           ->orWhere('contact_address', 'like', '%' . $search . '%')
+                           ->orWhere('contact_tin', 'like', '%' . $search . '%');
+                     })
+                     ->orWhere('description', 'like', '%' . $search . '%')
+                     ->orWhereHas('transaction', function ($q) use ($search) {
+                         $q->where('inv_number', 'like', '%' . $search . '%');
+                     })
+                     ->orWhereHas('atc', function ($q) use ($search) {
+                         $q->where('tax_code', 'like', '%' . $search . '%');
+                     });
+                 });
+             }
          })
          ->whereHas('transaction', function ($query) use ($transactionIds) {
              $query->whereIn('id', $transactionIds); // Ensure transactions belong to the current tax return
          })
          ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load relationships
-         ->paginate(5);
+         ->paginate($perPage); // Use perPage to control pagination size
      
-         return view('tax_return.vat_show', compact('taxReturn', 'paginatedTaxRows', 'type'));
+         return view('tax_return.vat_show', compact('taxReturn', 'paginatedTaxRows', 'type', 'search'));
      }
      
-     
-     public function showSummary(TaxReturn $taxReturn, Request $request)
+     // Function to show Income Sales Data
+     public function showIncomeSalesData(TaxReturn $taxReturn, Request $request)
      {
-         // Get the transaction IDs linked to this tax return
-         $transactionIds = $taxReturn->transactions->pluck('id');
+         // Get Individual and Spouse Background Information
+         $individualBackground = $taxReturn->individualBackgroundInformation;
+         $spouseBackground = $individualBackground->spouseInformation ?? null;
+         $type = $request->input('type', 'default');
      
-         // Get the tax rows and eager load taxType to access tax_rate and transaction_type
-         $taxRows = TaxRow::whereIn('transaction_id', $transactionIds)
-             ->with('taxType') // Eager load taxType to get transaction_type and tax_rate
-             ->get();
+         // Get search term and active tab
+         $search = $request->input('search', ''); // Default to empty string if no search term
+         $activeTab = $request->get('tab', 'individual'); // Default to 'individual' if no tab is specified
      
-         // Initialize an array to store the summary data, grouped by tax type
-         $summaryData = [];
+         // Collect transactions for Individual from individual_transactions table
+         $individualTransactionIds = $taxReturn->individualTransaction()->pluck('transaction_id') ?? collect();
      
-         foreach ($taxRows as $taxRow) {
-             $taxType = $taxRow->taxType; // Get the tax type relationship
-             $transactionType = $taxType->transaction_type; // Get transaction_type from taxType
+         // Collect transactions for Spouse from spouse_transactions table, if applicable
+         $spouseTransactionIds = $spouseBackground 
+             ? $taxReturn->spouseTransactions()->pluck('transaction_id') ?? collect() 
+             : collect(); // Empty collection if no spouse information
      
-             // Only process rows with a valid transaction type and tax type
-             if ($taxType && $transactionType) {
-                 // Get the tax rate from the taxType
-                 $tax_rate = $taxType->VAT;
+         // Query for Individual Sales TaxRows
+         $individualSalesTaxRowsQuery = TaxRow::whereHas('transaction', function ($q) use ($individualTransactionIds, $search) {
+             $q->whereIn('id', $individualTransactionIds)
+               ->where('transaction_type', 'sales');
      
-                 // Initialize the tax type if not already present in the summaryData
-                 if (!isset($summaryData[$taxType->tax_type])) {
-                     $summaryData[$taxType->tax_type] = [
-                         'net_amount' => 0,
-                         'tax_amount' => 0,
-                         'tax_rate' => $tax_rate,
-                         'transaction_type' => $transactionType, // Store transaction type for later use
-                     ];
-                 }
-     
-                 // Aggregate the amounts based on the tax type
-                 $summaryData[$taxType->tax_type]['net_amount'] += $taxRow->net_amount;
-                 $summaryData[$taxType->tax_type]['tax_amount'] += $taxRow->tax_amount;
+             // Apply search filter if search term is provided
+             if (!empty($search)) {
+                 $q->where(function ($query) use ($search) {
+                     $query->where('inv_number', 'like', "%$search%")
+                           ->orWhere('description', 'like', "%$search%")
+                           ->orWhere('reference', 'like', "%$search%")
+                           ->orWhereHas('contactDetails', function ($contactQuery) use ($search) {
+                               $contactQuery->where('bus_name', 'like', "%$search%")
+                                            ->orWhere('contact_address', 'like', "%$search%")
+                                            ->orWhere('contact_tin', 'like', "%$search%");
+                           });
+                 });
              }
-         }
-     
-         // Convert the summary data into a collection
-         $summaryCollection = collect($summaryData)->map(function ($item, $key) {
-             return [
-                 'tax_type' => $key,
-                 'vatable_sales' => $item['net_amount'],
-                 'tax_due' => $item['tax_amount'],
-                 'tax_rate' => $item['tax_rate'],
-             ];
          });
      
-         // Paginate the summary data
-         $perPage = 5; // Number of items per page
-         $currentPage = LengthAwarePaginator::resolveCurrentPage();
-         $currentItems = $summaryCollection->slice(($currentPage - 1) * $perPage, $perPage)->all();
+         // Query for Spouse Sales TaxRows
+         $spouseSalesTaxRowsQuery = TaxRow::whereHas('transaction', function ($q) use ($spouseTransactionIds, $search) {
+             $q->whereIn('id', $spouseTransactionIds)
+               ->where('transaction_type', 'sales');
      
-         // Create the LengthAwarePaginator instance
-         $paginatedSummaryData = new LengthAwarePaginator(
-             $currentItems,
-             $summaryCollection->count(),
-             $perPage,
-             $currentPage,
-             ['path' => LengthAwarePaginator::resolveCurrentPath()]
-         );
+             // Apply search filter if search term is provided
+             if (!empty($search)) {
+                 $q->where(function ($query) use ($search) {
+                     $query->where('inv_number', 'like', "%$search%")
+                           ->orWhere('description', 'like', "%$search%")
+                           ->orWhere('reference', 'like', "%$search%")
+                           ->orWhereHas('contactDetails', function ($contactQuery) use ($search) {
+                               $contactQuery->where('bus_name', 'like', "%$search%")
+                                            ->orWhere('contact_address', 'like', "%$search%")
+                                            ->orWhere('contact_tin', 'like', "%$search%");
+                           });
+                 });
+             }
+         });
      
-         // Return the view with the paginated summary data
-         return view('tax_return.vat_summary', compact('taxReturn', 'paginatedSummaryData'));
+         // Paginate Individual and Spouse Sales TaxRows
+         $individualSalesTaxRows = $individualSalesTaxRowsQuery
+             ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load related data
+             ->paginate(5);
+     
+         $spouseSalesTaxRows = $spouseSalesTaxRowsQuery
+             ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load related data
+             ->paginate(5);
+     
+         // Return to view with paginated data and activeTab
+         return view('tax_return.income_show_sales', [
+             'taxReturn' => $taxReturn,
+             'individualTaxRows' => $individualSalesTaxRows,
+             'spouseTaxRows' => $spouseSalesTaxRows,
+             'type' => $type,
+             'activeTab' => $activeTab, // Pass the activeTab to the view
+             'search' => $search, // Include search term for the view
+         ]);
      }
      
+
+   // Function to show Income Sales Data
+public function showIncomeCoaData(TaxReturn $taxReturn, Request $request)
+{
+    // Get Individual and Spouse Background Information
+    $individualBackground = $taxReturn->individualBackgroundInformation;
+    $spouseBackground = $individualBackground->spouseInformation ?? null;
+    $type = $request->input('type', 'default');
+    $search = $request->input('search'); // Get the search term from the request
+
+    // Collect transactions for Individual from individual_transactions table
+    $individualTransactionIds = $taxReturn->individualTransaction()->pluck('transaction_id') ?? collect();
+
+    // Collect transactions for Spouse from spouse_transactions table, if applicable   
+    $spouseTransactionIds = $spouseBackground
+                               ? $taxReturn->spouseTransactions()->pluck('transaction_id') ?? collect() 
+                               : collect(); // Empty collection if no spouse information
+
+    // Query for Individual COA TaxRows (Cost of Goods Sold and Allowable Itemized Deduction)
+    $individualTaxRowsQuery = TaxRow::whereHas('coaAccount', function ($q) {
+        $q->whereIn('sub_type', ['Cost of Goods Sold', 'Allowable Itemized Deduction']);
+    });
+
+    // Add condition for Individual transactions if applicable (only filter if IDs are provided)
+    $individualTaxRowsQuery->whereHas('transaction', function ($q) use ($individualTransactionIds) {
+        $q->whereIn('id', $individualTransactionIds);
+    });
+
+    // If search term is provided, filter based on description or other relevant fields
+    if ($search) {
+        $individualTaxRowsQuery->where(function ($q) use ($search) {
+            $q->where('description', 'like', "%$search%")
+              ->orWhereHas('transaction.contactDetails', function ($q) use ($search) {
+                  $q->where('bus_name', 'like', "%$search%")
+                    ->orWhere('contact_address', 'like', "%$search%")
+                    ->orWhere('contact_tin', 'like', "%$search%");
+              });
+        });
+    }
+
+    // Query for Spouse COA TaxRows (Cost of Goods Sold and Allowable Itemized Deduction)
+    $spouseTaxRowsQuery = TaxRow::whereHas('coaAccount', function ($q) {
+        $q->whereIn('sub_type', ['Cost of Goods Sold', 'Allowable Itemized Deduction']);
+    });
+
+    // Add condition for Spouse transactions if applicable (only filter if IDs are provided)
+    $spouseTaxRowsQuery->whereHas('transaction', function ($q) use ($spouseTransactionIds) {
+        $q->whereIn('id', $spouseTransactionIds);
+    });
+
+    // If search term is provided, filter based on description or other relevant fields for spouse
+    if ($search) {
+        $spouseTaxRowsQuery->where(function ($q) use ($search) {
+            $q->where('description', 'like', "%$search%")
+              ->orWhereHas('transaction.contactDetails', function ($q) use ($search) {
+                  $q->where('bus_name', 'like', "%$search%")
+                    ->orWhere('contact_address', 'like', "%$search%")
+                    ->orWhere('contact_tin', 'like', "%$search%");
+              });
+        });
+    }
+
+    // Paginate Individual and Spouse TaxRows
+    $individualTaxRows = $individualTaxRowsQuery
+        ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load related data
+        ->paginate(5); // Paginate the results
+
+    $spouseTaxRows = $spouseTaxRowsQuery
+        ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount']) // Eager load related data
+        ->paginate(5); // Paginate results for spouse transactions
+
+    // Get the current activeTab from the request, or default to 'individual'
+    $activeTab = $request->get('tab', 'individual');
+
+    // Return to view with paginated data and activeTab
+    return view('tax_return.income_show_coa', [
+        'taxReturn' => $taxReturn,
+        'individualTaxRows' => $individualTaxRows,
+        'spouseTaxRows' => $spouseTaxRows,
+        'type' => $type,
+        'activeTab' => $activeTab, // Pass the activeTab to the view
+    ]);
+}
+
+
+
+
+
      
+     
+     
+        // Function to show Summary Report on Value-Added Tax Return 2550Q
+     
+     
+        public function showSummary(TaxReturn $taxReturn, Request $request)
+        {
+            // Get the transaction IDs linked to this tax return
+            $transactionIds = $taxReturn->transactions->pluck('id');
+        
+            // Get the tax rows and eager load taxType to access tax_rate and transaction_type
+            $taxRows = TaxRow::whereIn('transaction_id', $transactionIds)
+                ->with('taxType') // Eager load taxType to get transaction_type and tax_rate
+                ->get();
+        
+            // Initialize an array to store the summary data, grouped by tax type
+            $summaryData = [];
+        
+            foreach ($taxRows as $taxRow) {
+                $taxType = $taxRow->taxType; // Get the tax type relationship
+                $transactionType = $taxType->transaction_type; // Get transaction_type from taxType
+        
+                // Only process rows with a valid transaction type and tax type
+                if ($taxType && $transactionType) {
+                    // Get the tax rate from the taxType
+                    $tax_rate = $taxType->VAT;
+        
+                    // Initialize the tax type if not already present in the summaryData
+                    if (!isset($summaryData[$taxType->tax_type])) {
+                        $summaryData[$taxType->tax_type] = [
+                            'net_amount' => 0,
+                            'tax_amount' => 0,
+                            'tax_rate' => $tax_rate,
+                            'transaction_type' => $transactionType, // Store transaction type for later use
+                        ];
+                    }
+        
+                    // Aggregate the amounts based on the tax type
+                    $summaryData[$taxType->tax_type]['net_amount'] += $taxRow->net_amount;
+                    $summaryData[$taxType->tax_type]['tax_amount'] += $taxRow->tax_amount;
+                }
+            }
+        
+            // Convert the summary data into a collection
+            $summaryCollection = collect($summaryData)->map(function ($item, $key) {
+                return [
+                    'tax_type' => $key,
+                    'vatable_sales' => $item['net_amount'],
+                    'tax_due' => $item['tax_amount'],
+                    'tax_rate' => $item['tax_rate'],
+                ];
+            });
+        
+            // Apply search filter if provided
+            $searchTerm = $request->input('search');
+            if ($searchTerm) {
+                $summaryCollection = $summaryCollection->filter(function ($item) use ($searchTerm) {
+                    return stripos($item['tax_type'], $searchTerm) !== false ||
+                           stripos((string)$item['vatable_sales'], $searchTerm) !== false ||
+                           stripos((string)$item['tax_due'], $searchTerm) !== false ||
+                           stripos((string)$item['tax_rate'], $searchTerm) !== false;
+                });
+            }
+        
+            // Determine per page
+            $perPage = $request->input('perPage', 5); // Default to 5 if not specified
+            $currentPage = LengthAwarePaginator::resolveCurrentPage();
+            $currentItems = $summaryCollection->slice(($currentPage - 1) * $perPage, $perPage)->all();
+        
+            // Create the LengthAwarePaginator instance
+            $paginatedSummaryData = new LengthAwarePaginator(
+                $currentItems,
+                $summaryCollection->count(),
+                $perPage,
+                $currentPage,
+                ['path' => LengthAwarePaginator::resolveCurrentPath()]
+            );
+        
+            // Add query parameters to pagination links
+            $paginatedSummaryData->appends($request->only(['search', 'perPage']));
+        
+            // Return the view with the paginated summary data
+            return view('tax_return.vat_summary', compact('taxReturn', 'paginatedSummaryData'));
+        }
+         
+        // Function to show Percentage Tax SLSP Data 2551Q
     
     public function showPercentageSlspData(TaxReturn $taxReturn)
     {
@@ -808,6 +1215,7 @@ public function showVatReport($id)
         return view('tax_return.percentage_show', compact('taxReturn', 'paginatedTaxRows'));
     }
     
+            // Function to show Percentage Tax Summary Page 2551Q
     
     public function showPercentageSummaryPage(TaxReturn $taxReturn)
 {
@@ -872,6 +1280,7 @@ public function showVatReport($id)
 
     
 
+            // Function to show Value Added Tax Return Report 
 
         public function showReport(TaxReturn $taxReturn)
     {
@@ -1216,6 +1625,7 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
             'pdfPath' => asset('storage/filled_report.pdf'), // Serve the PDF from public storage
         ]);
     }
+                // Function to show Percentage Tax Report (PDF)
     public function showPercentageReportPDF(TaxReturn $taxReturn)
     {
         // Get data from the `2551q` table
@@ -1332,27 +1742,199 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
         ]);
     }
     
+    public function showVatReportPDF(TaxReturn $taxReturn)
+    {
+        // Get data from the `2551q` table
+        $formData = Tax2550Q::where('tax_return_id', $taxReturn->id)->first();
+        if (!$formData) {
+            return dd('No data found in the 2550q table for this tax return.');
+        }
+ 
+        // Initialize fields array
+        $fields = [
+            '1A' => $formData->year_ended === '2021-12' ? 'X' : '',
+            '1B' => $formData->year_ended === '2021-12' ? '' : 'X',
+           '1C' => implode('/', array_reverse(explode('-', $formData->year_ended))),
+            '3A' => $formData->quarter === '1st' ? 'X' : '',
+            '3B' => $formData->quarter === '2nd' ? 'X' : '',
+            '3C' => $formData->quarter === '3rd' ? 'X' : '',
+            '3D' => $formData->quarter === '4th' ? 'X' : '',
+            '4A' =>$formData->return_from ?? '',
+            '4B' =>$formData->return_to ?? '',
+            '5Y' => $formData->amended_return === 'yes' ? 'X' : '',
+            '5N' => $formData->amended_return === 'no' ? 'X' : '',
+            '6Y' => $formData->short_period_return === 'yes' ? 'X' : '',
+            '6N' => $formData->short_period_return === 'no' ? 'X' : '',
+            '7A' => explode('-', $formData->tin)[0] ?? '',
+            '7B' => explode('-', $formData->tin)[1] ?? '',
+            '7C' => explode('-', $formData->tin)[2] ?? '',
+            '7D' => explode('-', $formData->tin)[3] ?? '',
+            '8' => $formData->rdo_code ?? '',
+            '9' => $formData->taxpayer_name ?? '',
+            '10' => $formData->registered_address ?? '',
+            '10A' => $formData->zip_code ?? '',
+            '11' => $formData->contact_number ?? '',
+            '12' => $formData->email_address ?? '',
+            '13A' => $formData->taxpayer_classification === 'Micro' ? 'X' : '',
+            '13B' => $formData->taxpayer_classification === 'Small' ? 'X' : '',
+            '13C' => $formData->taxpayer_classification === 'Medium' ? 'X' : '',
+            '13D' => $formData->taxpayer_classification === 'Large' ? 'X' : '',
+            '14Y' => $formData->tax_relief === 'yes' ? 'X' : '',
+            '14N' => $formData->tax_relief === 'no' ? 'X' : '',
+            '14A' => $formData->yes_specify ?? '',
+            '15' => floor($formData->excess_input_tax ?? 0),
+            '15D' => ($formData->excess_input_tax ?? 0) * 100 % 100,
+            '16' => floor($formData->creditable_vat_withheld ?? 0),
+            '16D' => ($formData->creditable_vat_withheld ?? 0) * 100 % 100,
+            '17' => floor($formData->advance_vat_payment ?? 0),
+            '17D' => ($formData->advance_vat_payment ?? 0) * 100 % 100,
+            '18' => floor($formData->vat_paid_if_amended ?? 0),
+            '18D' => ($formData->vat_paid_if_amended ?? 0) * 100 % 100,
+            '19S' => $formData->other_credits_specify ?? '',
+            '19' => floor($formData->other_credits_specify_amount ?? 0),
+            '19D' => ($formData->other_credits_specify_amount ?? 0) * 100 % 100,
+            '20' => floor($formData->total_tax_credits ?? 0),
+            '20D' => ($formData->total_tax_credits ?? 0) * 100 % 100,
+            '21' => floor($formData->tax_still_payable ?? 0),
+            '21D' => ($formData->tax_still_payable ?? 0) * 100 % 100,
+            '22' => floor($formData->surcharge ?? 0),
+            '22D' => ($formData->surcharge ?? 0) * 100 % 100,
+            '23' => floor($formData->interest ?? 0),
+            '23D' => ($formData->interest ?? 0) * 100 % 100,
+            '24' => floor($formData->compromise ?? 0),
+            '24D' => ($formData->compromise ?? 0) * 100 % 100,
+            '25' => floor($formData->total_penalties ?? 0),
+            '25D' => ($formData->total_penalties ?? 0) * 100 % 100,
+            '26' => floor($formData->total_amount_payable ?? 0),
+            '26D' => ($formData->total_amount_payable ?? 0) * 100 % 100,
+            'TINRow1' => $formData->tin ?? '',
+            '31A' => floor($formData->vatable_sales ?? 0),
+            '31AD' => ($formData->vatable_sales ?? 0) * 100 % 100,
+            '31B' => floor($formData->vatable_sales_tax_amount ?? 0),
+            '31BD' => ($formData->vatable_sales_tax_amount ?? 0) * 100 % 100,
+            '32A' => floor($formData->zero_rated_sales ?? 0),
+            '32AD' => ($formData->zero_rated_sales ?? 0) * 100 % 100,
+            '33A' => floor($formData->exempt_sales ?? 0),
+            '33AD' => ($formData->exempt_sales ?? 0) * 100 % 100,
+            '34A' => floor($formData->total_sales ?? 0),
+            '34AD' => ($formData->total_sales ?? 0) * 100 % 100,
+            '34B' => floor($formData->total_output_tax ?? 0),
+            '34BD' => ($formData->total_output_tax ?? 0) * 100 % 100,
+            '35B' => floor($formData->uncollected_receivable_vat ?? 0),
+            '35BD' => ($formData->uncollected_receivable_vat ?? 0) * 100 % 100,
+            '36B' => floor($formData->recovered_uncollected_receivables ?? 0),
+            '36BD' => ($formData->recovered_uncollected_receivables ?? 0) * 100 % 100,
+            '37B' => floor($formData->total_adjusted_output_tax ?? 0),
+            '37BD' => ($formData->total_adjusted_output_tax ?? 0) * 100 % 100,
+            '38B' => floor($formData->input_carried_over ?? 0),
+            '38BD' => ($formData->input_carried_over ?? 0) * 100 % 100,
+            '39B' => floor($formData->input_tax_deferred ?? 0),
+            '39BD' => ($formData->input_tax_deferred ?? 0) * 100 % 100,
+            '40B' => floor($formData->transitional_input_tax ?? 0),
+            '40BD' => ($formData->transitional_input_tax ?? 0) * 100 % 100,
+            '41B' => floor($formData->presumptive_input_tax ?? 0),
+            '41BD' => ($formData->presumptive_input_tax ?? 0) * 100 % 100,
+            '42S' => $formData->other_specify ?? '',
+            '42B' => floor($formData->other_input_tax ?? 0),
+            '42BD' => ($formData->other_input_tax ?? 0) * 100 % 100,
+            '43B' => floor($formData->total_input_tax ?? 0),
+            '43BD' => ($formData->total_input_tax ?? 0) * 100 % 100,
+            '44A' => floor($formData->domestic_purchase ?? 0),
+            '44AD' => ($formData->domestic_purchase ?? 0) * 100 % 100,
+            '44B' => floor($formData->domestic_purchase_input_tax ?? 0),
+            '44BD' => ($formData->domestic_purchase_input_tax ?? 0) * 100 % 100,
+            '45A' => floor($formData->services_non_resident ?? 0),
+            '45AD' => ($formData->services_non_resident ?? 0) * 100 % 100,
+            '45B' => floor($formData->services_non_resident_input_tax ?? 0),
+            '45BD' => ($formData->services_non_resident_input_tax ?? 0) * 100 % 100,
+            '46A' => floor($formData->importations ?? 0),
+            '46AD' => ($formData->importations ?? 0) * 100 % 100,
+            '46B' => floor($formData->importations_input_tax ?? 0),
+            '46BD' => ($formData->importations_input_tax ?? 0) * 100 % 100,
+            '47S' => $formData->purchases_others_specify ?? '',
+            '47A' => floor($formData->purchases_others_specify_amount ?? 0),
+            '47AD' => ($formData->purchases_others_specify_amount ?? 0) * 100 % 100,
+            '47B' => floor($formData->purchases_others_specify_input_tax ?? 0),
+            '47BD' => ($formData->purchases_others_specify_input_tax ?? 0) * 100 % 100,
+            '48A' => floor($formData->domestic_no_input ?? 0),
+            '48AD' => ($formData->domestic_no_input ?? 0) * 100 % 100,
+            '49A' => floor($formData->tax_exempt_importation ?? 0),
+            '49AD' => ($formData->tax_exempt_importation ?? 0) * 100 % 100,
+            '50A' => floor($formData->total_current_purchase ?? 0),
+            '50AD' => ($formData->total_current_purchase ?? 0) * 100 % 100,
+            '50B' => floor($formData->total_current_purchase_input_tax ?? 0),
+            'fill_67' => ($formData->total_current_purchase_input_tax ?? 0) * 100 % 100,
+            '51B' => floor($formData->total_available_input_tax ?? 0),
+            '51BD' => ($formData->total_available_input_tax ?? 0) * 100 % 100,
+            '52B' => floor($formData->importation_million_deferred_input_tax	 ?? 0),
+            '52BD' => ($formData->importation_million_deferred_input_tax	 ?? 0) * 100 % 100,
+            '53B' => floor($formData->attributable_vat_exempt_input_tax ?? 0),
+            '53BD' => ($formData->attributable_vat_exempt_input_tax ?? 0) * 100 % 100,
+            '54B' => floor($formData->vat_refund_input_tax ?? 0),
+            '54BD' => ($formData->vat_refund_input_tax ?? 0) * 100 % 100,
+            '55B' => floor($formData->unpaid_payables_input_tax ?? 0),
+            '55BD' => ($formData->unpaid_payables_input_tax ?? 0) * 100 % 100,
+            '56S' => $formData->other_deduction_specify ?? '',
+            '56B' => floor($formData->other_deduction_specify_input_tax ?? 0),
+            '56BD' => ($formData->other_deduction_specify_input_tax ?? 0) * 100 % 100,
+            '57B' => floor($formData->total_deductions_input_tax ?? 0),
+            '57BD' => ($formData->total_deductions_input_tax ?? 0) * 100 % 100,
+            '58B' => floor($formData->settled_unpaid_input_tax ?? 0),
+            '58BD' => ($formData->settled_unpaid_input_tax ?? 0) * 100 % 100,
+            '59B' => floor($formData->adjusted_deductions_input_tax ?? 0),
+            '59BD' => ($formData->adjusted_deductions_input_tax ?? 0) * 100 % 100,
+            '60B' => floor($formData->total_allowable_input_Tax ?? 0),
+            '60BD' => ($formData->total_allowable_input_Tax ?? 0) * 100 % 100,
+            '61B' => floor($formData->excess_input_tax ?? 0),
+            '61BD' => ($formData->excess_input_tax ?? 0) * 100 % 100,
+            
+            
+        ];
+    
+
+    
+        // Define the PDF template path
+        $pdfTemplatePath = public_path('pdfs/2550Q_2024_Updated.pdf');
+    
+        // Check if the PDF template exists
+        if (!file_exists($pdfTemplatePath)) {
+            return dd('PDF template not found at: ' . $pdfTemplatePath);
+        }
+    
+        // Create a new PDF instance
+        $pdf = new \mikehaertl\pdftk\Pdf($pdfTemplatePath);
+    
+        // Fill the PDF with the data
+        $result = $pdf->fillForm($fields)
+            ->needAppearances()
+            ->saveAs(storage_path('app/public/2550Q.pdf'));
+    
+        // Check for errors
+        if (!$result) {
+            Log::error('PDF fill form error: ' . $pdf->getError());
+            return dd('PDF fill form failed: ' . $pdf->getError());
+        }
+    
+        // Check if the output PDF was created successfully
+        $outputPdfPath = storage_path('app/public/2550Q.pdf');
+        if (!file_exists($outputPdfPath)) {
+            return dd('PDF was not created at: ' . $outputPdfPath);
+        }
+    
+        // Serve the filled PDF in a view
+        return view('tax_return.vat_report', [
+            'taxReturn' => $taxReturn,
+            'pdfPath' => asset('storage/2550Q.pdf'), // Serve the PDF from public storage
+        ]);
+    }
+    
     
 
 
     
 
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(TaxReturn $taxReturn)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateTaxReturnRequest $request, TaxReturn $taxReturn)
-    {
-        //
-    }
 
     //Soft delete
     public function destroy(Request $request)

@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('individual_background_information', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tax_return_id')->constrained()->onDelete('cascade');
-            $table->date('date_of_birth');
+            $table->foreignId('tax_return_id')->constrained('tax_returns')->onDelete('cascade'); // Links to the Tax Returns table
+            $table->date('date_of_birth')->nullable();
             $table->enum('filer_type', ['single_proprietor', 'professional', 'estate', 'trust']);
-            $table->string('tax_code');
+            $table->string('alphanumeric_tax_code')->nullable();
             $table->enum('civil_status', ['single', 'married']);
-            $table->text('other_information')->nullable();
+            $table->string('citizenship')->nullable(); 
+            $table->string('foreign_tax')->nullable(); 
+            $table->boolean('claiming_foreign_credits')->default(false); 
             $table->timestamps();
         });
     }

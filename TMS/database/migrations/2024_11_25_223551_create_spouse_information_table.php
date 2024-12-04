@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('spouse_information', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tax_return_id')->constrained()->onDelete('cascade');
+            $table->foreignId('individual_background_information_id')->constrained('individual_background_information')->onDelete('cascade');
             $table->enum('employment_status', ['employed', 'unemployed']);
             $table->string('tin')->nullable();
             $table->string('rdo')->nullable();
@@ -23,7 +23,6 @@ return new class extends Migration
             $table->enum('filer_type', ['single_proprietor', 'professional', 'compensation_owner']);
             $table->timestamps();
         });
-        
     }
 
     /**

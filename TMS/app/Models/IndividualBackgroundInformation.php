@@ -9,26 +9,50 @@ class IndividualBackgroundInformation extends Model
 {
     use HasFactory;
 
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected $table = 'individual_background_information';
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
-        'tax_return_id', 
-        'date_of_birth', 
-        'filer_type', 
-        'alphanumeric_tax_code', 
-        'civil_status', 
-        'spouse_employment_status', 
-        'spouse_tin', 
-        'spouse_rdo', 
-        'spouse_last_name', 
-        'spouse_first_name', 
-        'spouse_middle_name', 
-        'spouse_filer_type'
+        'tax_return_id',
+        'date_of_birth',
+        'filer_type',
+        'alphanumeric_tax_code',
+        'civil_status',
+        'citizenship',
+        'foreign_tax',
+        'claiming_foreign_credits',
     ];
 
-    // Relationship to TaxReturn
+    /**
+     * Get the tax return that owns this background information.
+     */
     public function taxReturn()
     {
         return $this->belongsTo(TaxReturn::class);
+    }
+    public function individualTransaction()
+    {
+        return $this->hasMany(IndividualTransaction::class);
+    }
+    public function taxOptionRate()
+    {
+        return $this->hasOne(TaxOptionRate::class, 'individual_background_information_id');
+    }
+
+    /**
+     * Get the spouse information associated with this individual.
+     */
+    public function spouseInformation()
+    {
+        return $this->hasOne(SpouseInformation::class, 'individual_background_information_id');
     }
 }

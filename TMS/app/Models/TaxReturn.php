@@ -92,6 +92,24 @@ class TaxReturn extends Model
     {
         return $this->belongsTo(User::class, 'deleted_by');
     }
+    public function individualBackgroundInformation()
+    {
+        return $this->hasOne(IndividualBackgroundInformation::class);
+    }
+    public function individualTransaction()
+    {
+        return $this->belongsToMany(Transactions::class, 'individual_transactions', 'tax_return_id', 'transaction_id')
+                    ->withPivot('amount', 'description')
+                    ->withTimestamps();
+    }
+    
+    public function spouseTransactions()
+    {
+        return $this->belongsToMany(Transactions::class, 'spouse_transactions', 'tax_return_id', 'transaction_id')
+                    ->withPivot('amount', 'description')
+                    ->withTimestamps();
+    }
+    
     
      protected static function boot()
     {

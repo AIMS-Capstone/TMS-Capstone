@@ -58,6 +58,7 @@ class CreateTax2550qTable extends Migration
             $table->decimal('purchases_others_specify_amount', 15, 2);
             $table->decimal('purchases_others_specify_input_tax', 15, 2);
             $table->decimal('domestic_no_input', 15, 2);
+            $table->decimal('tax_exempt_importation', 15, 2);
             $table->decimal('total_current_purchase', 15, 2);
             $table->decimal('total_current_purchase_input_tax', 15, 2);
             $table->decimal('total_available_input_tax', 15, 2);

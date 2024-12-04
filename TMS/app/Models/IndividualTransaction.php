@@ -29,4 +29,8 @@ class IndividualTransaction extends Model
     {
         return $this->belongsTo(Transactions::class);
     }
+    public function individualBackground()
+    {
+        return $this->belongsTo(IndividualBackgroundInformation::class);
+    }
 }
