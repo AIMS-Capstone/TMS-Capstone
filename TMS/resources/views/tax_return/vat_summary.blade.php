@@ -150,7 +150,7 @@
                                 </tbody>
                             </table>
                         </div>
-                         <!-- Pagination Controls -->
+                        <!-- Pagination Controls -->
                         <div class="mb-4">
                             <div>
                                 {{ $paginatedSummaryData->links('vendor.pagination.custom') }}
