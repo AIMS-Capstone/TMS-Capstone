@@ -41,8 +41,7 @@ class SalesTransaction extends Component
     public function mount()
     {
         $this->addTaxRow();
-        $this->addTaxRow();
-        $this->addTaxRow();
+ 
         $this->organization_id = session('organization_id');
        
     }
