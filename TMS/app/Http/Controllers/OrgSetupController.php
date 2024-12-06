@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\OrgSetup;
+use App\Models\Rdo;
 use App\Models\TaxReturn;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -35,9 +36,14 @@ class OrgSetupController extends Controller
         $orgSetupCount = OrgSetup::count();
         $nonIndividualClients = OrgSetup::where('type', 'Non-Individual')->count();
         $individualClients = OrgSetup::where('type', 'Individual')->count();
+        $organizations = OrgSetup::all(); // Fetch all organizations
+        $rdos = Rdo::all(); // Fetch all RDOs
+        $regions = json_decode(file_get_contents(public_path('json/regions.json')), true);
+        $provinces = json_decode(file_get_contents(public_path('json/provinces.json')), true);
+        $municipalities = json_decode(file_get_contents(public_path('json/municipalities.json')), true);
 
 
-        return view('org-setup', compact('orgsetups', 'unfiledTaxReturnsCount', 'filedTaxReturnsCount', 'orgSetupCount', 'nonIndividualClients', 'individualClients'));
+        return view('org-setup', compact('orgsetups', 'unfiledTaxReturnsCount', 'filedTaxReturnsCount', 'orgSetupCount', 'nonIndividualClients', 'individualClients', 'rdos', 'regions', 'provinces', 'municipalities'));
     }
 
     /**
@@ -133,7 +139,9 @@ class OrgSetupController extends Controller
             return redirect()->back()->withErrors($errors)->withInput();
         }
         
+
     }
+    
     
         /**
      * Display the specified resource.
@@ -154,10 +162,29 @@ class OrgSetupController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, OrgSetup $orgSetup)
+    public function update(Request $request, $id)
     {
-        //
+        // Find the organization by ID
+        $organization = OrgSetup::findOrFail($id);
+    
+        // Manually validate the request
+        $validatedData = $request->validate([
+            'address_line' => 'required|string|max:255',
+            'region' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:10',
+            'rdo' => 'required|string|max:20',
+            'contact_number' => 'required|string|max:20',
+            'email' => 'required|email|max:255',
+        ]);
+    
+        // Update the organization with validated data
+        $organization->update($validatedData);
+    
+        // Redirect back with success message
+        return redirect()->back()->with('success', 'Organization details updated successfully.');
     }
+    
 
     /**
      * Remove the specified resource from storage.

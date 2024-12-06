@@ -94,6 +94,7 @@ Route::middleware([
     Route::post('/tax-return-transaction/add-transaction', [TransactionsController::class, 'addTransaction'])->name('tax_return_transaction.addTransaction');
     Route::get('/org-setup', [OrgSetupController::class, 'index'])->name('org-setup');
     Route::post('/org-setup', [OrgSetupController::class, 'store'])->name('OrgSetup.store');
+    Route::put('/org-setup/{id}', [OrgSetupController::class, 'update'])->name('org-setup.update');
     Route::post('/org-delete', [OrgSetupController::class, 'destroy'])->name('orgSetup.destroy');
     Route::post('/org-account-destroy', [OrgAccountController::class, 'destroy'])->name('orgaccount.destroy');
     Route::post('/user-account-destroy', [UserController::class, 'destroy'])->name('users.destroy');

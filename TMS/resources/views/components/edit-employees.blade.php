@@ -1,11 +1,12 @@
-<div 
+    <div 
     x-data="{ step: 1, show: false, employee: {} }"
     x-show="show"
-    x-on:open-edit-employee-modal.window="show = true; employee = $event.detail"
+    x-on:open-edit-employee-modal.window="show = true; console.log($event.detail); employee = $event.detail"
     x-on:close-modal.window="show = false"
     x-effect="document.body.classList.toggle('overflow-hidden', show)"
     class="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-50 px-4 overflow-y-auto"
     x-cloak
+>
 >
     <!-- Modal Container -->
     <div 
@@ -20,7 +21,7 @@
     >
         <!-- Modal Header -->
         <div class="relative bg-blue-900 text-white text-center py-4">
-            <h1 class="text-lg font-bold">Edit Employee</h1>
+            <h2>Edit Employee: <span x-text="employee.first_name"></span></h2>
             <button @click="show = false" class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>
@@ -68,86 +69,139 @@
                     @csrf
                     @method('PUT')
 
-                    <!-- Step 1: Basic Information -->
-                    <div x-show="currentStep === 1" id="edit-tab-basic-info">
-                        <div class="mb-6 flex justify-between items-start">
-                            <!-- Left Column -->
-                            <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                <label for="first_name" class="text-zinc-700 font-semibold whitespace-nowrap">
-                                    First Name <span class="text-red-500">*</span>
-                                </label>
-                                <input 
-                                    type="text" 
-                                    id="first_name" 
-                                    name="first_name" 
-                                    placeholder="First Name" 
-                                    class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
-                                    required>
-                            </div>
-                            <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                <label for="date_of_birth" class="text-zinc-700 font-semibold whitespace-nowrap">
-                                    Date of Birth <span class="text-red-500">*</span>
-                                </label>
-                                <input 
-                                    type="date" 
-                                    id="date_of_birth" 
-                                    name="date_of_birth" 
-                                    class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
-                                    required>
-                            </div>
-                        </div>
+        
+        <!-- Step 1: Basic Information -->
+        <div x-show="currentStep === 1" id="edit-tab-basic-info">
+            <div class="mb-6 flex justify-between items-start">
+                <!-- Left Column -->
+                <div class="w-2/3 pr-4 flex items-center space-x-4">
+                    <label for="first_name" class="text-zinc-700 font-semibold whitespace-nowrap">
+                        First Name <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="first_name" 
+                        name="first_name" 
+                        placeholder="First Name" 
+                        class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
+                        required
+                        x-model="employee.first_name">
+                </div>
+                <div class="w-2/3 pr-4 flex items-center space-x-4">
+                    <label for="date_of_birth" class="text-zinc-700 font-semibold whitespace-nowrap">
+                        Date of Birth <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        type="date" 
+                        id="date_of_birth" 
+                        name="date_of_birth" 
+                        class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
+                        required
+                        x-model="employee.date_of_birth">
+                </div>
+            </div>
 
-                        <!-- Right Column -->
-                        <div class="mb-6 flex justify-between items-start">
-                            <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                <label for="middle_name" class="text-zinc-700 font-semibold whitespace-nowrap">Middle Name</label>
-                                <input type="text" id="middle_name" name="middle_name" placeholder="Middle Name" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                            </div>
-                            <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                <label for="contact_number" class="text-zinc-700 font-semibold whitespace-nowrap">Contact Number <span class="text-red-500">*</span></label>
-                                <input type="text" id="contact_number" name="contact_number" placeholder="e.g., 09123456789" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                            </div>
-                        </div>
+            <!-- Right Column -->
+            <div class="mb-6 flex justify-between items-start">
+                <div class="w-2/3 pr-4 flex items-center space-x-4">
+                    <label for="middle_name" class="text-zinc-700 font-semibold whitespace-nowrap">Middle Name</label>
+                    <input 
+                        type="text" 
+                        id="middle_name" 
+                        name="middle_name" 
+                        placeholder="Middle Name" 
+                        class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                        x-model="employee.middle_name">
+                </div>
+                <div class="w-2/3 pr-4 flex items-center space-x-4">
+                    <label for="contact_number" class="text-zinc-700 font-semibold whitespace-nowrap">Contact Number <span class="text-red-500">*</span></label>
+                    <input 
+                        type="text" 
+                        id="contact_number" 
+                        name="contact_number" 
+                        placeholder="e.g., 09123456789" 
+                        class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                        x-model="employee.contact_number">
+                </div>
+            </div>
 
-                        <div class="mb-6 flex justify-between items-start">
-                            <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                <label for="last_name" class="text-zinc-700 font-semibold whitespace-nowrap">Last Name <span class="text-red-500">*</span></label>
-                                <input type="text" id="last_name" name="last_name" placeholder="Last Name" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
-                            </div>
-                            <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                <label for="nationality" class="text-zinc-700 font-semibold whitespace-nowrap">Nationality <span class="text-red-500">*</span></label>
-                                <input type="text" id="nationality" name="nationality" placeholder="e.g., Filipino" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                            </div>
-                        </div>
+            <div class="mb-6 flex justify-between items-start">
+                <div class="w-2/3 pr-4 flex items-center space-x-4">
+                    <label for="last_name" class="text-zinc-700 font-semibold whitespace-nowrap">Last Name <span class="text-red-500">*</span></label>
+                    <input 
+                        type="text" 
+                        id="last_name" 
+                        name="last_name" 
+                        placeholder="Last Name" 
+                        class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
+                        required
+                        x-model="employee.last_name">
+                </div>
+                <div class="w-2/3 pr-4 flex items-center space-x-4">
+                    <label for="nationality" class="text-zinc-700 font-semibold whitespace-nowrap">Nationality <span class="text-red-500">*</span></label>
+                    <input 
+                        type="text" 
+                        id="nationality" 
+                        name="nationality" 
+                        placeholder="e.g., Filipino" 
+                        class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                        x-model="employee.nationality">
+                </div>
+            </div>
 
-                        <div class="mb-6 flex justify-between items-start">
-                            <div class="w-2/3 mt-3 pr-4 flex items-center space-x-4">
-                                <label for="suffix" class="text-zinc-700 font-semibold whitespace-nowrap">Suffix</label>
-                                <select id="suffix" name="suffix" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                    <option value="">e.g., Jr.</option>
-                                    <option value="Jr">Jr.</option>
-                                    <option value="Sr">Sr.</option>
-                                    <option value="II">II</option>
-                                    <option value="III">III</option>
-                                </select>
-                            </div>
-                            <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                <label for="address" class="text-zinc-700 font-semibold whitespace-nowrap">Address <span class="text-red-500">*</span></label>
-                                <input type="text" id="address" name="address" placeholder="e.g., 145 Yakal St." class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                            </div>
-                        </div>
+            <div class="mb-6 flex justify-between items-start">
+                <div class="w-2/3 mt-3 pr-4 flex items-center space-x-4">
+                    <label for="suffix" class="text-zinc-700 font-semibold whitespace-nowrap">Suffix</label>
+                    <select 
+                        id="suffix" 
+                        name="suffix" 
+                        class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                        x-model="employee.suffix">
+                        <option value="">e.g., Jr.</option>
+                        <option value="Jr" :selected="employee.suffix === 'Jr'">Jr.</option>
+                        <option value="Sr" :selected="employee.suffix === 'Sr'">Sr.</option>
+                        <option value="II" :selected="employee.suffix === 'II'">II</option>
+                        <option value="III" :selected="employee.suffix === 'III'">III</option>
+                    </select>
+                </div>
+                <div class="w-2/3 pr-4 flex items-center space-x-4">
+                    <label for="address" class="text-zinc-700 font-semibold whitespace-nowrap">Address <span class="text-red-500">*</span></label>
+                    <input 
+                        type="text" 
+                        id="address" 
+                        name="address" 
+                        placeholder="e.g., 145 Yakal St." 
+                        class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                        x-model="employee.address">
+                </div>
+            </div>
 
-                        <div class="mb-6 flex justify-between items-start">
-                            <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                <label for="tin" class="text-zinc-700 font-semibold whitespace-nowrap">Tax Identification Number (TIN) <span class="text-red-500">*</span></label>
-                                <input type="text" id="tin" name="tin" placeholder="000-000-000-000" maxlength="17" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
-                            </div>
-                            <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                <label for="zip_code" class="text-zinc-700 font-semibold whitespace-nowrap">Zip Code <span class="text-red-500">*</span></label>
-                                <input type="text" id="zip_code" name="zip_code" placeholder="e.g., 1203" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                            </div>
-                        </div>
-                    </div>
+            <div class="mb-6 flex justify-between items-start">
+                <div class="w-2/3 pr-4 flex items-center space-x-4">
+                    <label for="tin" class="text-zinc-700 font-semibold whitespace-nowrap">Tax Identification Number (TIN) <span class="text-red-500">*</span></label>
+                    <input 
+                        type="text" 
+                        id="tin" 
+                        name="tin" 
+                        placeholder="000-000-000-000" 
+                        maxlength="17" 
+                        class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
+                        required
+                        x-model="employee.tin">
+                </div>
+                <div class="w-2/3 pr-4 flex items-center space-x-4">
+                    <label for="zip_code" class="text-zinc-700 font-semibold whitespace-nowrap">Zip Code <span class="text-red-500">*</span></label>
+                    <input 
+                        type="text" 
+                        id="zip_code" 
+                        name="zip_code" 
+                        placeholder="e.g., 1203" 
+                        class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                        x-model="employee.zip_code">
+                </div>
+            </div>
+        </div>
+
 
                     <!-- Step 2: Present Employer -->
                     <div x-show="currentStep === 2" id="tab-present-employer">

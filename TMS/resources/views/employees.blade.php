@@ -296,9 +296,10 @@
                                                     <td class="text-left py-3 px-4">
                                                         <x-edit-employees />
                                                         <button 
-                                                            @click="$dispatch('open-edit-employee-modal', {{ json_encode($employee->load('address', 'employments.address')) }})"
-                                                            class="hover:underline hover:text-blue-500">Edit
-                                                        </button>
+                                                        @click="$dispatch('open-edit-employee-modal', @js($employee))">
+                                                        Edit Employee
+                                                    </button>
+                                                    
                                                     </td>
                                                 </tr>
                                             @endforeach
