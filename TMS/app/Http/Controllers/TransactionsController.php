@@ -617,7 +617,7 @@ private function extractTextFromReceipt($filePath)
     $validated = $request->validate([
         'payment_date' => 'required|date',
         'reference_number' => 'required|string|max:255',
-        'bank_account' => 'required|string|max:255',
+      
         'total_amount_paid' => 'required|numeric|min:0', // Optional field for partial payments
     ]);
 
@@ -626,7 +626,6 @@ private function extractTextFromReceipt($filePath)
         'transaction_id' => $transaction->id,
         'payment_date' => $validated['payment_date'],
         'reference_number' => $validated['reference_number'],
-        'bank_account' => $validated['bank_account'],
         'total_amount_paid' => $validated['total_amount_paid'],  // Amount paid
     ]);
 

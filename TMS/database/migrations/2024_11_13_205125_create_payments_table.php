@@ -16,7 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('transaction_id');
             $table->date('payment_date');
             $table->string('reference_number');
-            $table->string('bank_account');
             $table->decimal('total_amount_paid', 10, 2);
             $table->timestamps();
     

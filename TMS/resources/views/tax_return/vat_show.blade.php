@@ -370,7 +370,10 @@ deleteRows() {
                                             <td class="text-left py-3 px-2">{{ $taxRow->net_amount }}</td>
                                             <td class="text-left py-3 px-2">{{ $taxRow->atc_amount }}</td>
                                             <td class="text-left py-3 px-2">{{ $taxRow->atc->tax_rate }}</td>
-                                            <td class="text-left py-3 px-2">{{ $taxRow->coaAccount->code }}</td>
+                                            
+                                            <td class="text-left py-3 px-2">{{ $taxRow->coaAccount->code ?? 'No Code Available' }}
+
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>

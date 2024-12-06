@@ -199,7 +199,7 @@ $organizationId = session('organization_id');
                                 </button>
                                 
                                 <!-- Tab 2: Capital Goods -->
-                                <button @click="selectedTab = 'CapitalGoods'; $dispatch('filter', { type: 'CapitalGoods' })" 
+                                {{-- <button @click="selectedTab = 'CapitalGoods'; $dispatch('filter', { type: 'CapitalGoods' })" 
                                     :aria-selected="selectedTab === 'CapitalGoods'" 
                                     :tabindex="selectedTab === 'CapitalGoods' ? '0' : '-1'" 
                                     :class="selectedTab === 'CapitalGoods' 
@@ -210,7 +210,7 @@ $organizationId = session('organization_id');
                                     role="tab" 
                                     aria-controls="tabpanelAssets">
                                     Capital Goods
-                                </button>
+                                </button> --}}
                             </div>
                         </div>
 
