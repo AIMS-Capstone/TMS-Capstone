@@ -74,9 +74,9 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                             </a>
                         </li>
                         <li class="pl-0">
-                            <a href="{{ route('contacts') }}"
+                            <a href="{{ route('contacts', 'employees') }}"
                             class="flex items-center rounded-r-full px-6 py-2 
-                            {{ request()->routeIs('contacts') ? 'sidebar-active' : '' }}">
+                            {{ request()->routeIs('contacts') || request()->routeIs('employees') ? 'sidebar-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon mr-3" viewBox="0 0 14 14"><path fill="#273C75" fill-rule="evenodd" d="M8 3a3 3 0 1 1-6 0a3 3 0 0 1 6 0m2.75 4.5a.75.75 0 0 1 .75.75V10h1.75a.75.75 0 0 1 0 1.5H11.5v1.75a.75.75 0 0 1-1.5 0V11.5H8.25a.75.75 0 0 1 0-1.5H10V8.25a.75.75 0 0 1 .75-.75M5 7c1.493 0 2.834.655 3.75 1.693v.057h-.5a2 2 0 0 0-.97 3.75H.5A.5.5 0 0 1 0 12a5 5 0 0 1 5-5" clip-rule="evenodd"/></svg>
                                 <span class="sidebar-text ease-in duration-500 transition-all">Contacts</span>
                             </a>
@@ -132,7 +132,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                 </li>
                             </ul>
                         </li>
-                        <li x-data="{ open: {{ request()->routeIs('general-ledger', 'sales-book', 'purchase-book', 'cash-receipt', 'cash-disbursement', 'general-journal') ? 'true' : 'false' }} }">
+                        <li x-data="{ open: {{ request()->routeIs('general-ledger', 'sales-book', 'salesPosted', 'purchase-book', 'purchasePosted', 'cash-receipt',
+                            'receiptPosted', 'cash-disbursement', 'disbPosted', 'general-journal') ? 'true' : 'false' }} }">
                             <button @click="open = !open" type="button"
                                 :class="{
                                     'flex items-center w-full p-2 text-[14px] ease-in transition-all duration-500 rounded-r-full hover:font-bold px-6 py-2 group': true,
@@ -160,25 +161,25 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                 </li>
                                 <li>
                                     <a href="{{ route('sales-book') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
-                                    {{ request()->routeIs('sales-book') ? 'sidebar-submenu-active' : '' }}">
+                                    {{ request()->routeIs('sales-book') || request()->routeIs('salesPosted') ? 'sidebar-submenu-active' : '' }}">
                                         Sales Book Journal
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{ route('purchase-book') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
-                                    {{ request()->routeIs('purchase-book') ? 'sidebar-submenu-active' : '' }}">
+                                    {{ request()->routeIs('purchase-book') || request()->routeIs('purchasePosted') ? 'sidebar-submenu-active' : '' }}">
                                         Purchase Book Journal
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{ route('cash-receipt') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
-                                    {{ request()->routeIs('cash-receipt') ? 'sidebar-submenu-active' : '' }}">
+                                    {{ request()->routeIs('cash-receipt') || request()->routeIs('receiptPosted') ? 'sidebar-submenu-active' : '' }}">
                                         Cash Receipt Book
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{ route('cash-disbursement') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
-                                    {{ request()->routeIs('cash-disbursement') ? 'sidebar-submenu-active' : '' }}">
+                                    {{ request()->routeIs('cash-disbursement') || request()->routeIs('disbPosted') ? 'sidebar-submenu-active' : '' }}">
                                         Cash Disbursement Book
                                     </a>
                                 </li>
@@ -191,9 +192,9 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                             </ul>
                         </li>
                         <li class="pl-0">
-                            <a href="{{ route('coa') }}"
+                            <a href="{{ route('coa', 'archive') }}"
                             class="flex items-center rounded-r-full px-6 py-2 ease-in transition-all
-                            {{ request()->routeIs('coa') ? 'sidebar-active' : '' }}">
+                            {{ request()->routeIs('coa') || request()->routeIs('archive') ? 'sidebar-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon mr-2" viewBox="0 0 24 24"><path fill="#273C75" d="M19 17h-7c-1.103 0-2 .897-2 2s.897 2 2 2h7c1.103 0 2-.897 2-2s-.897-2-2-2m0-7h-7c-1.103 0-2 .897-2 2s.897 2 2 2h7c1.103 0 2-.897 2-2s-.897-2-2-2m0-7h-7c-1.103 0-2 .897-2 2s.897 2 2 2h7c1.103 0 2-.897 2-2s-.897-2-2-2"/><circle cx="5" cy="19" r="2.5" fill="#172554"/><circle cx="5" cy="12" r="2.5" fill="#172554"/><circle cx="5" cy="5" r="2.5" fill="#172554"/></svg>                                
                                 <span class="sidebar-text ease-in duration-500 transition-all">Chart of Accounts</span>
                             </a>
