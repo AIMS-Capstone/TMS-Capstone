@@ -200,7 +200,8 @@
                                                         <div id="dropdownAction-{{ $organization->id }}" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-40 origin-top-right overflow-y-auto max-h-64">
                                                             <div class="py-2 px-2 text-sm text-zinc-700" aria-labelledby="dropdownMenuAction">
                                                                 <div x-data x-on:click="$dispatch('open-view-org-modal', { organization: {{ $organization->toJson() }} })" class="block px-4 py-2 w-full text-left hover-dropdown">View Details</div>
-                                                                <div  x-data x-on:click="$dispatch('open-edit-org-modal', { organizationId: '{{ $organization->id }}' })" class="block px-4 py-2 w-full text-left hover-dropdown">Edit</div>
+                                                                <div x-data x-on:click="$dispatch('open-edit-org-modal', { organization: {{ $organization->toJson() }} })" class="block px-4 py-2 w-full text-left hover-dropdown">Edit</div>
+
                                                                 @if (!$organization->account)
                                                                 <div x-data x-on:click="$dispatch('open-generate-modal', { organizationId: '{{ $organization->id }}' })" class="block px-4 py-2 w-full text-left hover-dropdown">
                                                                     Create Account
@@ -353,7 +354,8 @@
     </div>
     
     {{-- Edit Modal: Shows Error with "PUT" + not sure about the action + Selections of Address and RDO --}}
-    <div x-data="{ showEdit: false, organization: {} }"
+    <div x-data="{ showEdit: false, organization: {}, formatDate(date) {const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(date).toLocaleDateString(undefined, options); } }"
         x-show="showEdit"
         @open-edit-org-modal.window="showEdit = true; organization = $event.detail.organization" 
         x-on:close-modal.window="showEdit = false"
@@ -378,64 +380,108 @@
             </div>
             <!-- Modal body -->
             <div class="p-10">
-                <form id="editAccountForm" method="POST" :action="'/org-setup/' + organziation.id">
+                <form id="editAccountForm" :action="'/org-setup/' + organization.id" method="POST">
                     @csrf
                     @method('PUT')
-    
+                
+                    <!-- Address Line (Already in 3-Column Grid) -->
                     <div class="grid grid-cols-3 gap-6 mb-5">
                         <div class="w-full">
                             <label class="block text-sm font-bold text-zinc-700">Address Line<span class="text-red-500">*</span></label>
-                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
+                            <input 
+                                class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                                x-bind:value="organization.address_line" 
+                                name="address_line" 
+                                required>
                         </div>
+                    
+                
+                    <!-- Region Dropdown -->
+                
                         <div class="w-full">
-                            <label class="block text-sm font-bold text-zinc-700">Region<span class="text-red-500">*</span></label>
-                            {{-- PLace the region selection here create-org --}}
-                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
+                            <x-field-label for="region" value="{{ __('Region') }}" class="mb-2 text-left" />
+                            <select wire:model="region" name="region" id="region" class="cursor-pointer border rounded-xl px-4 py-2 w-full text-sm border-gray-300 focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                                <option value="" disabled>Select Region</option>
+                                @foreach($regions as $region)
+                                    <option value="{{ $region['designation'] }}" {{ $region['designation'] == old('region', $organization->region) ? 'selected' : '' }}>
+                                        {{ $region['name'] }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
+               
+                
+                    <!-- Province Dropdown -->
+               
                         <div class="w-full">
-                            <label class="block text-sm font-bold text-zinc-700">City<span class="text-red-500">*</span></label>
-                            {{-- Place the city selection here from create-org --}}
-                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
+                            <x-field-label for="province" value="{{ __('Province') }}" class="mb-2 text-left" />
+                            <select wire:model="province" name="province" id="province" class="cursor-pointer border rounded-xl px-4 py-2 w-full text-sm border-gray-300 focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                                <option value="" disabled>Select Province</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-6 mb-5">
+                
+                    <!-- City and ZIP Code -->
+                    <div class="grid grid-cols-3 gap-6 mb-5">
                         <div class="w-full">
-                            <label class="block text-sm font-bold text-zinc-700">Zip Code<span class="text-red-500">*</span></label>
-                            {{-- Place the same zip code autofill from create-org --}}
-                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
+                            <x-field-label for="city" value="{{ __('City') }}" class="mb-2 text-left" />
+                            <select wire:model="city" name="city" id="city" class="cursor-pointer border rounded-xl px-4 py-2 w-full text-sm border-gray-300 focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                                <option value="" disabled>Select City</option>
+                            </select>
                         </div>
+                        <div class="w-32">
+                            <x-field-label for="zip_code" value="{{ __('Zip Code') }}" class="mb-2 text-left readonly" />
+                            <x-input type="text" name="zip_code" id="zip_code" wire:model="zip_code" placeholder="1203" class="border rounded-xl px-4 py-2 w-full readonly" maxlength="4"  />
+                        </div>
+                    
+                    <!-- RDO Dropdown (Styled like Address Line) -->
+                  
                         <div class="w-full">
-                            <label class="block text-sm font-bold text-zinc-700">RDO<span class="text-red-500">*</span></label>
-                            {{-- Place the selection of RDO here --}}
-                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
+                            <x-field-label for="rdo" value="{{ __('RDO') }}" class="mb-2 text-left" />
+                            <select name="rdo" id="rdo" class="cursor-pointer border rounded-xl px-4 py-2 w-full text-sm border-gray-300 focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                                <option value="" disabled>Select RDO</option>
+                                @foreach($rdos as $rdo)
+                                    <option value="{{ $rdo->id }}" {{ $organization->rdo == $rdo->id ? 'selected' : '' }}>
+                                        {{ $rdo->rdo_code }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-6 mb-5">
+                
+                    <!-- Contact Information Section -->
+                    <div class="grid grid-cols-3 gap-6 mb-5">
                         <div class="w-full">
                             <label class="block text-sm font-bold text-zinc-700">Contact Number<span class="text-red-500">*</span></label>
-                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
+                            <input 
+                                class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                                x-bind:value="organization.contact_number" 
+                                name="contact_number" 
+                                required>
                         </div>
                         <div class="w-full">
                             <label class="block text-sm font-bold text-zinc-700">Email Address<span class="text-red-500">*</span></label>
-                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
+                            <input 
+                                class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                                x-bind:value="organization.email" 
+                                name="email" 
+                                type="email" 
+                                required>
                         </div>
                     </div>
-                    
-    
-                    <!-- Submit -->
+                
+                    <!-- Submit Buttons -->
                     <div class="flex justify-end my-4">
-                        <button 
-                            x-on:click="$dispatch('close-modal')"
-                            class="mr-2 font-semibold text-zinc-600 px-3 py-1 rounded-md hover:text-zinc-900 transition">
+                        <button x-on:click="$dispatch('close-modal')" type="button" class="mr-2 font-semibold text-zinc-600 px-3 py-1 rounded-md hover:text-zinc-900 transition">
                             Cancel
                         </button>
-                        <button 
-                            type="submit" 
-                            class="font-semibold bg-blue-900 text-white text-center px-6 py-1.5 rounded-md hover:bg-blue-950 border-blue-900 hover:text-white transition">
+                        <button type="submit" class="font-semibold bg-blue-900 text-white text-center px-6 py-1.5 rounded-md hover:bg-blue-950 border-blue-900 hover:text-white transition">
                             Update
                         </button>
                     </div>
                 </form>
+                
+                
             </div>
         </div>
     </div>
@@ -683,5 +729,105 @@
             })
             .catch(error => console.error('Error:', error));
         }
+        document.addEventListener('DOMContentLoaded', function () {
+    const provinces = @json($provinces);
+    const municipalities = @json($municipalities);
+
+    const regionSelect = document.getElementById('region');
+    const provinceSelect = document.getElementById('province');
+    const citySelect = document.getElementById('city');
+    const zipCodeInput = document.getElementById('zip_code');
+
+    // Function to populate provinces based on region
+    function populateProvinces(selectedRegion, selectedProvince) {
+        provinceSelect.innerHTML = '<option value="" disabled>Select Province</option>';
+        provinceSelect.disabled = true;
+
+        provinces.forEach(province => {
+            if (province.region === selectedRegion) {
+                const option = document.createElement('option');
+                option.value = province.name;
+                option.textContent = province.name;
+                if (province.name === selectedProvince) {
+                    option.selected = true;
+                }
+                provinceSelect.appendChild(option);
+            }
+        });
+
+        provinceSelect.disabled = false;
+    }
+
+    // Function to populate cities based on province
+    function populateCities(selectedProvince, selectedCity) {
+        citySelect.innerHTML = '<option value="" disabled>Select City</option>';
+        citySelect.disabled = true;
+
+        municipalities.forEach(municipality => {
+            if (municipality.province === selectedProvince) {
+                const option = document.createElement('option');
+                option.value = municipality.name;
+                option.textContent = municipality.name;
+                if (municipality.name === selectedCity) {
+                    option.selected = true;
+                }
+                citySelect.appendChild(option);
+            }
+        });
+
+        citySelect.disabled = false;
+    }
+
+    // Function to set ZIP code
+    function setZipCode(selectedCity) {
+        const selectedMunicipality = municipalities.find(m => m.name === selectedCity);
+        zipCodeInput.value = selectedMunicipality ? selectedMunicipality.zip_code : '';
+    }
+
+    // Event Listener: When the modal opens, pre-fill values
+    document.addEventListener('open-edit-org-modal', function (event) {
+        const organization = event.detail.organization;
+
+        // Pre-fill region and trigger province update
+        regionSelect.value = organization.region;
+        populateProvinces(organization.region, organization.province);
+
+        // Pre-fill province and trigger city update
+        populateCities(organization.province, organization.city);
+
+        // Pre-fill city and ZIP code
+        citySelect.value = organization.city;
+        setZipCode(organization.city);
+
+        // Ensure other fields are filled
+        zipCodeInput.value = organization.zip_code;
+    });
+
+    // Event Listener: Handle region change
+    regionSelect.addEventListener('change', function () {
+        const selectedRegion = this.value;
+
+        populateProvinces(selectedRegion, null);
+        citySelect.innerHTML = '<option value="" disabled>Select City</option>';
+        citySelect.disabled = true;
+        zipCodeInput.value = ''; // Reset ZIP code
+    });
+
+    // Event Listener: Handle province change
+    provinceSelect.addEventListener('change', function () {
+        const selectedProvince = this.value;
+
+        populateCities(selectedProvince, null);
+        zipCodeInput.value = ''; // Reset ZIP code
+    });
+
+    // Event Listener: Handle city change
+    citySelect.addEventListener('change', function () {
+        const selectedCity = this.value;
+
+        setZipCode(selectedCity);
+    });
+});
+
     </script>
 </x-organization-layout>
