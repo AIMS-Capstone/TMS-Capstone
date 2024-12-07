@@ -13,6 +13,7 @@ class TaxReturnsRecycleBinController extends Controller
     public function index(Request $request)
     {
         $query = TaxReturn::onlyTrashed()->with(['deletedByUser', 'Organization', 'user']);
+        $perPage = $request->input('perPage', 5);
 
         // Check if the search input is provided
         if ($request->has('search') && $request->search != '') {
@@ -31,7 +32,7 @@ class TaxReturnsRecycleBinController extends Controller
             });
         }
 
-        $trashedTaxReturn = TaxReturn::onlyTrashed()->paginate(10);
+        $trashedTaxReturn = TaxReturn::onlyTrashed()->paginate($perPage);
 
         return view('recycle-bin.tax-returns', compact('trashedTaxReturn'));
     }

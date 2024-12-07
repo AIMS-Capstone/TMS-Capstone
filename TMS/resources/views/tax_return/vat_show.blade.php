@@ -231,9 +231,6 @@ deleteRows() {
                         <a href="{{ route('tax_return.report', $taxReturn->id) }}" class="text-zinc-600 flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('tax_return.report') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }} px-3 py-2">
                             Report
                         </a>
-                        {{-- <a href="{{ route('notes_activity') }}" class="text-zinc-600 flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('notes_activity') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }} px-3 py-2">
-                            Notes & Activity
-                        </a> --}}
                     </nav>
                 </div>
 

@@ -197,20 +197,6 @@ $organizationId = session('organization_id');
                                     aria-controls="tabpanelAll">
                                     2550M/Q
                                 </button>
-                                
-                                <!-- Tab 2: Capital Goods -->
-                                {{-- <button @click="selectedTab = 'CapitalGoods'; $dispatch('filter', { type: 'CapitalGoods' })" 
-                                    :aria-selected="selectedTab === 'CapitalGoods'" 
-                                    :tabindex="selectedTab === 'CapitalGoods' ? '0' : '-1'" 
-                                    :class="selectedTab === 'CapitalGoods' 
-                                        ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
-                                        : 'text-zinc-600 font-medium hover:text-blue-900'" 
-                                    class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
-                                    type="button" 
-                                    role="tab" 
-                                    aria-controls="tabpanelAssets">
-                                    Capital Goods
-                                </button> --}}
                             </div>
                         </div>
 

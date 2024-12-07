@@ -7,9 +7,6 @@
                     <nav class="flex" aria-label="Breadcrumb">
                         <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
                             <li class="inline-flex items-center text-sm font-normal text-zinc-500">
-                            {{-- <a href="{{ route('vat_return') }}" class="inline-flex items-center text-sm font-normal text-zinc-500">
-                                
-                            </a> --}}
                             Value Added Tax Return
                             </li>
                             <li>

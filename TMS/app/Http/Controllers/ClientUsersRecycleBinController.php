@@ -10,6 +10,7 @@ class ClientUsersRecycleBinController extends Controller
     public function index(Request $request)
     {
         $query = OrgAccount::onlyTrashed()->with(['deletedByUser']);
+        $perPage = $request->input('perPage', 5);
 
         // Search functionality
         if ($request->filled('user_search')) {
@@ -24,7 +25,7 @@ class ClientUsersRecycleBinController extends Controller
             });
         }
 
-        $trashedClientUsers = $query->paginate(10);
+        $trashedClientUsers = $query->paginate($perPage);
 
         return view('recycle-bin.client-users', compact('trashedClientUsers'));
     }

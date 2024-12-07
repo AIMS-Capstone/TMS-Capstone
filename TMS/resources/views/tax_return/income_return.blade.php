@@ -6,25 +6,25 @@ $organizationId = session('organization_id');
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <!-- Page Main -->
-                <div class="px-10 py-6">
+                <div class="px-10 py-6" 
+                    x-data="{ selectedTab: '1701Q', init() { this.selectedTab = (new URL(window.location.href)).searchParams.get('type') || '1701Q'; } }" 
+                    x-init="init">
                     <nav class="flex" aria-label="Breadcrumb">
                         <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
                             <li class="inline-flex items-center text-sm font-normal text-zinc-500">
-                            {{-- <a href="{{ route('vat_return') }}" class="inline-flex items-center text-sm font-normal text-zinc-500">
-                                
-                            </a> --}}
-                            Income Tax Return
+                                Income Tax Return
                             </li>
                             <li>
-                            <div class="flex items-center">
-                                <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                                </svg>
-                                <a href="{{ route('income_return') }}" 
-                                    class="ms-1 text-sm font-medium {{ Request::routeIs('income_return') ? 'font-extrabold text-blue-900' : 'text-zinc-500' }} md:ms-2">
-                                    1701Q
-                                </a>
-                            </div>
+                                <div class="flex items-center">
+                                    <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4" />
+                                    </svg>
+                                    <a :href="`/${selectedTab.toLowerCase()}_return`" 
+                                    class="ms-1 text-sm font-medium md:ms-2" 
+                                    :class="selectedTab ? 'text-blue-900 font-extrabold' : 'text-zinc-500'">
+                                        <span x-text="selectedTab"></span>
+                                    </a>
+                                </div>
                             </li>
                         </ol>
                     </nav>

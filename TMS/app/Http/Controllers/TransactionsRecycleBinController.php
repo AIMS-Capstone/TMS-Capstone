@@ -14,6 +14,7 @@ class TransactionsRecycleBinController extends Controller
     {
         // Start the query with only soft-deleted transactions, including deletedByUser relation
         $query = Transactions::onlyTrashed()->with(['deletedByUser', 'contactDetails', 'Organization']);
+        $perPage = $request->input('perPage', 5);
 
         // Check if the search input is provided
         if ($request->has('search') && $request->search != '') {
@@ -33,7 +34,7 @@ class TransactionsRecycleBinController extends Controller
         }
 
         // Paginate the filtered results
-        $trashedTransactions = $query->paginate(5);
+        $trashedTransactions = $query->paginate($perPage);
 
         // Return the view with the filtered and paginated trashed transactions
         return view('recycle-bin.transactions', compact('trashedTransactions'));

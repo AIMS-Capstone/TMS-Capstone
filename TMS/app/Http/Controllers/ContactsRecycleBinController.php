@@ -14,6 +14,7 @@ class ContactsRecycleBinController extends Controller
     {
         // Start the query with only soft-deleted contacts, including deletedByUser and organization relations
         $query = Contacts::onlyTrashed()->with(['deletedByUser', 'transactions', 'Organization']);
+        $perPage = $request->input('perPage', 5);
 
         // Check if the search input is provided
         if ($request->has('search') && $request->search != '') {
@@ -29,7 +30,7 @@ class ContactsRecycleBinController extends Controller
         }
 
         // Paginate the filtered results
-        $trashedContacts = $query->paginate(5);
+        $trashedContacts = $query->paginate($perPage);
 
         // Return the view with the filtered and paginated trashed contacts
         return view('recycle-bin.contacts', compact('trashedContacts'));

@@ -10,6 +10,7 @@ class OrganizationRecycleBinController extends Controller
     public function index(Request $request)
     {
         $query = OrgSetup::onlyTrashed()->with('deletedByUser');
+        $perPage = $request->input('perPage', 5);
 
         // Search functionality
         if ($request->has('user_search') && $request->user_search != '') {
@@ -21,7 +22,7 @@ class OrganizationRecycleBinController extends Controller
             });
         }
 
-        $trashedOrganizations = $query->paginate(10);
+        $trashedOrganizations = $query->paginate($perPage);
 
         return view('recycle-bin.organization', compact('trashedOrganizations'));
     }

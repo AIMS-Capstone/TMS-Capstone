@@ -82,7 +82,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                             </a>
                         </li>
 
-                        <li x-data="{ open: {{ request()->routeIs('vat_return', 'percentage_return') ? 'true' : 'false' }} }">
+                        <li x-data="{ open: {{ request()->routeIs('income_return', 'vat_return', 'percentage_return', 'percentage_return.slsp_data') ? 'true' : 'false' }} }">
                             <button @click="open = !open" type="button"
                                 :class="{
                                     'flex items-center w-full p-2 text-[14px] ease-in transition-all duration-500 rounded-r-full hover:font-bold px-6 py-2 group': true,
@@ -104,7 +104,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                             <ul x-show="open" x-transition class="py-1 space-y-1 taxuri-color">
                                 <li>
                                     <a href="{{ route('percentage_return') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
-                                    {{ request()->routeIs('percentage_return') ? 'sidebar-submenu-active' : '' }}">
+                                    {{ request()->routeIs('percentage_return') || request()->routeIs('percentage_return.slsp_data') ? 'sidebar-submenu-active' : '' }}">
                                         Percentage Tax Return
                                     </a>
                                 </li>

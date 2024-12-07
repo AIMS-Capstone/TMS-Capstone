@@ -11,6 +11,7 @@ class AccountantUsersRecycleBinController extends Controller
     public function index(Request $request)
     {
         $query = User::onlyTrashed()->with(['deletedByUser']);
+        $perPage = $request->input('perPage', 5);
 
         // Search functionality
         if ($request->filled('user_search')) {
@@ -25,7 +26,7 @@ class AccountantUsersRecycleBinController extends Controller
             });
         }
 
-        $trashedAccountantUsers = $query->paginate(10);
+        $trashedAccountantUsers = $query->paginate($perPage);
 
         return view('recycle-bin.accountant-users', compact('trashedAccountantUsers'));
     }

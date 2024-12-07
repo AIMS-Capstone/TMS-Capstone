@@ -11,6 +11,7 @@ class EmployeesRecycleBinController extends Controller
     {
         
         $query = Employee::onlyTrashed()->with(['address', 'organization', 'deletedByUser']);
+        $perPage = $request->input('perPage', 5);
 
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
@@ -23,7 +24,7 @@ class EmployeesRecycleBinController extends Controller
         }
 
         // Paginate results
-        $trashedEmployees = $query->paginate(5);
+        $trashedEmployees = $query->paginate($perPage);
 
         return view('recycle-bin.employees', compact('trashedEmployees'));
     }
