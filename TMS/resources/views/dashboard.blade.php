@@ -137,19 +137,6 @@
                     <span class="font-bold text-3xl taxuri-color leading-tight">Quick Actions</span>
                 </div>
                 <div class="mb-4">
-                    <button type="button" class="w-full border border-gray-200 text-zinc-600 hover:text-blue-900 hover:bg-slate-200 focus:ring-4 focus:outline-none font-medium rounded-lg px-5 py-2.5 text-center inline-flex items-center">
-                        <div class="text-left">
-                            <h1 class="font-bold text-md">File a New Tax Return</h1>
-                            <p class="text-xs">Start the process of filing a new tax return for any category</p>
-                        </div>
-                        <span class="ml-auto">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8m-4 4l4-4l-4-4"/></g>                           
-                            </svg>
-                        </span>
-                    </button>
-                </div>
-        
-                <div class="mb-4">
                     <a href="{{ route('transactions') }}">
                         <button type="button" class="w-full border border-gray-200 text-zinc-600 hover:text-blue-900 hover:bg-slate-200 focus:ring-4 focus:outline-none font-medium rounded-lg px-5 py-2.5 text-center inline-flex items-center">
                             <div class="text-left">
@@ -164,6 +151,21 @@
                     </a>
                 </div>
 
+                <div class="mb-4">
+                    <a href="{{ route('general-ledger') }}">
+                        <button type="button" class="w-full border border-gray-200 text-zinc-600 hover:text-blue-900 hover:bg-slate-200 focus:ring-4 focus:outline-none font-medium rounded-lg px-5 py-2.5 text-center inline-flex items-center">
+                            <div class="text-left">
+                                <h1 class="font-bold text-md">Manage Books of Accounts</h1>
+                                <p class="text-xs">manage, view, or export financial records with ease</p>
+                            </div>
+                            <span class="ml-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8m-4 4l4-4l-4-4"/></g>                           
+                                </svg>
+                            </span>
+                        </button>
+                    </a>
+                </div>
+        
                 <div class="mb-4">
                     <a href="{{ route('predictive-analytics') }}">
                         <button type="button" class="w-full border border-gray-200 text-zinc-600 hover:text-blue-900 hover:bg-slate-200 focus:ring-4 focus:outline-none font-medium rounded-lg px-5 py-2.5 text-center inline-flex items-center">

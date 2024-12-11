@@ -1,22 +1,18 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+@php
+$organizationId = session('organization_id');
+$organization = \App\Models\OrgSetup::find($organizationId);
+@endphp
+<nav x-data="{ open: false }" class="bg-white sticky top-0 z-40 border-b border-gray-100">
     <!-- Primary Navigation Menu -->
     <div class="max-w-full mx-auto px-4 h-[70px] sm:px-6 lg:px-8">
         <div class="flex justify-between h-[70px]">
-            <div class="flex">
-                {{-- In Session --}}
-                <div class="datetime-navbar mt-[10px]">
-                    <div onload="initClock()" class="font-bold">
-                        <span id="hour">00</span>:<span id="minutes">00</span> <span id="period">AM</span>
-                    </div>
-                    <div class="text-sm font-medium">
-                        <span id="dayname">Day</span>, <span id="month">Month</span> <span id="daynum">00</span>, <span id="year">Year</span>
-                    </div>
+            <div class="flex flex-col items-start mt-3">
+                <div class="flex items-center bg-green-100 text-emerald-500 text-xs py-1 px-3 text-left rounded-full">
+                    <!-- Circle Indicator -->
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></div>
+                    <span class="leading-none">Session is set for</span>
                 </div>
-                <!-- Taxuri Logo -->
-                {{-- <div class="shrink-0 flex items-center">
-                    <img src="{{ asset('images/Taxuri Logo-name.png') }}" alt="logo" class='w-[160px]' />
-                </div> --}}
-                
+                <h1 class="text-blue-900 text-lg font-bold">{{ $organization->registration_name }}</h1>
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -71,6 +67,17 @@
                         </x-dropdown>
                     </div>
                 @endif
+
+                <!-- Right: Date and Time -->
+                <div class="datetime-navbar mr-6 flex flex-col float-end items-end text-right">
+                    <div onload="initClock()" class="font-bold">
+                        <span id="hour">00</span>:<span id="minutes">00</span> <span id="period">AM</span>
+                    </div>
+                    <div class="text-sm font-medium text-zinc-600">
+                        <span id="dayname">Day</span>, <span id="month">Month</span> <span id="daynum">00</span>, <span id="year">Year</span>
+                    </div>
+                </div>
+
                 <div class="h-8 border-l border-gray-200"></div>
                 <!-- Settings Dropdown -->
                 <div class="ms-3 relative py-2 px-2">

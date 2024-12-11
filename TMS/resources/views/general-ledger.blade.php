@@ -68,6 +68,7 @@
                                 <div class="flex flex-col w-32 taxuri-color">
                                     <label for="period_select" class="font-bold text-blue-900">Period </label>
                                     <select id="period_select" x-model="period" @change="updateYearAndMonthOptions" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+                                        <option value="" disabled selected></option>
                                         <option value="monthly">Monthly</option>
                                         <option value="quarterly">Quarterly</option>
                                         <option value="annually" selected>Annually</option>
@@ -78,6 +79,7 @@
                                 <div class="flex flex-col w-32">
                                     <label for="year_select" class="font-bold text-blue-900">Year</label>
                                     <select id="year_select" x-model="selectedYear" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+                                        <option value="" disabled selected></option>
                                         <template x-for="year in years" :key="year">
                                             <option :value="year" x-text="year"></option>
                                         </template>
@@ -88,6 +90,7 @@
                                 <div class="flex flex-col w-32" x-show="period === 'quarterly'">
                                     <label for="quarter_select" class="font-bold text-blue-900">Quarter</label>
                                     <select id="quarter_select" x-model="selectedQuarter" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+                                        <option value="" disabled selected></option>
                                         <option value="Q1">1st Quarter</option>
                                         <option value="Q2">2nd Quarter</option>
                                         <option value="Q3">3rd Quarter</option>
@@ -98,6 +101,7 @@
                                 <div class="flex flex-col w-32" x-show="period === 'monthly'">
                                     <label for="month_select" class="font-bold text-blue-900">Month</label>
                                     <select id="month_select" x-model="selectedMonth" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+                                        <option value="" disabled selected></option>
                                         <template x-for="month in months" :key="month.value">
                                             <option :value="month.value" x-text="month.label"></option>
                                         </template>
@@ -107,6 +111,7 @@
                                 <div class="flex flex-col w-32">
                                     <label for="status_filter" class="font-bold text-blue-900">Status</label>
                                     <select id="status_filter" name="status" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+                                        <option value="" disabled selected></option>
                                         <option value="">All</option>
                                         <option value="draft">Draft</option>
                                         <option value="posted">Posted</option>
@@ -121,7 +126,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 hover:border-green-500 hover:text-green-500 transition" viewBox="0 0 32 32">
                                         <path fill="#949494" d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5z"/>
                                     </svg>
-                                    <span class="text-sm">Add Filter</span>
+                                    <span class="text-sm">Apply Filter</span>
                                 </button>
                                 <button @click="resetFilters" class="text-sm text-gray-600 whitespace-nowrap">
                                     Clear all filters
@@ -193,8 +198,8 @@
 <script>
     function filterComponent() {
     return {
-        period: 'annually',
-        selectedYear: new Date().getFullYear(),
+        period: '',
+        selectedYear: '',
         selectedMonth: '',
         selectedQuarter: '',
         years: [],
@@ -250,7 +255,7 @@
             } else if (this.period === 'quarterly' && this.selectedQuarter) {
                 return `Listing as of ${this.selectedQuarter}, ${this.selectedYear}`;
             } else {
-                return `Listing as of January 01, ${this.selectedYear}`;
+                return `Listing as of ${this.selectedYear}`;
             }
         },
         async applyFilters() {

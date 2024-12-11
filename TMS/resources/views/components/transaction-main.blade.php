@@ -303,16 +303,17 @@
                                 </div>
                             </label>
                         </th>
-                        <th scope="col" class="text-left py-4 px-4">Contact</th>
-                        <th scope="col" class="text-left py-4 px-4">Date</th>
-                        <th scope="col" class="text-left py-4 px-4">Invoice Number</th>
-                        <th scope="col" class="text-left py-4 px-4">Reference No.</th>
-                        <th scope="col" class="text-left py-4 px-4">Gross Amount</th>
-                        <th scope="col" class="text-left py-4 px-4">Type</th>
-                        <th scope="col" class="text-left py-4 px-4">Status</th>
+                        <th scope="col" class="text-left py-2.5 px-4">Contact</th>
+                        <th scope="col" class="text-left py-2.5 px-4">Date</th>
+                        <th scope="col" class="text-left py-2.5 px-4">Invoice Number</th>
+                        <th scope="col" class="text-left py-2.5 px-4">Reference No.</th>
+                        <th scope="col" class="text-left py-2.5 px-4">Type</th>
+                        <th scope="col" class="text-left py-2.5 px-4">Gross Amount</th>
+                        <th scope="col" class="text-left py-2.5 px-4">Payment</th>
+                        <th scope="col" class="text-left py-2.5 px-4">Status</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-neutral-300">
+                <tbody class="text-[13px] divide-y divide-neutral-300">
                     <!-- Check if there is any data for the current page -->
                     @if($transactions && $transactions->count() > 0)
                         @foreach ($transactions as $transaction)
@@ -327,31 +328,45 @@
                                         </div>
                                     </label>
                                 </td>
-                                <td class="text-left py-3 px-4 hover:font-bold hover:underline hover:text-blue-500">
-                                    <a href="{{ route('transactions.show', ['transaction' => $transaction->id]) }}">
+                                <td class="text-left py-3 px-4">
+                                    <a href="{{ route('transactions.show', ['transaction' => $transaction->id]) }}" class="font-bold hover:font-bold hover:underline hover:text-blue-500">
                                     {{ $transaction->contactDetails->bus_name ?? 'N/A' }}
-                                    </a>
+                                    </a><br>
+                                    {{ $transaction->contactDetails->contact_address ?? 'N/A' }}<br>
+                                    {{ $transaction->contactDetails->contact_tin ?? 'N/A'}}
                                 </td>
                                 <td class="text-left py-4 px-4">{{ \Carbon\Carbon::parse($transaction->date)->format('F j, Y') }}</td>
                                 <td class="text-left py-4 px-4">{{$transaction ->inv_number}}</td>
                                 <td class="text-left py-4 px-4">{{$transaction ->reference}}</td>
+                                <td class="text-left py-4 px-4"><span class="bg-zinc-100 text-zinc-700 text-xs font-medium me-2 px-4 py-1.5 rounded-full">{{$transaction ->transaction_type}}</span></td>
                                 <td class="text-left py-4 px-4">{{$transaction ->vat_amount}}</td>
-                                <td class="text-left py-4 px-4"><span class="bg-zinc-100 text-zinc-800 text-xs font-medium me-2 px-4 py-2 rounded-full">{{$transaction ->transaction_type}}</span></td>
                                 <td class="text-left py-4 px-4">
-                    
                                     @if($transaction->Paidstatus === 'Unpaid')
-                                        Awaiting Payment
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-2 h-2 shrink-0 rounded-full bg-amber-300"></div>
+                                            <span class="text-zinc-600">Awaiting Payment</span>
+                                        </div>
                                     @elseif($transaction->Paidstatus === 'Partial')
                                         Partially Paid
                                     @else
-                                        Paid
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-2 h-2 shrink-0 rounded-full bg-emerald-500"></div>
+                                            <span class="text-zinc-600">Paid</span>
+                                        </div>
+                                    @endif
+                                </td>
+                                <td class="text-left py-4 px-4">
+                                    @if($transaction->status === 'posted')
+                                        <span class="text-emerald-600 bg-emerald-100 text-xs font-medium me-2 px-4 py-1.5 rounded-full">Posted</span>
+                                    @else
+                                    <span class="bg-amber-50 text-amber-500 text-xs font-medium me-2 px-4 py-1.5 rounded-full">Draft</span>
                                     @endif
                                 </td>
                             </tr>                             
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="7" class="text-center p-4">
+                            <td colspan="8" class="text-center p-4">
                                 <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
                                 <h1 class="font-extrabold text-lg mt-2">No Transactions yet</h1>
                                 <p class="text-sm text-neutral-500 mt-2">Start adding transactions with the <br> + button at the top.</p>

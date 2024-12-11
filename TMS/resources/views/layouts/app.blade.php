@@ -44,12 +44,12 @@ $organization = \App\Models\OrgSetup::find($organizationId);
         <div class="w-full flex">
             {{-- Sidebar --}}
             <nav id="sidebar" class="bg-white h-screen 
-            sticky top-0 sidebar-open py-6 pr-4 border-r-2 shadow-sm overfow-hidden transition-all duration-500">
+            sticky top-0 z-50 sidebar-open py-6 pr-4 border-r-2 shadow-sm overfow-hidden transition-all duration-500">
                 <div class="relative flex justify-center items-center">
                     <a href="{{ route('dashboard') }}" class="text-center content">
                         <img src="{{ asset('images/Taxuri Logo-name.png') }}" alt="logo" class='w-[160px]' />
                     </a>
-                    <button id="toggleSidebar" class="absolute -right-8 -top-2 h-8 w-8 p-[6px] border-gray-300 cursor-pointer bg-slate-50 flex items-center justify-center transition-all rounded-full drop-shadow-md">
+                    <button id="toggleSidebar" class="absolute -right-8 -top-2 h-8 w-8 p-[6px] z-50 border-gray-300 cursor-pointer bg-slate-50 flex items-center justify-center transition-all rounded-full drop-shadow-md">
                         <svg id="sidebarArrow" class="w-3 h-3 transform rotate-90 transition-transform duration-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1l4 4 4-4"/>
                         </svg>
@@ -68,7 +68,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                         <li class="pl-0">
                             <a href="{{ route('transactions') }}"
                             class="flex items-center rounded-r-full px-6 py-2 
-                            {{ request()->routeIs('transactions') ? 'sidebar-active' : '' }}">
+                            {{ request()->routeIs('transactions') || request()->routeIs('transactions.create') || request()->routeIs('transactions.show') || request()->routeIs('transactions.edit') 
+                            || request()->routeIs('transactions.upload') || request()->routeIs('receipts.uploadForm') ? 'sidebar-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon mr-2" viewBox="0 0 256 256"><path fill="#273C75" d="M216 40H40a16 16 0 0 0-16 16v152a8 8 0 0 0 11.58 7.15L64 200.94l28.42 14.21a8 8 0 0 0 7.16 0L128 200.94l28.42 14.21a8 8 0 0 0 7.16 0L192 200.94l28.42 14.21A8 8 0 0 0 232 208V56a16 16 0 0 0-16-16m-40 104H80a8 8 0 0 1 0-16h96a8 8 0 0 1 0 16m0-32H80a8 8 0 0 1 0-16h96a8 8 0 0 1 0 16"/></svg>
                                 <span class="sidebar-text ease-in duration-500 transition-all">Transactions</span>
                             </a>
