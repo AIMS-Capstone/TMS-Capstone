@@ -35,7 +35,8 @@ class DatabaseSeeder extends Seeder
             CoaSeeder::class,
             AddressSeeder::class,
             EmployeeSeeder::class,
-            EmploymentSeeder::class
+            EmploymentSeeder::class,
+            WithHoldingSeeder::class
         ]);
 
     }

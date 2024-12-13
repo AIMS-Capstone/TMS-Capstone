@@ -38,6 +38,6 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'client.auth' => \App\Http\Middleware\ClientAuth::class,
         'client.organization' => \App\Http\Middleware\SetOrganization::class, // Add custom middleware here
-        'check.role' => \App\Http\Middleware\CheckUserRole::class, //Auth for recycle-bin            and user-management
+        'check.role' => \App\Http\Middleware\CheckUserRole::class, //Auth for recycle-bin and user-management
     ];
 }

@@ -7,12 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
-
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Transactions extends Model
 {
-    use HasFactory, SoftDeletes;
-    protected $fillable = ['transaction_type', 'date', 'inv_number', 'reference', 'total_amount', 'contact', 'itr_include', 'total_amount_credit', 'total_amount_debit', 'vatable_sales','vatable_purchase', 'vat_amount', 'non_vatable_sales','non_vatable_purchase','status', 'organization_id', 'deleted_by' ];
+    use HasFactory, SoftDeletes, LogsActivity;
+    protected $fillable = ['transaction_type', 'date', 'inv_number', 'reference', 'total_amount', 'contact', 'itr_include', 'total_amount_credit', 'total_amount_debit', 'vatable_sales','vatable_purchase', 'vat_amount', 'non_vatable_sales','non_vatable_purchase','status', 'organization_id', 'deleted_by', 'withholding_id', ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'transaction_type', 'date', 'inv_number', 'reference', 'total_amount', 'status'
+            ]) // Attributes to log
+            ->logOnlyDirty() // Logs only changed attributes
+            ->setDescriptionForEvent(fn(string $eventName) => "Transaction was {$eventName}"); // Custom event description
+    }
 
     public function taxRows()
     {
@@ -46,18 +57,23 @@ class Transactions extends Model
         return $this->belongsTo(User::class, 'deleted_by');
     }
 
-     protected static function boot()
+    protected static function boot()
     {
         parent::boot();
 
-       static::deleting(function ($trasaction) {
-            if (!$$trasaction->isForceDeleting()) {
-                $trasaction->deleted_by = Auth::user()->id;
-                $trasaction->save();
+        static::deleting(function ($transaction) {
+            if (!$transaction->isForceDeleting()) {
+                $transaction->deleted_by = Auth::user()->id;
+                $transaction->save();
             }
         });
 
     }
 
+    //Krazy setting of withHolding ID
+    public function withholding()
+    {
+        return $this->belongsTo(WithHolding::class, 'withholding_id');
+    }   
 
 }
