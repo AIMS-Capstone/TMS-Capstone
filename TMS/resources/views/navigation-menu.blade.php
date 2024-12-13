@@ -2,7 +2,7 @@
 $organizationId = session('organization_id');
 $organization = \App\Models\OrgSetup::find($organizationId);
 @endphp
-<nav x-data="{ open: false }" class="bg-white sticky top-0 z-40 border-b border-gray-100">
+<nav x-data="{ open: false }" class="bg-white sticky top-0 z-40 border-b shadow-sm border-gray-100">
     <!-- Primary Navigation Menu -->
     <div class="max-w-full mx-auto px-4 h-[70px] sm:px-6 lg:px-8">
         <div class="flex justify-between h-[70px]">
@@ -73,7 +73,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                     <div onload="initClock()" class="font-bold">
                         <span id="hour">00</span>:<span id="minutes">00</span> <span id="period">AM</span>
                     </div>
-                    <div class="text-sm font-medium text-zinc-600">
+                    <div class="text-sm text-zinc-600">
                         <span id="dayname">Day</span>, <span id="month">Month</span> <span id="daynum">00</span>, <span id="year">Year</span>
                     </div>
                 </div>

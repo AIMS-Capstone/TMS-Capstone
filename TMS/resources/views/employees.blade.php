@@ -31,7 +31,7 @@
                                 </button>
 
                                 <!-- Dropdown Menu -->
-                                <div id="dropdown" class="absolute z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-md w-full mt-2">
+                                <div id="dropdown" class="absolute hidden bg-white divide-y divide-gray-100 rounded-lg shadow-md w-full mt-2 z-50">
                                     <ul class="py-2 px-2 text-sm text-gray-700" aria-labelledby="dropdownDefaultButton">
                                         <!-- Add Manual Button -->
                                         <li>

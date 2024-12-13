@@ -94,7 +94,7 @@
                         <div class="w-full md:w-3/4 mt-8 ml-0 md:ml-8 h-auto border border-zinc-300 rounded-lg p-4 bg-white">
                             <div class="flex flex-row items-center">
                                 <!-- Search row -->
-                                <div class="relative w-80 p-5">
+                                <div class="relative w-80 p-3">
                                     <form x-target="tableid" action="/org-setup" role="search" aria-label="Table" autocomplete="off">
                                         <input 
                                         type="search" 
@@ -108,22 +108,77 @@
                                         </form>
                                     <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-zinc-400"></i>
                                 </div>
-                    
-                                <!-- Sort by dropdown -->
-                                <div class="relative inline-block text-left sm:w-auto">
-                                    <button id="sortButton" class="flex items-center text-zinc-600 w-full">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
-                                            <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
-                                        </svg>
-                                        <span id="selectedOption" class="font-normal text-md text-zinc-700 truncate">Sort by</span>
-                                    </button>
+                                
+                                <div class="flex flex-row items-center space-x-4">
+                                    <div class="relative inline-block text-left sm:w-auto w-full">
+                                        <button id="filterButton" class="flex items-center text-zinc-600 hover:text-zinc-800 w-full hover:shadow-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
+                                                <path fill="none" stroke="#696969" stroke-width="2" d="M18 4H6c-1.105 0-2.026.91-1.753 1.98a8.02 8.02 0 0 0 4.298 5.238c.823.394 1.455 1.168 1.455 2.08v6.084a1 1 0 0 0 1.447.894l2-1a1 1 0 0 0 .553-.894v-5.084c0-.912.632-1.686 1.454-2.08a8.02 8.02 0 0 0 4.3-5.238C20.025 4.91 19.103 4 18 4z"/>
+                                            </svg>
+                                            <span id="selectedFilter" class="font-normal text-sm text-zinc-600 truncate">Filter</span>
+                                            <svg id="dropdownArrow" class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
+                                        </button>
+                                    
+                                        <div id="dropdownFilter" class="absolute mt-2 w-64 rounded-lg shadow-lg bg-white hidden z-50">
+                                            <div class="py-2 px-2">
+                                                <span class="block px-4 py-2 text-xs font-bold text-zinc-700">Filter</span>
+                                                <span class="block px-4 py-1 text-zinc-700 font-bold text-sm">Tax Type</span>
+                                                <div class="block px-4 py-2 text-xs">
+                                                    <label class="flex items-center space-x-2 py-1">
+                                                        <input type="checkbox" value="Value-Added Tax" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Tax Type" />
+                                                        <span>Value-Added Tax</span>
+                                                    </label>
+                                                    <label class="flex items-center space-x-2 py-1">
+                                                        <input type="checkbox" value="Percentage Tax" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Tax Type" />
+                                                        <span>Percentage Tax</span>
+                                                    </label>
+                                                    <label class="flex items-center space-x-2 py-1">
+                                                        <input type="checkbox" value="Exempt Tax" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Tax Type" />
+                                                        <span>Exempt Tax</span>
+                                                    </label>
+                                                </div>
+                                                <span class="block px-4 py-1 text-zinc-700 font-bold text-sm">Account Status</span>
+                                                <div class="block px-4 py-2 text-xs">
+                                                    <label class="flex items-center space-x-2 py-1">
+                                                        <input type="checkbox" value="Account Active" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Account Status" />
+                                                        <span>Account Active</span>
+                                                    </label>
+                                                    <label class="flex items-center space-x-2 py-1">
+                                                        <input type="checkbox" value="No Account Yet" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Account Status" />
+                                                        <span>No Account Yet</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center space-x-4 px-4 py-1.5 mb-1.5">
+                                                <button id="applyFiltersButton" class="flex items-center bg-white border border-gray-300 hover:border-green-500 hover:bg-green-100 hover:text-green-500 transition rounded-md px-3 py-1.5 whitespace-nowrap group">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 fill-current group-hover:fill-green-500 hover:border-green-500 hover:text-green-500 transition" viewBox="0 0 32 32">
+                                                        <path fill="currentColor" d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5z"/>
+                                                    </svg>
+                                                    <span class="text-zinc-700 transition group-hover:text-green-500 text-xs">Apply Filter</span>
+                                                </button>
+                                                <button id="clearFiltersButton" class="text-xs text-zinc-600 hover:text-zinc-900 whitespace-nowrap">Clear all filters</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="h-8 border-l border-zinc-300"></div>
                         
-                                    <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
-                                        <div class="py-2 px-2">
-                                            <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
-                                            <div data-sort="recently-added" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
-                                            <div data-sort="ascending" class="block px-4 py-2 w-full text-sm hover-dropdown">Ascending</div>
-                                            <div data-sort="descending" class="block px-4 py-2 w-full text-sm hover-dropdown">Descending</div>
+                                    <!-- Sort by dropdown -->
+                                    <div class="relative inline-block text-left sm:w-auto">
+                                        <button id="sortButton" class="flex items-center text-zinc-600 w-full hover:shadow-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24"><path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span id="selectedOption" class="font-normal text-sm text-zinc-600 hover:text-zinc-800 truncate">Sort by</span>
+                                            <svg class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
+                                        </button>
+                            
+                                        <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
+                                            <div class="py-2 px-2">
+                                                <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
+                                                <div data-sort="recently-added" class="block px-4 py-2 w-full text-xs hover-dropdown">Recently Added</div>
+                                                <div data-sort="ascending" class="block px-4 py-2 w-full text-xs hover-dropdown">Ascending</div>
+                                                <div data-sort="descending" class="block px-4 py-2 w-full text-xs hover-dropdown">Descending</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -131,7 +186,7 @@
                                 {{-- Right side: Set as Session button and Dropdown --}}
                                 <div class="ml-auto flex flex-row items-center space-x-4">
                                     <div class="relative inline-block text-left sm:w-auto">
-                                        <button id="setSessionButton" disabled onclick="document.getElementById('form-' + selectedRowId).submit();" class="flex items-center border border-zinc-300 rounded-lg p-2 text-zinc-600 text-sm w-full">
+                                        <button id="setSessionButton" disabled onclick="document.getElementById('form-' + selectedRowId).submit();" class="flex items-center border border-zinc-300 rounded-lg p-2 text-zinc-600 text-sm w-full bg-gray-100">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" class="mr-2" viewBox="0 0 24 24">
                                                 <path fill="currentColor" d="M6.25 5C5.56 5 5 5.56 5 6.25v11.5c0 .69.56 1.25 1.25 1.25h11.5c.69 0 1.25-.56 1.25-1.25V14a1 1 0 1 1 2 0v3.75A3.25 3.25 0 0 1 17.75 21H6.25A3.25 3.25 0 0 1 3 17.75V6.25A3.25 3.25 0 0 1 6.25 3H10a1 1 0 1 1 0 2zM14 5a1 1 0 1 1 0-2h6a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0V6.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L17.586 5z"/>
                                             </svg>
@@ -610,224 +665,327 @@
         </div>
     </div>
 
-    <script>
-        // FOR SORT BUTTON
-        document.getElementById('sortButton').addEventListener('click', function() {
-            const dropdown = document.getElementById('dropdownMenu');
+<script>
+    //FILTER BUTTON
+    const filterButton = document.getElementById('filterButton');
+    const dropdownFilter = document.getElementById('dropdownFilter');
+    const applyFiltersButton = document.getElementById('applyFiltersButton');
+    const clearFiltersButton = document.getElementById('clearFiltersButton');
+    const selectedFilter = document.getElementById('selectedFilter');
+    const tableRows = document.querySelectorAll('tbody tr');
+    const dropdownArrow = document.getElementById('dropdownArrow');
+
+    filterButton.addEventListener('click', () => {
+        dropdownArrow.classList.toggle('rotate-180');
+        dropdownFilter.classList.toggle('hidden');
+    });
+    function getSelectedFilters() {
+        const filters = {};
+        document.querySelectorAll('.filter-checkbox:checked').forEach((checkbox) => {
+            const category = checkbox.dataset.category;
+            if (!filters[category]) filters[category] = [];
+            filters[category].push(checkbox.value);
+        });
+        return filters;
+    }
+    function applyFilters() {
+        const filters = getSelectedFilters();
+        tableRows.forEach((row) => {
+            let isVisible = true;
+            for (const category in filters) {
+                const selectedValues = filters[category];
+                let cellText = "";
+                if (category === "Tax Type") {
+                    cellText = row.cells[1]?.textContent.trim(); // Tax Type column
+                } else if (category === "Account Status") {
+                    cellText = row.cells[3]?.textContent.trim(); // Account Status column
+                }
+                if (!selectedValues.some((value) => cellText.includes(value))) {
+                    isVisible = false;
+                    break;
+                }
+            }
+            row.style.display = isVisible ? "" : "none";
+        });
+        dropdownFilter.classList.add('hidden');
+        selectedFilter.textContent = 'Filter';
+    }
+    function clearFilters() {
+        document.querySelectorAll('.filter-checkbox').forEach((checkbox) => (checkbox.checked = false));
+        tableRows.forEach((row) => (row.style.display = ''));
+
+        dropdownFilter.classList.add('hidden');
+        selectedFilter.textContent = 'Filter';
+    }
+    applyFiltersButton.addEventListener('click', applyFilters);
+    clearFiltersButton.addEventListener('click', clearFilters);
+
+    window.addEventListener('click', (event) => {
+        if (!filterButton.contains(event.target) && !dropdownFilter.contains(event.target)) {
+            dropdownFilter.classList.add('hidden');
+        }
+    });
+    // Initial setup: disable the "Apply Filter" button
+    applyFiltersButton.disabled = true;
+    applyFiltersButton.classList.add('opacity-50', 'cursor-not-allowed'); // Optional: Add styles for disabled state
+    function updateApplyButtonState() {
+        const hasSelection = document.querySelectorAll('.filter-checkbox:checked').length > 0;
+        applyFiltersButton.disabled = !hasSelection;
+        if (hasSelection) {
+            applyFiltersButton.classList.remove('opacity-50', 'cursor-not-allowed'); // Optional: Remove disabled styles
+        } else {
+            applyFiltersButton.classList.add('opacity-50', 'cursor-not-allowed'); // Optional: Add disabled styles
+        }
+    }
+
+    document.querySelectorAll('.filter-checkbox').forEach((checkbox) => {
+        checkbox.addEventListener('change', updateApplyButtonState);
+    });
+
+    clearFiltersButton.addEventListener('click', () => {
+        document.querySelectorAll('.filter-checkbox').forEach((checkbox) => (checkbox.checked = false));
+        tableRows.forEach((row) => (row.style.display = ''));
+        dropdownFilter.classList.add('hidden');
+        selectedFilter.textContent = 'Filter';
+        updateApplyButtonState();
+    });
+
+    // FOR SORT BUTTON
+    document.getElementById('sortButton').addEventListener('click', function() {
+        const dropdown = document.getElementById('dropdownMenu');
+        const dropdownArrow = this.querySelector('svg:nth-child(3)');
+        dropdown.classList.toggle('hidden');
+        dropdownArrow.classList.toggle('rotate-180');
+    });
+
+    // FOR SORT BY
+    function sortItems(criteria) {
+        const table = document.querySelector('table tbody');
+        const rows = Array.from(table.querySelectorAll('tr'));
+        let sortedRows;
+        if (criteria === 'recently-added') {
+            // Sort by the order of rows (assuming they are in the order of addition)
+            sortedRows = rows.reverse();
+        } else {
+            // Sort by text content of the first column
+            sortedRows = rows.sort((a, b) => {
+                const aText = a.querySelector('td').textContent.trim().toLowerCase();
+                const bText = b.querySelector('td').textContent.trim().toLowerCase();
+
+                if (criteria === 'ascending') {
+                    return aText.localeCompare(bText);
+                } else if (criteria === 'descending') {
+                    return bText.localeCompare(aText);
+                }
+            });
+        }
+        // Append sorted rows back to the table body
+        table.innerHTML = '';
+        sortedRows.forEach(row => table.appendChild(row));
+    }
+    // to sort options
+    document.querySelectorAll('#dropdownMenu div[data-sort]').forEach(item => {
+        item.addEventListener('click', function() {
+            const criteria = this.getAttribute('data-sort');
+            sortItems(criteria);
+        });
+    });
+    window.addEventListener('click', (event) => {
+        if (!sortButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+            dropdownMenu.classList.add('hidden');
+        }
+    });
+
+    // FOR BUTTON OF SHOW ENTRIES
+    document.getElementById('dropdownMenuIconButton').addEventListener('click', function() {
+        const dropdown = document.getElementById('dropdownDots');
+        dropdown.classList.toggle('hidden');
+    });
+
+    // FOR ACTION BUTTON
+    document.querySelectorAll('[id^="dropdownMenuAction-"]').forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.stopPropagation();
+            const id = this.id.split('-')[1];
+            const dropdown = document.getElementById(`dropdownAction-${id}`);
             dropdown.classList.toggle('hidden');
         });
+    });
 
-        // FOR SORT BY
-        function sortItems(criteria) {
-            const table = document.querySelector('table tbody');
-            const rows = Array.from(table.querySelectorAll('tr'));
-            let sortedRows;
-            if (criteria === 'recently-added') {
-                // Sort by the order of rows (assuming they are in the order of addition)
-                sortedRows = rows.reverse();
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('[id^="dropdownAction-"], [id^="dropdownMenuAction-"]')) {
+            document.querySelectorAll('[id^="dropdownAction-"]').forEach(dropdown => {
+                dropdown.classList.add('hidden');
+            });
+        }
+    });
+
+    // FOR SHOWING/SETTING ENTRIES
+    function setEntries(entries) {
+        const form = document.createElement('form');
+        form.method = 'GET';
+        form.action = "{{ route('org-setup') }}";
+        // Create a hidden input for perPage
+        const perPageInput = document.createElement('input');
+        perPageInput.type = 'hidden';
+        perPageInput.name = 'perPage';
+        perPageInput.value = entries;
+        // Add search input value if needed
+        const searchInput = document.createElement('input');
+        searchInput.type = 'hidden';
+        searchInput.name = 'search';
+        searchInput.value = "{{ request('search') }}";
+        // Append inputs to form
+        form.appendChild(perPageInput);
+        form.appendChild(searchInput);
+        // Append the form to the body and submit
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    // FOR SELECTING A SESSION
+    let selectedRowId = null;
+    function selectRow(id) {
+        // If there's a previously selected row, reset its style
+        if (selectedRowId) {
+            document.getElementById('row-' + selectedRowId).classList.remove('bg-blue-100');
+        }
+        selectedRowId = id;
+        document.getElementById('row-' + selectedRowId).classList.add('bg-blue-100');
+
+        const setSessionButton = document.getElementById('setSessionButton');
+        setSessionButton.disabled = false;  // Enable button
+        setSessionButton.classList.remove('border-gray-300', 'text-gray-600', 'hover:bg-blue-200', 'hover:border-blue-700');
+        setSessionButton.classList.add('bg-blue-200', 'text-blue-700', 'border-blue-700');
+    }
+    function disableButton() {
+        const setSessionButton = document.getElementById('setSessionButton');
+        setSessionButton.disabled = true;  // Disable button
+        setSessionButton.classList.remove('bg-blue-200', 'text-blue-700', 'border-blue-700');  // Remove enabled styles
+        setSessionButton.classList.add('opacity-25', 'text-zinc-500', 'border-zinc-300');  // Add disabled styles
+    }
+    function submitForm() {
+        // Example asynchronous submission (AJAX)
+        fetch('{{ route("org_accounts.store") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+            },
+            body: JSON.stringify({ 
+                org_setup_id: this.organizationId, 
+                email: this.email 
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                // Emit success event
+                window.dispatchEvent(new CustomEvent('submit-success'));
             } else {
-                // Sort by text content of the first column
-                sortedRows = rows.sort((a, b) => {
-                    const aText = a.querySelector('td').textContent.trim().toLowerCase();
-                    const bText = b.querySelector('td').textContent.trim().toLowerCase();
+                alert("Failed to create account.");
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+        
+    document.addEventListener('DOMContentLoaded', function () {
+        const provinces = @json($provinces);
+        const municipalities = @json($municipalities);
 
-                    if (criteria === 'ascending') {
-                        return aText.localeCompare(bText);
-                    } else if (criteria === 'descending') {
-                        return bText.localeCompare(aText);
+        const regionSelect = document.getElementById('region');
+        const provinceSelect = document.getElementById('province');
+        const citySelect = document.getElementById('city');
+        const zipCodeInput = document.getElementById('zip_code');
+
+        // Function to populate provinces based on region
+        function populateProvinces(selectedRegion, selectedProvince) {
+            provinceSelect.innerHTML = '<option value="" disabled>Select Province</option>';
+            provinceSelect.disabled = true;
+
+            provinces.forEach(province => {
+                if (province.region === selectedRegion) {
+                    const option = document.createElement('option');
+                    option.value = province.name;
+                    option.textContent = province.name;
+                    if (province.name === selectedProvince) {
+                        option.selected = true;
                     }
-                });
-            }
-            // Append sorted rows back to the table body
-            table.innerHTML = '';
-            sortedRows.forEach(row => table.appendChild(row));
-        }
-        // to sort options
-        document.querySelectorAll('#dropdownMenu div[data-sort]').forEach(item => {
-            item.addEventListener('click', function() {
-                const criteria = this.getAttribute('data-sort');
-                sortItems(criteria);
+                    provinceSelect.appendChild(option);
+                }
             });
-        });
 
-        // FOR BUTTON OF SHOW ENTRIES
-        document.getElementById('dropdownMenuIconButton').addEventListener('click', function() {
-            const dropdown = document.getElementById('dropdownDots');
-            dropdown.classList.toggle('hidden');
-        });
+            provinceSelect.disabled = false;
+        }
 
-        // FOR ACTION BUTTON
-        document.querySelectorAll('[id^="dropdownMenuAction-"]').forEach(button => {
-            button.addEventListener('click', function() {
-                const id = this.id.split('-')[1];
-                const dropdown = document.getElementById(`dropdownAction-${id}`);
-                dropdown.classList.toggle('hidden');
+        // Function to populate cities based on province
+        function populateCities(selectedProvince, selectedCity) {
+            citySelect.innerHTML = '<option value="" disabled>Select City</option>';
+            citySelect.disabled = true;
+
+            municipalities.forEach(municipality => {
+                if (municipality.province === selectedProvince) {
+                    const option = document.createElement('option');
+                    option.value = municipality.name;
+                    option.textContent = municipality.name;
+                    if (municipality.name === selectedCity) {
+                        option.selected = true;
+                    }
+                    citySelect.appendChild(option);
+                }
             });
-        });
 
-        // FOR SHOWING/SETTING ENTRIES
-        function setEntries(entries) {
-            const form = document.createElement('form');
-            form.method = 'GET';
-            form.action = "{{ route('org-setup') }}";
-            // Create a hidden input for perPage
-            const perPageInput = document.createElement('input');
-            perPageInput.type = 'hidden';
-            perPageInput.name = 'perPage';
-            perPageInput.value = entries;
-            // Add search input value if needed
-            const searchInput = document.createElement('input');
-            searchInput.type = 'hidden';
-            searchInput.name = 'search';
-            searchInput.value = "{{ request('search') }}";
-            // Append inputs to form
-            form.appendChild(perPageInput);
-            form.appendChild(searchInput);
-            // Append the form to the body and submit
-            document.body.appendChild(form);
-            form.submit();
+            citySelect.disabled = false;
         }
 
-        // FOR SELECTING A SESSION
-        let selectedRowId = null;
-        function selectRow(id) {
-            // If there's a previously selected row, reset its style
-            if (selectedRowId) {
-                document.getElementById('row-' + selectedRowId).classList.remove('bg-blue-100');
-            }
-            // Set the selected row and apply styles
-            selectedRowId = id;
-            document.getElementById('row-' + selectedRowId).classList.add('bg-blue-100');
-            // Enable the "Set as Session" button and change it to blue
-            const setSessionButton = document.getElementById('setSessionButton');
-            setSessionButton.disabled = false;
-            setSessionButton.classList.remove('border-gray-300', 'text-gray-600', 'hover:bg-blue-200', 'hover:border-blue-700');
-            setSessionButton.classList.add('bg-blue-200', 'text-blue-700', 'border-blue-700');
+        // Function to set ZIP code
+        function setZipCode(selectedCity) {
+            const selectedMunicipality = municipalities.find(m => m.name === selectedCity);
+            zipCodeInput.value = selectedMunicipality ? selectedMunicipality.zip_code : '';
         }
 
-    
-        function submitForm() {
-            // Example asynchronous submission (AJAX)
-            fetch('{{ route("org_accounts.store") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-                },
-                body: JSON.stringify({ 
-                    org_setup_id: this.organizationId, 
-                    email: this.email 
-                })
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Emit success event
-                    window.dispatchEvent(new CustomEvent('submit-success'));
-                } else {
-                    alert("Failed to create account.");
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-        document.addEventListener('DOMContentLoaded', function () {
-    const provinces = @json($provinces);
-    const municipalities = @json($municipalities);
+        // Event Listener: When the modal opens, pre-fill values
+        document.addEventListener('open-edit-org-modal', function (event) {
+            const organization = event.detail.organization;
 
-    const regionSelect = document.getElementById('region');
-    const provinceSelect = document.getElementById('province');
-    const citySelect = document.getElementById('city');
-    const zipCodeInput = document.getElementById('zip_code');
+            // Pre-fill region and trigger province update
+            regionSelect.value = organization.region;
+            populateProvinces(organization.region, organization.province);
 
-    // Function to populate provinces based on region
-    function populateProvinces(selectedRegion, selectedProvince) {
-        provinceSelect.innerHTML = '<option value="" disabled>Select Province</option>';
-        provinceSelect.disabled = true;
+            // Pre-fill province and trigger city update
+            populateCities(organization.province, organization.city);
 
-        provinces.forEach(province => {
-            if (province.region === selectedRegion) {
-                const option = document.createElement('option');
-                option.value = province.name;
-                option.textContent = province.name;
-                if (province.name === selectedProvince) {
-                    option.selected = true;
-                }
-                provinceSelect.appendChild(option);
-            }
+            // Pre-fill city and ZIP code
+            citySelect.value = organization.city;
+            setZipCode(organization.city);
+
+            // Ensure other fields are filled
+            zipCodeInput.value = organization.zip_code;
         });
 
-        provinceSelect.disabled = false;
-    }
+        // Event Listener: Handle region change
+        regionSelect.addEventListener('change', function () {
+            const selectedRegion = this.value;
 
-    // Function to populate cities based on province
-    function populateCities(selectedProvince, selectedCity) {
-        citySelect.innerHTML = '<option value="" disabled>Select City</option>';
-        citySelect.disabled = true;
-
-        municipalities.forEach(municipality => {
-            if (municipality.province === selectedProvince) {
-                const option = document.createElement('option');
-                option.value = municipality.name;
-                option.textContent = municipality.name;
-                if (municipality.name === selectedCity) {
-                    option.selected = true;
-                }
-                citySelect.appendChild(option);
-            }
+            populateProvinces(selectedRegion, null);
+            citySelect.innerHTML = '<option value="" disabled>Select City</option>';
+            citySelect.disabled = true;
+            zipCodeInput.value = ''; // Reset ZIP code
         });
 
-        citySelect.disabled = false;
-    }
+        // Event Listener: Handle province change
+        provinceSelect.addEventListener('change', function () {
+            const selectedProvince = this.value;
 
-    // Function to set ZIP code
-    function setZipCode(selectedCity) {
-        const selectedMunicipality = municipalities.find(m => m.name === selectedCity);
-        zipCodeInput.value = selectedMunicipality ? selectedMunicipality.zip_code : '';
-    }
+            populateCities(selectedProvince, null);
+            zipCodeInput.value = ''; // Reset ZIP code
+        });
 
-    // Event Listener: When the modal opens, pre-fill values
-    document.addEventListener('open-edit-org-modal', function (event) {
-        const organization = event.detail.organization;
+        // Event Listener: Handle city change
+        citySelect.addEventListener('change', function () {
+            const selectedCity = this.value;
 
-        // Pre-fill region and trigger province update
-        regionSelect.value = organization.region;
-        populateProvinces(organization.region, organization.province);
-
-        // Pre-fill province and trigger city update
-        populateCities(organization.province, organization.city);
-
-        // Pre-fill city and ZIP code
-        citySelect.value = organization.city;
-        setZipCode(organization.city);
-
-        // Ensure other fields are filled
-        zipCodeInput.value = organization.zip_code;
+            setZipCode(selectedCity);
+        });
     });
-
-    // Event Listener: Handle region change
-    regionSelect.addEventListener('change', function () {
-        const selectedRegion = this.value;
-
-        populateProvinces(selectedRegion, null);
-        citySelect.innerHTML = '<option value="" disabled>Select City</option>';
-        citySelect.disabled = true;
-        zipCodeInput.value = ''; // Reset ZIP code
-    });
-
-    // Event Listener: Handle province change
-    provinceSelect.addEventListener('change', function () {
-        const selectedProvince = this.value;
-
-        populateCities(selectedProvince, null);
-        zipCodeInput.value = ''; // Reset ZIP code
-    });
-
-    // Event Listener: Handle city change
-    citySelect.addEventListener('change', function () {
-        const selectedCity = this.value;
-
-        setZipCode(selectedCity);
-    });
-});
-
-    </script>
+</script>
 </x-organization-layout>
