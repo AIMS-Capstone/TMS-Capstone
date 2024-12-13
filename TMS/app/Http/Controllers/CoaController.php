@@ -61,7 +61,8 @@ class CoaController extends Controller
 
         if ($submitAction === 'manual') {
             $request->validate([
-                'account_type_input' => 'required|string|max:255',
+                'type' => 'required|string|max:255',
+                'sub_type' => 'required|string|max:255',
                 'code' => 'required|string|max:10',
                 'name' => 'required|string|max:150',
                 'description' => 'nullable|string|max:255',

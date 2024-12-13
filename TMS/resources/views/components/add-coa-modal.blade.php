@@ -44,10 +44,28 @@
                         <label for="type" class="block font-semibold text-sm text-gray-700">
                             Account Type <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" name="account_type_input" id="accountTypeInput" required
-                            placeholder="Expense | Ordinary Allowance Itemized Deductions"
+                        <input type="text" name="type" id="type" required
+                            placeholder="Expense"
                             class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                        <p class="text-[10px] opacity-75 px-1">Enter in the format: Type | Sub Type</p>
+                    </div>
+                    <div class="w-1/3 text-left">
+                        <label for="sub_type" class="block font-semibold text-sm text-gray-700">
+                            Sub Type <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="sub_type" id="sub_type" required
+                            maxlength="10" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                    </div>
+                </div>
+
+                <!-- Account Name -->
+                <div class="mb-3 flex justify-between items-start">
+                    <div class="w-2/3 pr-4">
+                        <label for="name" class="block font-semibold text-sm text-gray-700">
+                            Name <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="name" id="name" required
+                            maxlength="150" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                        <p class="text-xs opacity-75 px-1">A short title for this account (limited 150 characters)</p>
                     </div>
                     <!-- Account Code -->
                     <div class="w-1/3 text-left">
@@ -58,16 +76,6 @@
                             maxlength="10" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                         <p class="text-[10px] opacity-75 px-1">Unique code/number for this account (limited 10 characters)</p>
                     </div>
-                </div>
-
-                <!-- Account Name -->
-                <div class="mb-3">
-                    <label for="name" class="block font-semibold text-sm text-gray-700">
-                        Name <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" name="name" id="name" required
-                        maxlength="150" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                    <p class="text-xs opacity-75 px-1">A short title for this account (limited 150 characters)</p>
                 </div>
 
                 <!-- Account Description -->    
