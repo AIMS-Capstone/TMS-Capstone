@@ -24,11 +24,21 @@ class JournalTransaction extends Component
     public $reference; // Reference number
     public $selectedContact; // Selected contact for the transaction
     public $type = 'journal'; // Default to 'journal' transaction type
-    
-    public  $organizationId;
+    public $errors = [];
+    public $organizationId;
 
     // Listen for child component updates
     protected $listeners = ['journalRowUpdated' => 'updateJournalRow', 'journalRowRemoved' => 'removeJournalRow'];
+
+    // Validation rules
+    protected $rules = [
+        'date' => 'required|date|before_or_equal:today',
+        'reference' => 'required|numeric',
+        'journalRows.*.description' => 'required|string',
+        'journalRows.*.coa' => 'required|exists:coas,id',
+        'journalRows.*.debit' => 'nullable|numeric',
+        'journalRows.*.credit' => 'nullable|numeric',
+    ];
 
     public function mount()
     {
@@ -77,23 +87,28 @@ class JournalTransaction extends Component
     // Handles saving the transaction
     public function saveTransaction()
     {
+        // Validate inputs
+        $this->validate();
+
         // Ensure debits and credits are balanced
         if ($this->totalAmountDebit !== $this->totalAmountCredit) {
             session()->flash('error', 'Debits and credits must be balanced.');
             return;
         }
+
         $organizationId = Session::get('organization_id');
+
         // Create a new transaction
         $transaction = Transactions::create([
             'transaction_type' => 'Journal',
             'date' => $this->date,
             'reference' => $this->reference,
-            'total_amount' => $this -> totalAmount,
+            'total_amount' => $this->totalAmount,
             'total_amount_debit' => $this->totalAmountDebit,
             'total_amount_credit' => $this->totalAmountCredit,
-            'status'=> 'Draft',
+            'status' => 'Draft',
             'contact' => $this->selectedContact, // Optionally link a contact
-            'organization_id'=> $organizationId
+            'organization_id' => $organizationId
         ]);
 
         // Save each journal row linked to the transaction

@@ -1,3 +1,5 @@
+@props(['justify' => 'end'])
+
 <div {{ $attributes->merge(['class' => 'md:flex md:flex-col md:gap-6 px-12 py-4']) }}>
     <div class="mt-5 mb-20 md:mt-0">
         <form wire:submit="saveTransaction">
@@ -19,10 +21,10 @@
                     {{ $after ?? '' }}
                 </div>
                 @if (isset($actions))
-                    <div class="flex items-center justify-end px-4 py-3 bg-white text-end sm:px-6  sm:rounded-bl-md sm:rounded-br-md">
-                        {{ $actions }}
-                    </div>
-                @endif
+                <div class="flex items-center px-4 py-3 bg-white text-end sm:px-6 sm:rounded-bl-md sm:rounded-br-md {{ $justify === 'between' ? 'justify-between' : 'justify-end' }}">
+                    {{ $actions }}
+                </div>
+            @endif
             </div>
         </form>
     </div>

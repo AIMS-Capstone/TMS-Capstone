@@ -362,15 +362,14 @@ deleteRows() {
                                                 {{ $taxRow->transaction->contactDetails->contact_tin }}</td>
                                             <td class="text-left py-3 px-2">{{ $taxRow->description }}</td>
                                             <td class="text-left py-3 px-2">{{ $taxRow->transaction->inv_number }}</td>
-                                            <td class="text-left py-3 px-2">{{ $taxRow->atc->tax_code }}</td>
+                                            <td class="text-left py-3 px-2">{{ $taxRow->atc->tax_code ?? 'N/A' }}</td>
                                             <td class="text-left py-3 px-2">{{ \Carbon\Carbon::parse($taxRow->transaction->date)->format(' F j, Y') }}</td>
                                             <td class="text-left py-3 px-2">{{ $taxRow->net_amount }}</td>
                                             <td class="text-left py-3 px-2">{{ $taxRow->atc_amount }}</td>
-                                            <td class="text-left py-3 px-2">{{ $taxRow->atc->tax_rate }}</td>
-                                            
-                                            <td class="text-left py-3 px-2">{{ $taxRow->coaAccount->code ?? 'No Code Available' }}
 
-                                            </td>
+                                            <td class="text-left py-3 px-2">{{ $taxRow->atc->tax_rate  ?? 'N/A' }}</td>
+                                            <td class="text-left py-3 px-2">{{ $taxRow->coaAccount->code  ?? 'N/A' }}</td>
+
                                         </tr>
                                     @endforeach
                                 </tbody>

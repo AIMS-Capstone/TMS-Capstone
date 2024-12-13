@@ -1,4 +1,4 @@
-<x-transaction-form-section>
+<x-transaction-form-section :justify="'between'">
     @php
     $type = request()->query('type', 'purchase'); // Default to 'purchase' if 'type' is not set
     @endphp
@@ -143,7 +143,21 @@
     </x-slot:form>
     <!-- Save Button -->
     <x-slot:actions>
-        <div class="flex justify-end mt-4 mb-10">
+        <div class="flex justify-start">
+            @if($this->getErrorBag()->any())
+            <div class="text-left ml-auto">
+                <div class="inline-block bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <strong class="font-bold">Oops! There are some errors:</strong>
+                    <ul class="list-disc list-inside mt-2">
+                        @foreach($this->getErrorBag()->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        @endif
+        </div>
+        <div class="flex justify-end mt-4">
             <x-button type="submit" class="ml-4 text-white px-4 py-2 rounded-lg shadow-md">
                 {{ __('Save Transaction') }}
             </x-button>
@@ -275,55 +289,7 @@ $('#select_contact').on('change', function() {
                         </div>
                     </div>
 
-                    <!-- Default Tax Information -->
-                    <h2 class="text-xl taxuri-color font-bold my-4">Default Tax Information</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                    <!-- Revenue Section -->
-                    <div>
-                        <p class="text-sm mb-4">Revenue</p>
-
-                        <label for="revenue_tax_type" class="block text-gray-700 text-sm font-bold">Tax Type</label>
-                        <select id="revenue_tax_type" wire:model.defer="newContactPurchase.revenue_tax_type" name="revenue_tax_type" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
-                            <option value="">Nothing Selected</option>
-                            <!-- Add options for Tax Type here -->
-                        </select>
-
-                        <label for="revenue_atc" class="block text-gray-700 text-sm font-bold mt-4">ATC</label>
-                        <select id="revenue_atc" wire:model.defer="newContactPurchase.revenue_atc" name="revenue_atc" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
-                            <option value="">Nothing Selected</option>
-                            <!-- Add options for ATC here -->
-                        </select>
-
-                        <label for="revenue_chart_accounts" class="block text-gray-700 text-sm font-bold mt-4">Chart of Accounts</label>
-                        <select id="revenue_chart_accounts" wire:model.defer="newContactPurchase.revenue_chart_accounts" name="revenue_chart_accounts" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
-                            <option value="">Nothing Selected</option>
-                            <!-- Add options for Chart of Accounts here -->
-                        </select>
-                    </div>
-
-                    <!-- Expense Section -->
-                    <div>
-                        <p class="text-sm mb-4">Expense</p>
-
-                        <label for="expense_tax_type" class="block text-gray-700 text-sm font-bold">Tax Type</label>
-                        <select id="expense_tax_type" wire:model.defer="newContactPurchase.expense_tax_type" name="expense_tax_type" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
-                            <option value="">Nothing Selected</option>
-                            <!-- Add options for Tax Type here -->
-                        </select>
-
-                        <label for="expense_atc" class="block text-gray-700 text-sm font-bold mt-4">ATC</label>
-                        <select id="expense_atc" wire:model.defer="newContactPurchase.expense_atc" name="expense_atc" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
-                            <option value="">Nothing Selected</option>
-                            <!-- Add options for ATC here -->
-                        </select>
-
-                        <label for="expense_chart_accounts" class="block text-gray-700 text-sm font-bold mt-4">Chart of Accounts</label>
-                        <select id="expense_chart_accounts" wire:model.defer="newContactPurchase.expense_chart_accounts" name="expense_chart_accounts" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peerm">
-                            <option value="">Nothing Selected</option>
-                            <!-- Add options for Chart of Accounts here -->
-                        </select>
-                    </div>
-                </div>
+                 
 
                 <!-- Save Button -->
                 <div class="flex justify-end items-center mt-6 gap-4">

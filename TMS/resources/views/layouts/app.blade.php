@@ -34,11 +34,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
     @endphp
 
     <header>
-        @if ($organization)
-            {{-- <h1>Welcome, {{ $organization->registration_name }}</h1> --}}
-        @else
-            {{-- <h1>Welcome to our application!</h1> --}}
-        @endif
+
+
     </header>
         <x-banner />
         <div class="w-full flex">

@@ -9,55 +9,41 @@
             placeholder="Enter Description" 
             value="{{ $description ?? '' }}"  
         />
+ 
     </td>
 
-    <!-- Tax Type -->
     <td class="border px-4 py-2">
-        <select 
-            name="tax_type" 
-            class="form-control mt-2 w-full select2 block py-2.5 px-0 text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
-            id="tax_type" 
-            wire:model.live="tax_type"
-        >
-            <option value="" disabled {{ is_null($tax_type) ? 'selected' : '' }}></option>
-            @foreach($taxTypes as $tax)
-                <option value="{{ $tax->id }}" {{ $tax->id == $tax_type ? 'selected' : '' }}>
-                    {{ $tax->tax_type }} ({{ $tax->VAT }}%)
-                </option>
-            @endforeach
-        </select>
+        <livewire:tax-type-select
+        name="tax_type"
+        labelKey="name"
+        valueKey="value"
+        class="form-control w-full select2i"
+        :index="$index"
+        :selectedTaxType="$tax_type"
+    />
     </td>
 
     <!-- ATC -->
     <td class="border px-4 py-2">
-        <select 
-            class="block w-full h-full border-none select2 py-2.5 px-0 text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
-            id="tax_code" 
-            wire:model.live="tax_code"
-        >
-            <option value="" disabled {{ is_null($tax_code) ? 'selected' : '' }}></option>
-            @foreach($atcs as $atc)
-                <option value="{{ $atc->id }}" {{ $atc->id == $tax_code ? 'selected' : '' }}>
-                    {{ $atc->tax_code }} ({{ $atc->tax_rate }}%)
-                </option>
-            @endforeach
-        </select>
+        <livewire:atc-select 
+            name="tax_code"
+            :index="$index"
+            :transaction-type="$type"  
+            :selected-a-t-c-code="$tax_code" 
+        />
+    </td>
+    
     </td>
 
     <!-- COA -->
     <td class="border px-4 py-2">
-        <select 
-            class="block w-full h-full border-none select2 py-2.5 px-0 text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
-            id="coa" 
-            wire:model="coa"
-        >
-            <option value="" disabled {{ is_null($coa) ? 'selected' : '' }}></option>
-            @foreach($coas as $coaItem)
-                <option value="{{ $coaItem->id }}" {{ $coaItem->id == $coa ? 'selected' : '' }}>
-                    {{ $coaItem->code }} {{ $coaItem->name }}
-                </option>
-            @endforeach
-        </select>
+<livewire:coa-select 
+    name="coa"
+    :index="$index"
+         class="form-control w-full select2i"
+    :status="'Active'"  
+    :selected-coa="$coa"  
+/>
     </td>
 
     <!-- Amount -->
@@ -69,6 +55,7 @@
             wire:model.blur="amount" 
             value="{{ $amount ?? '' }}"  
         />
+  
     </td>
 
     <!-- Tax Amount -->
@@ -81,6 +68,7 @@
             readonly 
             value="{{ $tax_amount ?? '' }}" 
         />
+  
     </td>
 
     <!-- Net Amount -->
@@ -93,7 +81,9 @@
             readonly 
             value="{{ $net_amount ?? '' }}"  
         />
+    
     </td>
+
 
     <td class="border px-4 py-2">
         <button 
@@ -110,3 +100,24 @@
         </button>
     </td>
 </tr>
+
+<script>
+        $(document).ready(function() {
+    $('.select2i').select2();
+});
+
+document.addEventListener('initialize-select2', (event) => {
+    console.log('Re-initializing Select2');
+    
+    // Initialize Select2 for all the tax rows
+    $(document).ready(function() {
+        $('.select2i').each(function() {
+            $(this).select2({
+                dropdownParent: $(this).closest('tr')
+            });
+        });
+    });
+});
+
+    
+</script>

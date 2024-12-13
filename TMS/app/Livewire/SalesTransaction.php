@@ -27,15 +27,18 @@ class SalesTransaction extends Component
     public $reference;
     public $selectedContact;
 
+    public $errors = [];
     protected $listeners = ['taxRowUpdated' => 'updateTaxRow', 'contactSelected', 'taxRowRemoved' => 'removeTaxRow'];
 
     protected $rules = [
         'date' => 'required|date',
         'inv_number' => 'required|string',
         'reference' => 'nullable|string',
-        'taxRows.*.amount' => 'required|numeric|min:0',
+        'taxRows.*.description' => 'nullable|string',
+        'taxRows.*.tax_type' => 'required|exists:tax_types,id',
         'taxRows.*.tax_code' => 'nullable|exists:atcs,id',
-        'taxRows.*.coa' => 'nullable|string',
+        'taxRows.*.coa' => 'nullable|exists:coas,id',
+        'taxRows.*.amount' => 'required|numeric|min:0.01',
     ];
 
     public function mount()
@@ -46,19 +49,25 @@ class SalesTransaction extends Component
        
     }
 
-    public function addTaxRow()
-    {
-        $this->taxRows[] = [
-            'description' => '',
-            'tax_type' => '',
-            'tax_code' => '',
-            'coa' => '',
-            'amount' => 0,
-            'tax_amount' => 0,
-            'net_amount' => 0
-        ];
-    }
+public function addTaxRow()
+{
+    // Use a unique identifier instead of just the count
+    $index = uniqid('tax_row_');
+    
+    $this->taxRows[$index] = [
+        'id' => $index,  // Add a unique identifier
+        'description' => '',
+        'tax_type' => '',
+        'tax_code' => '',
+        'coa' => '',
+        'amount' => 0,
+        'tax_amount' => 0,
+        'net_amount' => 0
+    ];
 
+    // Dispatch event with the unique index
+    $this->dispatch('initialize-select2', index: $index);
+}
     public function contactSelected($contactId)
     {
         $this->selectedContact = $contactId;
@@ -66,9 +75,17 @@ class SalesTransaction extends Component
 
     public function removeTaxRow($index)
     {
+        // Remove the specific row
         unset($this->taxRows[$index]);
-        $this->taxRows = array_values($this->taxRows); // Re-index array
-        $this->calculateTotals(); // Recalculate after removing a row
+        
+        // Re-index the array to ensure continuous keys
+        $this->taxRows = array_values($this->taxRows);
+        
+        // Recalculate totals
+        $this->calculateTotals();
+        
+
+        $this->dispatch('refresh-select2');
     }
 
     public function updateTaxRow($data)
@@ -153,8 +170,16 @@ class SalesTransaction extends Component
         $this->totalAmount = $this->vatableSales + $this->vatAmount + $this->nonVatableSales + $this->appliedATCsTotalAmount; // Total includes ATC tax
     }
     
-    
-
+    public function rendered(): void
+    {
+        // Dispatch errors for each tax row
+        foreach ($this->taxRows as $index => $row) {
+            $this->dispatch('parentComponentErrorBag', [
+                'index' => $index,
+                'errors' => $this->getErrorBag()->get("taxRows.{$index}.*")
+            ]);
+        }
+    }
     public function saveTransaction()
     {
         // Validate the required fields

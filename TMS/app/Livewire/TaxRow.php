@@ -21,20 +21,33 @@ class TaxRow extends Component
     public $description; // Added if needed
     public $tax_type; // Added if needed
     public $type; // Added to store transaction type
+    public $selectedTaxType;
     public $mode;
+    protected $listeners = [
+        'parentComponentErrorBag', 'taxTypeSelected'  => 'handleTaxTypeSelection', 'atcCodeSelected' => 'handleAtcCodeSelection', 'coaSelected' =>'handleCoaSelection'
+    ];
+    protected $rules = [
+        'description' => 'nullable|string|max:255',
+        'tax_type' => 'required|exists:tax_types,id',
+        'tax_code' => 'nullable|exists:atcs,id',
+        'coa' => 'nullable|exists:coas,id',
+        'amount' => 'required|numeric|min:0.01',
+    ];
 
     // Handle initialization for both edit and create
     public function mount($index, $taxRow = null, $type = 'purchase', $mode ='create')
     {
         $this->mode = $mode;
         $this->type = $type;
+        $this->index = $index;
+
         
         // Load initial data based on the type
         $this->taxTypes = TaxType::where('transaction_type', $this->type)->get();
         $this->atcs = ATC::where('transaction_type', $this->type)->get();
         $this->coas = Coa::where('status', 'Active')->get();
-        $this->index = $index;
-
+    
+        
         // If editing, populate fields with taxRow data; else, use default values for creating
         if ($taxRow) {
             $this->tax_code = $taxRow['tax_code'] ?? null;
@@ -58,7 +71,49 @@ class TaxRow extends Component
         // Calculate tax (if any initial values are available)
         $this->calculateTax();
     }
-
+    public function handleAtcCodeSelection($data)
+    {
+        // Ensure you're handling the array input   
+        $atcId = is_array($data) ? ($data['value'] ?? null) : $data;
+        $index = is_array($data) ? ($data['index'] ?? null) : null;
+    
+        // Only proceed if we have a valid ATC ID and the index matches this row's index
+        if ($atcId !== null && $index == $this->index) {
+            $this->tax_code = $atcId;
+            
+            // Directly call calculateTax method
+            $this->calculateTax();
+        }
+    }
+    
+    public function handleTaxTypeSelection($data)
+    {
+        // Ensure you're handling the array input   
+        $value = is_array($data) ? ($data['value'] ?? null) : $data;
+        $index = is_array($data) ? ($data['index'] ?? null) : null;
+    
+        // Only proceed if we have a valid value and the index matches this row's index
+        if ($value !== null && $index == $this->index) {
+            $this->tax_type = $value;
+            
+            // Directly call calculateTax method
+            $this->calculateTax();
+        }
+    }
+    public function handleCoaSelection($data)
+    {
+        // Ensure you're handling the array input   
+        $coaId = is_array($data) ? ($data['value'] ?? null) : $data;
+        $index = is_array($data) ? ($data['index'] ?? null) : null;
+    
+        // Only proceed if we have a valid COA ID and the index matches this row's index
+        if ($coaId !== null && $index == $this->index) {
+            $this->coa = $coaId;
+            
+            // Directly call calculateTax method
+            $this->calculateTax();
+        }
+    }
     // Method to remove the row
     public function removeRow()
     {
@@ -68,10 +123,11 @@ class TaxRow extends Component
     // Automatically update tax when specific fields are updated
     public function updated($field)
     {
+        $this->validateOnly($field);
+    
         if (in_array($field, ['tax_code', 'amount', 'tax_type'])) {
             $this->calculateTax();
             
-            // Dispatch updated event to parent component
             $this->dispatch('taxRowUpdated', [
                 'index' => $this->index,
                 'description' => $this->description,
@@ -84,7 +140,6 @@ class TaxRow extends Component
             ])->to($this->getParentComponentClass());
         }
     }
-
     // Determine parent component for event dispatch
     protected function getParentComponentClass()
     {
@@ -101,7 +156,21 @@ class TaxRow extends Component
         // Fallback default
         return 'App\Livewire\SalesTransaction';
     }
+    public function parentComponentErrorBag($data)
+    {
+        $index = $data['index'] ?? null;
+        $errors = $data['errors'] ?? [];
     
+        // Clear existing errors first
+        $this->resetErrorBag();
+    
+        // Add errors passed from the parent
+        foreach ($errors as $field => $messages) {
+            // Remove the "taxRows.index." prefix if present
+            $cleanField = preg_replace('/^taxRows\.\d+\./', '', $field);
+            $this->addError($cleanField, $messages[0]);
+        }
+    }
     // Calculate tax and net amounts
     public function calculateTax()
     {

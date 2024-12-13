@@ -1,4 +1,4 @@
-<x-transaction-form-section>
+<x-transaction-form-section :justify="'between'">
     @php
         $type = 'journal'; // Set type to 'journal' for journal transactions
     @endphp
@@ -86,10 +86,24 @@
     </x-slot:form>
 
     <!-- Save Button -->
-    <x-slot:actions>
-        <div class="flex justify-end mt-4 mb-32">
+    <x-slot:actions >
+        <div class="flex justify-start">
+            @if($this->getErrorBag()->any())
+            <div class="text-left ml-auto">
+                <div class="inline-block bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <strong class="font-bold">Oops! There are some errors:</strong>
+                    <ul class="list-disc list-inside mt-2">
+                        @foreach($this->getErrorBag()->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        @endif
+        </div>
+        <div class="flex justify-end mt-4">
             <x-button type="submit" class="ml-4 text-white px-4 py-2 rounded-lg shadow-md">
-                {{ __('Save Journal Entry') }}
+                {{ __('Save Transaction') }}
             </x-button>
         </div>
     </x-slot:actions>

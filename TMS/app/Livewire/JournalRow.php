@@ -16,6 +16,15 @@ class JournalRow extends Component
   
     public $type; // Journal entry type (journal, sales, purchase, etc.)
     public $mode; // Mode for the row (create/edit)
+    protected $listeners = [
+        'parentComponentErrorBag',
+    ];
+    protected $rules = [
+        'description' => 'required|string|max:255',
+        'coa' => 'nullable|exists:coas,id',
+        'credit' => 'nullable|numeric',
+        'debit' => 'nullable|numeric',
+    ];
 
     public function mount($index, $journalRow = [], $type = 'journal', $mode = 'create')
     {
@@ -35,10 +44,25 @@ class JournalRow extends Component
     {
         $this->dispatch('journalRowRemoved', $this->index);  // Emit the event with the row index
     }
-
+    public function parentComponentErrorBag($data)
+    {
+        $index = $data['index'] ?? null;
+        $errors = $data['errors'] ?? [];
+    
+        // Clear existing errors first
+        $this->resetErrorBag();
+    
+        // Add errors passed from the parent
+        foreach ($errors as $field => $messages) {
+            // Remove the "taxRows.index." prefix if present
+            $cleanField = preg_replace('/^taxRows\.\d+\./', '', $field);
+            $this->addError($cleanField, $messages[0]);
+        }
+    }
     // Watch for updates on debit or credit fields
     public function updated($field)
     {
+        $this->validateOnly($field);
         if (in_array($field, ['debit', 'credit', 'coa'])) {
             // Make sure to adjust totals and dispatch updates when debit/credit change
             $this->dispatch('journalRowUpdated', [

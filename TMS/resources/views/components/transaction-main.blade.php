@@ -339,7 +339,7 @@
                                 <td class="text-left py-4 px-4">{{$transaction ->inv_number}}</td>
                                 <td class="text-left py-4 px-4">{{$transaction ->reference}}</td>
                                 <td class="text-left py-4 px-4"><span class="bg-zinc-100 text-zinc-700 text-xs font-medium me-2 px-4 py-1.5 rounded-full">{{$transaction ->transaction_type}}</span></td>
-                                <td class="text-left py-4 px-4">{{$transaction ->vat_amount}}</td>
+                                <td class="text-left py-4 px-4">{{$transaction ->total_amount}}</td>
                                 <td class="text-left py-4 px-4">
                                     @if($transaction->Paidstatus === 'Unpaid')
                                         <div class="flex items-center space-x-2">

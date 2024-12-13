@@ -20,22 +20,24 @@ class PurchaseTransaction extends Component
     public $appliedATCsTotalAmount = 0; // Add this line to define the property
     public $date;
     public $contact;
-    public $inv_number;
+
     public $type = 'purchase';
     public $reference;
     public $selectedContact;
     public $appliedATCs = []; // Array to hold applied ATC details
     public $organizationId;
+    public $errors = [];
 
     protected $listeners = ['taxRowUpdated' => 'updateTaxRow', 'contactSelected', 'taxRowRemoved' => 'removeTaxRow'];
 
     protected $rules = [
         'date' => 'required|date',
-        'inv_number' => 'required|string',
         'reference' => 'nullable|string',
-        'taxRows.*.amount' => 'required|numeric|min:0',
+        'taxRows.*.description' => 'nullable|string',
+        'taxRows.*.tax_type' => 'required|exists:tax_types,id',
         'taxRows.*.tax_code' => 'nullable|exists:atcs,id',
-        'taxRows.*.coa' => 'nullable|string',
+        'taxRows.*.coa' => 'nullable|exists:coas,id',
+        'taxRows.*.amount' => 'required|numeric|min:0.01',
     ];
 
     public function mount()
@@ -138,13 +140,13 @@ class PurchaseTransaction extends Component
     public function saveTransaction()
     {
    
+        $this->validate();
         $organizationId = Session::get('organization_id');
         // Create a transaction with 'Purchase' type
         $transaction = Transactions::create([
             'transaction_type' => 'Purchase',
             'date' => $this->date,
             'contact' => $this->selectedContact,
-            'inv_number' => $this->inv_number,
             'reference' => $this->reference,
             'total_amount' => $this->totalAmount,
             'vatable_purchase' => $this->vatablePurchase,
@@ -174,6 +176,17 @@ class PurchaseTransaction extends Component
         // Optionally, redirect or provide feedback to the user
         session()->flash('message', 'Transaction saved successfully!');
         return redirect()->route('transactions.show', ['transaction' => $transaction->id]);
+    }
+    
+    public function rendered(): void
+    {
+        // Dispatch errors for each tax row
+        foreach ($this->taxRows as $index => $row) {
+            $this->dispatch('parentComponentErrorBag', [
+                'index' => $index,
+                'errors' => $this->getErrorBag()->get("taxRows.{$index}.*")
+            ]);
+        }
     }
 
     public function render()
