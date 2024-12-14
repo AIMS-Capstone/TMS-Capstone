@@ -29,11 +29,16 @@ class Employment extends Model
 
     public function employee()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(Employee::class, 'employee_id');
     }
 
-    public function address()
+    public function address()       
     {
         return $this->morphOne(Address::class, 'addressable');
+    }
+    
+    public function sources()
+    {
+        return $this->hasMany(Source::class, 'employment_id');
     }
 }

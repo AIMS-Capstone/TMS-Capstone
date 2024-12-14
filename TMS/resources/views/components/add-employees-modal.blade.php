@@ -228,10 +228,10 @@
                                     <!-- Radio Buttons -->
                                     <div class="flex flex-col justify-between items-start space-y-2">
                                         <label class="flex items-center">
-                                            <input type="radio" name="employee_wage_status" value="Minimum Wage" class="mr-2"> Minimum Wage
+                                            <input type="radio" name="employee_wage_status" value="Minimum Wage Earner" class="mr-2"> Minimum Wage Earner
                                         </label>
                                         <label class="flex items-center">
-                                            <input type="radio" name="employee_wage_status" value="Above Minimum Wage" class="mr-2"> Above Minimum Wage
+                                            <input type="radio" name="employee_wage_status" value="Above Minimum Wage Earner" class="mr-2"> Above Minimum Wage Earner
                                         </label>
                                     </div>
                                 </div>

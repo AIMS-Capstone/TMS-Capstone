@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use thiagoalessio\TesseractOCR\TesseractOCR;
 use Imagick;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionsController extends Controller
 {
@@ -353,6 +354,13 @@ public function getAllTransactions(Request $request)
         
     ]);
 
+    activity('transactions')
+        ->performedOn($transaction) 
+        ->causedBy(Auth::user()) 
+        ->withProperties(['attributes' => $transaction->toArray()]) 
+        ->log('Transaction was manually created');
+
+
     // Step 3: Add a TaxRow for each item in the transaction
     $taxRow = new ModelsTaxRow([
         'description' => $request->description,
@@ -581,9 +589,13 @@ private function extractTextFromReceipt($filePath)
             ];
         })->toArray();
 
-        // Pass the transaction and tax rows to the view
-        return view('transactions.show', compact('transaction', 'taxRows', 'contacts','atcs','tax_types','coas'));
+        // Access the transaction_type directly from the $transaction instance
+        $transaction_type = $transaction->transaction_type;
+
+        // Pass the transaction, tax rows, and transaction type to the view
+        return view('transactions.show', compact('transaction', 'taxRows', 'contacts', 'atcs', 'tax_types', 'coas', 'transaction_type'));
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -661,6 +673,15 @@ private function extractTextFromReceipt($filePath)
     
         // Update transaction with validated data
         $transaction->update($validated);
+
+        activity('transactions')
+            ->performedOn($transaction)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'attributes' => $transaction->toArray(),
+            ])
+            ->log('Transaction was manually updated');
+
     
         // Optionally, handle any additional fields, such as tax rows
     
@@ -675,9 +696,19 @@ private function extractTextFromReceipt($filePath)
         
         $ids = $request->input('ids');  // This will be an array of IDs sent from JavaScript
 
+        $transactions = Transactions::whereIn('id', $ids)->get();
+
         // Log the incoming IDs for debugging
         Log::info('Received transaction IDs: ', $ids);
         Transactions::whereIn('id', $ids)->delete();
+
+        // Log the deletions manually
+        foreach ($transactions as $transaction) {
+            activity('transactions')
+                ->performedOn($transaction)
+                ->causedBy(Auth::user())
+                ->log("Transaction ID {$transaction->id} was soft deleted");
+        }
 
         // Optionally, return a response
         return response()->json(['message' => 'Transaction soft deleted successfully.']);

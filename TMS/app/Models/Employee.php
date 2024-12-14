@@ -32,8 +32,13 @@ class Employee extends Model
 
     public function employments()
     {
-        return $this->hasMany(Employment::class);
+        return $this->hasMany(Employment::class, 'employee_id');
         
+    }
+
+    public function latestEmployment()
+    {
+        return $this->hasOne(Employment::class)->latestOfMany();
     }
 
     public function transactions()

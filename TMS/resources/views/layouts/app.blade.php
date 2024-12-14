@@ -122,7 +122,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group">
+                                    <a href="{{ route('with_holding.1601C')}}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
+                                    {{ request()->routeIs('with_holding.1601C') ? 'sidebar-submenu-active' : '' }}">
                                         Withholding Tax Return
                                     </a>
                                 </li>

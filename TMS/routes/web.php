@@ -24,6 +24,17 @@ use App\Http\Controllers\FinancialController;
 use App\Http\Controllers\PredictionController;
 use App\Http\Controllers\AtcController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\EmployeesController;
+use App\Http\Controllers\TaxTypeController;
+use App\Http\Controllers\Tax1701QController;
+
+// WithHolding
+use App\Http\Controllers\WithHoldingController; // this is the default for withHolding, where the 1601C resides
+// Hiniwalay ko na yung controller, aabot ng 3k lines e
+use App\Http\Controllers\withHolding0619EController;
+use App\Http\Controllers\withHolding1601EQController;
+use App\Http\Controllers\withHolding1604CController;
+use App\Http\Controllers\withHolding1604EController;
 
 //Recycle Bin
 use App\Http\Controllers\OrganizationRecycleBinController; //This is the default for layouts
@@ -34,14 +45,16 @@ use App\Http\Controllers\TaxReturnsRecycleBinController;
 use App\Http\Controllers\ContactsRecycleBinController;
 use App\Http\Controllers\EmployeesRecycleBinController;
 
+//Notes and Activities
+use App\Http\Controllers\SalesLogController;
+
 //Client
 use App\Http\Controllers\ClientAuthController;
 use App\Http\Controllers\ClientFinancialController;
 use App\Http\Controllers\ClientProfileController;
 use App\Http\Controllers\ClientAnalyticsController;
-use App\Http\Controllers\EmployeesController;
-use App\Http\Controllers\Tax1701QController;
-use App\Http\Controllers\TaxTypeController;
+
+//Models
 use App\Models\rdo;
 use App\Models\TaxReturn;
 
@@ -143,7 +156,7 @@ Route::middleware([
             // Tax Returns
             Route::get('/tax-returns', [TaxReturnsRecycleBinController::class, 'index'])->name('recycle-bin.tax-returns.index');
             Route::post('/tax-returns/bulk-restore', [TaxReturnsRecycleBinController::class, 'bulkRestore'])->name('recycle-bin.tax-returns.bulkRestore');
-            Route::delete('/tax-returns/bulk-delete', [TaxReturnsRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.tax-returns.bulkDelete');
+            Route::post('/tax-returns/bulk-delete', [TaxReturnsRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.tax-returns.bulkDelete');
 
             // Contacts
             Route::get('/contacts', [ContactsRecycleBinController::class, 'index'])->name('recycle-bin.contacts.index');
@@ -312,6 +325,71 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
         Route::get('/vat_report_pdf', function () {
             return view('tax_return.vat_report_pdf'); // Make sure to create this view file
         })->name('vat_report_pdf');
+
+        // With Holding tax
+        Route::prefix('/tax_return/with_holding')->group(function () {
+
+            // Routes for generating withholding tax return for 1601C
+                Route::get('/1601C', [WithHoldingController::class, 'index1601C'])->name('with_holding.1601C');
+                Route::post('/1601C/generate', [WithHoldingController::class, 'generate1601C'])->name('with_holding.1601C.generate');
+                Route::post('/1601C/destroy', [WithHoldingController::class, 'destroy1601C'])->name('with_holding.1601C.destroy');
+                Route::get('/{id}/1601C_summary', [WithHoldingController::class, 'showSummary1601C'])->name('with_holding.1601C_summary');
+                Route::get('/{id}/1601C_sources', [WithHoldingController::class, 'showSources1601C'])->name('with_holding.1601C_sources');
+                Route::post('/{id}/1601C_sources_store', [WithHoldingController::class, 'store1601C'])->name('with_holding.1601C_sources_store');
+                // Route for creating the 1601C form
+                Route::get('/{id}/1601C_form', [WithHoldingController::class, 'createForm1601C'])->name('form1601C.create');
+                Route::post('/{id}/1601C/store', [WithHoldingController::class, 'storeForm1601C'])->name('form1601C.store');
+
+            // Routes for generting withholding tax return for 0619E
+                Route::get('/0619E', [withHolding0619EController::class, 'index0619E'])->name('with_holding.0619E');
+                Route::post('/0619E/generate', [withHolding0619EController::class, 'generate0619E'])->name('with_holding.0619E.generate');
+                Route::post('/0619E/destroy ', [withHolding0619EController::class, 'destroy0619E'])->name('with_holding.0619E.destroy');
+                // Route for creating the 0619E
+                Route::get('/{id}/0619E_form', [withHolding0619EController::class, 'createForm0619E'])->name('form0619E.create');
+                Route::post('/{id}/0619E/store', [withHolding0619EController::class, 'storeForm0619E'])->name('form0619E.store');
+            
+            // Routes for generating withholding tax return for 1601EQ
+                Route::get('/1601EQ', [withHolding1601EQController::class, 'index1601EQ'])->name('with_holding.1601EQ');
+                Route::post('/1601EQ/generate', [withHolding1601EQController::class, 'generate1601EQ'])->name('with_holding.1601EQ.generate');
+                Route::post('/1601EQ/destroy', [withHolding1601EQController::class, 'destroy1601EQ'])->name('with_holding.1601EQ.destroy');
+                //QAP nig
+                Route::get('/{id}/1601EQ_Qap', [withHolding1601EQController::class, 'showQap1601EQ'])->name('with_holding.1601EQ_Qap');
+                Route::post('/{id}/1601EQ_Qap/set', [withHolding1601EQController::class, 'setQap1601EQ'])->name('with_holding.1601EQ_Qap.set');
+
+                // Route for creating 1601EQ
+                Route::get('/{id}/1601EQ_form', [withHolding1601EQController::class, 'createForm1601EQ'])->name('form1601EQ.create');
+                Route::post('/{id}/1601EQ/store', [withHolding1601EQController::class, 'storeForm1601EQ'])->name('form1601EQ.store');
+                
+            // Route for generating witholding tax return for 1604C
+                Route::get('/1604C', [withHolding1604CController::class, 'index1604C'])->name('with_holding.1604C');
+                Route::post('/1604C/generate', [withHolding1604CController::class, 'generate1604C'])->name('with_holding.1604C.generate');
+                // creating 1604C
+                Route::get('/{id}/1604C_remittances', [withHolding1604CController::class, 'showRemittance1604C'])->name('with_holding.1604C_remittances');
+                // Routes for 1604C sources
+                Route::get('/{id}/1604C_schedule1', [withHolding1604CController::class, 'show1604Cschedule1'])->name('with_holding.1604C_schedule1');
+                Route::get('/{id}/1604C_schedule2', [withHolding1604CController::class, 'show1604Cschedule2'])->name('with_holding.1604C_schedule2');
+                // Generating hatdog na 1604C
+                Route::get('/{id}/1604C_form', [withHolding1604CController::class, 'createForm1604C'])->name('form1604C.create');
+                Route::post('/{id}/1604C/store', [withHolding1604CController::class, 'storeForm1604C'])->name('form1604C.store');
+
+            // Route for generating witholding tax return for 1604E
+                Route::get('/1604E', [withHolding1604EController::class, 'index1604E'])->name('with_holding.1604E');
+                Route::post('/1604E/generate', [withHolding1604EController::class, 'generate1604E'])->name('with_holding.1604E.generate');
+                //creating 1604E
+                Route::get('/{id}/1604E_summary', [withHolding1604EController::class, 'showSummary1604E'])->name('with_holding.1604E_summary');
+                Route::get('/{id}/1604E_remittances', [withHolding1604EController::class, 'showRemittance1604E'])->name('with_holding.1604E_remittances');
+                Route::get('/{id}/1604E_sources', [WithHolding1604EController::class, 'showSources1604E'])->name('with_holding.1604E_sources');
+                Route::get('/{id}/1604E_schedule4', [WithHolding1604EController::class, 'showSchedule41604E'])->name('with_holding.1604E_schedule4');
+                Route::post('/{id}/1604E_schedule4', [WithHolding1604EController::class, 'storeSchedule41604E'])->name('with_holding.1604E_store');
+
+                Route::get('/{id}/1604E_form', [withHolding1604EController::class, 'createForm1604E'])->name('form1604E.create');
+                Route::post('/{id}/1604E/store', [withHolding1604EController::class, 'storeForm1604E'])->name('form1604E.store');
+
+
+        });//ending of tax_return/with_holding prefix
+
+        //Notes and Activities
+        Route::get('/sales-transactions-log', [SalesLogController::class, 'index'])->name('transactions.log');
 
     });//ending of organization middleware
 });//ending of built in auth of Laravel Jetstream
