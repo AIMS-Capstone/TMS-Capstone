@@ -36,10 +36,19 @@
                     <div class="w-2/3 pr-4">
                         <label for="coaType" class="block text-sm font-bold text-zinc-700">Account Type</label>
                         <input type="text" id="coaType" name="account_type_input" 
-                            x-bind:value="coa.sub_type ? `${coa.type} | ${coa.sub_type}` : coa.type" 
+                            x-bind:value="coa.type" 
                             class="block w-full py-3 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
                             required 
-                            placeholder="Expense | Ordinary Allowance Itemized Deductions"
+                            placeholder="Expense"
+                        >
+                    </div>
+                    <div class="w-2/3 pr-3">
+                        <label for="coaSubType" class="block text-sm font-bold text-zinc-700">Sub Type</label>
+                        <input type="text" name="sub_type" id="coaSubType"
+                            x-bind:value="coa.sub_type" 
+                            class="block w-full py-3 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                            required
+                            placeholder="Ordinary Allowance Itemized Deductions"
                         >
                     </div>
                     <!-- COA Code -->
@@ -59,7 +68,7 @@
                 <!-- COA Description -->
                 <div class="mb-5">
                     <label for="coaDescription" class="block text-sm font-bold text-gray-700">Description</label>
-                    <input type="text" id="coaDescription" name="description" x-model="coa.description" class="block w-full py-3 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
+                    <input type="text" id="coaDescription" name="description" x-model="coa.description" class="block w-full py-3 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                 </div>
 
                 <!-- Submit -->

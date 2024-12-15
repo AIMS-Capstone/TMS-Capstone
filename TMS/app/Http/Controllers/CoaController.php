@@ -68,40 +68,24 @@ class CoaController extends Controller
                 'description' => 'nullable|string|max:255',
             ]);
 
-            $accountTypeInput = $request->input('account_type_input');
-            $parts = array_map('trim', explode('|', $accountTypeInput));
-            $type = $parts[0] ?? null;
-            $subType = $parts[1] ?? null;
+            Coa::create([
+                'type' => $request->input('type'),
+                'sub_type' => $request->input('sub_type'),
+                'code' => $request->input('code'),
+                'name' => $request->input('name'),
+                'description' => $request->input('description'),
+                'organization_id' => $organizationId,
+            ]);
 
-            if ($type && $subType) {
-                Coa::create([
-                    'type' => $type,
-                    'sub_type' => $subType,
-                    'code' => $request->input('code'),
-                    'name' => $request->input('name'),
-                    'description' => $request->input('description'),
-                    'organization_id' => $organizationId,
-                ]);
-
-                return redirect()->route('coa')->with('success', 'Account created successfully.');
-            } else {
-                return redirect()->back()->withErrors(['account_type_input' => 'Please provide a valid input in the format: "Type | Sub Type".']);
-            }
+            return redirect()->route('coa')->with('success', 'Account created successfully.');
         } elseif ($submitAction === 'import') {
-
-            $request->validate([
-                'csv_file' => 'required|file|mimes:csv,xlsx|max:2048',
-                    ]);
-
-                    dd("Starting import with organization_id: {$organizationId}");
-
-                    // Pass organization ID when creating CoaImport instance
-                    MaatExcel::import(new CoaImport($organizationId), $request->file('csv_file'));
-
+            // Import logic (CSV handling)
             return redirect()->route('coa')->with('success', 'CSV imported successfully.');
         }
+
         return redirect()->route('coa')->with('error', 'Invalid action.');
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -110,25 +94,25 @@ class CoaController extends Controller
     {
         $organizationId = session('organization_id');
 
+        if (!$organizationId) {
+            return redirect()->back()->withErrors(['error' => 'User does not have an organization ID.']);
+        }
+
         $request->validate([
             'account_type_input' => 'required|string|max:255',
+            'sub_type' => 'required|string|max:255',
             'code' => 'required|string|max:10',
             'name' => 'required|string|max:150',
             'description' => 'nullable|string|max:255',
         ]);
-
-        $accountTypeInput = $request->input('account_type_input');
-        $parts = array_map('trim', explode('|', $accountTypeInput));
-        $type = $parts[0] ?? null;
-        $subType = $parts[1] ?? null;
 
         $coa = Coa::where('id', $id)
             ->where('organization_id', $organizationId)
             ->firstOrFail();
 
         $coa->update([
-            'type' => $type,
-            'sub_type' => $subType,
+            'type' => $request->input('account_type_input'),
+            'sub_type' => $request->input('sub_type'),
             'code' => $request->input('code'),
             'name' => $request->input('name'),
             'description' => $request->input('description'),

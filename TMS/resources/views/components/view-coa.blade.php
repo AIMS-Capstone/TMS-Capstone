@@ -34,7 +34,13 @@
                 <div class="w-2/3 pr-4">
                     <label class="block text-sm font-bold text-zinc-700">Account Type</label>
                     <input class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200 focus:outline-none focus:ring-0"
-                        x-bind:value="coa.sub_type ? `${coa.type} | ${coa.sub_type}` : coa.type" disabled readonly
+                        x-bind:value="coa.type" disabled readonly
+                    >
+                </div>
+                <div class="w-2/3 pr-3">
+                    <label class="block text-sm font-bold text-zinc-700">Sub Type</label>
+                    <input class="peer py-3 pe-0 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200 focus:outline-none focus:ring-0"
+                        x-bind:value="coa.sub_type" disabled readonly
                     >
                 </div>
                 <div class="w-1/3 text-left">
