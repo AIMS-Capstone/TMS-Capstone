@@ -45,6 +45,7 @@
                                     <label for="period_select" class="font-bold text-blue-900">Period</label>
                                     <select id="period_select" x-model="period" @change="updateYearAndMonthOptions"
                                             class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        <option value="" disabled selected></option>
                                         <option value="monthly">Monthly</option>
                                         <option value="quarterly">Quarterly</option>
                                         <option value="annually" selected>Annually</option>
@@ -57,7 +58,8 @@
                                     <label for="year_select" class="font-bold text-blue-900">Year</label>
                                     <select id="year_select" x-model="selectedYear"
                                             class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                        <template x-for="year in years" :key="year">
+                                            <option value="" disabled selected></option>
+                                            <template x-for="year in years" :key="year">
                                             <option :value="year" x-text="year"></option>
                                         </template>
                                     </select>
@@ -69,6 +71,7 @@
                                     <label for="quarter_select" class="font-bold text-blue-900">Quarter</label>
                                     <select id="quarter_select" x-model="selectedQuarter"
                                             class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        <option value="" disabled selected></option>
                                         <option value="Q1">1st Quarter</option>
                                         <option value="Q2">2nd Quarter</option>
                                         <option value="Q3">3rd Quarter</option>
@@ -81,7 +84,8 @@
                                     <label for="month_select" class="font-bold text-blue-900">Month</label>
                                     <select id="month_select" x-model="selectedMonth"
                                             class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                        <template x-for="month in months" :key="month.value">
+                                            <option value="" disabled selected></option>
+                                            <template x-for="month in months" :key="month.value">
                                             <option :value="month.value" x-text="month.label"></option>
                                         </template>
                                     </select>
@@ -92,7 +96,7 @@
                                     <label for="status_filter" class="font-bold text-blue-900">Status</label>
                                     <select id="status_filter" name="status"
                                             class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                        
+                                        <option value="" disabled selected></option>
                                         <option value="draft">Draft</option>
                                         <option value="posted">Posted</option>
                                     </select>
@@ -281,8 +285,8 @@
 <script>
         function filterComponent() {
     return {
-        period: 'annually',
-        selectedYear: new Date().getFullYear(),
+        period: '',
+        selectedYear: '',
         selectedMonth: '',
         selectedQuarter: '',
         years: [],
@@ -338,7 +342,7 @@
             } else if (this.period === 'quarterly' && this.selectedQuarter) {
                 return `ending ${this.selectedQuarter}, ${this.selectedYear}`;
             } else {
-                return `ending December 31, ${this.selectedYear}`;
+                return `ending ${this.selectedYear}`;
             }
         },
         async applyFilters() {

@@ -35,80 +35,83 @@
                 @method('PUT')
 
                 <div class="mb-6 flex justify-between items-start">
+                    <!-- Name -->
+                    <div class="w-[50%] pr-4">
+                        <label for="bus_name" class="block font-semibold text-sm text-gray-700">
+                            Name <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="bus_name" id="bus_name" required
+                            placeholder="Customer Name"
+                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                    </div>
+
                     <!-- Contact Type -->
                     <div class="w-[50%] pr-4">
-                        <label for="contactType" class="block text-sm font-bold text-gray-700">Contact Type <span class="text-red-500">*</span></label>
-                        <select id="contactType" name="contact_type" 
-                            x-model="contact.contact_type" 
-                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
-                            required>
+                        <label for="contact_type" class="block font-semibold text-sm text-gray-700">
+                            Contact Type <span class="text-red-500">*</span>
+                        </label>
+                        <select name="contact_type" id="contact_type" required
+                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                            <option value="" disabled selected>Select Contact Type</option>
+                            <option value="Customer">Customer</option>
+                            <option value="Vendor">Vendor</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-6 flex justify-between items-start">
+                    <!-- TIN -->
+                    <div class="w-[50%] pr-4">
+                        <label for="contact_tin" class="block font-semibold text-sm text-gray-700">
+                            Tax Identification Number (TIN) <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="contact_tin" id="contact_tin" required
+                            placeholder="000-000-000-000" maxlength="17"
+                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                    </div>
+
+                    <div class="w-[50%] pr-4">
+                        <label for="classification" class="block font-semibold text-sm text-gray-700">
+                           Classification<span class="text-red-500">*</span>
+                        </label>
+                        <select name="classification" id="classification" required
+                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                            <option value="" disabled selected>Select Classification Type</option>
                             <option value="Individual">Individual</option>
                             <option value="Non-Individual">Non-Individual</option>
                         </select>
                     </div>
-
-                    <!-- TIN -->
-                    <div class="w-2/3">
-                        <label for="contactTIN" class="block text-sm font-bold text-gray-700">Tax Identification Number (TIN) <span class="text-red-500">*</span></label>
-                        <input 
-                            type="text" 
-                            id="contactTIN" 
-                            name="contact_tin" 
-                            x-model="contact.contact_tin" 
-                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
-                            placeholder="000-000-000-000" 
-                            required>
-                    </div>
-                </div>
-
-                <!-- Name -->
-                <div class="mb-5">
-                    <label for="contactName" class="block text-sm font-bold text-gray-700">Name <span class="text-red-500">*</span></label>
-                    <input 
-                        type="text" 
-                        id="contactName" 
-                        name="bus_name" 
-                        x-model="contact.bus_name" 
-                        class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
-                        placeholder="Contact Name" 
-                        required>
                 </div>
 
                 <div class="mb-6 flex justify-between items-start">
                     <!-- Address -->
                     <div class="w-2/3 pr-4">
-                        <label for="contactAddress" class="block text-sm font-bold text-gray-700">Address <span class="text-red-500">*</span></label>
-                        <input 
-                            type="text" 
-                            id="contactAddress" 
-                            name="contact_address" 
-                            x-model="contact.contact_address" 
-                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
-                            placeholder="Contact Address" 
-                            required>
+                        <label for="contact_address" class="block font-semibold text-sm text-gray-700">
+                            Address <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="contact_address" id="contact_address" required
+                            placeholder="Address"
+                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                     </div>
 
+                    <!-- City -->
                     <div class="w-2/3 pr-4">
-                        <label for="contactCity" class="block text-sm font-bold text-gray-700">City <span class="text-red-500">*</span></label>
-                        <input 
-                            type="text" 
-                            id="contactCity" 
-                            name="contact_city" 
-                            x-model="contact.contact_city" 
-                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
-                            placeholder="City" 
-                            required>
+                        <label for="contact_city" class="block font-semibold text-sm text-gray-700">
+                            City <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="contact_city" id="contact_city" required
+                            placeholder="City"
+                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                     </div>
+
+                    <!-- Zip Code -->
                     <div class="w-2/3 pr-4">
-                        <label for="contactZip" class="block text-sm font-bold text-gray-700">Zip Code <span class="text-red-500">*</span></label>
-                        <input 
-                            type="text" 
-                            id="contactZip" 
-                            name="contact_zip" 
-                            x-model="contact.contact_zip" 
-                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
-                            placeholder="Zip Code" 
-                            required>
+                        <label for="contact_zip" class="block font-semibold text-sm text-gray-700">
+                            Zip Code <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="contact_zip" id="contact_zip" required
+                            placeholder="e.g., 1446" maxlength="4"
+                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                     </div>
                 </div>
 

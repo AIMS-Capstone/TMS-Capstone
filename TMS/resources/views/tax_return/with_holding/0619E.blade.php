@@ -198,8 +198,10 @@ $organizationId = session('organization_id');
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="py-3 px-4 text-center text-gray-500">
-                                            No withholding records found.
+                                        <td colspan="6" class="text-center p-4">
+                                            <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                            <h1 class="font-bold mt-2">No Withholding Tax yet</h1>
+                                            <p class="text-sm text-neutral-500 mt-2">Start generating with the + button <br>at the top.</p>
                                         </td>
                                     </tr>
                                 @endforelse

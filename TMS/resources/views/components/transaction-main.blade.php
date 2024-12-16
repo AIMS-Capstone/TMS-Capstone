@@ -141,7 +141,7 @@
             </div>
 
             <div class="flex flex-row items-center space-x-4">
-                <div class="relative inline-block text-left sm:w-auto w-full z-50">
+                <div class="relative inline-block text-left sm:w-auto w-full z-30">
                     <button id="filterButton" class="flex items-center text-zinc-600 hover:text-zinc-800 w-full hover:shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
                             <path fill="none" stroke="#696969" stroke-width="2" d="M18 4H6c-1.105 0-2.026.91-1.753 1.98a8.02 8.02 0 0 0 4.298 5.238c.823.394 1.455 1.168 1.455 2.08v6.084a1 1 0 0 0 1.447.894l2-1a1 1 0 0 0 .553-.894v-5.084c0-.912.632-1.686 1.454-2.08a8.02 8.02 0 0 0 4.3-5.238C20.025 4.91 19.103 4 18 4z"/>
@@ -150,7 +150,7 @@
                         <svg id="dropdownArrow" class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
                     </button>
                 
-                    <div id="dropdownFilter" class="absolute mt-2 w-[340px] rounded-lg shadow-lg bg-white hidden z-50">
+                    <div id="dropdownFilter" class="absolute mt-2 w-[340px] rounded-lg shadow-lg bg-white hidden z-40">
                         <div class="py-2 px-2">
                             <span class="block px-4 py-2 text-xs font-bold text-zinc-700">Filter</span>
                             <span class="block px-4 py-1 text-zinc-700 font-bold text-xs">Timeframe</span>
@@ -208,7 +208,7 @@
                         <svg class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
                     </button>
         
-                    <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
+                    <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-30">
                         <div class="py-2 px-2">
                             <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
                             <div data-sort="recently-added" class="block px-4 py-2 w-full text-xs hover-dropdown">Recently Added</div>

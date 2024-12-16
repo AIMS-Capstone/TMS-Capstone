@@ -373,7 +373,7 @@ $organizationId = session('organization_id');
                         @csrf
                         <div class="grid grid-cols-2 gap-6 mb-5">
                             <div class="w-full">
-                                <label for="year" class="block font-semibold text-sm text-gray-700">Year</label>
+                                <label for="year" class="block font-semibold text-sm text-zinc-700">Year</label>
                                 <select id="year" name="year" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
                                     <option value="">Select Year</option>
                                     @php
@@ -387,7 +387,7 @@ $organizationId = session('organization_id');
                             </div>
 
                             <div class="w-full">
-                                <label for="month" class="block font-semibold text-sm text-gray-700">Month</label>
+                                <label for="month" class="block font-semibold text-sm text-zinc-700">Month</label>
                                 <select id="month" name="month" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
                                     x-model="month" 
                                     @change="selectedType = month.includes('Q') ? '2550Q' : '2550M'" 

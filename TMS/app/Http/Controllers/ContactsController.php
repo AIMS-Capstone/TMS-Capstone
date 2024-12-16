@@ -61,7 +61,8 @@ class ContactsController extends Controller
     // Validate the incoming request
     $validated = $request->validate([
         'contact_type' => 'required|string',
-        'bus_name' => 'required|string|max:255', 
+        'bus_name' => 'required|string|max:255',
+        'classification' => 'required|string', 
         'contact_email' => 'nullable|email|max:255', 
         'contact_phone' => 'nullable|string|max:20',
         'contact_tin' => 'nullable|string|max:255',
@@ -98,6 +99,7 @@ class ContactsController extends Controller
         $validated = $request->validate([
             'contact_type' => 'required|string',
             'bus_name' => 'required|string|max:255',
+            'classification' => 'required|string',
             'contact_tin' => 'nullable|string|max:255',
             'contact_address' => 'nullable|string|max:255',
             'contact_city' => 'required|string|max:255',

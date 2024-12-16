@@ -12,7 +12,7 @@
     <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
 
     <!-- Modal container -->
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto z-10 overflow-hidden"
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-xl mx-auto z-10 overflow-hidden"
          x-show="show" 
          x-transition:enter="transition ease-out duration-300 transform" 
          x-transition:enter-start="opacity-0 scale-90" 
@@ -43,73 +43,85 @@
                 @csrf
                 <input type="hidden" name="organization_id" value="{{ Auth::user()->organization_id }}">
 
-                <!-- Form fields in a grid -->
                 <div class="mb-6 flex justify-between items-start">
+                    <!-- Name -->
+                    <div class="w-[50%] pr-4">
+                        <label for="bus_name" class="block font-semibold text-sm text-gray-700">
+                            Name <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="bus_name" id="bus_name" required
+                            placeholder="Customer Name"
+                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                    </div>
+
                     <!-- Contact Type -->
                     <div class="w-[50%] pr-4">
                         <label for="contact_type" class="block font-semibold text-sm text-gray-700">
                             Contact Type <span class="text-red-500">*</span>
                         </label>
                         <select name="contact_type" id="contact_type" required
-                            class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                             <option value="" disabled selected>Select Contact Type</option>
-                            <option value="Individual">Individual</option>
-                            <option value="Non-Individual">Non-Individual</option>
+                            <option value="Customer">Customer</option>
+                            <option value="Vendor">Vendor</option>
                         </select>
                     </div>
+                </div>
 
+                <div class="mb-6 flex justify-between items-start">
                     <!-- TIN -->
-                    <div class="w-2/3">
+                    <div class="w-[50%] pr-4">
                         <label for="contact_tin" class="block font-semibold text-sm text-gray-700">
                             Tax Identification Number (TIN) <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="contact_tin" id="contact_tin" required
                             placeholder="000-000-000-000" maxlength="17"
-                            class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                    </div>
+
+                    <div class="w-[50%] pr-4">
+                        <label for="classification" class="block font-semibold text-sm text-gray-700">
+                           Classification<span class="text-red-500">*</span>
+                        </label>
+                        <select name="classification" id="classification" required
+                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                            <option value="" disabled selected>Select Classification Type</option>
+                            <option value="Individual">Individual</option>
+                            <option value="Non-Individual">Non-Individual</option>
+                        </select>
                     </div>
                 </div>
 
-                 <!-- Name -->
-                 <div class="mb-6">
-                    <label for="bus_name" class="block font-semibold text-sm text-gray-700">
-                        Name <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" name="bus_name" id="bus_name" required
-                        placeholder="Customer Name"
-                        class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                </div>
-
                 <div class="mb-6 flex justify-between items-start">
-
                     <!-- Address -->
-                        <div class="w-2/3 pr-4">
-                            <label for="contact_address" class="block font-semibold text-sm text-gray-700">
-                                Address <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" name="contact_address" id="contact_address" required
-                                placeholder="Address"
-                                class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                        </div>
+                    <div class="w-2/3 pr-4">
+                        <label for="contact_address" class="block font-semibold text-sm text-gray-700">
+                            Address <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="contact_address" id="contact_address" required
+                            placeholder="Address"
+                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                    </div>
 
-                        <!-- City -->
-                        <div class="w-2/3 pr-4">
-                            <label for="contact_city" class="block font-semibold text-sm text-gray-700">
-                                City <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" name="contact_city" id="contact_city" required
-                                placeholder="City"
-                                class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                        </div>
+                    <!-- City -->
+                    <div class="w-2/3 pr-4">
+                        <label for="contact_city" class="block font-semibold text-sm text-gray-700">
+                            City <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="contact_city" id="contact_city" required
+                            placeholder="City"
+                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                    </div>
 
-                        <!-- Zip Code -->
-                        <div class="w-2/3 pr-4">
-                            <label for="contact_zip" class="block font-semibold text-sm text-gray-700">
-                                Zip Code <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" name="contact_zip" id="contact_zip" required
-                                placeholder="e.g., 1446" maxlength="4"
-                                class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                        </div>
+                    <!-- Zip Code -->
+                    <div class="w-2/3 pr-4">
+                        <label for="contact_zip" class="block font-semibold text-sm text-gray-700">
+                            Zip Code <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="contact_zip" id="contact_zip" required
+                            placeholder="e.g., 1446" maxlength="4"
+                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                    </div>
                 </div>
 
                 <!-- Modal Footer -->
@@ -121,6 +133,7 @@
                         >
                         Cancel
                     </button>
+                    {{-- Edit button dapat: same sa coa, and then sa edit-contact modal yung may "Update" button --}}
                     <button 
                         type="submit" 
                         class="px-6 py-1.5 font-semibold bg-blue-900 text-white rounded-md hover:bg-blue-950 transition">
