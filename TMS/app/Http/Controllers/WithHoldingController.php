@@ -405,45 +405,24 @@ class WithHoldingController extends Controller
             
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function importSources1601C(Request $request, $id)
     {
+        // Validate file input
+        $request->validate([
+            'file' => 'required|mimes:csv,xlsx'
+        ]);
 
-    }
+        // Find the 1601C withholding record
+        $withHolding = WithHolding::findOrFail($id);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        
-    }
+        // Save the file temporarily
+        $path = $request->file('file')->store('temp');
 
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
-    {
-    
+        // Pass withholdingId to the Blade view
+        return view('tax_return.with_holding.1601C_sources', [
+            'importPath' => $path,
+            'withholdingId' => $id, // Pass withholdingId
+        ]);
     }
 
     /**
