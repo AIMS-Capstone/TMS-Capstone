@@ -15,7 +15,7 @@
         <!-- Modal header -->
         <div class="relative p-3 bg-blue-900 border-opacity-80 w-full">
             <h1 class="text-lg font-bold text-white text-center">Employee Details</h1>
-            <button @click="showEmp = false" class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200">
+            <button @click="$dispatch('close-modal')" class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 8L16 16M8 16L16 8" stroke="#1e3a8a" class="transition duration-200 hover:stroke-gray-600"/>

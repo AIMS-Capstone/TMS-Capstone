@@ -226,7 +226,7 @@ class EmployeesController extends Controller
                 'zip_code' => $validated['prev_zip_code'],
                 'region' => $validated['region'],
             ]);
-
+            
             return redirect()->route('employees')->with('success', 'Employee updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Failed to update employee: ' . $e->getMessage()]);

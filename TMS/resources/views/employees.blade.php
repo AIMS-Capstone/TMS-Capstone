@@ -282,12 +282,12 @@
                                                     </td>
                                                     <td class="text-left py-3 px-4">
                                                         <x-view-employees />
-                                                        <button 
-                                                            x-data x-on:click="$dispatch('open-view-employee-modal', { employee: {{ $employee->toJson() }} })"
+                                                        <button
+                                                            @click="$dispatch('open-view-employee-modal', {{ json_encode($employee) }})" 
                                                             class="hover:underline hover:text-blue-500">
                                                             {{ $employee->first_name }} {{ $employee->last_name }}
                                                         </button>
-                                                    </td>
+                                                    </td>   
                                                     <td class="text-left py-3 px-4">{{ $employee->tin }}</td>
                                                     <td class="text-left py-3 px-4">{{ \Carbon\Carbon::parse($employee->date_of_birth)->format('F d, Y') }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->contact_number }}</td>
@@ -296,7 +296,7 @@
                                                     <td class="text-left py-3 px-4">
                                                         <x-edit-employees />
                                                         <button 
-                                                        @click="$dispatch('open-edit-employee-modal', @js($employee))">
+                                                        @click="$dispatch('open-edit-employee-modal', {{@json_encode($employee) }})">
                                                         Edit Employee
                                                     </button>
                                                     
@@ -492,7 +492,7 @@
             form.submit();
         }
 
-        document.addEventListener('open-view-epmloyee-modal', event => {
+        document.addEventListener('open-view-employee-modal', event => {
             console.log(event.detail); 
         });
 
