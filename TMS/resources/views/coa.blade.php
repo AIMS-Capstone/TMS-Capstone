@@ -413,9 +413,6 @@
                                                                     | {{ $coa->description }}
                                                                 @endif
                                                             </td>
-                                                            {{-- <td class="text-left py-3 px-4">{{ $coa->created_at->format('F j, Y h:i:s A') }}</td> --}}
-                                                            {{-- <td class="text-left py-3 px-4">{{ $coa->created_at }}</td> --}}
-                                                            <td></td>
                                                             <td class="text-left py-3 px-4">{{ $coa->created_at ? $coa->created_at->format('F j, Y h:i:s A') : 'N/A'}}</td>
                                                         </tr>
                                                     @endforeach
