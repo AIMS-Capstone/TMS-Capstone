@@ -252,7 +252,7 @@
                 <div class="mb-5 flex justify-between items-start">
                     <div class="w-2/3 pr-4">
                         <label class="block text-sm font-bold text-zinc-700">Email Address</label>
-                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
                             x-bind:value="client.email" disabled readonly>
                     </div>
                     <div class="w-2/3 text-left">

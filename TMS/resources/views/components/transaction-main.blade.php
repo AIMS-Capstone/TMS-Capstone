@@ -9,7 +9,7 @@
     </div>
     <div class="flex justify-between items-center px-10">
         <div class="flex items-center px-2">            
-            <p class="font-normal text-sm text-zinc-700">The Transactions feature ensures accurate tracking and categorization <br> of each transaction.</p>
+            <p class="font-normal text-xs text-zinc-700">The Transactions feature ensures accurate tracking and categorization <br> of each transaction.</p>
         </div>
         <div class="items-end float-end relative sm:w-auto" 
             x-data="{ selectedTab: (new URL(window.location.href)).searchParams.get('type') || 'All' }" 
@@ -130,7 +130,7 @@
                     <input 
                     type="search" 
                     name="search" 
-                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
+                    class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
                     aria-label="Search Term" 
                     placeholder="Search..." 
                     @input.debounce="$el.form.requestSubmit()" 
@@ -427,7 +427,7 @@
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="8" class="text-center p-4">
+                            <td colspan="9" class="text-center p-4">
                                 <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
                                 <h1 class="font-extrabold text-lg mt-2">No Transactions yet</h1>
                                 <p class="text-sm text-neutral-500 mt-2">Start adding transactions with the <br> + button at the top.</p>
