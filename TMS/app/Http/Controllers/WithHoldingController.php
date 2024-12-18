@@ -20,18 +20,12 @@ class WithHoldingController extends Controller
     // etong parent withHoldingController na gamit ko sa 1601C
     public function index1601C(Request $request)
     {
-        $search = $request->input('search');
-        $type = $request->input('type');
-        //idk why it can't show entries
-        $perPage = $request->input('perPage', 5);
-
         $organizationId = session('organization_id');
 
-        $query = WithHolding::query();
+        // Get the perPage value from the request, default to 5
+        $perPage = $request->input('perPage', 5);
 
-        //idk why it can't show entries
-        $with_holdings = $query->paginate($perPage);
-        $with_holdings = $this->getWithHoldings($organizationId, '1601C');
+        $with_holdings = $this->getWithHoldings($organizationId, '1601C', $perPage);
         return view('tax_return.with_holding.1601C', compact('with_holdings'));
     }
 
@@ -405,13 +399,13 @@ class WithHoldingController extends Controller
             ->with('success', '1601C Form has been successfully submitted.');
     }
 
-    private function getWithHoldings($organizationId, $type)
+    private function getWithHoldings($organizationId, $type, $perPage = 5)
     {
 
         return WithHolding::with(['employee', 'employment', 'creator'])
             ->where('type', $type)
             ->where('organization_id', $organizationId)
-            ->paginate(5);
+            ->paginate($perPage);
             
     }
 

@@ -25,8 +25,11 @@ class withHolding1604CController extends Controller
             return redirect()->back()->withErrors(['error' => 'Organization setup ID not found.']);
         }
 
-        $with_holdings = $this->getWithHoldings($organizationId, '1604C');
+        // Get the perPage value from the request, default to 5
+        $perPage = $request->input('perPage', 5);
 
+        // Pass the perPage parameter to the getWithHoldings method
+        $with_holdings = $this->getWithHoldings($organizationId, '1604C', $perPage);
         return view('tax_return.with_holding.1604C', compact('with_holdings'));
     }
 
@@ -236,11 +239,11 @@ Log::debug('Grouped Monthly Data:', $groupedData->toArray());
     /**
      * Fetch withholdings for a specific type and organization.
      */
-    private function getWithHoldings($organizationId, $type)
+    private function getWithHoldings($organizationId, $type, $perPage = 5)
     {
         return WithHolding::with(['sources.employee', 'sources.employment'])
             ->where('type', $type)
             ->where('organization_id', $organizationId)
-            ->paginate(5);
+            ->paginate($perPage);
     }
 }

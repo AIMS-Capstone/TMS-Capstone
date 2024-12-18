@@ -268,8 +268,7 @@
                                             return this.selectedRows.length; 
                                         }
                                     }"
-                                    class="mb-12 mx-12 overflow-hidden max-w-full rounded-md border-neutral-300 dark:border-neutral-700"
-                                >
+                                    class="mb-12 mx-12 overflow-hidden max-w-full">
                                     <div class="container mx-auto">
                                         <div class="flex flex-row space-x-2 items-center justify-between">
                                             <div class="flex space-x-2 items-center">
@@ -279,7 +278,7 @@
                                                         <input 
                                                             type="search" 
                                                             name="search" 
-                                                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900" 
+                                                            class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900" 
                                                             aria-label="Search Term" 
                                                             placeholder="Search..." 
                                                             @input.debounce="$el.form.requestSubmit()" 
@@ -294,7 +293,8 @@
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
                                                             <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
                                                         </svg>
-                                                        <span id="selectedOption" class="font-normal text-md text-zinc-700 truncate">Sort by</span>
+                                                        <span id="selectedOption" class="font-normal text-sm text-zinc-600 hover:text-zinc-800 truncate">Sort by</span>
+                                                        <svg class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
                                                     </button>
                                                     <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
                                                         <div class="py-2 px-2">
@@ -307,14 +307,14 @@
                                                 </div>
                                             </div>
 
-                                            <div class="mx-auto space-x-4 pr-6 flex items-center">
+                                            <div class="mx-auto space-x-4 pr-2 flex items-center">
                                                 <!-- Unarchive Button -->
                                                 <button 
                                                     type="button" 
                                                     @click="showCheckboxes = !showCheckboxes; showRestoreCancelButtons = !showRestoreCancelButtons; disableButtons();" 
                                                     :disabled="selectedRows.length === 1 || isDisabled"
                                                     class="border px-3 py-2 rounded-lg text-sm text-gray-600 hover:border-gray-800 hover:text-gray-800 hover:bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
-                                                >
+                                                    >
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-zinc-500" viewBox="0 0 24 24">
                                                         <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
                                                     </svg>
@@ -326,7 +326,7 @@
                                                     @click="showCheckboxes = !showCheckboxes; showDeleteCancelButtons = !showDeleteCancelButtons; disableButtons();" 
                                                     :disabled="selectedRows.length === 1 || isDisabled"
                                                     class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-red-800 hover:text-red-800 hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
-                                                >
+                                                    >
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
                                                     <span class="text-zinc-600 transition group-hover:text-red-500">Delete</span>
                                                 </button>
@@ -410,7 +410,7 @@
                                                                 | {{ $coa->description }}
                                                             @endif
                                                         </td>
-                                                        <td class="text-left py-3 px-4">{{ $coa->created_at->format('F j, Y h:i:s A') }}</td>
+                                                        <td class="text-left py-3 px-4">{{ $coa->created_at ? $coa->created_at->format('F j, Y h:i:s A') : 'N/A'}}</td>
                                                     </tr>
                                                 @endforeach
                                                 @if ($inactiveCoas->isEmpty())
@@ -591,7 +591,9 @@
         // FOR SORT BUTTON
         document.getElementById('sortButton').addEventListener('click', function() {
             const dropdown = document.getElementById('dropdownMenu');
+            const dropdownArrow = this.querySelector('svg:nth-child(3)');
             dropdown.classList.toggle('hidden');
+            dropdownArrow.classList.toggle('rotate-180');
         });
 
         // FOR SORT BY
@@ -599,7 +601,6 @@
             const table = document.querySelector('#tableid tbody');
             const rows = Array.from(table.querySelectorAll('tr')).filter(row => row.style.display !== 'none');
             let sortedRows;
-
             if (criteria === 'recently-added') {
                 // Sort by the 'Date Created' column; adjust index as necessary
                 sortedRows = rows.sort((a, b) => {
@@ -619,22 +620,21 @@
                     }
                 });
             }
-
-            // Append sorted rows back to the table body
             table.innerHTML = '';
             sortedRows.forEach(row => table.appendChild(row));
         }
-
-        // Sort dropdown click event handling
+        // Dropdown event listeners
         document.querySelectorAll('#dropdownMenu div[data-sort]').forEach(item => {
             item.addEventListener('click', function() {
                 const criteria = this.getAttribute('data-sort');
+                document.getElementById('selectedOption').textContent = this.textContent; // Update selected option text
                 sortItems(criteria);
-
-                // Update displayed text and close dropdown
-                document.getElementById('selectedOption').textContent = this.textContent;
-                document.getElementById('dropdownMenu').classList.add('hidden');
             });
+        });
+        window.addEventListener('click', (event) => {
+            if (!sortButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                dropdownMenu.classList.add('hidden');
+            }
         });
         
         // FOR BUTTON OF SHOW ENTRIES

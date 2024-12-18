@@ -228,7 +228,7 @@ $organizationId = session('organization_id');
                                             <tr>
                                                 <td colspan="6" class="text-center p-4">
                                                     <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
-                                                    <h1 class="font-bold mt-2">No Generated VAT yet</h1>
+                                                    <h1 class="font-bold mt-2 text-lg">No Generated Returns yet</h1>
                                                     <p class="text-sm text-neutral-500 mt-2">Start generating with the + button <br>at the top.</p>
                                                 </td>
                                             </tr>
