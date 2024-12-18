@@ -203,10 +203,10 @@ Route::post('/tax-return/store1701Q/{taxReturn}', [Tax1701QController::class, 's
         });
 
         // Employees Routes
-        Route::controller(EmployeesController::class)->group(function(){
+        Route::controller(EmployeesController::class)->group(function () {
             Route::get('/employees', 'index')->name('employees');
             Route::post('/employees', 'store')->name('employees.store');
-            Route::put('/employees/{employees}', [EmployeesController::class, 'update'])->name('employees.update');
+            Route::put('/employees/{employee}', [EmployeesController::class, 'update'])->name('employees.update'); 
             Route::delete('/employees/destroy', 'destroy')->name('employees.destroy');
         });
 
@@ -339,6 +339,9 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
                 // Route for creating the 1601C form
                 Route::get('/{id}/1601C_form', [WithHoldingController::class, 'createForm1601C'])->name('form1601C.create');
                 Route::post('/{id}/1601C/store', [WithHoldingController::class, 'storeForm1601C'])->name('form1601C.store');
+                //Route for import
+                Route::post('/withholding/1601C/{id}/import', [WithHoldingController::class, 'importSources1601C'])->name('with_holding.1601C_import');
+
 
             // Routes for generting withholding tax return for 0619E
                 Route::get('/0619E', [withHolding0619EController::class, 'index0619E'])->name('with_holding.0619E');

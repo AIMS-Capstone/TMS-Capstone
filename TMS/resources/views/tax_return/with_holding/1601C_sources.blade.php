@@ -214,6 +214,9 @@ $organizationId = session('organization_id');
                                     </div>
                                 </div>
                             </div>
+                        
+                        <!-- Livewire Source Import -->
+                        <livewire:source-import :withholdingId="$with_holding->id" />
 
                         <button class="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600">
                             Delete
