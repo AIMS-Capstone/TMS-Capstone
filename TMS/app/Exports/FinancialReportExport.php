@@ -14,54 +14,45 @@ class FinancialReportExport implements FromArray, WithHeadings
         $this->financialData = $financialData;
     }
 
-public function array(): array
-{
-    return [
+    public function array(): array
+    {
+        if (empty($this->financialData)) {
+            return [['No data available for the selected period']];
+        }
 
-        // ['Report Period', "{$this->financialData['year']} - {$this->financialData['month']} - {$this->financialData['quarter']}"],
-        // Revenue Section
-        ['Revenue', ''],
-        ['Sales/Revenues/Receipts/Fees', $this->financialData['totalRevenue']], // Main sales revenue
-        ['Total Revenue', $this->financialData['totalRevenue']],
-        
-        // Cost of Sales Section
-        ['Cost of Sales', ''],
-        ['Cost of Goods Sold', $this->financialData['totalCostOfSales']],
-        ['Total Cost of Sales', $this->financialData['totalCostOfSales']],
-        
-        // Gross Profit
-        ['Gross Profit', $this->financialData['grossProfit']],
-        
-        // Expenses Section Header
-        ['Expenses', ''],
+        return [
+            ['Revenue', ''],
+            ['Sales/Revenues/Receipts/Fees', $this->financialData['totalRevenue'] ?? 0],
+            ['Total Revenue', $this->financialData['totalRevenue'] ?? 0],
 
-        // Individual Expenses
-        ['Rental', $this->financialData['rentalTotal']],
-        ['Depreciation', $this->financialData['depreciationTotal']],
-        ['Management and Consultancy Fee', $this->financialData['managementFeeTotal']],
-        ['Office Supplies', $this->financialData['officeSuppliesTotal']],
-        ['Professional Fees', $this->financialData['professionalFeesTotal']],
-        ['Representation and Entertainment', $this->financialData['representationTotal']],
-        ['Research and Development', $this->financialData['researchDevelopmentTotal']],
-        ['Salaries and Allowances', $this->financialData['salariesAllowancesTotal']],
-        ['SSS, GSIS, PhilHealth, HDMF and Other Contributions', $this->financialData['contributionsTotal']],
-        ['Others', $this->financialData['otherExpensesTotal']],
-        
-        // Total Operating Expenses
-        ['Total Operating Expenses', $this->financialData['totalOperatingExpenses']],
-        
-        // Net Income
-        ['Net Income (Loss) From Operations', $this->financialData['netIncome']],
-        
-        // Placeholder for Income Tax Expense if needed
-        ['Income Tax Expense', ''],
-        
-        // Final Net Income
-        ['Net Income (Loss) From Operations', $this->financialData['netIncome']]
-    ];
-}
+            // Cost of Sales Section
+            ['Cost of Sales', ''],
+            ['Cost of Goods Sold', $this->financialData['totalCostOfSales'] ?? 0],
+            ['Total Cost of Sales', $this->financialData['totalCostOfSales'] ?? 0],
 
+            // Gross Profit
+            ['Gross Profit', $this->financialData['grossProfit'] ?? 0],
 
+            // Expenses Section Header
+            ['Expenses', ''],
+            ['Rental', $this->financialData['rentalTotal'] ?? 0],
+            ['Depreciation', $this->financialData['depreciationTotal'] ?? 0],
+            ['Management and Consultancy Fee', $this->financialData['managementFeeTotal'] ?? 0],
+            ['Office Supplies', $this->financialData['officeSuppliesTotal'] ?? 0],
+            ['Professional Fees', $this->financialData['professionalFeesTotal'] ?? 0],
+            ['Representation and Entertainment', $this->financialData['representationTotal'] ?? 0],
+            ['Research and Development', $this->financialData['researchDevelopmentTotal'] ?? 0],
+            ['Salaries and Allowances', $this->financialData['salariesAllowancesTotal'] ?? 0],
+            ['SSS, GSIS, PhilHealth, HDMF and Other Contributions', $this->financialData['contributionsTotal'] ?? 0],
+            ['Others', $this->financialData['otherExpensesTotal'] ?? 0],
+
+            // Total Operating Expenses
+            ['Total Operating Expenses', $this->financialData['totalOperatingExpenses'] ?? 0],
+
+            // Net Income
+            ['Net Income (Loss) From Operations', $this->financialData['netIncome'] ?? 0],
+        ];
+    }
 
     public function headings(): array
     {
