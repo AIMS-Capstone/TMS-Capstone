@@ -5,7 +5,16 @@
             {{ $description }}
         </p>
     </div>
+    @if (!empty($wildcard))
+        <div class="ml-auto">
+            <p class="mt-1 text-2xl font-bold auth-color mb-2">
+                {{ $wildcard }}
+            </p>
+        </div>
+    @endif
+
     <!-- Notes and Activities Button -->
+
     @if (Route::currentRouteName() == 'transactions.show')
         <div class="ml-auto float-end justify-end items-center">
             <button type="button" class="group text-zinc-700 border border-gray-300 hover:bg-blue-900 hover:text-white font-medium rounded-lg text-sm px-2 py-2 flex items-center focus:outline-none focus:ring-1 focus:ring-gray-300 transition">
