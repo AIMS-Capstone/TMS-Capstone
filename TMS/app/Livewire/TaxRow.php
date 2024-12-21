@@ -6,133 +6,156 @@ use Livewire\Component;
 use App\Models\ATC;
 use App\Models\TaxType;
 use App\Models\Coa;
+use Illuminate\Support\Facades\Log;
 
 class TaxRow extends Component
 {
     public $taxTypes = [];
     public $atcs = [];
     public $coas = [];
-    public $tax_code;
-    public $coa;
-    public $amount = 0;
-    public $tax_amount = 0;
-    public $net_amount = 0;
+    public $amount = [];
     public $index; // Unique row index
-    public $description; // Added if needed
-    public $tax_type; // Added if needed
-    public $type; // Added to store transaction type
+    public $taxRow = [
+        'description' => '',
+        'tax_code' => null,
+        'coa' => null,
+        'amount' => 0,
+        'tax_amount' => 0,
+        'net_amount' => 0,
+        'tax_type' => ''
+    ];
+    protected $listeners = [
+        'parentComponentErrorBag'
+    ];
+    protected $rules = [
+        'description' => 'required|string|max:255',
+        'tax_type' => 'required|exists:tax_types,id',
+        'tax_code' => 'nullable|exists:atcs,id',
+        'coa' => 'nullable|exists:coas,id',
+        'amount' => 'required|numeric|min:0.01',
+    ];
+    
+    public $type; // Transaction type (purchase/sales)
     public $mode;
 
-    // Handle initialization for both edit and create
-    public function mount($index, $taxRow = null, $type = 'purchase', $mode ='create')
+    public function mount($index, $taxRow = null, $type = 'purchase', $mode = 'create')
     {
-        $this->mode = $mode;
+        $this->index = $index;
         $this->type = $type;
-        
-        // Load initial data based on the type
+        $this->mode = $mode;
+
+        // Load dropdown options
         $this->taxTypes = TaxType::where('transaction_type', $this->type)->get();
         $this->atcs = ATC::where('transaction_type', $this->type)->get();
         $this->coas = Coa::where('status', 'Active')->get();
-        $this->index = $index;
 
-        // If editing, populate fields with taxRow data; else, use default values for creating
+        // Populate default or passed taxRow data
         if ($taxRow) {
-            $this->tax_code = $taxRow['tax_code'] ?? null;
-            $this->coa = $taxRow['coa'] ?? null;
-            $this->amount = $taxRow['amount'] ?? 0;
-            $this->tax_amount = $taxRow['tax_amount'] ?? 0;
-            $this->net_amount = $taxRow['net_amount'] ?? 0;
-            $this->description = $taxRow['description'] ?? '';
-            $this->tax_type = $taxRow['tax_type'] ?? '';
-        } else {
-            // Initialize for create
-            $this->tax_code = null;
-            $this->coa = null;
-            $this->amount = 0;
-            $this->tax_amount = 0;
-            $this->net_amount = 0;
-            $this->description = '';
-            $this->tax_type = '';
+            $this->taxRow = $taxRow;
         }
 
-        // Calculate tax (if any initial values are available)
         $this->calculateTax();
     }
-
-    // Method to remove the row
-    public function removeRow()
-    {
-        $this->dispatch('taxRowRemoved', $this->index);  // Emit the event with the row index
-    }
-
-    // Automatically update tax when specific fields are updated
     public function updated($field)
     {
-        if (in_array($field, ['tax_code', 'amount', 'tax_type'])) {
+        if (strpos($field, 'taxRow.') === 0) {
+            $fieldName = str_replace('taxRow.', '', $field); // Get field name
+            $this->resetErrorBag($fieldName . '.' . $this->index); 
             $this->calculateTax();
-            
-            // Dispatch updated event to parent component
-            $this->dispatch('taxRowUpdated', [
-                'index' => $this->index,
-                'description' => $this->description,
-                'tax_type' => $this->tax_type,
-                'tax_code' => $this->tax_code,
-                'coa' => $this->coa,
-                'amount' => $this->amount,
-                'tax_amount' => $this->tax_amount,
-                'net_amount' => $this->net_amount,
-            ])->to($this->getParentComponentClass());
         }
+    
+        $this->dispatch('taxRowUpdated', [
+            'index' => $this->index,
+            'taxRow' => $this->taxRow
+        ]);
+    }
+    public function calculateTax()
+    {
+        Log::info("nae nega nae ");
+        $taxRate = $this->getTaxRateByType($this->taxRow['tax_type']);
+
+        if ($taxRate > 0) {
+            $vatExclusiveAmount = $this->taxRow['amount'] / (1 + ($taxRate / 100));
+            $this->taxRow['tax_amount'] = round($this->taxRow['amount'] - $vatExclusiveAmount, 2);
+            $this->taxRow['net_amount'] = round($vatExclusiveAmount, 2);
+        } else {
+            $this->taxRow['tax_amount'] = 0;
+            $this->taxRow['net_amount'] = $this->taxRow['amount'];
+        }
+
+        // Dispatch event after calculation with specific target
+        $this->dispatch('taxRowUpdated', [
+            'index' => $this->index, 
+            'taxRow' => $this->taxRow
+        ]);
     }
 
     // Determine parent component for event dispatch
     protected function getParentComponentClass()
     {
+        $componentClass = null;
+    
         if ($this->mode === 'edit') {
             // If in edit mode, dispatch to the Edit component
-            return $this->type === 'sales' ? 'App\Livewire\EditSalesTransaction' : 'App\Livewire\EditPurchaseTransaction';
-        }
-    
-        // If in create mode, dispatch to the create component
-        if ($this->mode === 'create') {
-            return $this->type === 'sales' ? 'App\Livewire\SalesTransaction' : 'App\Livewire\PurchaseTransaction';
-        }
-    
-        // Fallback default
-        return 'App\Livewire\SalesTransaction';
-    }
-    
-    // Calculate tax and net amounts
-    public function calculateTax()
-    {
-        $taxRate = $this->getTaxRateByType($this->tax_type);
-
-        if ($taxRate > 0) {
-            $vatExclusiveAmount = $this->amount / (1 + ($taxRate / 100));
-            $this->tax_amount = $this->amount - $vatExclusiveAmount; // VAT amount
-            $this->net_amount = $vatExclusiveAmount; // VAT-exclusive amount
+            $componentClass = $this->type === 'sales' 
+                ? 'App\Livewire\EditSalesTransaction' 
+                : 'App\Livewire\EditPurchaseTransaction';
+        } elseif ($this->mode === 'create') {
+            // If in create mode, dispatch to the create component
+            $componentClass = $this->type === 'sales' 
+                ? 'App\Livewire\SalesTransaction' 
+                : 'App\Livewire\PurchaseTransaction';
         } else {
-            $this->tax_amount = 0;
-            $this->net_amount = $this->amount;
+            // Fallback default
+            $componentClass = 'App\Livewire\SalesTransaction';
         }
-
-        $this->dispatch('taxRowUpdated', [
-            'index' => $this->index,
-            'description' => $this->description,
-            'tax_type' => $this->tax_type,
-            'tax_code' => $this->tax_code,
-            'coa' => $this->coa,
-            'amount' => $this->amount,
-            'tax_amount' => $this->tax_amount,
-            'net_amount' => $this->net_amount,
+    
+        // Log the returned component class
+        Log::info('Component class determined in getParentComponentClass', [
+            'mode' => $this->mode,
+            'type' => $this->type,
+            'component_class' => $componentClass,
         ]);
+    
+        return $componentClass;
+    }
+    public function removeRow()
+    {
+        $this->dispatch('taxRowRemoved', $this->index);
     }
 
-    // Fetch the tax rate for a specific tax type
+    public function reinitializeSelect2()
+    {
+        $this->dispatch('select2:reinitialize');
+    }
+
+    public function parentComponentErrorBag($data)
+    {
+        $index = $data['index'] ?? null;
+        $errors = $data['errors'] ?? [];
+    
+        Log::warning('Errors received for TaxRow component: ' . json_encode($errors));
+    
+        // Only clear errors for this specific index
+        foreach ($errors as $field => $messages) {
+            $this->resetErrorBag("$field.$index");
+        }
+    
+        // Add errors with correct indexing
+        foreach ($errors as $field => $messages) {
+            $this->addError("$field.$index", $messages[0]); // Append the index to the field name
+        }
+    }
+    
+    
+    
+    
+    
+
     public function getTaxRateByType($taxTypeId)
     {
-        $taxTypeRecord = TaxType::find($taxTypeId);
-        return $taxTypeRecord ? $taxTypeRecord->VAT : 0;
+        $taxType = TaxType::find($taxTypeId);
+        return $taxType ? $taxType->VAT : 0;
     }
 
     public function render()

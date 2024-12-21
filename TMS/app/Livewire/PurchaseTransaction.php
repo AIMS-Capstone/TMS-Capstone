@@ -8,6 +8,7 @@ use App\Models\ATC;
 use App\Models\TaxType;
 use App\Models\Coa;
 use App\Models\Transactions;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
 class PurchaseTransaction extends Component
@@ -33,11 +34,12 @@ class PurchaseTransaction extends Component
         'date' => 'required|date',
         'inv_number' => 'required|string',
         'reference' => 'nullable|string',
-        'taxRows.*.amount' => 'required|numeric|min:0',
+        'taxRows.*.amount' => 'required|numeric|min:0.01',
         'taxRows.*.tax_code' => 'nullable|exists:atcs,id',
-        'taxRows.*.coa' => 'nullable|string',
+        'taxRows.*.coa' => 'required|string',
+        'taxRows.*.description' => 'required|string',
+        'taxRows.*.tax_type' => 'required|exists:tax_types,id', // Add validation for tax type
     ];
-
     public function mount()
     {
         $this->addTaxRow();
@@ -46,16 +48,19 @@ class PurchaseTransaction extends Component
 
     public function addTaxRow()
     {
+        $newIndex = count($this->taxRows);
+            
         $this->taxRows[] = [
+            'id' => uniqid(), 
             'description' => '',
             'tax_type' => '',
             'tax_code' => '',
             'coa' => '',
             'amount' => 0,
             'tax_amount' => 0,
-            'net_amount' => 0,
-            'atc_amount' => 0
+            'net_amount' => 0
         ];
+        $this->dispatch('select2:reinitialize');
     }
 
     public function contactSelected($contactId)
@@ -72,8 +77,23 @@ class PurchaseTransaction extends Component
 
     public function updateTaxRow($data)
     {
-        $this->taxRows[$data['index']] = $data;
-        $this->calculateTotals(); // Recalculate after updating a row
+        Log::info('updateTaxRow data received', [
+            'full_data' => $data,
+            'index' => $data['index'] ?? 'No index',
+            'taxRow' => $data['taxRow'] ?? 'No taxRow'
+        ]);
+    
+        // Find the key of the row with the matching ID
+        $key = array_search($data['index'], array_column($this->taxRows, 'id'));
+        
+        if ($key !== false) {
+            Log::info('naabot mo to idol sa updateTaxrow to');
+            $this->taxRows[$key] = $data['taxRow'];
+            $this->calculateTotals();
+        }
+        else {
+            Log::info("ina mo mali ka");
+        };
     }
 
     public function calculateTotals()
@@ -85,6 +105,10 @@ class PurchaseTransaction extends Component
     $this->appliedATCs = [];
     $this->appliedATCsTotalAmount = 0;
 
+    Log::info('Calculating totals', [
+        'tax_rows_count' => count($this->taxRows)
+    ]);
+
     foreach ($this->taxRows as &$row) {  // Use reference (&) to modify array elements
         $amount = $row['amount'];
         $taxTypeId = $row['tax_type'];
@@ -94,6 +118,14 @@ class PurchaseTransaction extends Component
 
         $atc = ATC::find($row['tax_code']);
         $atcRate = $atc ? $atc->tax_rate : 0;
+  
+            // Log each row's details
+            Log::info('Processing tax row', [
+                'row_details' => $row,
+                'tax_type' => $row['tax_type'],
+                'amount' => $row['amount']
+            ]);
+    
 
         if ($vatRate > 0) {
             // Handle vatable purchase
@@ -135,11 +167,13 @@ class PurchaseTransaction extends Component
     
     
 
-    public function saveTransaction()
-    {
-   
-        $organizationId = Session::get('organization_id');
-        // Create a transaction with 'Purchase' type
+public function saveTransaction()
+{
+    $this->validate(); // Add validation if not already present
+
+    $organizationId = session('organization_id');
+    
+    try {
         $transaction = Transactions::create([
             'transaction_type' => 'Purchase',
             'date' => $this->date,
@@ -150,32 +184,32 @@ class PurchaseTransaction extends Component
             'vatable_purchase' => $this->vatablePurchase,
             'non_vatable_purchase' => $this->nonVatablePurchase,
             'vat_amount' => $this->vatAmount,
-            'status'=> 'Draft',
-            'organization_id'=> $organizationId
-
+            'status' => 'Draft',
+            'organization_id' => $organizationId
         ]);
 
-        // Save each tax row linked to the transaction
         foreach ($this->taxRows as $row) {
             TaxRow::create([
                 'transaction_id' => $transaction->id,
                 'description' => $row['description'],
                 'amount' => $row['amount'],
-                'tax_code' => $row['tax_code'],
+                'tax_code' => !empty($row['tax_code']) ? $row['tax_code'] : null,
                 'tax_type' => $row['tax_type'],
                 'tax_amount' => $row['tax_amount'],
-                'atc_amount' => $row['atc_amount'], // Save ATC amount if applicable
+                'atc_amount' => isset($row['atc_amount']) ? $row['atc_amount'] : 0,
                 'net_amount' => $row['net_amount'],
                 'coa' => !empty($row['coa']) ? $row['coa'] : null,
-                
             ]);
         }
 
-        // Optionally, redirect or provide feedback to the user
-        session()->flash('message', 'Transaction saved successfully!');
+        session()->flash('message', 'Purchase transaction saved successfully!');
         return redirect()->route('transactions.show', ['transaction' => $transaction->id]);
-    }
 
+    } catch (\Exception $e) {
+        Log::error('Error saving purchase transaction: ' . $e->getMessage());
+        session()->flash('error', 'There was an error saving the purchase transaction.');
+    }
+}
     public function render()
     {
         return view('livewire.purchase-transaction', [
