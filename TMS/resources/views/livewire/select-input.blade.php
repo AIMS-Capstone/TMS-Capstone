@@ -1,17 +1,17 @@
-<div class="form-group">
+<div class="form-group text-xs">
     <select 
         name="{{ $name }}" 
-        class="select2 {{ $class }} mr-2 @error('selectedValue') border-red-500 @enderror" 
+        class="text-xs select2 {{ $class }} mr-2 @error('selectedValue') border-red-500 @enderror" 
         id="{{ $id }}" 
         @if($isGrouped) data-grouped="true" @endif
         wire:model="selectedValue"
-    >
+        >
         <!-- Default empty option -->
        <option 
-            value="default" 
+            class="text-sm" value="default" 
             data-tax-id="000-000-000-000"
             {{ empty($selectedValue) || $selectedValue == 'default' ? 'selected' : '' }}
-        >
+            >
             Default TIN
         </option>
 
@@ -39,7 +39,7 @@
                     @if(isset($option['tax_identification_number']) && $option['tax_identification_number']) 
                         data-tax-id="{{ $option['tax_identification_number'] }}"
                     @endif
-                >
+                    >
                     {{ $option[$labelKey] }}
                 </option>
             @endif

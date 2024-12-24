@@ -6,30 +6,25 @@
                 <div class="px-10 py-6">
                     <nav class="flex" aria-label="Breadcrumb">
                         <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
-                            <li class="inline-flex items-center text-sm font-normal text-zinc-500">
-                            {{-- <a href="{{ route('vat_return') }}" class="inline-flex items-center text-sm font-normal text-zinc-500">
-                                
-                            </a> --}}
-                            Percentage Tax Return
-                            </li>
+                            <li class="inline-flex items-center text-sm font-normal text-zinc-500">Percentage Tax Return</li>
                             <li>
-                            <div class="flex items-center">
-                                <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                                </svg>
-                                <a href="{{ route('percentage_return') }}" 
-                                    class="ms-1 text-sm font-medium {{ Request::routeIs('percentage_return') ? 'font-bold text-blue-900' : 'text-zinc-500' }} md:ms-2">
-                                    2551M/Q
-                                </a>
-                            </div>
+                                <div class="flex items-center">
+                                    <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                                    </svg>
+                                    <a href="{{ route('percentage_return') }}" 
+                                        class="ms-1 text-sm font-medium {{ Request::routeIs('percentage_return') ? 'font-bold text-blue-900' : 'text-zinc-500' }} md:ms-2">
+                                        2551M/Q
+                                    </a>
+                                </div>
                             </li>
                             <li aria-current="page">
-                            <div class="flex items-center">
-                                <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                                </svg>
-                                <a href="" class="ms-1 text-sm font-bold text-blue-900 md:ms-2">SLSP Data</a>
-                            </div>
+                                <div class="flex items-center">
+                                    <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                                    </svg>
+                                    <a href="" class="ms-1 text-sm font-bold text-blue-900 md:ms-2">SLSP Data</a>
+                                </div>
                             </li>
                         </ol>
                     </nav>
@@ -134,7 +129,7 @@
 
                     <!-- Transactions Header -->
                     <div 
-                    x-data="{
+                        x-data="{
                         showCheckboxes: false, 
                         checkAll: false, 
                         selectedRows: [], 
@@ -210,8 +205,7 @@
                             window.location.href = url.toString();
                         }
                     }"
-                    class="container mx-auto pt-2 overflow-hidden"
-                    >
+                    class="container mx-auto pt-2 overflow-hidden">
                     <!-- Table -->
                     <div class="mb-12 mt-1 mx-12 overflow-hidden max-w-full border-neutral-300">
                         <div class="overflow-x-auto">

@@ -11,25 +11,25 @@
             </a>
         </x-slot:redirection>
     
-  <!-- Form Header Title -->
-<x-slot:description>
-    <div class="flex justify-between items-center">
-        <!-- Title -->
-        <h1 class="text-3xl font-bold text-blue-900">Add New Sale</h1>
-
-        <!-- "Marked as Draft" Indicator -->
-    
-    </div>
-    
-</x-slot:description>
-<x-slot:wildcard>
-    <div class=" ml-auto text-gray-600 text-sm font-medium px-4">
-        Marked as Draft
-    </div>
-</x-slot>
-
-
-    
+        <!-- Form Header Title -->
+        <x-slot:description>
+            <div class="flex justify-between items-center">
+                <!-- Title -->
+                <h1 class="text-3xl font-bold text-blue-900">Add New Sale</h1>
+            </div>
+            
+        </x-slot:description>
+        <x-slot:wildcard>
+            <div class="flex flex-col text-sm px-1">
+                <div class="flex justify-end items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-400" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M5 21V5q0-.825.588-1.412T7 3h10q.825 0 1.413.588T19 5v16l-7-3zm2-3.05l5-2.15l5 2.15V5H7zM7 5h10z"/>
+                    </svg>
+                    <span class="text-amber-400">Drafted</span>
+                </div>
+                <p class="text-zinc-500 text-xs italic mt-1 text-end">Transactions are automatically saved as Draft.</p>
+            </div>
+        </x-slot:wildcard>
 
         <!-- Form Fields (Customer, Date, etc.) -->
         <x-slot:form>
@@ -38,7 +38,6 @@
                 <div class="mt-5 mb-8 ml-10">
                     <label for="select-contact" class="block font-bold text-sm text-blue-900">Customer <span class="text-red-700">*</span></label>
                     <div class="mt-4">
-                     
                         <livewire:select-input
                             name="select_contact"
                             labelKey="name"
@@ -61,7 +60,7 @@
     
                 <div class="mt-5 mb-8">
                     <x-transaction-label for="date" :value="__('Invoice Date')"  required="true"/>
-                    <x-transaction-input id="date" type="date" class="mt-4 w-full" wire:model.defer="date" />
+                    <x-transaction-input id="date" type="date" class="mt-4 text-sm w-full" wire:model.defer="date" />
                     @if($this->getErrorBag()->has('date'))
                     @foreach($this->getErrorBag()->get('date') as $error)
                     <span class="text-red-700">{{ $error }}</span>
@@ -74,7 +73,7 @@
                 <!-- Invoice Number Field -->
                 <div class="mt-5 mb-8">
                     <x-transaction-label for="inv_number" :value="__('Invoice Number')"   required="true"/>
-                    <x-transaction-input id="inv_number" type="text" class="mt-4  w-full" wire:model.defer="inv_number" />
+                    <x-transaction-input id="inv_number" type="text" class="mt-4 text-sm w-full" wire:model.defer="inv_number" />
                     @if($this->getErrorBag()->has('inv_number'))
                     @foreach($this->getErrorBag()->get('inv_number') as $error)
                     <span class="text-red-700">{{ $error }}</span>
@@ -85,7 +84,7 @@
                 <!-- Reference Field -->
                 <div class="mt-5 mb-8">
                     <x-transaction-label for="reference" :value="__('Reference')" />
-                    <x-transaction-input id="reference" type="text" class="mt-4  w-full" wire:model.defer="reference" />
+                    <x-transaction-input id="reference" type="text" class="mt-4 text-sm w-full" wire:model.defer="reference" />
                     @if($this->getErrorBag()->has('reference'))
                     @foreach($this->getErrorBag()->get('reference') as $error)
                     <span class="text-red-700">{{ $error }}</span>
@@ -103,15 +102,15 @@
             <!-- Table Section -->
             <div class="mt-0">
                 <table class="table-auto w-full text-left text-sm text-neutral-600">
-                    <thead class="bg-neutral-100 text-neutral-900">
+                    <thead class="bg-neutral-100 text-neutral-700">
                         <tr>
-                            <th class="px-4 py-2">Description <span class="text-red-700">*</span></th>
-                            <th class="px-4 py-2">Tax Type <span class="text-red-700">*</span></th>
-                            <th class="px-4 py-2">Alphanumeric Tax Code (ATC)<span class="text-red-700">*</span></th>
-                            <th class="px-4 py-2">Chart of Account (COA)<span class="text-red-700">*</span></th>
-                            <th class="px-4 py-2">Amount (VAT Inclusive)<span class="text-red-700">*</span></th>
-                            <th class="px-4 py-2">Tax Amount <span class="text-red-700">*</span></th>
-                            <th class="px-4 py-2">Net Amount <span class="text-red-700">*</span></th>
+                            <th class="px-3 py-2">Description <span class="text-red-700">*</span></th>
+                            <th class="px-3 py-2">Tax Type <span class="text-red-700">*</span></th>
+                            <th class="px-3 py-2">Alphanumeric Tax Code (ATC)<span class="text-red-700">*</span></th>
+                            <th class="px-3 py-2">Chart of Account (COA)<span class="text-red-700">*</span></th>
+                            <th class="px-3 py-2">Amount (VAT Inclusive)<span class="text-red-700">*</span></th>
+                            <th class="px-3 py-2">Tax Amount <span class="text-red-700">*</span></th>
+                            <th class="px-3 py-2">Net Amount <span class="text-red-700">*</span></th>
                             <th></th>
                         </tr>
                     </thead>
@@ -123,7 +122,7 @@
                             :tax-row="$row" 
                             :type="$type" 
                         />
-                    @endforeach
+                        @endforeach
                     
                     </tbody>
                 </table>

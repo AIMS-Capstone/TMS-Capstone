@@ -43,7 +43,7 @@
                                     <input 
                                         type="search" 
                                         name="search" 
-                                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900" 
+                                        class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900" 
                                         aria-label="Search Term" 
                                         placeholder="Search..." 
                                         value="{{ request('search') }}"
@@ -58,7 +58,8 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
                                         <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
                                     </svg>
-                                    <span id="selectedOption" class="font-normal text-md text-zinc-700 truncate">Sort by</span>
+                                    <span id="selectedOption" class="font-normal text-sm text-zinc-600 hover:text-zinc-800 truncate">Sort by</span>
+                                    <svg class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
                                 </button>
 
                                 <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
@@ -116,8 +117,6 @@
                                 {{ request()->routeIs('tax_return.report') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }}">
                                  Report
                              </a>
-                             
-                           
                         </nav>
                     </div>
 
@@ -129,7 +128,7 @@
                             <table class="w-full text-left text-sm text-neutral-600" id="tableid">
                                 <thead class="bg-neutral-100 text-sm text-neutral-700">
                                     <tr>
-                                        <th scope="col" class="py-4 px-2">Tax Type</th>
+                                        <th scope="col" class="py-4 px-4">Tax Type</th>
                                         <th scope="col" class="py-4 px-2">Sales/Purchases</th>
                                         <th scope="col" class="py-4 px-2">Tax Amount</th>
                                         <th scope="col" class="py-4 px-2">Tax Rate</th>
@@ -138,12 +137,22 @@
                                 <tbody class="divide-y divide-neutral-300 text-left py-[7px]">
                                     @foreach ($paginatedSummaryData as $data)
                                         <tr class="hover:bg-blue-50 cursor-pointer ease-in-out">
-                                            <td class="text-left py-3 px-2">{{ ucfirst($data['tax_type']) }}</td>
-                                            <td class="text-left py-3 px-2">{{ number_format($data['vatable_sales'], 2) }}</td>
-                                            <td class="text-left py-3 px-2">{{ number_format($data['tax_due'], 2) }}</td>
-                                            <td class="text-left py-3 px-2">{{ number_format($data['tax_rate'], 2) }}%</td>
+                                            <td class="text-left py-4 px-4">{{ ucfirst($data['tax_type']) }}</td>
+                                            <td class="text-left py-4 px-2">{{ number_format($data['vatable_sales'], 2) }}</td>
+                                            <td class="text-left py-4 px-2">{{ number_format($data['tax_due'], 2) }}</td>
+                                            <td class="text-left py-4 px-2">{{ number_format($data['tax_rate'], 2) }}%</td>
                                         </tr>
                                     @endforeach
+                                    @if ($paginatedSummaryData->isEmpty())
+                                        <tr>
+                                            <td colspan="10" class="text-center p-4">
+                                                <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                                <h1 class="font-bold text-lg mt-2">No Summary Data yet</h1>
+                                                <p class="text-sm text-neutral-500 mt-2">Start generating with the + button <br>at the top.</p>
+                                            </td>
+                                        </tr>
+                                    @else
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
@@ -163,7 +172,9 @@
         // FOR SORT BUTTON
         document.getElementById('sortButton').addEventListener('click', function() {
             const dropdown = document.getElementById('dropdownMenu');
+            const dropdownArrow = this.querySelector('svg:nth-child(3)');
             dropdown.classList.toggle('hidden');
+            dropdownArrow.classList.toggle('rotate-180');
         });
 
         // FOR SORT BY
@@ -188,12 +199,10 @@
                     }
                 });
             }
-
             // Append sorted rows back to the table body
             table.innerHTML = '';
             sortedRows.forEach(row => table.appendChild(row));
         }
-
         // Dropdown event listeners
         document.querySelectorAll('#dropdownMenu div[data-sort]').forEach(item => {
             item.addEventListener('click', function() {
@@ -201,6 +210,11 @@
                 document.getElementById('selectedOption').textContent = this.textContent; // Update selected option text
                 sortItems(criteria);
             });
+        });
+        window.addEventListener('click', (event) => {
+            if (!sortButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                dropdownMenu.classList.add('hidden');
+            }
         });
 
         // FOR BUTTON OF SHOW ENTRIES
@@ -210,29 +224,29 @@
         });
         // FOR SHOWING/SETTING ENTRIES
         function setEntries(entries) {
-    const form = document.createElement('form');
-    form.method = 'GET';
-    form.action = "{{ route('tax_return.summary', $taxReturn->id) }}";
+            const form = document.createElement('form');
+            form.method = 'GET';
+            form.action = "{{ route('tax_return.summary', $taxReturn->id) }}";
 
-    // Create a hidden input for perPage
-    const perPageInput = document.createElement('input');
-    perPageInput.type = 'hidden';
-    perPageInput.name = 'perPage';
-    perPageInput.value = entries;
+            // Create a hidden input for perPage
+            const perPageInput = document.createElement('input');
+            perPageInput.type = 'hidden';
+            perPageInput.name = 'perPage';
+            perPageInput.value = entries;
 
-    // Add search input value if it exists
-    const searchInput = document.createElement('input');
-    searchInput.type = 'hidden';
-    searchInput.name = 'search';
-    searchInput.value = document.querySelector('input[name="search"]')?.value || '';
+            // Add search input value if it exists
+            const searchInput = document.createElement('input');
+            searchInput.type = 'hidden';
+            searchInput.name = 'search';
+            searchInput.value = document.querySelector('input[name="search"]')?.value || '';
 
-    // Append inputs to form
-    form.appendChild(perPageInput);
-    form.appendChild(searchInput);
+            // Append inputs to form
+            form.appendChild(perPageInput);
+            form.appendChild(searchInput);
 
-    // Append the form to the body and submit
-    document.body.appendChild(form);
-    form.submit();
-}
+            // Append the form to the body and submit
+            document.body.appendChild(form);
+            form.submit();
+        }
     </script>
 </x-app-layout>

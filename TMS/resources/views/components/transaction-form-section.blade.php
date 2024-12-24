@@ -6,9 +6,7 @@
                     <x-transaction-section-title>
                         <x-slot name="redirection">{{ $redirection }}</x-slot>
                         <x-slot name="description">{{ $description }}</x-slot>
-                        <x-slot name="wildcard">
-{{$wildcard ?? ''}}
-</x-slot>
+                        <x-slot name="wildcard">{{$wildcard ?? ''}}</x-slot>
                     </x-transaction-section-title>
                     <div class="justify-end flex relative text-left mb-4">
                         {{ $options ?? '' }} <!-- This is where the dropdown will be rendered -->
