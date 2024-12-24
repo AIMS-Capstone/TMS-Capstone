@@ -9,7 +9,7 @@
     </div>
     <div class="flex justify-between items-center px-10">
         <div class="flex items-center px-2">            
-            <p class="font-normal text-xs text-zinc-700">The Transactions feature ensures accurate tracking and categorization <br> of each transaction.</p>
+            <p class="font-normal text-sm text-zinc-700">The Transactions feature ensures accurate tracking and categorization <br> of each transaction.</p>
         </div>
         <div class="items-end float-end relative sm:w-auto" 
             x-data="{ selectedTab: (new URL(window.location.href)).searchParams.get('type') || 'All' }" 

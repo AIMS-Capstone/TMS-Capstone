@@ -38,7 +38,7 @@
             <hr>
 
             <div
-            x-data="{
+                x-data="{
                 showCheckboxes: false, 
                 checkAll: false, 
                 selectedRows: [], 
@@ -120,7 +120,7 @@ deleteRows() {
                             x-data="{
                                 search: '{{ request('search', '') }}',
                                 type: '{{ request('type', 'sales') }}',
-                                perPage: {{ request('perPage', 10) }},
+                                perPage: {{ request('perPage', 5) }},
                                 updateSearch() {
                                     this.$refs.searchForm.submit();
                                 }
@@ -131,13 +131,13 @@ deleteRows() {
                             role="search" 
                             aria-label="Table" 
                             autocomplete="off"
-                        >
+                            >
                             <input 
                                 type="search" 
                                 name="search" 
                                 x-model="search"
                                 x-on:input.debounce.500ms="updateSearch"
-                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
+                                class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
                                 aria-label="Search Term" 
                                 placeholder="Search..." 
                             >
@@ -154,9 +154,9 @@ deleteRows() {
                                 <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
                                     <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
                                 </svg>
-                                <span id="selectedOption" class="font-normal text-md text-zinc-700 truncate">Sort by</span>
+                                <span id="selectedOption" class="font-normal text-sm text-zinc-600 hover:text-zinc-800 truncate">Sort by</span>
+                                <svg class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
                             </button>
-
                             <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
                                 <div class="py-2 px-2">
                                     <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
@@ -236,10 +236,7 @@ deleteRows() {
 
                 <hr>
                 
-                <div 
-                 
-                    class="container mx-auto pt-2 overflow-hidden">
-
+                <div class="container mx-auto pt-2 overflow-hidden">
                     <!-- Transactions Header -->
                     <div class="container mx-auto ps-8">
                         <div class="flex flex-row space-x-2 mt-2 items-center justify-center">
@@ -281,20 +278,6 @@ deleteRows() {
                                         </span>
                                     </button>
                                     <button 
-                                        @click="selectedType = 'importation'; filterTransactions()" 
-                                        :aria-selected="selectedType === 'importation'"
-                                        :tabindex="selectedType === 'importation' ? '0' : '-1'" 
-                                        :class="selectedType === 'importation' ? 'font-bold text-blue-900 ' : 'text-neutral-600 font-normal hover:border-b-blue-900 hover:text-blue-900 hover:font-bold'" 
-                                        class="h-min py-2 text-base relative" 
-                                        type="button" 
-                                        role="tab" 
-                                        aria-controls="tabpanelimportation">
-                                        <span class="block">Importation</span>
-                                        <span 
-                                            :class="selectedType === 'importation' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
-                                        </span>
-                                    </button>
-                                    <button 
                                         @click="selectedType = 'capital_goods'; filterTransactions()" 
                                         :aria-selected="selectedType === 'capital_goods'"
                                         :tabindex="selectedType === 'capital_goods' ? '0' : '-1'" 
@@ -306,6 +289,20 @@ deleteRows() {
                                         <span class="block">Capital Goods</span>
                                         <span 
                                             :class="selectedType === 'capital_goods' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
+                                        </span>
+                                    </button>
+                                    <button 
+                                        @click="selectedType = 'importation'; filterTransactions()" 
+                                        :aria-selected="selectedType === 'importation'"
+                                        :tabindex="selectedType === 'importation' ? '0' : '-1'" 
+                                        :class="selectedType === 'importation' ? 'font-bold text-blue-900 ' : 'text-neutral-600 font-normal hover:border-b-blue-900 hover:text-blue-900 hover:font-bold'" 
+                                        class="h-min py-2 text-base relative" 
+                                        type="button" 
+                                        role="tab" 
+                                        aria-controls="tabpanelimportation">
+                                        <span class="block">Importation</span>
+                                        <span 
+                                            :class="selectedType === 'importation' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
                                         </span>
                                     </button>
                                 </div>
@@ -350,9 +347,9 @@ deleteRows() {
                                             <td class="p-4">
                                                 <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                                     <div class="relative flex items-center">
-                                                        <input type="checkbox" @change="toggleCheckbox('{{ $taxRow->transaction_id }}')" :checked="selectedRows.includes('{{ $taxRow->transaction_id }}')" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-yellow-600 checked:before:bg-yellow-600 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-yellow-600 checked:focus:outline-yellow-600 active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
-                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 peer-checked:visible text-white">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                                        <input type="checkbox" @change="toggleCheckbox('{{ $taxRow->transaction_id }}')" :checked="selectedRows.includes('{{ $taxRow->transaction_id }}')" class="w-5 h-5 before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-red-600 checked:before:bg-red-600" />
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" 
+                                                            stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                                         </svg>
                                                     </div>
                                                 </label>
@@ -367,67 +364,57 @@ deleteRows() {
                                             <td class="text-left py-3 px-2">{{ $taxRow->net_amount }}</td>
                                             <td class="text-left py-3 px-2">{{ $taxRow->atc_amount }}</td>
                                             <td class="text-left py-3 px-2">{{ $taxRow->atc->tax_rate }}</td>
-                                            
-                                            <td class="text-left py-3 px-2">{{ $taxRow->coaAccount->code ?? 'No Code Available' }}
-
-                                            </td>
+                                            <td class="text-left py-3 px-2">{{ $taxRow->coaAccount->code ?? 'No Code Available' }}</td>
                                         </tr>
                                     @endforeach
+                                    @if ($paginatedTaxRows->isEmpty())
+                                        <tr>
+                                            <td colspan="10" class="text-center p-4">
+                                                <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                                <h1 class="font-bold text-lg mt-2">No Transactions yet</h1>
+                                                <p class="text-sm text-neutral-500 mt-2">Start generating with the + button <br>at the top.</p>
+                                            </td>
+                                        </tr>
+                                    @else
+                                    @endif
                                 </tbody>
-                                
-                                {{-- <!-- Pagination links -->
-                                <tr>
-                                    <td colspan="12" class="p-4">
-                                        <div class="flex justify-between items-center">
-                                            
-                                        </div>
-                                    </td>
-                                </tr> --}}
                             </table>
                         </div>
                     </div>
 
-                  <!-- Delete Confirmation Modal -->
-                  <div 
-                  x-show="showConfirmDeleteModal" 
-                  x-cloak 
-                  class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
-                  x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)">
-                  
-                  <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
-                      <div class="flex flex-col items-center">
-                          <!-- Icon -->
-                          <div class="mb-4">
-                              <i class="fas fa-exclamation-triangle text-red-700 text-8xl"></i>
-                          </div>
-
-                          <!-- Title -->
-                          <h2 class="text-2xl font-extrabold text-zinc-700 mb-2">Delete Item(s)</h2>
-
-                          <!-- Description -->
-                          <p class="text-sm text-zinc-700 text-center">
-                              You're going to Delete the selected item(s) in the Value Added Tax Return table. Are you sure?
-                          </p>
-
-                          <!-- Actions -->
-                          <div class="flex justify-center space-x-8 mt-6 w-full">
-                              <button 
-                                  @click="showConfirmDeleteModal = false; showDeleteCancelButtons = true;" 
-                                  class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
-                                  > 
-                                  Cancel
-                              </button>
-                              <button 
-                                  @click="deleteRows(); showConfirmDeleteModal = false;" 
-                                  class="px-5 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg text-sm font-medium transition"
-                                  > 
-                                  Delete
-                              </button>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-
+                    <!-- Delete Confirmation Modal -->
+                    <div x-show="showConfirmDeleteModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
+                        x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)">
+                        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
+                            <div class="flex flex-col items-center">
+                                <!-- Icon -->
+                                <div class="mb-4">
+                                    <i class="fas fa-exclamation-triangle text-red-700 text-8xl"></i>
+                                </div>
+                                <!-- Title -->
+                                <h2 class="text-2xl font-extrabold text-zinc-700 mb-2">Delete Item(s)</h2>
+                                <!-- Description -->
+                                <p class="text-sm text-zinc-700 text-center">
+                                    You're going to Delete the selected item(s) in the Value Added Tax Return table. Are you sure?
+                                </p>
+                                <!-- Actions -->
+                                <div class="flex justify-center space-x-8 mt-6 w-full">
+                                    <button 
+                                        @click="showConfirmDeleteModal = false; showDeleteCancelButtons = true;" 
+                                        class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
+                                        > 
+                                        Cancel
+                                    </button>
+                                    <button 
+                                        @click="deleteRows(); showConfirmDeleteModal = false;" 
+                                        class="px-5 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg text-sm font-medium transition"
+                                        > 
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Action Buttons -->
                     <div x-show="showDeleteCancelButtons" class="flex justify-center py-4" x-cloak>
@@ -453,7 +440,6 @@ deleteRows() {
                     </div>
                 </div>
                
-
                 <div 
                     x-data="{
                         open: false,
@@ -489,14 +475,20 @@ deleteRows() {
                     @open-generate-modal.window="openModal($event.detail.year, $event.detail.monthOrQuarter)"
                     x-show="open" 
                     x-transition
-                    class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center"
+                    class="fixed inset-0 bg-gray-200 bg-opacity-50 z-50 flex items-center justify-center"
                     x-cloak
                     >
                     <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden" x-show="open" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
                         x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
                         <!-- Modal Header -->
-                        <div class="flex bg-blue-900 justify-center rounded-t-lg items-center p-3 border-b border-opacity-80 mx-auto">
+                        <div class="relative flex bg-blue-900 justify-center rounded-t-lg items-center p-3 border-b border-opacity-80 mx-auto">
                             <h1 class="text-lg font-bold text-white">Select Transaction</h1>
+                            <button @click="open = false" class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 8L16 16M8 16L16 8" stroke="#1e3a8a" class="transition duration-200 hover:stroke-gray-600"/>
+                                </svg>
+                            </button>
                         </div>
 
                         <!-- Modal Body -->
@@ -504,16 +496,10 @@ deleteRows() {
                             <form method="POST" action="{{ route('tax_return_transaction.addPercentage') }}">
                                 @csrf
                                 <div class="mb-4">
-                                    <label for="transaction-dropdown" class="block text-sm font-bold text-gray-700">Select a Transaction</label>
-                                    <select 
-                                    name="transaction_id"
-                                        id="transaction-dropdown" 
-                                        
-                                        x-model="selectedTransaction" 
-                                        class="w-full border-gray-300 rounded-md shadow-sm"
-                                        :disabled="transactions.length === 0"
-                                    >
-                                        <option value="">-- Select a transaction --</option>
+                                    <label for="transaction-dropdown" class="block font-bold text-sm text-zinc-700">Select a Transaction</label>
+                                    <select name="transaction_id" id="transaction-dropdown" x-model="selectedTransaction" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                                        :disabled="transactions.length === 0">
+                                        <option value="" disabled selected>Select a transaction</option>
                                         <template x-for="transaction in transactions" :key="transaction.id">
                                             <option :value="transaction.id"   x-text="transaction.contact_details.bus_name + ' - ' + 
                                             (transaction.inv_number ? transaction.inv_number : transaction.reference) + 
@@ -526,18 +512,16 @@ deleteRows() {
                                 <input type="hidden" name="tax_return_id" value="{{ $taxReturn->id }}">
 
                                 <div class="flex justify-end mt-6">
-                                    <button type="button" @click="closeModal" class="mr-4 font-semibold text-zinc-700 px-3 py-1 rounded-md hover:text-zinc-900 transition">Cancel</button>
-                                    <button type="submit" :disabled="!selectedTransaction" class="font-semibold bg-blue-900 text-white text-center px-6 py-1.5 rounded-md hover:bg-blue-950 border-blue-900 hover:text-white transition disabled:bg-gray-300 disabled:cursor-not-allowed">
-                                        Submit
-                                    </button>
+                                    <div class="flex justify-end mt-4">
+                                        <button type="button" @click="closeModal" class="mr-2 hover:text-zinc-900 text-zinc-600 text-sm font-semibold py-2 px-4">Cancel</button>
+                                        <button type="submit" :disabled="!selectedTransaction" class="bg-blue-900 hover:bg-blue-950 text-white font-semibold text-sm py-1 px-6 rounded-lg">Add</button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
-
-            
         </div>
     </div>
 </div>
@@ -561,7 +545,9 @@ document.addEventListener('search', event => {
     // FOR SORT BUTTON
     document.getElementById('sortButton').addEventListener('click', function() {
         const dropdown = document.getElementById('dropdownMenu');
+        const dropdownArrow = this.querySelector('svg:nth-child(3)');
         dropdown.classList.toggle('hidden');
+        dropdownArrow.classList.toggle('rotate-180');
     });
 
     // FOR SORT BY
@@ -586,12 +572,10 @@ document.addEventListener('search', event => {
                 }
             });
         }
-
         // Append sorted rows back to the table body
         table.innerHTML = '';
         sortedRows.forEach(row => table.appendChild(row));
     }
-
     // Dropdown event listeners
     document.querySelectorAll('#dropdownMenu div[data-sort]').forEach(item => {
         item.addEventListener('click', function() {
@@ -599,6 +583,11 @@ document.addEventListener('search', event => {
             document.getElementById('selectedOption').textContent = this.textContent; // Update selected option text
             sortItems(criteria);
         });
+    });
+    window.addEventListener('click', (event) => {
+        if (!sortButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+            dropdownMenu.classList.add('hidden');
+        }
     });
 
     // FOR BUTTON OF SHOW ENTRIES
