@@ -7,7 +7,7 @@
                         <x-slot name="redirection">{{ $redirection }}</x-slot>
                         <x-slot name="description">{{ $description }}</x-slot>
                         <x-slot name="wildcard">
-{{$wildcard ?? ''}}
+{{$wildcard}}
 </x-slot>
                     </x-transaction-section-title>
                     <div class="justify-end flex relative text-left mb-4">
