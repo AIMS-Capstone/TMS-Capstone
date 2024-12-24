@@ -80,7 +80,12 @@
                 </thead>
                 <tbody>
                     @foreach($taxRows as $index => $row)
-                    <livewire:tax-row :key="$index" :index="$index" :tax-row="$row" :type="$type" />
+                    <livewire:tax-row 
+                            :key="$row['id']" 
+                            :index="$row['id']" 
+                            :tax-row="$row" 
+                            :type="$type" 
+                        />
                 @endforeach
                 
                 </tbody>
@@ -143,8 +148,23 @@
     </x-slot:form>
     <!-- Save Button -->
     <x-slot:actions>
-        <div class="flex justify-end mt-4 mb-10">
+        <div class="flex justify-start">
+            @if($this->getErrorBag()->any())
+            <div class="text-left ml-auto">
+                <div class="inline-block bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <strong class="font-bold">Oops! There are some errors:</strong>
+                    <ul class="list-disc list-inside mt-2">
+                        @foreach($this->getErrorBag()->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        @endif
+        </div>
+        <div class="flex justify-end mt-4">
             <x-button type="submit" class="ml-4 text-white px-4 py-2 rounded-lg shadow-md">
+             
                 {{ __('Save Transaction') }}
             </x-button>
         </div>

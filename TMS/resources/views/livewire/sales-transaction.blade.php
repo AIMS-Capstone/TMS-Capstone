@@ -13,15 +13,30 @@
     
         <!-- Form Header Title -->
         <x-slot:description>
-            <h1 class="text-3xl font-bold text-blue-900">Add New Sale</h1>
+            <div class="flex justify-between items-center">
+                <!-- Title -->
+                <h1 class="text-3xl font-bold text-blue-900">Add New Sale</h1>
+            </div>
+            
         </x-slot:description>
-    
+        <x-slot:wildcard>
+            <div class="flex flex-col text-sm px-1">
+                <div class="flex justify-end items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-400" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M5 21V5q0-.825.588-1.412T7 3h10q.825 0 1.413.588T19 5v16l-7-3zm2-3.05l5-2.15l5 2.15V5H7zM7 5h10z"/>
+                    </svg>
+                    <span class="text-amber-400">Drafted</span>
+                </div>
+                <p class="text-zinc-500 text-xs italic mt-1 text-end">Transactions are automatically saved as Draft.</p>
+            </div>
+        </x-slot:wildcard>
+
         <!-- Form Fields (Customer, Date, etc.) -->
         <x-slot:form>
             <div class="grid grid-cols-5 gap-6">
                 <!-- Customer Select -->
                 <div class="mt-5 mb-8 ml-10">
-                    <label for="select-contact" class="block font-bold text-sm text-blue-900">Customer</label>
+                    <label for="select-contact" class="block font-bold text-sm text-blue-900">Customer <span class="text-red-700">*</span></label>
                     <div class="mt-4">
                         <livewire:select-input
                             name="select_contact"
@@ -31,53 +46,83 @@
                             id="select_contact"
                             :type="$type"
                         />
+                        @if($this->getErrorBag()->has('selectedContact'))
+                        @foreach($this->getErrorBag()->get('selectedContact') as $error)
+                        <span class="text-red-700">{{ $error }}</span>
+                    @endforeach
+                    @endif
                     </div>
+                    
+                    <span id="contact-error-message" class="text-red-500"></span>
                 </div>
     
                 <!-- Date Field -->
-                <div class="mt-5 mb-8">
-                    <x-transaction-label for="date" :value="__('Invoice Date')" />
-                    <x-transaction-input id="date" type="date" class="mt-1 block w-full" wire:model.defer="date" />
-                </div>
     
+                <div class="mt-5 mb-8">
+                    <x-transaction-label for="date" :value="__('Invoice Date')"  required="true"/>
+                    <x-transaction-input id="date" type="date" class="mt-4 text-sm w-full" wire:model.defer="date" />
+                    @if($this->getErrorBag()->has('date'))
+                    @foreach($this->getErrorBag()->get('date') as $error)
+                    <span class="text-red-700">{{ $error }}</span>
+                @endforeach
+                @endif
+    
+                </div>
+           
+          
                 <!-- Invoice Number Field -->
                 <div class="mt-5 mb-8">
-                    <x-transaction-label for="inv_number" :value="__('Invoice Number')" />
-                    <x-transaction-input id="inv_number" type="text" class="mt-1 block w-full" wire:model.defer="inv_number" />
+                    <x-transaction-label for="inv_number" :value="__('Invoice Number')"   required="true"/>
+                    <x-transaction-input id="inv_number" type="text" class="mt-4 text-sm w-full" wire:model.defer="inv_number" />
+                    @if($this->getErrorBag()->has('inv_number'))
+                    @foreach($this->getErrorBag()->get('inv_number') as $error)
+                    <span class="text-red-700">{{ $error }}</span>
+                @endforeach
+                @endif
                 </div>
     
                 <!-- Reference Field -->
                 <div class="mt-5 mb-8">
                     <x-transaction-label for="reference" :value="__('Reference')" />
-                    <x-transaction-input id="reference" type="text" class="mt-1 block w-full" wire:model.defer="reference" />
+                    <x-transaction-input id="reference" type="text" class="mt-4 text-sm w-full" wire:model.defer="reference" />
+                    @if($this->getErrorBag()->has('reference'))
+                    @foreach($this->getErrorBag()->get('reference') as $error)
+                    <span class="text-red-700">{{ $error }}</span>
+                @endforeach
+                @endif
                 </div>
     
                 <!-- Total Amount Field -->
                 <div class="col-span-1 bg-blue-50 p-4 rounded-tr-sm">
                     <x-transaction-label for="total_amount" :value="__('Total Amount')" />
-                    <x-transaction-input id="total_amount" type="text" class="font-bold text-blue-900 bg-blue-50 mt-1 block w-full" value="{{ $totalAmount }}" wire:model.defer="total_amount" readonly />
+                    <x-transaction-input id="total_amount" type="text" class="font-bold text-blue-900 bg-blue-50 mt-4  w-full" value="{{ $totalAmount }}" wire:model.defer="total_amount" readonly />
                 </div>
             </div>
     
             <!-- Table Section -->
             <div class="mt-0">
                 <table class="table-auto w-full text-left text-sm text-neutral-600">
-                    <thead class="bg-neutral-100 text-neutral-900">
+                    <thead class="bg-neutral-100 text-neutral-700">
                         <tr>
-                            <th class="px-4 py-2">Description</th>
-                            <th class="px-4 py-2">Tax Type</th>
-                            <th class="px-4 py-2">ATC</th>
-                            <th class="px-4 py-2">COA</th>
-                            <th class="px-4 py-2">Amount (VAT Inclusive)</th>
-                            <th class="px-4 py-2">Tax Amount</th>
-                            <th class="px-4 py-2">Net Amount</th>
+                            <th class="px-3 py-2">Description <span class="text-red-700">*</span></th>
+                            <th class="px-3 py-2">Tax Type <span class="text-red-700">*</span></th>
+                            <th class="px-3 py-2">Alphanumeric Tax Code (ATC)<span class="text-red-700">*</span></th>
+                            <th class="px-3 py-2">Chart of Account (COA)<span class="text-red-700">*</span></th>
+                            <th class="px-3 py-2">Amount (VAT Inclusive)<span class="text-red-700">*</span></th>
+                            <th class="px-3 py-2">Tax Amount <span class="text-red-700">*</span></th>
+                            <th class="px-3 py-2">Net Amount <span class="text-red-700">*</span></th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($taxRows as $index => $row)
-                        <livewire:tax-row :key="$index" :index="$index" :tax-row="$row" :type="$type" />
-                    @endforeach
+                        @foreach($taxRows as $row)
+                        <livewire:tax-row 
+                            :key="$row['id']" 
+                            :index="$row['id']" 
+                            :tax-row="$row" 
+                            :type="$type" 
+                        />
+                        @endforeach
                     
                     </tbody>
                 </table>
@@ -142,14 +187,34 @@
     
         <!-- Save Button -->
         <x-slot:actions>
+            <div class="flex items-center justify-between w-full">
+                <!-- Error Section on the Left -->
+                <div class="text-left">
+                    @if($this->getErrorBag()->any())
+                        <div class="inline-block bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                            <strong class="font-bold">Oops! There are some errors:</strong>
+                            <ul class="list-disc list-inside mt-2">
+                                @foreach($this->getErrorBag()->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @else
+                        <!-- Empty placeholder to maintain layout -->
+                        <div class="h-12"></div>
+                    @endif
+                </div>
         
-            <div class="flex justify-end mt-4">
-                <x-button type="submit" class="ml-4 text-white px-4 py-2 rounded-lg shadow-md">
-                    {{ __('Save Transaction') }}
-                </x-button>
+                <!-- Save Button on the Right -->
+                <div class="text-right">
+                    <x-button type="submit" class="ml-4 text-white px-4 py-2 rounded-lg shadow-md">
+                        {{ __('Save Transaction') }}
+                    </x-button>
+                </div>
             </div>
         </x-slot:actions>
-
+        
+        
     
 </x-transaction-form-section>
 
@@ -161,6 +226,40 @@
 
 @script
     <script>
+            document.addEventListener('livewire:load', () => {
+        @this.on('contactError', data => {
+            const errorContainer = document.getElementById('contact-error-message');
+            if (errorContainer && data.errors.contact) {
+                // Display the first error message
+                errorContainer.textContent = data.errors.contact[0];
+            }
+        });
+    });
+
+        // In your main JS file or layout
+document.addEventListener('livewire:initialized', function () {
+    // Initialize Select2
+    $('.select2').select2({
+        placeholder: 'Select a contact',
+        allowClear: true,
+        width: '100%'
+    });
+
+    // Handle error styling
+    Livewire.on('parentComponentErrorBag', function(data) {
+        if (data.index === 'select_contact') {
+            const select2Container = $('#select_contact').next('.select2-container');
+            select2Container.find('.select2-selection').addClass('border-red-500');
+        }
+    });
+
+    // Clear error styling on change
+    $('.select2').on('change', function() {
+        $(this).next('.select2-container')
+            .find('.select2-selection')
+            .removeClass('border-red-500');
+    });
+});
         $(document).ready(function() {
 
             $('#select_contact').select2({
@@ -249,6 +348,45 @@ $('#select_contact').on('change', function() {
             $wire.dispatch('triggerModal', { title, body }); // Trigger the modal from Livewire
         });
     });
+    document.addEventListener('livewire:initialized', function () {
+    // Initialize Select2 with error handling
+    $('.select2').select2({
+        placeholder: 'Select a contact',
+        allowClear: true,
+        width: '100%'
+    }).on('select2:open', function() {
+        // Remove error styling when dropdown opens
+        $(this).next('.select2-container')
+            .find('.select2-selection')
+            .removeClass('border-red-500 border-2');
+    });
+
+    // Listen for error events from the parent component
+    Livewire.on('parentComponentErrorBag', function(data) {
+        if (data.index === 'select_contact') {
+            // Add error styling to Select2
+            const select2Container = $('.select2-container');
+            select2Container.find('.select2-selection')
+                .addClass('border-red-500 border-2');
+            
+            // Add error message below the select
+            let errorDiv = $('#select-contact-error');
+            if (!errorDiv.length) {
+                errorDiv = $('<div id="select-contact-error" class="text-red-500 text-sm mt-1"></div>');
+                select2Container.after(errorDiv);
+            }
+            errorDiv.text(data.errors.contact[0]);
+        }
+    });
+
+    // Clear error styling on change
+    $('.select2').on('change', function() {
+        $(this).next('.select2-container')
+            .find('.select2-selection')
+            .removeClass('border-red-500 border-2');
+        $('#select-contact-error').remove();
+    });
+});
 
     </script>
 @endscript
