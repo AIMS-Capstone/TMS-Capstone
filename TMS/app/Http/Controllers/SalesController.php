@@ -186,7 +186,7 @@ class SalesController extends Controller
 
             activity('sales')
                 ->performedOn($transaction)
-                ->causedBy(Auth::user())
+                ->causedBy(Auth::user())    
                 ->withProperties([
                     'organization_id' => $transaction->organization_id,
                     'old_status' => $oldStatus,
