@@ -124,6 +124,7 @@
                                         <tr>
                                             <th class="text-left py-3 px-4 font-semibold text-sm">Name</th>
                                             <th class="text-left py-3 px-4 font-semibold text-sm">TIN</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-sm">Email Address</th>
                                             <th class="text-left py-3 px-4 font-semibold text-sm">Account Type</th>
                                             <th class="text-left py-3 px-4 font-semibold text-sm">Date Created</th>
                                             <th class="text-left py-3 px-4 font-semibold text-sm">Action</th>
@@ -152,6 +153,7 @@
                                                       
                                                     </td>
                                                     <td class="text-left py-4 px-4">{{ $client->orgSetup->tin ?? 'N/A' }}</td>
+                                                    <td class="text-left py-4 px-4">{{ $client->email }}</td>
                                                     <td class="text-left py-4 px-4">
                                                         <span class="bg-amber-100 text-zinc-700 text-xs font-medium me-2 px-4 py-2 rounded-full">Client</span>
                                                     </td>
@@ -249,22 +251,29 @@
                 </div>
                 <div class="mb-5 flex justify-between items-start">
                     <div class="w-2/3 pr-4">
+                        <label class="block text-sm font-bold text-zinc-700">Email Address</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="client.email" disabled readonly>
+                    </div>
+                    <div class="w-2/3 text-left">
                         <label class="block text-sm font-bold text-zinc-700">Classification</label>
                         <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
                             x-bind:value="client.classification" disabled readonly>
                     </div>
-                    <div class="w-2/3 text-left">
+                </div>
+                <div class="mb-5 flex justify-between items-start">
+                    <div class="w-2/3 pr-4">
                         <label class="block text-sm font-bold text-zinc-700">Account Type</label>
-                        <div class="inline-block bg-gray-100 text-gray-700 text-xs font-medium mt-2 px-4 py-2 rounded-full">
+                        <div class="inline-block bg-amber-100 text-gray-700 text-xs font-medium mt-2 px-4 py-2 rounded-full">
                             <span x-text="client.role"></span>
                         </div>
                     </div>
-                </div>
-                <div class="w-2/3 pr-4 mb-4">
-                    <label for="email" class="block text-sm font-bold text-zinc-700">Date Created</label>
-                    <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
-                    x-bind:value="client.date_created" disabled readonly>                
-                </div>
+                    <div class="w-2/3 text-left">
+                        <label for="email" class="block text-sm font-bold text-zinc-700">Date Created</label>
+                        <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                        x-bind:value="client.date_created" disabled readonly>                
+                    </div>
+            </div>
             </div>
         </div>
     </div>
