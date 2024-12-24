@@ -158,7 +158,7 @@
                                     <tbody class="divide-y divide-zinc-200 text-sm text-zinc-700">
                                         @if($trashedItems->isEmpty())
                                             <tr>
-                                                <td colspan="7" class="text-center p-4">
+                                                <td colspan="10" class="text-center p-4">
                                                     <img src="{{ asset('images/Box.png') }}" alt="No data available" class="mx-auto w-48 h-48" />
                                                     <h1 class="font-extrabold">No Deleted Tax Return Users yet</h1>
                                                     <p class="text-sm text-neutral-500 mt-2">Deleted items will show up here when you need to restore or permanently delete them.</p>

@@ -18,10 +18,14 @@ use Illuminate\Support\Facades\Log;
 class withHolding0619EController extends Controller
 {
     //0619E function
-    public function index0619E()
+    public function index0619E(Request $request)
     {
         $organizationId = session('organization_id');
-        $with_holdings = $this->getWithHoldings($organizationId, '0619E');
+
+        // Get the perPage value from the request, default to 5
+        $perPage = $request->input('perPage', 5);
+
+        $with_holdings = $this->getWithHoldings($organizationId, '0619E', $perPage);
         return view('tax_return.with_holding.0619E', compact('with_holdings'));
     }
 
@@ -203,13 +207,13 @@ class withHolding0619EController extends Controller
 
 
 
-    private function getWithHoldings($organizationId, $type)
+    private function getWithHoldings($organizationId, $type, $perPage = 5)
     {
 
         return WithHolding::with(['employee', 'employment', 'creator'])
             ->where('type', $type)
             ->where('organization_id', $organizationId)
-            ->paginate(5);
+            ->paginate($perPage);
             
     }
 }

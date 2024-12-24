@@ -1,101 +1,121 @@
-<tr>
+<tr class="{{ 
+    $errors->has('description.' . $index) || 
+    $errors->has('taxRow.tax_type.' . $index) || 
+    $errors->has('taxRow.tax_code.' . $index) || 
+    $errors->has('taxRow.coa.' . $index) || 
+    $errors->has('taxRow.amount.' . $index) 
+    ? ' border-t-4 border-b-4 border-red-500' : '' 
+}}">
     <!-- Description -->
-    <td class="border">
+    <td class="border {{ 
+    $errors->has('description.' . $index) || 
+    $errors->has('taxRow.tax_type.' . $index) || 
+    $errors->has('taxRow.tax_code.' . $index) || 
+    $errors->has('taxRow.coa.' . $index) || 
+    $errors->has('taxRow.amount.' . $index) 
+    ? ' border-l-4  border-red-500' : '' 
+}}">
         <input 
-            id="description" 
+            id="description-{{ $index }}" 
             type="text" 
             class="block w-full border-none" 
-            wire:model="description" 
+            wire:model.live="taxRow.description" 
             placeholder="Enter Description" 
-            value="{{ $description ?? '' }}"  
         />
+ 
     </td>
 
     <!-- Tax Type -->
-    <td class="border px-4 py-2">
+    <td wire:ignore class="border px-4 py-2">
         <select 
-            name="tax_type" 
-            class="form-control mt-2 w-full select2 block py-2.5 px-0 text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
-            id="tax_type" 
-            wire:model.live="tax_type"
+            x-data="select2()"
+            class="form-control select2-enabled"
+            id="tax_type-{{ $index }}"
+            wire:model="taxRow.tax_type"
         >
-            <option value="" disabled {{ is_null($tax_type) ? 'selected' : '' }}></option>
+            <option value="" disabled>Select Tax Type</option>
             @foreach($taxTypes as $tax)
-                <option value="{{ $tax->id }}" {{ $tax->id == $tax_type ? 'selected' : '' }}>
-                    {{ $tax->tax_type }} ({{ $tax->VAT }}%)
-                </option>
+                <option value="{{ $tax->id }}">{{ $tax->tax_type }} ({{ $tax->VAT }}%)</option>
             @endforeach
         </select>
+ 
     </td>
 
     <!-- ATC -->
-    <td class="border px-4 py-2">
+    <td wire:ignore class="border px-4 py-2">
         <select 
-            class="block w-full h-full border-none select2 py-2.5 px-0 text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
-            id="tax_code" 
-            wire:model.live="tax_code"
+            x-data="select2()"
+            class="select2-enabled"
+            id="tax_code-{{ $index }}" 
+            wire:model="taxRow.tax_code"
         >
-            <option value="" disabled {{ is_null($tax_code) ? 'selected' : '' }}></option>
+            <option value="" disabled>Select ATC</option>
             @foreach($atcs as $atc)
-                <option value="{{ $atc->id }}" {{ $atc->id == $tax_code ? 'selected' : '' }}>
-                    {{ $atc->tax_code }} ({{ $atc->tax_rate }}%)
-                </option>
+                <option value="{{ $atc->id }}">{{ $atc->tax_code }} - {{ $atc->description }} ({{ $atc->tax_rate }}%)</option>
             @endforeach
         </select>
+     
     </td>
 
     <!-- COA -->
-    <td class="border px-4 py-2">
+    <td wire:ignore class="border px-4 py-2 ">
         <select 
-            class="block w-full h-full border-none select2 py-2.5 px-0 text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
-            id="coa" 
-            wire:model="coa"
+            x-data="select2()"
+            class="select2-enabled"
+            id="coa-{{ $index }}" 
+            wire:model="taxRow.coa"
         >
-            <option value="" disabled {{ is_null($coa) ? 'selected' : '' }}></option>
+            <option value="" disabled>Select COA</option>
             @foreach($coas as $coaItem)
-                <option value="{{ $coaItem->id }}" {{ $coaItem->id == $coa ? 'selected' : '' }}>
-                    {{ $coaItem->code }} {{ $coaItem->name }}
-                </option>
+                <option value="{{ $coaItem->id }}">{{ $coaItem->code }} - {{ $coaItem->name }}</option>
             @endforeach
         </select>
+     
     </td>
 
     <!-- Amount -->
-    <td class="border px-4 py-2">
+    <td class="border ">
         <input 
-            id="amount" 
+            id="amount-{{ $index }}" 
             type="number" 
             class="block w-full border-none" 
-            wire:model.blur="amount" 
-            value="{{ $amount ?? '' }}"  
+            wire:model.live="taxRow.amount"
+            wire:change="calculateTax"
         />
+       
     </td>
 
     <!-- Tax Amount -->
     <td class="border px-4 py-2">
         <input 
-            id="tax_amount" 
+            id="tax_amount-{{ $index }}" 
             type="number" 
             class="block w-full border-none" 
-            wire:model.live="tax_amount" 
+            wire:model="taxRow.tax_amount" 
             readonly 
-            value="{{ $tax_amount ?? '' }}" 
         />
     </td>
 
     <!-- Net Amount -->
     <td class="border px-4 py-2">
         <input 
-            id="net_amount" 
+            id="net_amount-{{ $index }}" 
             type="number" 
             class="block w-full border-none" 
-            wire:model="net_amount" 
+            wire:model="taxRow.net_amount" 
             readonly 
-            value="{{ $net_amount ?? '' }}"  
         />
     </td>
 
-    <td class="border px-4 py-2">
+    <!-- Remove Row Button -->
+    <td class="border {{ 
+        $errors->has('description.' . $index) || 
+        $errors->has('taxRow.tax_type.' . $index) || 
+        $errors->has('taxRow.tax_code.' . $index) || 
+        $errors->has('taxRow.coa.' . $index) || 
+        $errors->has('taxRow.amount.' . $index) 
+        ? ' border-r-4  border-red-500' : '' 
+    }}">
         <button 
             type="button" 
             wire:click.prevent="removeRow" 
@@ -110,3 +130,84 @@
         </button>
     </td>
 </tr>
+
+
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('select2', () => ({
+        init() {
+            console.log("Alpine select2 init called");
+            this.initializeSelect2();
+        },
+    
+        initializeSelect2() {
+            console.log("initializeSelect2 method called");
+            this.$nextTick(() => {
+                const $select = $(this.$el);
+                
+                console.log("Select element:", $select);
+                console.log("Is Select2 initialized:", $select.data('select2') ? 'Yes' : 'No');
+
+                // Destroy existing Select2 instance if present
+                if ($select.data('select2')) {
+                    $select.select2('destroy');
+                }
+    
+                // Reinitialize Select2 with custom options
+                $select.select2({
+                    placeholder: "Select",
+                    allowClear: true,
+                    width: '100%'
+                });
+    
+                $select.on('change', (e) => {
+                    console.log("Select2 change event triggered");
+                    console.log("Element:", this.$el);
+                    console.log("Wire model:", this.$el.getAttribute('wire:model'));
+                    console.log("Selected value:", $select.val());
+                    
+                    // Trigger Livewire's native model update
+                    this.$wire.set(this.$el.getAttribute('wire:model'), $select.val());
+                });
+            });
+        }
+    }));
+});
+    
+    // Global event listener for Select2 reinitialization
+    document.addEventListener('livewire:load', () => {
+        Livewire.hook('morph.updated', (el) => {
+            setTimeout(() => {
+                document.querySelectorAll('select.select2-enabled').forEach(el => {
+                    const $el = $(el);
+                    if ($el.data('select2')) {
+                        $el.select2('destroy');
+                    }
+                    $el.select2({
+                        placeholder: "Select",
+                        allowClear: true,
+                        width: '100%'
+                    });
+                });
+            }, 100);
+        });
+    });
+    
+    // Custom event for manual reinitialization
+    document.addEventListener('select2:reinitialize', () => {
+        setTimeout(() => {
+            document.querySelectorAll('select.select2-enabled').forEach(el => {
+                const $el = $(el);
+                if ($el.data('select2')) {
+                    $el.select2('destroy');
+                }
+                $el.select2({
+                    placeholder: "Select",
+                    allowClear: true,
+                    width: '100%'
+                });
+            });
+        }, 100);
+    });
+    </script>

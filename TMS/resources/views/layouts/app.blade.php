@@ -83,7 +83,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                             </a>
                         </li>
 
-                        <li x-data="{ open: {{ request()->routeIs('income_return', 'vat_return', 'percentage_return', 'percentage_return.slsp_data') ? 'true' : 'false' }} }">
+                        <li x-data="{ open: {{ request()->routeIs('income_return', 'vat_return', 'percentage_return', 'percentage_return.slsp_data', 'with_holding.1601C', 'with_holding.0619E', 
+                            'with_holding.1601EQ', 'with_holding.1604C', 'with_holding.1604E') ? 'true' : 'false' }} }">
                             <button @click="open = !open" type="button"
                                 :class="{
                                     'flex items-center w-full p-2 text-[14px] ease-in transition-all duration-500 rounded-r-full hover:font-bold px-6 py-2 group': true,
@@ -102,33 +103,34 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                     </svg>
                                 </div>
                             </button>
-                            <ul x-show="open" x-transition class="py-1 space-y-1 taxuri-color">
+                            <ul x-show="open" x-transition class="taxuri-color">
                                 <li>
-                                    <a href="{{ route('percentage_return') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
+                                    <a href="{{ route('percentage_return') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
                                     {{ request()->routeIs('percentage_return') || request()->routeIs('percentage_return.slsp_data') ? 'sidebar-submenu-active' : '' }}">
                                         Percentage Tax Return
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('income_return') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
+                                    <a href="{{ route('income_return') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
                                     {{ request()->routeIs('income_return') ? 'sidebar-submenu-active' : '' }}">
                                         Income Tax Return
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('vat_return') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
+                                    <a href="{{ route('vat_return') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
                                     {{ request()->routeIs('vat_return') ? 'sidebar-submenu-active' : '' }}">
                                         Value Added Tax Return
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('with_holding.1601C')}}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
-                                    {{ request()->routeIs('with_holding.1601C') ? 'sidebar-submenu-active' : '' }}">
+                                    <a href="{{ route('with_holding.1601C')}}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
+                                    {{ request()->routeIs('with_holding.1601C') || request()->routeIs('with_holding.0619E')|| request()->routeIs('with_holding.1601EQ') || request()->routeIs('with_holding.1604C')
+                                    || request()->routeIs('with_holding.1604E') ? 'sidebar-submenu-active' : '' }}">
                                         Withholding Tax Return
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group">
+                                    <a href="#" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group">
                                         Final Withholding Tax Return
                                     </a>
                                 </li>
@@ -156,37 +158,37 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                             </button>
                             <ul x-show="open" x-transition class="py-1 space-y-1 taxuri-color">
                                 <li>
-                                    <a href="{{ route('general-ledger') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
+                                    <a href="{{ route('general-ledger') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
                                     {{ request()->routeIs('general-ledger') ? 'sidebar-submenu-active' : '' }}">
                                         General Ledger Listing
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('sales-book') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
+                                    <a href="{{ route('sales-book') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
                                     {{ request()->routeIs('sales-book') || request()->routeIs('salesPosted') ? 'sidebar-submenu-active' : '' }}">
                                         Sales Book Journal
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('purchase-book') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
+                                    <a href="{{ route('purchase-book') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
                                     {{ request()->routeIs('purchase-book') || request()->routeIs('purchasePosted') ? 'sidebar-submenu-active' : '' }}">
                                         Purchase Book Journal
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('cash-receipt') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
+                                    <a href="{{ route('cash-receipt') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
                                     {{ request()->routeIs('cash-receipt') || request()->routeIs('receiptPosted') ? 'sidebar-submenu-active' : '' }}">
                                         Cash Receipt Book
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('cash-disbursement') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
+                                    <a href="{{ route('cash-disbursement') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
                                     {{ request()->routeIs('cash-disbursement') || request()->routeIs('disbPosted') ? 'sidebar-submenu-active' : '' }}">
                                         Cash Disbursement Book
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('general-journal') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
+                                    <a href="{{ route('general-journal') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
                                     {{ request()->routeIs('general-journal') ? 'sidebar-submenu-active' : '' }}">
                                         General Journal
                                     </a>

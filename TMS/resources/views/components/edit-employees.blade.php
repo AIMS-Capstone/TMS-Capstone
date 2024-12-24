@@ -18,7 +18,7 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100 scale-100"
         x-transition:leave-end="opacity-0 scale-90"
-    >
+        >
         <!-- Modal Header -->
         <div class="relative bg-blue-900 text-white text-center py-4">
             <h2>Edit Employee: <span x-text="employee.first_name"></span></h2>
