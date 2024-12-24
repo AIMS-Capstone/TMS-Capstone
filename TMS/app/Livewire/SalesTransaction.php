@@ -25,25 +25,18 @@ class SalesTransaction extends Component
     public $inv_number;
     public $organization_id;
     public $reference;
-    public $errors = [];
-
     public $selectedContact;
 
     protected $listeners = ['taxRowUpdated' => 'updateTaxRow', 'contactSelected', 'taxRowRemoved' => 'removeTaxRow'];
- 
-protected $rules = [
 
-    'date' => 'required|date',
-    'inv_number' => 'required|string',
-    'reference' => 'nullable|string',
-    'selectedContact' => 'required|exists:contacts,id', // Add this validation rule
-    'taxRows.*.amount' => 'required|numeric|min:0.01',
-    'taxRows.*.tax_code' => 'nullable|exists:atcs,id',
-    'taxRows.*.coa' => 'required|string',
-    'taxRows.*.description' => 'required|string',
-    'taxRows.*.tax_type' => 'required|exists:tax_types,id',
-];
-
+    protected $rules = [
+        'date' => 'required|date',
+        'inv_number' => 'required|string',
+        'reference' => 'nullable|string',
+        'taxRows.*.amount' => 'required|numeric|min:0',
+        'taxRows.*.tax_code' => 'nullable|exists:atcs,id',
+        'taxRows.*.coa' => 'nullable|string',
+    ];
 
     public function mount()
     {
@@ -55,11 +48,7 @@ protected $rules = [
 
     public function addTaxRow()
     {
-        // Use count of existing rows or generate a unique identifier
-        $newIndex = count($this->taxRows);
-        
         $this->taxRows[] = [
-            'id' => uniqid(), // Add a unique identifier
             'description' => '',
             'tax_type' => '',
             'tax_code' => '',
@@ -68,11 +57,7 @@ protected $rules = [
             'tax_amount' => 0,
             'net_amount' => 0
         ];
-    
-        // Dispatch event to reinitialize Select2
-        $this->dispatch('select2:reinitialize');
     }
-    
 
     public function contactSelected($contactId)
     {
@@ -81,34 +66,19 @@ protected $rules = [
 
     public function removeTaxRow($index)
     {
-        // Find the key of the row with the matching index
-        $key = array_search($index, array_column($this->taxRows, 'id'));
-        
-        if ($key !== false) {
-            unset($this->taxRows[$key]);
-            $this->taxRows = array_values($this->taxRows); // Re-index array
-            $this->calculateTotals(); // Recalculate after removing a row
-        }
+        unset($this->taxRows[$index]);
+        $this->taxRows = array_values($this->taxRows); // Re-index array
+        $this->calculateTotals(); // Recalculate after removing a row
     }
 
     public function updateTaxRow($data)
     {
-        // Find the key of the row with the matching ID
-        $key = array_search($data['index'], array_column($this->taxRows, 'id'));
-        
-        if ($key !== false) {
-            $this->taxRows[$key] = $data['taxRow'];
-            $this->calculateTotals();
-        }
+        $this->taxRows[$data['index']] = $data;
+        $this->calculateTotals(); // Recalculate after updating a row
     }
-    public function selectReinit()
-    {
-       Log::info("naabot sa sales");
-        $this->dispatch('select2:reinitialize');
-    }
+
     public function calculateTotals()
     {
-        Log::info("fuck");
         // Initialize totals
         $this->vatableSales = 0;
         $this->vatAmount = 0;  // This will store the VAT amount (not including ATC)
@@ -181,8 +151,6 @@ protected $rules = [
     
         // Final adjustment to the total amount: VATable Sales + Non-VATable Sales + ATC tax
         $this->totalAmount = $this->vatableSales + $this->vatAmount + $this->nonVatableSales + $this->appliedATCsTotalAmount; // Total includes ATC tax
-
-        $this->rendered();
     }
     
     
@@ -191,13 +159,6 @@ protected $rules = [
     {
         // Validate the required fields
         $this->validate();
-        $this->validate([
-            'selectedContact' => 'required|exists:contacts,id',
-            // ... other validation rules ...
-        ], [
-            'selectedContact.required' => 'Please select a contact.',
-            'selectedContact.exists' => 'The selected contact is invalid.',
-        ]);
         
         // Retrieve organization ID from the session
         $this->organization_id = session('organization_id');
@@ -260,51 +221,8 @@ protected $rules = [
     }
     
     
-    public function rendered(): void
-    {
-        Log::info('rendered reached');
-        
-        // First, check for contact selection errors
-
-        $this->resetValidation();
-        if ($this->getErrorBag()->has('selectedContact')) {
-            $this->dispatch('contactError', [
-                'index' => 'select_contact', // Use a unique identifier for the contact field
-                'errors' => [
-                    'contact' => $this->getErrorBag()->get('selectedContact')
-                ]
-            ]);
-            Log::info('Contact Error: ' . json_encode($this->getErrorBag()->get('selectedContact')));
-        }
     
-        // Then handle tax row errors as before
-        foreach ($this->taxRows as $index => $row) {
-            $rowErrors = [];
-            
-            $errorFields = [
-                'description' => "taxRows.{$index}.description",
-                'tax_type' => "taxRows.{$index}.tax_type", 
-                'tax_code' => "taxRows.{$index}.tax_code",
-                'coa' => "taxRows.{$index}.coa", 
-                'amount' => "taxRows.{$index}.amount"
-            ];
-            
-            foreach ($errorFields as $field => $errorKey) {
-                if ($this->getErrorBag()->has($errorKey)) {
-                    $rowErrors[$field] = $this->getErrorBag()->get($errorKey);
-                    Log::info($rowErrors[$field] = $this->getErrorBag()->get($errorKey));
-                }
-            }
-            
-            if (!empty($rowErrors)) {
-                Log::info('Row Errors: ' . json_encode($rowErrors));
-                $this->dispatch('parentComponentErrorBag', [
-                    'index' => $row['id'], 
-                    'errors' => $rowErrors
-                ]);
-            }
-        }
-    }
+
     public function render()
     {
         return view('livewire.sales-transaction', [

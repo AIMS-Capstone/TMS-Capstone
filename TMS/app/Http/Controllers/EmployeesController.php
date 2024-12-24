@@ -8,6 +8,8 @@ use App\Models\Employment;
 use Illuminate\Http\Request;
 use App\Imports\EmployeesImport;
 use Maatwebsite\Excel\Facades\Excel as MaatExcel;
+use Illuminate\Support\Facades\Auth;
+use Spatie\Activitylog\Models\Activity;
 
 
 class EmployeesController extends Controller
@@ -126,6 +128,17 @@ class EmployeesController extends Controller
                 'region' => $validated['region'],
             ]);
 
+            activity('employees')
+                ->performedOn($employee)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'organization_id' => $employee->organization_id,
+                    'attributes' => $employee->toArray(),
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log("Employee {$employee->first_name} {$employee->last_name} created");
+
             return redirect()->route('employees')->with('success', 'Employee and Employer addresses added successfully!');
         } catch (\Exception $e) {
             // pang debug lang dami kasing data hatdog
@@ -171,6 +184,7 @@ class EmployeesController extends Controller
 
             // Step 2: Find the employee by ID
             $employee = Employee::with(['address', 'employments.address'])->findOrFail($id);
+            $oldAttributes = $employee->getOriginal();
 
             // Step 3: Update the employee details
             $employee->update([
@@ -226,6 +240,28 @@ class EmployeesController extends Controller
                 'zip_code' => $validated['prev_zip_code'],
                 'region' => $validated['region'],
             ]);
+
+            $changedAttributes = $employee->getChanges();
+            $changes = [];
+
+            foreach ($changedAttributes as $key => $newValue) {
+                $oldValue = $oldAttributes[$key] ?? 'N/A';
+                $changes[$key] = [
+                    'old' => $oldValue,
+                    'new' => $newValue,
+                ];
+            }
+
+            activity('employees')
+                ->performedOn($employee)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'organization_id' => $employee->organization_id,
+                    'changes' => $changes,
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log("Employee {$employee->first_name} {$employee->last_name} updated");
             
             return redirect()->route('employees')->with('success', 'Employee updated successfully.');
         } catch (\Exception $e) {
@@ -240,11 +276,31 @@ class EmployeesController extends Controller
             'ids.*' => 'exists:employees,id',
         ]);
 
-        // Delete employees and their associated addresses
-        Employee::whereIn('id', $request->ids)->each(function ($employee) {
-            $employee->address()->delete(); // Deletes the associated address
-            $employee->delete(); // Deletes the employee
-        });
+        $employees = Employee::whereIn('id', $request->ids)->get();
+
+        // Prepare data for logging
+        $deletedEmployees = [];
+
+        foreach ($employees as $employee) {
+            $deletedEmployees[] = [
+                'name' => "{$employee->first_name} {$employee->last_name}",
+                'tin' => $employee->tin,
+                'organization_id' => $employee->organization_id,
+            ];
+
+            $employee->address()->delete();
+            $employee->delete();
+        }
+
+        // Log the bulk deletion in a single entry
+        activity('employees')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'deleted_employees' => $deletedEmployees,
+                'ip' => request()->ip(),
+                'browser' => request()->header('User-Agent'),
+            ])
+            ->log(count($deletedEmployees) . " employees were deleted");
 
         return response()->json(['success' => true, 'message' => 'Employees deleted successfully.']);
     }

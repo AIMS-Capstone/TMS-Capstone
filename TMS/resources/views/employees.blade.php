@@ -1,7 +1,7 @@
-@php
-$organizationId = session('organization_id');
-$organization = \App\Models\OrgSetup::find($organizationId);
-@endphp
+    @php
+    $organizationId = session('organization_id');
+    $organization = \App\Models\OrgSetup::find($organizationId);
+    @endphp
 
 <x-app-layout>
     <div class="py-12">
@@ -45,6 +45,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                         <!-- Upload CSV Option -->
                                         <li>
                                             <livewire:employees-multi-step-import />
+                                            
                                         </li>
                                     </ul>
                                 </div>
@@ -166,6 +167,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                     <!-- Fourth Header -->
                     <div class="container mx-auto">
                         <div class="flex flex-row space-x-2 items-center justify-between">
+                            <!-- Search row -->
                             <div class="flex space-x-2 items-center ps-8">
                                 <!-- Search bar -->
                                 <div class="relative w-80 p-4">
@@ -173,7 +175,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                         <input 
                                             type="search" 
                                             name="search" 
-                                            class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
+                                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
                                             aria-label="Search Term" 
                                             placeholder="Search..." 
                                             @input.debounce="$el.form.requestSubmit()"
@@ -183,74 +185,22 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                     </form>
                                     <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                 </div>
-                                
-                                {{-- Wait ko munang maayos yung pag-fetch ng data sa page na 'to before ko tapusin filter --}}
-                                <div class="flex flex-row items-center space-x-4">
-                                    <div class="relative inline-block text-left sm:w-auto w-full z-30">
-                                        <button id="filterButton" class="flex items-center text-zinc-600 hover:text-zinc-800 w-full hover:shadow-sm">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
-                                                <path fill="none" stroke="#696969" stroke-width="2" d="M18 4H6c-1.105 0-2.026.91-1.753 1.98a8.02 8.02 0 0 0 4.298 5.238c.823.394 1.455 1.168 1.455 2.08v6.084a1 1 0 0 0 1.447.894l2-1a1 1 0 0 0 .553-.894v-5.084c0-.912.632-1.686 1.454-2.08a8.02 8.02 0 0 0 4.3-5.238C20.025 4.91 19.103 4 18 4z"/>
-                                            </svg>
-                                            <span id="selectedFilter" class="font-normal text-sm text-zinc-600 truncate">Filter</span>
-                                            <svg id="dropdownArrow" class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
-                                        </button>
-                                    
-                                        <div id="dropdownFilter" class="absolute mt-2 w-[340px] rounded-lg shadow-lg bg-white hidden z-40">
-                                            <div class="py-2 px-2">
-                                                <span class="block px-4 py-2 text-xs font-bold text-zinc-700">Filter</span>
-                                                <span class="block px-4 py-1 text-zinc-700 font-bold text-xs">Employee Wage Status</span>
-                                                <div class="px-4 py-2 text-xs colspan-2 flex justify-between items-center space-x-4">
-                                                    <label class="flex items-center space-x-2 py-1">
-                                                        <input type="checkbox" value="Minimum Wage Earner" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Status" />
-                                                        <span>Minimum Wage Earner (MWE)</span>
-                                                    </label>
-                                                    <label class="flex items-center space-x-2 py-1">
-                                                        <input type="checkbox" value="Above Minimum Wage Earner" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Status" />
-                                                        <span>Above Minimum Wage Earner (AMWE)</span>
-                                                    </label>
-                                                </div>
-                                                <span class="block px-4 py-1 text-zinc-700 font-bold text-xs">With Previous Employer</span>
-                                                <div id="statusFilterContainer" class="block px-4 py-2 text-xs">
-                                                    <label class="flex items-center space-x-2 py-1">
-                                                        <input type="checkbox" value="Yes" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Status" />
-                                                        <span>Yes</span>
-                                                    </label>
-                                                    <label class="flex items-center space-x-2 py-1">
-                                                        <input type="checkbox" value="No" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Status" />
-                                                        <span>No</span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="flex items-center space-x-4 px-4 py-1.5 mb-1.5">
-                                                <button id="applyFiltersButton" class="flex items-center bg-white border border-gray-300 hover:border-green-500 hover:bg-green-100 hover:text-green-500 transition rounded-md px-3 py-1.5 whitespace-nowrap group">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 fill-current group-hover:fill-green-500 hover:border-green-500 hover:text-green-500 transition" viewBox="0 0 32 32">
-                                                        <path fill="currentColor" d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5z"/>
-                                                    </svg>
-                                                    <span class="text-zinc-700 transition group-hover:text-green-500 text-xs">Apply Filter</span>
-                                                </button>
-                                                <button id="clearFiltersButton" class="text-xs text-zinc-600 hover:text-zinc-900 whitespace-nowrap">Clear all filters</button>
-                                            </div>
-                                        </div>
-                                    </div>
                     
-                                    <div class="h-8 border-l border-zinc-300"></div>
+                                <!-- Sort by dropdown -->
+                                <div class="relative inline-block text-left">
+                                    <button id="sortButton" class="flex items-center text-zinc-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
+                                            <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span id="selectedOption" class="font-normal text-md text-zinc-700 truncate">Sort by</span>
+                                    </button>
                     
-                                    <!-- Sort by dropdown -->
-                                    <div class="relative inline-block text-left min-w-[150px]">
-                                        <button id="sortButton" class="flex items-center text-zinc-600 w-full hover:shadow-sm">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24"><path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
-                                            </svg>
-                                            <span id="selectedOption" class="font-normal text-sm text-zinc-600 hover:text-zinc-800 truncate">Sort by</span>
-                                            <svg class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
-                                        </button>
-                            
-                                        <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-30">
-                                            <div class="py-2 px-2">
-                                                <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
-                                                <div data-sort="recently-added" class="block px-4 py-2 w-full text-xs hover-dropdown">Recently Added</div>
-                                                <div data-sort="ascending" class="block px-4 py-2 w-full text-xs hover-dropdown">Ascending</div>
-                                                <div data-sort="descending" class="block px-4 py-2 w-full text-xs hover-dropdown">Descending</div>
-                                            </div>
+                                    <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
+                                        <div class="py-2 px-2">
+                                            <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
+                                            <div data-sort="recently-added" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
+                                            <div data-sort="ascending" class="block px-4 py-2 w-full text-sm hover-dropdown">Ascending</div>
+                                            <div data-sort="descending" class="block px-4 py-2 w-full text-sm hover-dropdown">Descending</div>
                                         </div>
                                     </div>
                                 </div>
@@ -313,8 +263,6 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                             <th scope="col" class="text-left py-4 px-4">Contact</th>
                                             <th scope="col" class="text-left py-4 px-4">Nationality</th>
                                             <th scope="col" class="text-left py-4 px-4">Address</th>
-                                            <th scope="col" class="text-left py-4 px-4">Wage</th>
-                                            <th scope="col" class="text-left py-4 px-4">With Prev Employer</th>
                                             <th scope="col" class="text-left py-4 px-4">Action</th>
                                         </tr>
                                     </thead>
@@ -345,14 +293,13 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                                     <td class="text-left py-3 px-4">{{ $employee->contact_number }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->nationality }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->address->address ?? 'N/A' }}</td>
-                                                    <td class="text-left py-3 px-4">{{ $employee->employee_wage_status }}</td>
-                                                    <td class="text-left py-3 px-4">{{ $employee->with_prev_employer }}</td>
                                                     <td class="text-left py-3 px-4">
                                                         <x-edit-employees />
                                                         <button 
                                                         @click="$dispatch('open-edit-employee-modal', {{@json_encode($employee) }})">
                                                         Edit Employee
                                                     </button>
+                                                    
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -469,7 +416,6 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                 checkbox.checked = this.checkAll;
             });
         }
-        
         
         // FOR SORT BUTTON
         document.getElementById('sortButton').addEventListener('click', function() {

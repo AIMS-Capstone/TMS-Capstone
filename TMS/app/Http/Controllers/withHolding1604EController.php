@@ -21,13 +21,10 @@ use Illuminate\Support\Facades\Log;
 
 class withHolding1604EController extends Controller
 {
-    public function index1604E(Request $request)
+    public function index1604E()
     {
         $organizationId = session('organization_id');
-
-        // Get the perPage value from the request, default to 5
-        $perPage = $request->input('perPage', 5);
-        $with_holdings = $this->getWithHoldings($organizationId, '1604E', $perPage);
+        $with_holdings = $this->getWithHoldings($organizationId, '1604E');
         return view('tax_return.with_holding.1604E', compact('with_holdings'));
     }
 
@@ -280,13 +277,13 @@ class withHolding1604EController extends Controller
             ->with('success', 'Form 1604E submitted successfully.');
     }
 
-    private function getWithHoldings($organizationId, $type, $perPage = 5)
+    private function getWithHoldings($organizationId, $type)
     {
 
         return WithHolding::with(['employee', 'employment', 'creator'])
             ->where('type', $type)
             ->where('organization_id', $organizationId)
-            ->paginate($perPage);
+            ->paginate(5);
             
     }
 

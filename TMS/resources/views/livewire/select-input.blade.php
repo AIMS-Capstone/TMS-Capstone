@@ -1,19 +1,13 @@
 <div class="form-group">
     <select 
         name="{{ $name }}" 
-        class="select2 {{ $class }} mr-2 @error('selectedValue') border-red-500 @enderror" 
+        class="select2 {{ $class }} mr-2" 
         id="{{ $id }}" 
         @if($isGrouped) data-grouped="true" @endif
         wire:model="selectedValue"
     >
         <!-- Default empty option -->
-       <option 
-            value="default" 
-            data-tax-id="000-000-000-000"
-            {{ empty($selectedValue) || $selectedValue == 'default' ? 'selected' : '' }}
-        >
-            Default TIN
-        </option>
+        <option value="" disabled {{ empty($selectedValue) ? 'selected' : '' }}>Select Customer</option>
 
         @foreach($options as $option)
             @if($isGrouped && isset($option['label']))
@@ -45,7 +39,4 @@
             @endif
         @endforeach
     </select>
-    @error('selectedValue')
-    <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
-@enderror
 </div>

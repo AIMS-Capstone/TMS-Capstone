@@ -8,6 +8,7 @@ use App\Models\OrgSetup;
 use App\Models\Transactions;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Auth;
 
 class CashReceiptController extends Controller
 {
@@ -124,15 +125,40 @@ class CashReceiptController extends Controller
             'ids.*' => 'exists:transactions,id',
         ]);
 
-        // Update the status of the selected transactions to 'posted' for the specific organization
-        Transactions::whereIn('id', $request->ids)
+        $transactions = Transactions::whereIn('id', $request->ids)
             ->where('Paidstatus', 'Paid')
             ->where('transaction_type', 'Sales')
-            ->where('organization_id', $organizationId) // Filter by organization
-            ->update(['status' => 'posted']);
+            ->where('organization_id', $organizationId)
+            ->get();
+
+        foreach ($transactions as $transaction) {
+            $oldStatus = $transaction->status;
+
+            // Disable logging temporarily
+            Transactions::$disableLogging = true;
+
+            // Update to posted
+            $transaction->update(['status' => 'posted']);
+
+            // Re-enable logging
+            Transactions::$disableLogging = false;
+
+            activity('Cash Receipt')
+                ->performedOn($transaction)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'organization_id' => $transaction->organization_id,
+                    'old_status' => $oldStatus,
+                    'new_status' => 'posted',
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log("Cash Receipt #{$transaction->inv_number} was updated to posted.");
+        }
 
         return response()->json(['message' => 'Selected transactions have been marked as posted.']);
     }
+
 
     // Update selected transactions to 'draft' status
     public function updateToDraft(Request $request)
@@ -144,12 +170,36 @@ class CashReceiptController extends Controller
             'ids.*' => 'exists:transactions,id',
         ]);
 
-        // Update the status of the selected transactions to 'draft' for the specific organization
-        Transactions::whereIn('id', $request->ids)
+        $transactions = Transactions::whereIn('id', $request->ids)
             ->where('Paidstatus', 'Paid')
             ->where('transaction_type', 'Sales')
-            ->where('organization_id', $organizationId) // Filter by organization
-            ->update(['status' => 'draft']);
+            ->where('organization_id', $organizationId)
+            ->get();
+
+        foreach ($transactions as $transaction) {
+            $oldStatus = $transaction->status;
+
+            // Disable logging temporarily
+            Transactions::$disableLogging = true;
+
+            // Update to draft
+            $transaction->update(['status' => 'draft']);
+
+            // Re-enable logging
+            Transactions::$disableLogging = false;
+
+            activity('Cash Receipt')
+                ->performedOn($transaction)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'organization_id' => $transaction->organization_id,
+                    'old_status' => $oldStatus,
+                    'new_status' => 'draft',
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log("Cash Receipt #{$transaction->inv_number} was updated to draft.");
+        }
 
         return response()->json(['message' => 'Selected transactions have been marked as draft.']);
     }

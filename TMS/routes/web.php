@@ -169,6 +169,10 @@ Route::middleware([
             Route::delete('/employees/bulk-delete', [EmployeesRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.employees.bulkDelete');
 
         });//ending of recycle-bin prefix
+
+    //Notes and Activities
+        Route::get('/audit_log/index', [ActivityLogController::class, 'audit_log'])->name('audit_log');
+
     });//ending of auth role middleware
 
 

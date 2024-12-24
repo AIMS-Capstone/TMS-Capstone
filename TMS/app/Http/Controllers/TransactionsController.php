@@ -355,10 +355,13 @@ public function getAllTransactions(Request $request)
     ]);
 
     activity('transactions')
-        ->performedOn($transaction) 
-        ->causedBy(Auth::user()) 
-        ->withProperties(['attributes' => $transaction->toArray()]) 
-        ->log('Transaction was manually created');
+        ->performedOn($transaction)
+        ->causedBy(Auth::user())
+        ->withProperties([
+            'organization_id' => session('organization_id'),
+            'attributes' => $transaction->toArray(),
+        ])
+        ->log('Transaction using upload was created');
 
 
     // Step 3: Add a TaxRow for each item in the transaction
@@ -617,6 +620,16 @@ private function extractTextFromReceipt($filePath)
         $transaction->status = 'posted';
         $transaction->save();
 
+        activity('transactions')
+            ->performedOn($transaction)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'organization_id' => session('organization_id'),
+                'attributes' => $transaction->toArray(),
+            ])
+            ->log("Transaction {$transaction->inv_number} was mark as posted");
+
+
         // Optionally, you can return a response or redirect to another page
         session()->flash('success', 'Transaction has been successfully marked as Posted.');
         
@@ -650,6 +663,16 @@ private function extractTextFromReceipt($filePath)
     }
     $transaction->save();
 
+    activity('transactions')
+        ->performedOn($transaction)
+        ->causedBy(Auth::user())
+        ->withProperties([
+            'organization_id' => session('organization_id'),
+            'attributes' => $transaction->toArray(),
+        ])
+        ->log("Transaction {$transaction->inv_number} was mark as paid");
+
+
     session()->flash('successPayment', 'Transaction has been successfully marked as Posted.');
     // Return a JSON response indicating success
     return response()->json(['successPayment' => true]);
@@ -674,13 +697,6 @@ private function extractTextFromReceipt($filePath)
         // Update transaction with validated data
         $transaction->update($validated);
 
-        activity('transactions')
-            ->performedOn($transaction)
-            ->causedBy(Auth::user())
-            ->withProperties([
-                'attributes' => $transaction->toArray(),
-            ])
-            ->log('Transaction was manually updated');
 
     
         // Optionally, handle any additional fields, such as tax rows
@@ -707,7 +723,11 @@ private function extractTextFromReceipt($filePath)
             activity('transactions')
                 ->performedOn($transaction)
                 ->causedBy(Auth::user())
-                ->log("Transaction ID {$transaction->id} was soft deleted");
+                ->withProperties([
+                    'organization_id' => session('organization_id'),
+                    'attributes' => $transaction->toArray(),
+                ])
+                ->log("Transaction {$transaction->inv_number} was soft deleted");
         }
 
         // Optionally, return a response

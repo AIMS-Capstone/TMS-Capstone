@@ -19,13 +19,10 @@ use Illuminate\Support\Facades\Log;
 class withHolding1601EQController extends Controller
 {
      // 1601EQ function
-    public function index1601EQ(Request $request)
+    public function index1601EQ()
     {
         $organizationId = session('organization_id');
-
-        // Get the perPage value from the request, default to 5
-        $perPage = $request->input('perPage', 5);
-        $with_holdings = $this->getWithHoldings($organizationId, '1601EQ', $perPage);
+        $with_holdings = $this->getWithHoldings($organizationId, '1601EQ');
         return view('tax_return.with_holding.1601EQ', compact('with_holdings'));
     }
 
@@ -282,13 +279,13 @@ class withHolding1601EQController extends Controller
         return redirect()->route('with_holding.1601EQ')->with('success', 'Form 1601EQ submitted successfully.');
     }
 
-    private function getWithHoldings($organizationId, $type, $perPage = 5)
+    private function getWithHoldings($organizationId, $type)
     {
 
         return WithHolding::with(['employee', 'employment', 'creator'])
             ->where('type', $type)
             ->where('organization_id', $organizationId)
-            ->paginate($perPage);
+            ->paginate(5);
             
     }
 }

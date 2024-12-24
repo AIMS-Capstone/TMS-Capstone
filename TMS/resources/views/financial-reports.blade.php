@@ -12,7 +12,7 @@
     @endphp
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg" x-data="filterComponent()">
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg" x-data="filterComponent()">
 
                 <div class="container mx-auto my-4 pt-4">
                     <div class="flex justify-between items-center px-10">
@@ -45,32 +45,11 @@
                                     <label for="period_select" class="font-bold text-blue-900">Period</label>
                                     <select id="period_select" x-model="period" @change="updateYearAndMonthOptions"
                                             class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                        <option value="" disabled selected></option>
                                         <option value="monthly">Monthly</option>
                                         <option value="quarterly">Quarterly</option>
                                         <option value="annually" selected>Annually</option>
                                         <option value="select-date">Select Date</option>
-                                        <option value="select-date">Select Date</option>
                                     </select>
-                                </div>
-
-                                <!-- Date Picker Inputs -->
-                                <div class="flex flex-row space-x-4 " id="date-range" x-show="period === 'select-date'" x-cloak>
-                                    <!-- Start Date -->
-                                    <div lass="flex flex-row">
-                                        <label for="start_date" class="font-bold text-blue-900">Start Date:</label>
-                                        <input type="date" id="start_date" x-model="startDate" name="start_date"
-                                            max="{{ now()->format('Y-m-d') }}"
-                                            class="block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                    </div>
-                                    <!-- End Date -->
-                                
-                                    <div lass="flex flex-row">
-                                        <label for="end_date" class="font-bold text-blue-900 mt-2">End Date:</label>
-                                        <input type="date" id="end_date" x-model="endDate" name="end_date"
-                                            max="{{ now()->format('Y-m-d') }}"
-                                            class="block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                    </div>
                                 </div>
 
                                 <!-- Date Picker Inputs -->
@@ -98,7 +77,6 @@
                                     <label for="year_select" class="font-bold text-blue-900">Year</label>
                                     <select id="year_select" x-model="selectedYear"
                                             class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                        <option value="" disabled selected></option>
                                         <template x-for="year in years" :key="year">
                                             <option :value="year" x-text="year"></option>
                                         </template>
@@ -106,13 +84,11 @@
                                 </div>
 
                                 <!-- Quarter -->
-                                <!-- Quarter -->
                                 <div class="h-8 border-l border-gray-200"></div>
                                 <div class="flex flex-col w-32" x-show="period === 'quarterly'">
                                     <label for="quarter_select" class="font-bold text-blue-900">Quarter</label>
                                     <select id="quarter_select" x-model="selectedQuarter"
                                             class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                        <option value="" disabled selected></option>
                                         <option value="Q1">1st Quarter</option>
                                         <option value="Q2">2nd Quarter</option>
                                         <option value="Q3">3rd Quarter</option>
@@ -121,13 +97,11 @@
                                 </div>
 
                                 <!-- Month  -->
-                                <!-- Month  -->
                                 <div class="flex flex-col w-32" x-show="period === 'monthly'">
                                     <label for="month_select" class="font-bold text-blue-900">Month</label>
                                     <select id="month_select" x-model="selectedMonth"
                                             class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                            <option value="" disabled selected></option>
-                                            <template x-for="month in months" :key="month.value">
+                                        <template x-for="month in months" :key="month.value">
                                             <option :value="month.value" x-text="month.label"></option>
                                         </template>
                                     </select>
@@ -138,7 +112,7 @@
                                     <label for="status_filter" class="font-bold text-blue-900">Status</label>
                                     <select id="status_filter" name="status"
                                             class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                        <option value="" disabled selected></option>
+                                        
                                         <option value="draft">Draft</option>
                                         <option value="posted">Posted</option>
                                     </select>
@@ -164,8 +138,6 @@
                         <div class=" p-8 overflow-x-auto" id = "financial" >
                             <div class="container bg-white border border-gray-300">
                                 <div class="flex flex-row items-start space-x-2 pt-10 px-8 p-4 justify-between">
-                                   <p class="indent-4 font-bold text-xl text-left text-gray-700">Revenue</p>
-                                   <p class="indent-4 font-bold text-xl text-left text-gray-700">Amount</p>
                                    <p class="indent-4 font-bold text-xl text-left text-gray-700">Revenue</p>
                                    <p class="indent-4 font-bold text-xl text-left text-gray-700">Amount</p>
                                 </div>
@@ -303,18 +275,16 @@
 
                                 <div class="flex justify-between items-start space-x-2 p-4">
                                     <div>
-                                            <p class="indent-4 font-bold text-xl text-left text-gray-700">Net Income (Loss) From Operations</p>
+                                        <p class="indent-4 font-bold text-xl text-left text-gray-700">Net Income (Loss) From Operations</p>
                                     </div>
                                     <div>
                                         <p class="font-bold text-xl text-gray-700 pe-5">{{ number_format($netIncome, 2) }}</p>
                                     </div>
                                 </div>
                                 <hr class="mx-8 mb-10 border-2 border-gray-800"/>
-                                <hr class="mx-8 mb-10 border-2 border-gray-800"/>
 
                             </div>
-                            </div>
-
+                        </div>
 
                 </div>  
             </div>
@@ -325,8 +295,8 @@
 <script>
     function filterComponent() {
         return {
-            period: '',
-            selectedYear: '',
+            period: 'annually',
+            selectedYear: new Date().getFullYear(),
             selectedMonth: '',
             selectedQuarter: '',
             startDate: '',
@@ -350,66 +320,17 @@
                 const currentYear = new Date().getFullYear();
                 this.years = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const year = urlParams.get('year');
-                    const month = urlParams.get('month');
-                    const quarter = urlParams.get('quarter');
-                const startDate = urlParams.get('start_date');
-                const endDate = urlParams.get('end_date');
+                const urlParams = new URLSearchParams(window.location.search);
+                const year = urlParams.get('year');
+                const month = urlParams.get('month');
+                const quarter = urlParams.get('quarter');
                 const startDate = urlParams.get('start_date');
                 const endDate = urlParams.get('end_date');
 
-                    if (year && this.years.includes(parseInt(year))) {
-                        this.selectedYear = parseInt(year);
-                    }
+                if (year && this.years.includes(parseInt(year))) {
+                    this.selectedYear = parseInt(year);
+                }
 
-                if (month) {
-                    this.period = 'monthly';
-                    this.selectedMonth = month;
-                } else if (quarter) {
-                    this.period = 'quarterly';
-                    this.selectedQuarter = quarter;
-                } else if (startDate && endDate) {
-                    this.period = 'select-date';
-                    this.startDate = startDate;
-                    this.endDate = endDate;
-                }
-            },
-            updateYearAndMonthOptions() {
-                if (this.period === 'annually') {
-                    this.selectedMonth = '';
-                    this.selectedQuarter = '';
-                    this.startDate = '';
-                    this.endDate = '';
-                } else if (this.period === 'quarterly') {
-                    this.selectedMonth = '';
-                    this.startDate = '';
-                    this.endDate = '';
-                } else if (this.period === 'monthly') {
-                    this.selectedQuarter = '';
-                    this.startDate = '';
-                    this.endDate = '';
-                } else if (this.period === 'select-date') {
-                    this.selectedYear = '';
-                    this.selectedMonth = '';
-                    this.selectedQuarter = '';
-                }
-            },
-            getFormattedDate() {
-                if (this.period === 'monthly' && this.selectedMonth) {
-                    const month = this.months.find(m => m.value === this.selectedMonth).label;
-                    return `For ${month} ${this.selectedYear}`;
-                } else if (this.period === 'quarterly' && this.selectedQuarter) {
-                    return `For ${this.selectedQuarter} ${this.selectedYear}`;
-                } else if (this.period === 'select-date' && this.startDate && this.endDate) {
-                    return `From ${this.startDate} to ${this.endDate}`;
-                } else {
-                    return `For the Year ${this.selectedYear}`;
-                }
-            },  
-            async applyFilters() {
-                let url = new URL(window.location.origin + window.location.pathname);
-                url.searchParams.set('period', this.period);
                 if (month) {
                     this.period = 'monthly';
                     this.selectedMonth = month;
@@ -470,24 +391,12 @@
                 } else if (this.period === 'annually') {
                     url.searchParams.set('year', this.selectedYear);
                 }
-                if (this.period === 'monthly') {
-                    url.searchParams.set('year', this.selectedYear);
-                    url.searchParams.set('month', this.selectedMonth);
-                } else if (this.period === 'quarterly') {
-                    url.searchParams.set('year', this.selectedYear);
-                    url.searchParams.set('quarter', this.selectedQuarter);
-                } else if (this.period === 'select-date') {
-                    url.searchParams.set('start_date', this.startDate);
-                    url.searchParams.set('end_date', this.endDate);
-                } else if (this.period === 'annually') {
-                    url.searchParams.set('year', this.selectedYear);
-                }
 
-                    // Add the status filter
-                    const statusFilter = document.getElementById('status_filter').value;
-                    if (statusFilter) {
-                        url.searchParams.set('status', statusFilter);
-                    }
+                // Add the status filter
+                const statusFilter = document.getElementById('status_filter').value;
+                if (statusFilter) {
+                    url.searchParams.set('status', statusFilter);
+                }
 
                 // Fetch filtered content
                 await fetch(url.toString(), {
@@ -511,8 +420,9 @@
                 this.selectedQuarter = '';
                 this.startDate = '';
                 this.endDate = '';
-                // Fetch filtered content
-                await fetch(url.toString(), {
+
+                let url = new URL(window.location.origin + window.location.pathname);
+                fetch(url.toString(), {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
                     }
@@ -524,33 +434,10 @@
                     const newTableContent = doc.querySelector('#financial').innerHTML;
                     document.querySelector('#financial').innerHTML = newTableContent;
                 })
-                .catch(error => console.error('Error fetching data:', error));
-            },
-            resetFilters() {
-                this.period = 'annually';
-                this.selectedYear = new Date().getFullYear();
-                this.selectedMonth = '';
-                this.selectedQuarter = '';
-                this.startDate = '';
-                this.endDate = '';
-
-                    let url = new URL(window.location.origin + window.location.pathname);
-                    fetch(url.toString(), {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(response => response.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const newTableContent = doc.querySelector('#financial').innerHTML;
-                        document.querySelector('#financial').innerHTML = newTableContent;
-                    })
-                    .catch(error => console.error('Error resetting data:', error));
-                }
-            };
-        }
+                .catch(error => console.error('Error resetting data:', error));
+            }
+        };
+    }
     function exportReportExcel() {
         // Set default values using PHP variables
         const defaultYear = "{{ $currentYear }}";
@@ -559,21 +446,13 @@
 
         // Get selected filters
         const period = document.getElementById('period_select')?.value || 'annually';
-        // Get selected filters
-        const period = document.getElementById('period_select')?.value || 'annually';
         const year = document.getElementById('year_select')?.value || defaultYear;
-        const month = document.getElementById('month_select')?.value || '';
-        const quarter = document.getElementById('quarter_select')?.value || '';
-        const startDate = document.getElementById('start_date')?.value || '';
-        const endDate = document.getElementById('end_date')?.value || '';
         const month = document.getElementById('month_select')?.value || '';
         const quarter = document.getElementById('quarter_select')?.value || '';
         const startDate = document.getElementById('start_date')?.value || '';
         const endDate = document.getElementById('end_date')?.value || '';
         const status = document.getElementById('status_filter')?.value || '';
 
-        // Build the URL based on the selected period
-        let url = `{{ route('financial.exportExcel') }}?period=${period}&year=${year}&month=${month}&quarter=${quarter}&start_date=${startDate}&end_date=${endDate}&status=${status}`;
         // Build the URL based on the selected period
         let url = `{{ route('financial.exportExcel') }}?period=${period}&year=${year}&month=${month}&quarter=${quarter}&start_date=${startDate}&end_date=${endDate}&status=${status}`;
         

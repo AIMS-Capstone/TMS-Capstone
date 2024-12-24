@@ -18,14 +18,10 @@ use Illuminate\Support\Facades\Log;
 class WithHoldingController extends Controller
 {
     // etong parent withHoldingController na gamit ko sa 1601C
-    public function index1601C(Request $request)
+    public function index1601C()
     {
         $organizationId = session('organization_id');
-
-        // Get the perPage value from the request, default to 5
-        $perPage = $request->input('perPage', 5);
-
-        $with_holdings = $this->getWithHoldings($organizationId, '1601C', $perPage);
+        $with_holdings = $this->getWithHoldings($organizationId, '1601C');
         return view('tax_return.with_holding.1601C', compact('with_holdings'));
     }
 
@@ -399,13 +395,13 @@ class WithHoldingController extends Controller
             ->with('success', '1601C Form has been successfully submitted.');
     }
 
-    private function getWithHoldings($organizationId, $type, $perPage = 5)
+    private function getWithHoldings($organizationId, $type)
     {
 
         return WithHolding::with(['employee', 'employment', 'creator'])
             ->where('type', $type)
             ->where('organization_id', $organizationId)
-            ->paginate($perPage);
+            ->paginate(5);
             
     }
 
