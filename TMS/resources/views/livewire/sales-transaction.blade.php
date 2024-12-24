@@ -187,23 +187,37 @@
     
         <!-- Save Button -->
         <x-slot:actions>
-            <div class="flex items-center justify-between w-full">
-                <!-- Error Section on the Left -->
-                <div class="text-left">
-                    @if($this->getErrorBag()->any())
-                        <div class="inline-block bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                            <strong class="font-bold">Oops! There are some errors:</strong>
-                            <ul class="list-disc list-inside mt-2">
-                                @foreach($this->getErrorBag()->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @else
-                        <!-- Empty placeholder to maintain layout -->
-                        <div class="h-12"></div>
-                    @endif
-                </div>
+        <!-- Error Section on the Left -->
+<div class="text-left">
+    @if($this->getErrorBag()->any())
+        <div class="inline-block bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Oops! There are some errors:</strong>
+            <ul class="list-disc list-inside mt-2">
+                @php
+                    $processedMessages = collect($this->getErrorBag()->all())->map(function($message) {
+                        if (strpos($message, ':ordinal') !== false) {
+                            preg_match('/taxRows\.(\d+)\./', $message, $matches);
+                            if (isset($matches[1])) {
+                                $index = (int)$matches[1];
+                                $ordinals = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
+                                $ordinal = $ordinals[$index] ?? ($index + 1) . 'th';
+                                return str_replace(':ordinal', $ordinal, $message);
+                            }
+                        }
+                        return $message;
+                    })->unique();
+                @endphp
+                
+                @foreach($processedMessages as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @else
+        <!-- Empty placeholder to maintain layout -->
+        <div class="h-12"></div>
+    @endif
+</div>
         
                 <!-- Save Button on the Right -->
                 <div class="text-right">
@@ -289,7 +303,7 @@ document.addEventListener('livewire:initialized', function () {
     },
     language: {
         noResults: function() {
-            return "<a href='#' class='btn btn-danger use-anyway-btn'>Add a new contact</a>";
+            return "<a href='#' class='btn btn-danger use-anyway-btn'>Add a new customer</a>";
         }
     },
     escapeMarkup: function (markup) {
@@ -316,6 +330,8 @@ $('#select_contact').on('change', function() {
                             </select>
                         </div>
 
+                          <input type="hidden" id="contact_classification" wire:model.defer="newContact.contact_classification" name="contact_classification" value="Customer">
+                          
                         <div class="mb-4">
                             <label for="contact_tin" class="block text-gray-700 font-semibold">Tax Identification Number (TIN)<span class="text-red-500">*</span></label>
                             <input type="text" id="contact_tin" wire:model.defer="newContact.contact_tin" name="contact_tin" class="block w-full py-2 px-0 text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" placeholder="000-000-000-000">

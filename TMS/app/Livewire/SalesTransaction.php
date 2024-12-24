@@ -31,19 +31,50 @@ class SalesTransaction extends Component
 
     protected $listeners = ['taxRowUpdated' => 'updateTaxRow', 'contactSelected', 'taxRowRemoved' => 'removeTaxRow'];
  
-protected $rules = [
-
-    'date' => 'required|date',
-    'inv_number' => 'required|string',
-    'reference' => 'nullable|string',
-    'selectedContact' => 'required|exists:contacts,id', // Add this validation rule
-    'taxRows.*.amount' => 'required|numeric|min:0.01',
-    'taxRows.*.tax_code' => 'nullable|exists:atcs,id',
-    'taxRows.*.coa' => 'required|string',
-    'taxRows.*.description' => 'required|string',
-    'taxRows.*.tax_type' => 'required|exists:tax_types,id',
-];
-
+    public function rules()
+    {
+        $rules = [];
+        
+        // Base rules
+        $rules['date'] = 'required|date';
+        $rules['inv_number'] = 'required|string';
+        $rules['reference'] = 'nullable|string';
+        $rules['selectedContact'] = 'required|exists:contacts,id';
+        
+        // Dynamic rules for tax rows
+        foreach ($this->taxRows as $index => $row) {
+            $rules["taxRows.{$index}.amount"] = 'required|numeric|min:0.01';
+            $rules["taxRows.{$index}.tax_code"] = 'nullable|exists:atcs,id';
+            $rules["taxRows.{$index}.coa"] = 'required|string';
+            $rules["taxRows.{$index}.description"] = 'required|string';
+            $rules["taxRows.{$index}.tax_type"] = 'required|exists:tax_types,id';
+        }
+        
+        return $rules;
+    }
+    
+    public function messages()
+    {
+        $messages = [];
+        
+        // Base messages
+        $messages['selectedContact.required'] = 'Please select a contact.';
+        $messages['selectedContact.exists'] = 'The selected contact is invalid.';
+        $messages['date.required'] = 'The date field is required.';
+        $messages['inv_number.required'] = 'The invoice number is required.';
+        
+        // Dynamic messages for tax rows
+        foreach ($this->taxRows as $index => $row) {
+            $rowNum = $index + 1;
+            $messages["taxRows.{$index}.amount.required"] = "The amount field in Row #{$rowNum} is required.";
+            $messages["taxRows.{$index}.amount.min"] = "The amount field in Row #{$rowNum} must be at least :min.";
+            $messages["taxRows.{$index}.coa.required"] = "The chart of accounts field in Row #{$rowNum} is required.";
+            $messages["taxRows.{$index}.description.required"] = "The description field in Row #{$rowNum} is required.";
+            $messages["taxRows.{$index}.tax_type.required"] = "The tax type field in Row #{$rowNum} is required.";
+        }
+        
+        return $messages;
+    }
 
     public function mount()
     {
@@ -52,7 +83,34 @@ protected $rules = [
         $this->organization_id = session('organization_id');
        
     }
-
+    public function getValidationMessages()
+    {
+        $messages = $this->messages;
+        
+        foreach ($this->taxRows as $index => $row) {
+            foreach ($messages as $key => $message) {
+                if (strpos($key, 'taxRows.*') === 0) {
+                    $newKey = str_replace('*', $index, $key);
+                    // Add 1 and convert to ordinal
+                    $rowNumber = $this->numberToOrdinal($index + 1);
+                    // Replace both the key and the index in the message
+                    $messages[$newKey] = str_replace(':index', $rowNumber, $message);
+                }
+            }
+        }
+        
+        return $messages;
+    }
+private function numberToOrdinal($number)
+{
+    $suffix = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'];
+    
+    if ((($number % 100) >= 11) && (($number % 100) <= 13)) {
+        return $number . 'th';
+    } else {
+        return $number . $suffix[$number % 10];
+    }
+}
     public function addTaxRow()
     {
         // Use count of existing rows or generate a unique identifier
@@ -108,7 +166,7 @@ protected $rules = [
     }
     public function calculateTotals()
     {
-        Log::info("fuck");
+    
         // Initialize totals
         $this->vatableSales = 0;
         $this->vatAmount = 0;  // This will store the VAT amount (not including ATC)
@@ -189,16 +247,10 @@ protected $rules = [
 
     public function saveTransaction()
     {
-        // Validate the required fields
-        $this->validate();
-        $this->validate([
-            'selectedContact' => 'required|exists:contacts,id',
-            // ... other validation rules ...
-        ], [
-            'selectedContact.required' => 'Please select a contact.',
-            'selectedContact.exists' => 'The selected contact is invalid.',
-        ]);
-        
+        $this->validate(
+            $this->rules(),
+            $this->messages()
+        );
         // Retrieve organization ID from the session
         $this->organization_id = session('organization_id');
         

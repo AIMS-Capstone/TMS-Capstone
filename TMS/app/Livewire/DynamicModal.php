@@ -33,6 +33,8 @@ class DynamicModal extends Component
         'contact_address' => '',
         'contact_city' => '',
         'contact_zip' => '',
+        'contact_classification' => 'Customer',
+        'organization_id' => '',
     ];
 
     protected $listeners = ['triggerModal' => 'openModal'];
@@ -50,37 +52,44 @@ class DynamicModal extends Component
     }
 
     public function save()
-    {
-        // Validate and create the new contact
-        $validatedData = $this->validate([
-            'newContact.bus_name' => 'required|string|max:255',
-            'newContact.contact_tin' => 'nullable|string|max:255',
-            'newContact.contact_type' => 'nullable|string|max:255',
-            'newContact.contact_address' => 'nullable|string|max:255',
-            'newContact.contact_city' => 'nullable|string|max:255',
-            'newContact.contact_zip' => 'nullable|string|max:255',
-        ]);
+{
+    // Assign sessioned organization_id and classification to newContact
+    $this->newContact['organization_id'] = session('organization_id'); // Assuming the session key is 'organization_id'
+    $this->newContact['contact_classification'] = 'Customer';
 
-        $contact = Contacts::create($validatedData['newContact']);
+    // Validate and create the new contact
+    $validatedData = $this->validate([
+        'newContact.bus_name' => 'required|string|max:255',
+        'newContact.contact_tin' => 'nullable|string|max:255',
+        'newContact.contact_type' => 'nullable|string|max:255',
+        'newContact.contact_address' => 'nullable|string|max:255',
+        'newContact.contact_city' => 'nullable|string|max:255',
+        'newContact.contact_zip' => 'nullable|string|max:255',
+        'newContact.organization_id' => 'required|integer',
+        'newContact.contact_classification' => 'required|string',
+    ]);
 
-        // Reset the form
-        $this->reset('newContact');
-        $this->closeModal();
+    dd($validatedData);
+    $contact = Contacts::create($validatedData['newContact']);
 
-        // Fetch updated contacts
-        $options = Contacts::all()->map(function ($contact) {
-            return [
-                'value' => $contact->id,
-                'name' => $contact->bus_name,
-                'tin' => $contact->contact_tin,
-            ];
-        })->toArray();
+    // Reset the form
+    $this->reset('newContact');
+    $this->closeModal();
 
-        // Emit an event to update the SelectInput component
-        $this->dispatch('refreshDropdown', [
-            'options' => $options
-        ]);
-    }
+    // Fetch updated contacts
+    $options = Contacts::all()->map(function ($contact) {
+        return [
+            'value' => $contact->id,
+            'name' => $contact->bus_name,
+            'tin' => $contact->contact_tin,
+        ];
+    })->toArray();
+
+    // Emit an event to update the SelectInput component
+    $this->dispatch('refreshDropdown', [
+        'options' => $options
+    ]);
+}
     public function savePurchase()
     {
         // Validate all fields related to the purchase contact

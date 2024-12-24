@@ -30,20 +30,98 @@ class PurchaseTransaction extends Component
 
     protected $listeners = ['taxRowUpdated' => 'updateTaxRow', 'contactSelected', 'taxRowRemoved' => 'removeTaxRow'];
 
-    protected $rules = [
-        'date' => 'required|date',
-        'inv_number' => 'required|string',
-        'reference' => 'nullable|string',
-        'taxRows.*.amount' => 'required|numeric|min:0.01',
-        'taxRows.*.tax_code' => 'nullable|exists:atcs,id',
-        'taxRows.*.coa' => 'required|string',
-        'taxRows.*.description' => 'required|string',
-        'taxRows.*.tax_type' => 'required|exists:tax_types,id', // Add validation for tax type
-    ];
+    public function rules()
+    {
+        $rules = [];
+        
+        // Base rules
+        $rules['date'] = 'required|date';
+        $rules['reference'] = 'nullable|string';
+        $rules['selectedContact'] = 'required|exists:contacts,id';
+        
+        // Dynamic rules for tax rows
+        foreach ($this->taxRows as $index => $row) {
+            $rules["taxRows.{$index}.amount"] = 'required|numeric|min:0.01';
+            $rules["taxRows.{$index}.tax_code"] = 'nullable|exists:atcs,id';
+            $rules["taxRows.{$index}.coa"] = 'required|string';
+            $rules["taxRows.{$index}.description"] = 'required|string';
+            $rules["taxRows.{$index}.tax_type"] = 'required|exists:tax_types,id';
+        }
+        
+        return $rules;
+    }
+    
+    public function messages()
+    {
+        $messages = [];
+        
+        // Base messages
+        $messages['selectedContact.required'] = 'Please select a contact.';
+        $messages['selectedContact.exists'] = 'The selected contact is invalid.';
+        $messages['date.required'] = 'The date field is required.';
+        $messages['inv_number.required'] = 'The invoice number is required.';
+        
+        // Dynamic messages for tax rows
+        foreach ($this->taxRows as $index => $row) {
+            $rowNum = $index + 1;
+            $messages["taxRows.{$index}.amount.required"] = "The amount field in Row #{$rowNum} is required.";
+            $messages["taxRows.{$index}.amount.min"] = "The amount field in Row #{$rowNum} must be at least :min.";
+            $messages["taxRows.{$index}.coa.required"] = "The chart of accounts field in Row #{$rowNum} is required.";
+            $messages["taxRows.{$index}.description.required"] = "The description field in Row #{$rowNum} is required.";
+            $messages["taxRows.{$index}.tax_type.required"] = "The tax type field in Row #{$rowNum} is required.";
+        }
+        
+        return $messages;
+    }
     public function mount()
     {
         $this->addTaxRow();
  
+    }
+    public function rendered(): void
+    {
+        Log::info('rendered reached');
+        
+        // First, check for contact selection errors
+
+        $this->resetValidation();
+        if ($this->getErrorBag()->has('selectedContact')) {
+            $this->dispatch('contactError', [
+                'index' => 'select_contact', // Use a unique identifier for the contact field
+                'errors' => [
+                    'contact' => $this->getErrorBag()->get('selectedContact')
+                ]
+            ]);
+            Log::info('Contact Error: ' . json_encode($this->getErrorBag()->get('selectedContact')));
+        }
+    
+        // Then handle tax row errors as before
+        foreach ($this->taxRows as $index => $row) {
+            $rowErrors = [];
+            
+            $errorFields = [
+                'description' => "taxRows.{$index}.description",
+                'tax_type' => "taxRows.{$index}.tax_type", 
+                'tax_code' => "taxRows.{$index}.tax_code",
+                'coa' => "taxRows.{$index}.coa", 
+                'amount' => "taxRows.{$index}.amount"
+            ];
+            
+            foreach ($errorFields as $field => $errorKey) {
+                if ($this->getErrorBag()->has($errorKey)) {
+                    $rowErrors[$field] = $this->getErrorBag()->get($errorKey);
+                    Log::info($rowErrors[$field] = $this->getErrorBag()->get($errorKey));
+                }
+            }
+            
+            if (!empty($rowErrors)) {
+                Log::info('Row Errors: ' . json_encode($rowErrors));
+                $this->dispatch('parentComponentErrorBag', [
+                    'index' => $row['id'], 
+                    'errors' => $rowErrors
+                ]);
+            }
+        }
     }
 
     public function addTaxRow()
@@ -159,6 +237,8 @@ class PurchaseTransaction extends Component
 
     // Add both vatable and non-vatable purchases to the total amount
     $this->totalAmount = $vatInclusiveAmount + $this->nonVatablePurchase - $this->appliedATCsTotalAmount;
+    
+    $this->rendered();
 }
 
 
