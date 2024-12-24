@@ -14,7 +14,7 @@
                         providing an audit trail to ensure accountability and transparency.
                     </p>
                 </div>
-                <form method="GET" action="{{ route('audit_log') }}" class="flex items-center space-x-4">
+                <form method="GET" action="{{ route('audit_log.index') }}" class="flex items-center space-x-4">
                 <div class="text-sm text-gray-600">
                     <span class="font-medium">Activity Log for:</span>
                     <!-- Organization Filter -->
