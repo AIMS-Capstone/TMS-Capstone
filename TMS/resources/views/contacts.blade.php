@@ -280,7 +280,7 @@
                                             <tr>
                                                 <td colspan="6" class="text-center justify-center p-4">
                                                     <img src="{{ asset('images/no-account.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
-                                                    <h1 class="font-extrabold text-neutral-600 text-lg mt-2">No Contacts Added Yet</h1>
+                                                    <h1 class="font-bold text-neutral-600 text-lg mt-2">No Contacts Added Yet</h1>
                                                     <p class="text-sm text-neutral-500 mt-2">Start adding contacts and vendors by<br>clicking the + button above.</p>
                                                 </td>
                                             </tr>

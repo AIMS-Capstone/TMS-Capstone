@@ -12,7 +12,7 @@
     @endphp
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg" x-data="filterComponent()">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg" x-data="filterComponent()">
 
                 <div class="container mx-auto my-4 pt-4">
                     <div class="flex justify-between items-center px-10">
@@ -45,6 +45,7 @@
                                     <label for="period_select" class="font-bold text-blue-900">Period</label>
                                     <select id="period_select" x-model="period" @change="updateYearAndMonthOptions"
                                             class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        <option value="" disabled selected></option>
                                         <option value="monthly">Monthly</option>
                                         <option value="quarterly">Quarterly</option>
                                         <option value="annually" selected>Annually</option>
@@ -73,10 +74,10 @@
 
                                 <!-- Year -->
                                 <div class="flex flex-col w-32" x-show="period !== 'select-date'">
-                                <div class="flex flex-col w-32" x-show="period !== 'select-date'">
                                     <label for="year_select" class="font-bold text-blue-900">Year</label>
                                     <select id="year_select" x-model="selectedYear"
                                             class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        <option value="" disabled selected></option>
                                         <template x-for="year in years" :key="year">
                                             <option :value="year" x-text="year"></option>
                                         </template>
@@ -89,6 +90,7 @@
                                     <label for="quarter_select" class="font-bold text-blue-900">Quarter</label>
                                     <select id="quarter_select" x-model="selectedQuarter"
                                             class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        <option value="" disabled selected></option>
                                         <option value="Q1">1st Quarter</option>
                                         <option value="Q2">2nd Quarter</option>
                                         <option value="Q3">3rd Quarter</option>
@@ -101,7 +103,8 @@
                                     <label for="month_select" class="font-bold text-blue-900">Month</label>
                                     <select id="month_select" x-model="selectedMonth"
                                             class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                        <template x-for="month in months" :key="month.value">
+                                            <option value="" disabled selected></option>
+                                            <template x-for="month in months" :key="month.value">
                                             <option :value="month.value" x-text="month.label"></option>
                                         </template>
                                     </select>
@@ -112,7 +115,7 @@
                                     <label for="status_filter" class="font-bold text-blue-900">Status</label>
                                     <select id="status_filter" name="status"
                                             class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                        
+                                        <option value="" disabled selected></option>
                                         <option value="draft">Draft</option>
                                         <option value="posted">Posted</option>
                                     </select>
@@ -295,8 +298,8 @@
 <script>
     function filterComponent() {
         return {
-            period: 'annually',
-            selectedYear: new Date().getFullYear(),
+            period: '',
+            selectedYear: '',
             selectedMonth: '',
             selectedQuarter: '',
             startDate: '',

@@ -2,29 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\OrgSetup;
-use App\Models\WithHolding;
-use App\Models\Source;
-use App\Models\Employee;
-use App\Models\Employment;
-use App\Models\Form1601C;
+use App\Models\atc;
+use App\Models\Contacts;
 use App\Models\Form1601EQ;
 use App\Models\Form1604E;
-use App\Models\Contacts;
+use App\Models\OrgSetup;
 use App\Models\Payees;
-use App\Models\Form1601EQAtcDetail;
-use App\Models\atc;
-use Carbon\Carbon;
+use App\Models\WithHolding;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class withHolding1604EController extends Controller
 {
-    public function index1604E()
+    public function index1604E(Request $request)
     {
         $organizationId = session('organization_id');
-        $with_holdings = $this->getWithHoldings($organizationId, '1604E');
+
+        // Get the perPage value from the request, default to 5
+        $perPage = $request->input('perPage', 5);
+        $with_holdings = $this->getWithHoldings($organizationId, '1604E', $perPage);
         return view('tax_return.with_holding.1604E', compact('with_holdings'));
     }
 
@@ -225,7 +222,7 @@ class withHolding1604EController extends Controller
             // Log success
             Log::info('Payees added successfully', [
                 'withholding_id' => $withholdingId,
-                'payees' => $request->payees
+                'payees' => $request->payees,
             ]);
 
             return redirect()->back()->with('success', 'Payees have been successfully added.');
@@ -277,14 +274,14 @@ class withHolding1604EController extends Controller
             ->with('success', 'Form 1604E submitted successfully.');
     }
 
-    private function getWithHoldings($organizationId, $type)
+    private function getWithHoldings($organizationId, $type, $perPage = 5)
     {
 
         return WithHolding::with(['employee', 'employment', 'creator'])
             ->where('type', $type)
             ->where('organization_id', $organizationId)
-            ->paginate(5);
-            
+            ->paginate($perPage);
+
     }
 
 }

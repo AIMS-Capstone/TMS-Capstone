@@ -1,7 +1,7 @@
-    @php
-    $organizationId = session('organization_id');
-    $organization = \App\Models\OrgSetup::find($organizationId);
-    @endphp
+@php
+$organizationId = session('organization_id');
+$organization = \App\Models\OrgSetup::find($organizationId);
+@endphp
 
 <x-app-layout>
     <div class="py-12">
@@ -252,7 +252,6 @@
                                     <!-- Fourth Header -->
                                     <div class="container mx-auto">
                                         <div class="flex flex-row space-x-2 items-center justify-between">
-                                            <!-- Search row -->
                                             <div class="flex space-x-2 items-center">
                                                 <!-- Search bar -->
                                                 <div class="relative w-80 p-4">
@@ -260,7 +259,7 @@
                                                         <input 
                                                             type="search" 
                                                             name="search" 
-                                                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
+                                                            class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
                                                             aria-label="Search Term" 
                                                             placeholder="Search..." 
                                                             @input.debounce="$el.form.requestSubmit()" 
@@ -276,7 +275,8 @@
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
                                                             <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
                                                         </svg>
-                                                        <span id="selectedOption" class="font-normal text-md text-zinc-700 truncate">Sort by</span>
+                                                        <span id="selectedOption" class="font-normal text-sm text-zinc-600 hover:text-zinc-800 truncate">Sort by</span>
+                                                        <svg class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
                                                     </button>
                                     
                                                     <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
@@ -503,7 +503,6 @@
         document.addEventListener('search', event => {
             window.location.href = `?search=${event.detail.search}`;
         });
-
         document.addEventListener('filter', event => {
             const type = event.detail.type;
 
@@ -516,11 +515,9 @@
             }
             window.location.href = url.toString();
         });
-
         function toggleCheckboxes() {
             // Get all checkbox elements inside the table body
             const rowCheckboxes = document.querySelectorAll('tbody input[type="checkbox"]');
-
             // Clear or populate the selectedRows array based on checkAll state
             if (this.checkAll) {
                 // Check all checkboxes and add their IDs to selectedRows
@@ -529,18 +526,18 @@
                 // Uncheck all checkboxes and clear selectedRows
                 this.selectedRows = [];
             }
-
             // Update the DOM to reflect the state
             rowCheckboxes.forEach(checkbox => {
                 checkbox.checked = this.checkAll;
             });
         }
-        
 
         // FOR SORT BUTTON
         document.getElementById('sortButton').addEventListener('click', function() {
             const dropdown = document.getElementById('dropdownMenu');
+            const dropdownArrow = this.querySelector('svg:nth-child(3)');
             dropdown.classList.toggle('hidden');
+            dropdownArrow.classList.toggle('rotate-180');
         });
 
         // FOR SORT BY
@@ -550,7 +547,6 @@
             let sortedRows;
 
             if (criteria === 'recently-added') {
-                // Sort by the 'Date Created' column; adjust index as necessary
                 sortedRows = rows.sort((a, b) => {
                     const aDate = new Date(a.cells[4].textContent.trim());
                     const bDate = new Date(b.cells[4].textContent.trim());
@@ -560,7 +556,6 @@
                 sortedRows = rows.sort((a, b) => {
                     const aText = a.cells[1].textContent.trim().toLowerCase(); // Adjust index for 'Code' column
                     const bText = b.cells[1].textContent.trim().toLowerCase();
-
                     if (criteria === 'ascending') {
                         return aText.localeCompare(bText);
                     } else if (criteria === 'descending') {
@@ -568,22 +563,21 @@
                     }
                 });
             }
-
-            // Append sorted rows back to the table body
             table.innerHTML = '';
             sortedRows.forEach(row => table.appendChild(row));
         }
-
         // Sort dropdown click event handling
         document.querySelectorAll('#dropdownMenu div[data-sort]').forEach(item => {
             item.addEventListener('click', function() {
                 const criteria = this.getAttribute('data-sort');
+                document.getElementById('selectedOption').textContent = this.textContent; // Update selected option text
                 sortItems(criteria);
-
-                // Update displayed text and close dropdown
-                document.getElementById('selectedOption').textContent = this.textContent;
-                document.getElementById('dropdownMenu').classList.add('hidden');
             });
+        });
+        window.addEventListener('click', (event) => {
+            if (!sortButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                dropdownMenu.classList.add('hidden');
+            }
         });
 
         // FOR BUTTON OF SHOW ENTRIES

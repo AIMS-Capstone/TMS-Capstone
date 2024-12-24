@@ -2,26 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\OrgSetup;
-use App\Models\WithHolding;
-use App\Models\Source;
+use App\Models\atc;
 use App\Models\Employee;
 use App\Models\Employment;
 use App\Models\Form1601C;
-use App\Models\Form1601EQ;
-use App\Models\atc;
+use App\Models\OrgSetup;
+use App\Models\Source;
+use App\Models\WithHolding;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class WithHoldingController extends Controller
 {
     // etong parent withHoldingController na gamit ko sa 1601C
-    public function index1601C()
+    public function index1601C(Request $request)
     {
         $organizationId = session('organization_id');
-        $with_holdings = $this->getWithHoldings($organizationId, '1601C');
+
+        // Get the perPage value from the request, default to 5
+        $perPage = $request->input('perPage', 5);
+
+        $with_holdings = $this->getWithHoldings($organizationId, '1601C', $perPage);
         return view('tax_return.with_holding.1601C', compact('with_holdings'));
     }
 
@@ -67,7 +70,7 @@ class WithHoldingController extends Controller
 
     public function destroy1601C(Request $request)
     {
-        $ids = $request->input('ids');  // This will be an array of IDs sent from JavaScript
+        $ids = $request->input('ids'); // This will be an array of IDs sent from JavaScript
 
         // Validate that IDs are provided and valid
         if (!$ids || !is_array($ids)) {
@@ -128,9 +131,9 @@ class WithHoldingController extends Controller
             'total_compensation' => $withHolding->sources->sum('gross_compensation'),
             'statutory_minimum_wage' => $withHolding->sources->sum('statutory_minimum_wage'),
             'holiday_overtime_hazard' => $withHolding->sources->sum('holiday_pay') +
-                $withHolding->sources->sum('overtime_pay') +
-                $withHolding->sources->sum('night_shift_differential') +
-                $withHolding->sources->sum('hazard_pay'),
+            $withHolding->sources->sum('overtime_pay') +
+            $withHolding->sources->sum('night_shift_differential') +
+            $withHolding->sources->sum('hazard_pay'),
             'month_13_pay' => $withHolding->sources->sum('month_13_pay'),
             'de_minimis_benefits' => $withHolding->sources->sum('de_minimis_benefits'),
             'mandatory_contributions' => $withHolding->sources->sum('sss_gsis_phic_hdmf_union_dues'),
@@ -252,7 +255,7 @@ class WithHoldingController extends Controller
     //para sa non-taxable field
     private function computeNonTaxableBenefits($request)
     {
-        return 
+        return
             ($request->statutory_minimum_wage ?? 0) +
             ($request->holiday_pay ?? 0) +
             ($request->overtime_pay ?? 0) +
@@ -268,11 +271,11 @@ class WithHoldingController extends Controller
     private function computeTax($taxableCompensation)
     {
         $brackets = [
-            [250000, 0],         // Up to ₱250,000: 0% tax
-            [400000, 0.15],      // ₱250,001 - ₱400,000: 15%
-            [800000, 0.20],      // ₱400,001 - ₱800,000: 20%
-            [2000000, 0.25],     // ₱800,001 - ₱2,000,000: 25%
-            [8000000, 0.30],     // ₱2,000,001 - ₱8,000,000: 30%
+            [250000, 0], // Up to ₱250,000: 0% tax
+            [400000, 0.15], // ₱250,001 - ₱400,000: 15%
+            [800000, 0.20], // ₱400,001 - ₱800,000: 20%
+            [2000000, 0.25], // ₱800,001 - ₱2,000,000: 25%
+            [8000000, 0.30], // ₱2,000,001 - ₱8,000,000: 30%
             [PHP_INT_MAX, 0.35], // Over ₱8,000,000: 35%
         ];
 
@@ -395,21 +398,21 @@ class WithHoldingController extends Controller
             ->with('success', '1601C Form has been successfully submitted.');
     }
 
-    private function getWithHoldings($organizationId, $type)
+    private function getWithHoldings($organizationId, $type, $perPage = 5)
     {
 
         return WithHolding::with(['employee', 'employment', 'creator'])
             ->where('type', $type)
             ->where('organization_id', $organizationId)
-            ->paginate(5);
-            
+            ->paginate($perPage);
+
     }
 
     public function importSources1601C(Request $request, $id)
     {
         // Validate file input
         $request->validate([
-            'file' => 'required|mimes:csv,xlsx'
+            'file' => 'required|mimes:csv,xlsx',
         ]);
 
         // Find the 1601C withholding record

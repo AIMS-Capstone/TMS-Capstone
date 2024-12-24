@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Exports\FinancialReportExport;
-use App\Models\Transactions; 
 use App\Models\OrgSetup;
+use App\Models\Transactions;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use Carbon\Carbon;
 
 class FinancialController extends Controller
 {
@@ -15,15 +15,15 @@ class FinancialController extends Controller
     {
         switch ($quarter) {
             case 'Q1':
-                return [1, 3];  // January to March
+                return [1, 3]; // January to March
             case 'Q2':
-                return [4, 6];  // April to June
+                return [4, 6]; // April to June
             case 'Q3':
-                return [7, 9];  // July to September
+                return [7, 9]; // July to September
             case 'Q4':
-                return [10, 12];  // October to December
+                return [10, 12]; // October to December
             default:
-                return [1, 12];  // Full year as default if quarter is invalid
+                return [1, 12]; // Full year as default if quarter is invalid
         }
     }
     private function getFinancialData(Request $request)
@@ -33,14 +33,14 @@ class FinancialController extends Controller
         $year = $request->input('year', now()->year);
         $month = $request->input('month', now()->month);
         $quarter = $request->input('quarter', 'Q' . ceil(now()->month / 3));
-        $period = $request->input('period', 'annually');  
+        $period = $request->input('period', 'annually');
         $status = $request->input('status', 'draft');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
         $query = Transactions::with(['taxRows.coaAccount'])
-                ->where('organization_id', $organizationId)
-                ->whereYear('date', $year);
+            ->where('organization_id', $organizationId)
+            ->whereYear('date', $year);
 
         if ($period === 'select-date' && $startDate && $endDate) {
             $query->whereBetween('date', [$startDate, $endDate]);
@@ -128,9 +128,9 @@ class FinancialController extends Controller
     // Render Financial Report View
     public function financial(Request $request)
     {
-        
+
         $financialData = $this->getFinancialData($request);
-        
+
         return view('financial-reports', $financialData);
     }
 
@@ -156,7 +156,6 @@ class FinancialController extends Controller
             return response()->json(['error' => 'Organization not found'], 404);
         }
 
-
         if ($period === 'select-date' && $startDate && $endDate) {
             $fromDate = Carbon::parse($startDate);
             $toDate = Carbon::parse($endDate);
@@ -164,7 +163,7 @@ class FinancialController extends Controller
             $fromDate = Carbon::createFromFormat('Y-m-d', "$year-$month-01");
             $toDate = Carbon::createFromFormat('Y-m-d', "$year-$month-01")->endOfMonth();
         } elseif ($period === 'quarterly' && $quarter) {
-            $quarters = [ 
+            $quarters = [
                 'Q1' => ['start' => '01', 'end' => '03'],
                 'Q2' => ['start' => '04', 'end' => '06'],
                 'Q3' => ['start' => '07', 'end' => '09'],
@@ -224,9 +223,8 @@ class FinancialController extends Controller
                 break;
         }
 
-       return Excel::download(new FinancialReportExport($financialData), $filename);
+        return Excel::download(new FinancialReportExport($financialData), $filename);
 
     }
-
 
 }
