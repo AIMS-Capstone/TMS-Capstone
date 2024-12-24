@@ -94,6 +94,7 @@
 
                                 <!-- Year -->
                                 <div class="flex flex-col w-32" x-show="period !== 'select-date'">
+                                <div class="flex flex-col w-32" x-show="period !== 'select-date'">
                                     <label for="year_select" class="font-bold text-blue-900">Year</label>
                                     <select id="year_select" x-model="selectedYear"
                                             class="cursor-pointer block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-900 peer">
