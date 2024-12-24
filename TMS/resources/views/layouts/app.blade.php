@@ -50,7 +50,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                         <img src="{{ asset('images/Taxuri Logo-name.png') }}" alt="logo" class='w-[160px]' />
                     </a>
                     <button id="toggleSidebar" class="absolute -right-8 -top-2 h-8 w-8 p-[6px] z-50 border-gray-300 cursor-pointer bg-slate-50 flex items-center justify-center transition-all rounded-full drop-shadow-md">
-                        <svg id="sidebarArrow" class="w-3 h-3 transform rotate-90 transition-transform duration-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                        <svg id="sidebarArrow" class="w-3 h-3 transform rotate-90 transition-transform duration-200 text-blue-900" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1l4 4 4-4"/>
                         </svg>
                     </button>

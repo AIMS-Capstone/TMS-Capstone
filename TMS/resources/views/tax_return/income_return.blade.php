@@ -35,10 +35,10 @@ $organizationId = session('organization_id');
                 <!-- Third Header -->
                 <div x-data="{
                  searchTerm: '',
-        search() {
-            // Update the URL with the search term
-            window.location.href = `?search=${this.searchTerm}`;
-        },
+                    search() {
+                        // Update the URL with the search term
+                        window.location.href = `?search=${this.searchTerm}`;
+                    },
                     showCheckboxes: false, 
                     checkAll: false, 
                     selectedRows: [],
@@ -90,94 +90,94 @@ $organizationId = session('organization_id');
                     get selectedCount() {
                         return this.selectedRows.length;
                     }
-                }" class="container mx-auto pt-2 overflow-hidden">
+                    }" class="container mx-auto pt-2 overflow-hidden">
                     
-                <div class="container mx-auto">
-                    <div class="flex flex-row space-x-2 items-center justify-between">
-                        <!-- Search row -->
-                        <div class="flex flex-row space-x-2 items-center ps-8">
-                            <div class="relative w-80 p-4">
-                                <form x-target="tableid" action="/income_return" role="search" aria-label="Table" autocomplete="off">
-                                    <input 
-                                        type="search" 
-                                        name="search" 
-                                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900" 
-                                        aria-label="Search Term" 
-                                        placeholder="Search..." 
-                                        @input.debounce="$el.form.requestSubmit()" 
-                                        @search="$el.form.requestSubmit()"
-                                    >
-                                </form>
-                                <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                            </div>
+                    <div class="container mx-auto">
+                        <div class="flex flex-row space-x-2 items-center justify-between">
+                            <!-- Search row -->
+                            <div class="flex flex-row space-x-2 items-center ps-8">
+                                <div class="relative w-80 p-4">
+                                    <form x-target="tableid" action="/income_return" role="search" aria-label="Table" autocomplete="off">
+                                        <input 
+                                            type="search" 
+                                            name="search" 
+                                            class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900" 
+                                            aria-label="Search Term" 
+                                            placeholder="Search..." 
+                                            @input.debounce="$el.form.requestSubmit()" 
+                                            @search="$el.form.requestSubmit()"
+                                        >
+                                    </form>
+                                    <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                </div>
 
-                            <!-- Sort by dropdown -->
-                            <div class="relative inline-block text-left">
-                                <button id="sortButton" class="flex items-center text-zinc-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
-                                        <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span id="selectedOption" class="font-normal text-md text-zinc-700 truncate">Sort by</span>
-                                </button>
-                
-                                <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
-                                    <div class="py-2 px-2">
-                                        <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
-                                        <div data-sort="recently-added" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
-                                        <div data-sort="ascending" class="block px-4 py-2 w-full text-sm hover-dropdown">Ascending</div>
-                                        <div data-sort="descending" class="block px-4 py-2 w-full text-sm hover-dropdown">Descending</div>
+                                <!-- Sort by dropdown -->
+                                <div class="relative inline-block text-left">
+                                    <button id="sortButton" class="flex items-center text-zinc-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
+                                            <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span id="selectedOption" class="font-normal text-md text-zinc-700 truncate">Sort by</span>
+                                    </button>
+                    
+                                    <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
+                                        <div class="py-2 px-2">
+                                            <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
+                                            <div data-sort="recently-added" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
+                                            <div data-sort="ascending" class="block px-4 py-2 w-full text-sm hover-dropdown">Ascending</div>
+                                            <div data-sort="descending" class="block px-4 py-2 w-full text-sm hover-dropdown">Descending</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- End row -->
-                        <div class="flex space-x-4 items-center pr-10 ml-auto">
-                            <button 
-                                type="button" 
-                                @click="showCheckboxes = !showCheckboxes;    showDeleteCancelButtons: false, showDeleteCancelButtons = !showDeleteCancelButtons; $el.disabled = true;" 
-                                :disabled="selectedRows.length === 1"
-                                class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-red-500 hover:text-red-500 hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
-                                >
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
-                                <span class="text-zinc-600 transition group-hover:text-red-500">Delete</span>
-                            </button>
-                            
-                            <button 
-                                x-data 
-                                x-on:click="$dispatch('open-generate-modal')" 
-                                class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-green-500 hover:text-green-500 hover:bg-green-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
-                                >
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-green-500" viewBox="0 0 256 256"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"><circle cx="128" cy="128" r="112"/><path d="M 79.999992,128 H 176.0001"/><path d="m 128.00004,79.99995 v 96.0001"/></g></svg>
-                                <span class="text-zinc-600 transition group-hover:text-green-500">Generate</span>
-                            </button>
-
-                            {{-- Show Entries --}}
-                            <div class="relative inline-block space-x-4 text-left sm:w-auto">
-                                <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" class="flex items-center text-zinc-500 hover:text-zinc-700" type="button">
-                                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
-                                        <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
-                                    </svg>
+                            <!-- End row -->
+                            <div class="flex space-x-4 items-center pr-10 ml-auto">
+                                <button 
+                                    type="button" 
+                                    @click="showCheckboxes = !showCheckboxes;    showDeleteCancelButtons: false, showDeleteCancelButtons = !showDeleteCancelButtons; $el.disabled = true;" 
+                                    :disabled="selectedRows.length === 1"
+                                    class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-red-500 hover:text-red-500 hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                                    >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
+                                    <span class="text-zinc-600 transition group-hover:text-red-500">Delete</span>
                                 </button>
-                                <div id="dropdownDots" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-44 origin-top-right">
-                                    <div class="py-2 px-2 text-sm text-zinc-700" aria-labelledby="dropdownMenuIconButton">
-                                        <span class="block px-4 py-2 text-sm font-bold text-zinc-700 text-left">Show Entries</span>
-                                        <div onclick="setEntries(5)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">5 per page</div>
-                                        <div onclick="setEntries(25)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">25 per page</div>
-                                        <div onclick="setEntries(50)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">50 per page</div>
-                                        <div onclick="setEntries(100)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">100 per page</div>
-                                        <input type="hidden" name="search" value="{{ request('search') }}">
+                                
+                                <button 
+                                    x-data 
+                                    x-on:click="$dispatch('open-generate-modal')" 
+                                    class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-green-500 hover:text-green-500 hover:bg-green-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                                    >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-green-500" viewBox="0 0 256 256"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"><circle cx="128" cy="128" r="112"/><path d="M 79.999992,128 H 176.0001"/><path d="m 128.00004,79.99995 v 96.0001"/></g></svg>
+                                    <span class="text-zinc-600 transition group-hover:text-green-500">Generate</span>
+                                </button>
+
+                                {{-- Show Entries --}}
+                                <div class="relative inline-block space-x-4 text-left sm:w-auto">
+                                    <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" class="flex items-center text-zinc-500 hover:text-zinc-700" type="button">
+                                        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
+                                            <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
+                                        </svg>
+                                    </button>
+                                    <div id="dropdownDots" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-44 origin-top-right">
+                                        <div class="py-2 px-2 text-sm text-zinc-700" aria-labelledby="dropdownMenuIconButton">
+                                            <span class="block px-4 py-2 text-sm font-bold text-zinc-700 text-left">Show Entries</span>
+                                            <div onclick="setEntries(5)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">5 per page</div>
+                                            <div onclick="setEntries(25)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">25 per page</div>
+                                            <div onclick="setEntries(50)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">50 per page</div>
+                                            <div onclick="setEntries(100)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">100 per page</div>
+                                            <input type="hidden" name="search" value="{{ request('search') }}">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <hr>
+                    <hr>
 
-                   <!-- Filtering Tab/Third Header -->
-                   <div x-data="{
+                    <!-- Filtering Tab/Third Header -->
+                    <div x-data="{
                         selectedTab: '1701Q',
                         init() {
                             this.selectedTab = (new URL(window.location.href)).searchParams.get('type') || '1701Q';
@@ -216,46 +216,46 @@ $organizationId = session('organization_id');
                                 aria-controls="tabpanelAssets">
                                 1702Q
                             </button>
-                            <!-- Tab 2: 1702Q -->
+                            <!-- Tab 3: 1701 -->
                             <button @click="selectedTab = '1701'; $dispatch('filter', { type: '1701' })" 
-                            :aria-selected="selectedTab === '1701'" 
-                            :tabindex="selectedTab === '1701' ? '0' : '-1'" 
-                            :class="selectedTab === '1701' 
-                                ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
-                                : 'text-zinc-600 font-medium hover:text-blue-900'" 
-                            class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
-                            type="button" 
-                            role="tab" 
-                            aria-controls="tabpanelAssets">
-                            1701
-                        </button>
-                            <!-- Tab 2: 1702Q -->
+                                :aria-selected="selectedTab === '1701'" 
+                                :tabindex="selectedTab === '1701' ? '0' : '-1'" 
+                                :class="selectedTab === '1701' 
+                                    ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
+                                    : 'text-zinc-600 font-medium hover:text-blue-900'" 
+                                class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
+                                type="button" 
+                                role="tab" 
+                                aria-controls="tabpanelAssets">
+                                1701
+                            </button>
+                            <!-- Tab 4: 1702RT -->
                             <button @click="selectedTab = '1702RT'; $dispatch('filter', { type: '1702RT' })" 
-                            :aria-selected="selectedTab === '1702RT'" 
-                            :tabindex="selectedTab === '1702RT' ? '0' : '-1'" 
-                            :class="selectedTab === '1702RT' 
-                                ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
-                                : 'text-zinc-600 font-medium hover:text-blue-900'" 
-                            class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
-                            type="button" 
-                            role="tab" 
-                            aria-controls="tabpanelAssets">
-                            1702RT
-                        </button>
-                            <!-- Tab 2: 1702Q -->
+                                :aria-selected="selectedTab === '1702RT'" 
+                                :tabindex="selectedTab === '1702RT' ? '0' : '-1'" 
+                                :class="selectedTab === '1702RT' 
+                                    ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
+                                    : 'text-zinc-600 font-medium hover:text-blue-900'" 
+                                class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
+                                type="button" 
+                                role="tab" 
+                                aria-controls="tabpanelAssets">
+                                1702RT
+                            </button>
+                            <!-- Tab 5: 1702MX -->
                             <button @click="selectedTab = '1702MX'; $dispatch('filter', { type: '1702MX' })" 
-                            :aria-selected="selectedTab === '1702MX'" 
-                            :tabindex="selectedTab === '1702MX' ? '0' : '-1'" 
-                            :class="selectedTab === '1702MX' 
-                                ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
-                                : 'text-zinc-600 font-medium hover:text-blue-900'" 
-                            class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
-                            type="button" 
-                            role="tab" 
-                            aria-controls="tabpanelAssets">
-                            1702MX
-                        </button>
-                            <!-- Tab 2: 1702Q -->
+                                :aria-selected="selectedTab === '1702MX'" 
+                                :tabindex="selectedTab === '1702MX' ? '0' : '-1'" 
+                                :class="selectedTab === '1702MX' 
+                                    ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
+                                    : 'text-zinc-600 font-medium hover:text-blue-900'" 
+                                class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
+                                type="button" 
+                                role="tab" 
+                                aria-controls="tabpanelAssets">
+                                1702MX
+                            </button>
+                            <!-- Tab 6: 1702EX -->
                             <button @click="selectedTab = '1702EX'; $dispatch('filter', { type: '1702EX' })" 
                                 :aria-selected="selectedTab === '1702EX'" 
                                 :tabindex="selectedTab === '1702EX' ? '0' : '-1'" 
@@ -271,49 +271,58 @@ $organizationId = session('organization_id');
                         </div>
                         
                         <div x-data="{ open: false, selectedType: '', month: '' }" @open-generate-modal.window="open = true" x-cloak>
-                            <div x-show="open" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
-                                <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-                                    <h2 class="text-lg font-semibold mb-4">Income Tax Return</h2>
-                                    
-                                    <form method="POST" action="/vat_return">
-                                        @csrf
-                                        <div class="mb-4">
-                                            <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
-                                            <select id="year" name="year" class="mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-                                                <option value="">Select Year</option>
-                                                @php
-                                                    $currentYear = date('Y');
-                                                    $startYear = $currentYear - 100;
-                                                @endphp
-                                                @for ($year = $startYear; $year <= $currentYear; $year++)
-                                                    <option value="{{ $year }}">{{ $year }}</option>
-                                                @endfor
-                                            </select>
-                                        </div>
-                        
-                                        <div class="mb-4">
-                                            <label for="month" class="block text-sm font-medium text-gray-700">Month</label>
-                                            <select id="month" name="month" class="mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
-                                                x-model="month" 
-
-                                                required>
-                                                <option value="">Select Month</option>
-                                                <option value="Q1">January - March (Q1)</option>
-                                                <option value="Q2">April - June (Q2)</option>
-                                                <option value="Q3">July - September (Q3)</option>
-                                                <option value="Q4">October - December (Q4)</option>
-                                            </select>
-                                        </div>
-                        
-                                        <!-- Hidden inputs -->
-                                        <input type="hidden" name="type" x-model="selectedTab"> <!-- Dynamically set type -->
-                                        <input type="hidden" name="organization_id" value="{{ $organizationId }}">
-                        
-                                        <div class="flex justify-end">
-                                            <button type="button" @click="open = false" class="mr-4 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg">Cancel</button>
-                                            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg">Generate</button>
-                                        </div>
-                                    </form>
+                            <div x-show="open" class="fixed inset-0 bg-gray-200 bg-opacity-50 z-50 flex items-center justify-center transition-opacity"
+                                x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                                x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+                                <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-auto h-auto z-10 overflow-hidden">
+                                    <div class="relative p-3 bg-blue-900 border-opacity-80 w-full">
+                                        <h1 class="text-lg font-bold text-white text-center">Income Tax Return</h2>
+                                        <button @click="open = false" class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 8L16 16M8 16L16 8" stroke="#1e3a8a" class="transition duration-200 hover:stroke-gray-600"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div class="p-10">
+                                        <form method="POST" action="/vat_return">
+                                            @csrf
+                                            <div class="grid grid-cols-2 gap-6 mb-5">
+                                                <div class="mb-4">
+                                                    <label for="year" class="block font-bold text-sm text-zinc-700">Year</label>
+                                                    <select id="year" name="year" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
+                                                        <option value="">Select Year</option>
+                                                        @php
+                                                            $currentYear = date('Y');
+                                                            $startYear = $currentYear - 100;
+                                                        @endphp
+                                                        @for ($year = $startYear; $year <= $currentYear; $year++)
+                                                            <option value="{{ $year }}">{{ $year }}</option>
+                                                        @endfor
+                                                    </select>
+                                                </div>
+                            
+                                                <div class="mb-4">
+                                                    <label for="month" class="block font-bold text-sm text-zinc-700">Month</label>
+                                                    <select id="month" name="month" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
+                                                        x-model="month" required>
+                                                        <option value="">Select Month</option>
+                                                        <option value="Q1">January - March (Q1)</option>
+                                                        <option value="Q2">April - June (Q2)</option>
+                                                        <option value="Q3">July - September (Q3)</option>
+                                                        <option value="Q4">October - December (Q4)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <!-- Hidden inputs -->
+                                            <input type="hidden" name="type" x-model="selectedTab"> <!-- Dynamically set type -->
+                                            <input type="hidden" name="organization_id" value="{{ $organizationId }}">
+                                            <div class="flex justify-end mt-4">
+                                                <button type="button" @click="open = false" class="mr-2 hover:text-zinc-900 text-zinc-600 text-sm font-semibold py-2 px-4">Cancel</button>
+                                                <button type="submit" class="bg-blue-900 hover:bg-blue-950 text-white font-semibold text-sm py-1 px-6 rounded-lg">Generate</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -346,13 +355,13 @@ $organizationId = session('organization_id');
                                         <tr>
                                             <td colspan="6" class="text-center p-4">
                                                 <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
-                                                <h1 class="font-bold mt-2">No Generated VAT yet</h1>
+                                                <h1 class="font-bold text-lg mt-2">No Generated Returns yet</h1>
                                                 <p class="text-sm text-neutral-500 mt-2">Start generating with the + button <br>at the top.</p>
                                             </td>
                                         </tr>
                                     @else
                                         @foreach ($taxReturns as $taxReturn)
-                                            <tr>
+                                            <tr class="hover:bg-blue-50 cursor-pointer ease-in-out">
                                                 <td class="p-4">
                                                     <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                                         <div class="relative flex items-center">
@@ -401,7 +410,6 @@ $organizationId = session('organization_id');
                                         @endforeach
                                     @endif
                                 </tbody>
-                                
                             </table>
                         </div>
                     </div>
