@@ -1,8 +1,6 @@
 <div class="form-group text-xs">
-<div class="form-group text-xs">
     <select 
         name="{{ $name }}" 
-        class="text-xs select2 {{ $class }} mr-2 @error('selectedValue') border-red-500 @enderror" 
         class="text-xs select2 {{ $class }} mr-2 @error('selectedValue') border-red-500 @enderror" 
         id="{{ $id }}" 
         @if($isGrouped) data-grouped="true" @endif
