@@ -2,20 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\OrgSetup;
-use App\Models\WithHolding;
-use App\Models\Source;
-use App\Models\Employee;
-use App\Models\Employment;
-use App\Models\Form1601C;
+use App\Models\atc;
+use App\Models\Contacts;
 use App\Models\Form1601EQ;
 use App\Models\Form1604E;
-use App\Models\Contacts;
+use App\Models\OrgSetup;
 use App\Models\Payees;
-use App\Models\Form1601EQAtcDetail;
-use App\Models\atc;
-use Carbon\Carbon;
+use App\Models\WithHolding;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -228,7 +222,7 @@ class withHolding1604EController extends Controller
             // Log success
             Log::info('Payees added successfully', [
                 'withholding_id' => $withholdingId,
-                'payees' => $request->payees
+                'payees' => $request->payees,
             ]);
 
             return redirect()->back()->with('success', 'Payees have been successfully added.');
@@ -287,7 +281,7 @@ class withHolding1604EController extends Controller
             ->where('type', $type)
             ->where('organization_id', $organizationId)
             ->paginate($perPage);
-            
+
     }
 
 }

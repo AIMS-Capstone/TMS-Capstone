@@ -21,12 +21,13 @@ class withHolding0619EController extends Controller
     public function index0619E(Request $request)
     {
         $organizationId = session('organization_id');
-
+        $with_holdings = $this->getWithHoldings($organizationId, '0619E');
         // Get the perPage value from the request, default to 5
         $perPage = $request->input('perPage', 5);
-
         $with_holdings = $this->getWithHoldings($organizationId, '0619E', $perPage);
+        
         return view('tax_return.with_holding.0619E', compact('with_holdings'));
+
     }
 
     public function generate0619E(Request $request)
@@ -207,13 +208,13 @@ class withHolding0619EController extends Controller
 
 
 
-    private function getWithHoldings($organizationId, $type, $perPage = 5)
+    private function getWithHoldings($organizationId, $type)
     {
 
         return WithHolding::with(['employee', 'employment', 'creator'])
             ->where('type', $type)
             ->where('organization_id', $organizationId)
-            ->paginate($perPage);
+            ->paginate(5);
             
     }
 }

@@ -2,11 +2,11 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
 use App\Models\ATC;
-use App\Models\TaxType;
 use App\Models\Coa;
+use App\Models\TaxType;
 use Illuminate\Support\Facades\Log;
+use Livewire\Component;
 
 class TaxRow extends Component
 {
@@ -22,10 +22,10 @@ class TaxRow extends Component
         'amount' => 0,
         'tax_amount' => 0,
         'net_amount' => 0,
-        'tax_type' => ''
+        'tax_type' => '',
     ];
     protected $listeners = [
-        'parentComponentErrorBag'
+        'parentComponentErrorBag',
     ];
     protected $rules = [
         'description' => 'required|string|max:255',
@@ -34,7 +34,7 @@ class TaxRow extends Component
         'coa' => 'nullable|exists:coas,id',
         'amount' => 'required|numeric|min:0.01',
     ];
-    
+
     public $type; // Transaction type (purchase/sales)
     public $mode;
 
@@ -60,13 +60,13 @@ class TaxRow extends Component
     {
         if (strpos($field, 'taxRow.') === 0) {
             $fieldName = str_replace('taxRow.', '', $field); // Get field name
-            $this->resetErrorBag($fieldName . '.' . $this->index); 
+            $this->resetErrorBag($fieldName . '.' . $this->index);
             $this->calculateTax();
         }
-    
+
         $this->dispatch('taxRowUpdated', [
             'index' => $this->index,
-            'taxRow' => $this->taxRow
+            'taxRow' => $this->taxRow,
         ]);
     }
     public function calculateTax()
@@ -85,8 +85,8 @@ class TaxRow extends Component
 
         // Dispatch event after calculation with specific target
         $this->dispatch('taxRowUpdated', [
-            'index' => $this->index, 
-            'taxRow' => $this->taxRow
+            'index' => $this->index,
+            'taxRow' => $this->taxRow,
         ]);
     }
 
@@ -94,29 +94,29 @@ class TaxRow extends Component
     protected function getParentComponentClass()
     {
         $componentClass = null;
-    
+
         if ($this->mode === 'edit') {
             // If in edit mode, dispatch to the Edit component
-            $componentClass = $this->type === 'sales' 
-                ? 'App\Livewire\EditSalesTransaction' 
-                : 'App\Livewire\EditPurchaseTransaction';
+            $componentClass = $this->type === 'sales'
+            ? 'App\Livewire\EditSalesTransaction'
+            : 'App\Livewire\EditPurchaseTransaction';
         } elseif ($this->mode === 'create') {
             // If in create mode, dispatch to the create component
-            $componentClass = $this->type === 'sales' 
-                ? 'App\Livewire\SalesTransaction' 
-                : 'App\Livewire\PurchaseTransaction';
+            $componentClass = $this->type === 'sales'
+            ? 'App\Livewire\SalesTransaction'
+            : 'App\Livewire\PurchaseTransaction';
         } else {
             // Fallback default
             $componentClass = 'App\Livewire\SalesTransaction';
         }
-    
+
         // Log the returned component class
         Log::info('Component class determined in getParentComponentClass', [
             'mode' => $this->mode,
             'type' => $this->type,
             'component_class' => $componentClass,
         ]);
-    
+
         return $componentClass;
     }
     public function removeRow()
@@ -133,24 +133,19 @@ class TaxRow extends Component
     {
         $index = $data['index'] ?? null;
         $errors = $data['errors'] ?? [];
-    
+
         Log::warning('Errors received for TaxRow component: ' . json_encode($errors));
-    
+
         // Only clear errors for this specific index
         foreach ($errors as $field => $messages) {
             $this->resetErrorBag("$field.$index");
         }
-    
+
         // Add errors with correct indexing
         foreach ($errors as $field => $messages) {
             $this->addError("$field.$index", $messages[0]); // Append the index to the field name
         }
     }
-    
-    
-    
-    
-    
 
     public function getTaxRateByType($taxTypeId)
     {

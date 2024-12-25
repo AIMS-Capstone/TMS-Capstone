@@ -2,23 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\OrgSetup;
-use App\Models\WithHolding;
-use App\Models\Source;
-use App\Models\Employee;
-use App\Models\Employment;
-use App\Models\Form1601C;
-use App\Models\Form1601EQ;
-use App\Models\Transactions;
 use App\Models\atc;
-use Carbon\Carbon;
+use App\Models\Form1601EQ;
+use App\Models\OrgSetup;
+use App\Models\Transactions;
+use App\Models\WithHolding;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class withHolding1601EQController extends Controller
 {
-     // 1601EQ function
+    // 1601EQ function
     public function index1601EQ(Request $request)
     {
         $organizationId = session('organization_id');
@@ -35,17 +30,17 @@ class withHolding1601EQController extends Controller
         $request->validate([
             'year' => 'required|numeric|min:1900|max:' . date('Y'),
             'quarter' => 'required|numeric|min:1|max:4',
-            'type' => 'required|string|in:1601EQ', 
+            'type' => 'required|string|in:1601EQ',
         ]);
 
         $organizationId = session('organization_id');
 
         // Calculate the months covered by the quarter
         $monthsInQuarter = [
-            1 => [1, 2, 3],   // Q1
-            2 => [4, 5, 6],   // Q2
-            3 => [7, 8, 9],   // Q3
-            4 => [10, 11, 12] // Q4
+            1 => [1, 2, 3], // Q1
+            2 => [4, 5, 6], // Q2
+            3 => [7, 8, 9], // Q3
+            4 => [10, 11, 12], // Q4
         ];
 
         // Get the months for the selected quarter
@@ -67,7 +62,7 @@ class withHolding1601EQController extends Controller
             'type' => $request->type,
             'organization_id' => $organizationId,
             'title' => 'Quarterly Remittance Form of Creditable Income Taxes Withheld (Expanded)',
-            'quarter' => $request->quarter, 
+            'quarter' => $request->quarter,
             'year' => $request->year,
             'created_by' => Auth::id(),
         ]);
@@ -78,7 +73,7 @@ class withHolding1601EQController extends Controller
 
     public function destroy1601EQ(Request $request)
     {
-        $ids = $request->input('ids');  // This will be an array of IDs sent from JavaScript
+        $ids = $request->input('ids'); // This will be an array of IDs sent from JavaScript
 
         // Validate that IDs are provided and valid
         if (!$ids || !is_array($ids)) {
@@ -130,7 +125,7 @@ class withHolding1601EQController extends Controller
         $transactions = Transactions::where('withholding_id', $withholdingId)
             ->where('transaction_type', 'Purchase')
             ->with(['contactDetails', 'withholding'])
-            ->paginate(5);  
+            ->paginate(5);
 
         $unassignedTransactions = Transactions::whereNull('withholding_id')
             ->where('transaction_type', 'Purchase')
@@ -147,7 +142,7 @@ class withHolding1601EQController extends Controller
     public function setQap1601EQ(Request $request, $withholdingId)
     {
         $request->validate([
-            'transactions' => 'required|array|min:1',   
+            'transactions' => 'required|array|min:1',
             'transactions.*.transaction_id' => 'exists:transactions,id',
         ]);
 
@@ -186,81 +181,81 @@ class withHolding1601EQController extends Controller
 
         try {
 
-        $request->validate([
-            'year' => 'required|numeric|min:1900|max:' . date('Y'),
-            'quarter' => 'required|in:1,2,3,4',
-            'amended_return' => 'required|boolean',
-            'any_taxes_withheld' => 'required|boolean',
-            'atc.*' => 'nullable|exists:atcs,id', // Validate ATC IDs
-            'tax_base.*' => 'nullable|numeric|min:0', // Validate Tax Base
-            'tax_rate.*' => 'nullable|numeric|min:0|max:100', // Validate Tax Rate
-            'tax_withheld.*' => 'nullable|numeric|min:0', // Validate Tax Withheld
-            'remittances_1st_month' => 'nullable|numeric|min:0',
-            'remittances_2nd_month' => 'nullable|numeric|min:0',
-            'remitted_previous' => 'nullable|numeric|min:0',
-            'over_remittance' => 'nullable|numeric|min:0',
-            'surcharge' => 'nullable|numeric|min:0',
-            'interest' => 'nullable|numeric|min:0',
-            'compromise' => 'nullable|numeric|min:0',
-            'penalties' => 'nullable|numeric|min:0',
-        ]);
+            $request->validate([
+                'year' => 'required|numeric|min:1900|max:' . date('Y'),
+                'quarter' => 'required|in:1,2,3,4',
+                'amended_return' => 'required|boolean',
+                'any_taxes_withheld' => 'required|boolean',
+                'atc.*' => 'nullable|exists:atcs,id', // Validate ATC IDs
+                'tax_base.*' => 'nullable|numeric|min:0', // Validate Tax Base
+                'tax_rate.*' => 'nullable|numeric|min:0|max:100', // Validate Tax Rate
+                'tax_withheld.*' => 'nullable|numeric|min:0', // Validate Tax Withheld
+                'remittances_1st_month' => 'nullable|numeric|min:0',
+                'remittances_2nd_month' => 'nullable|numeric|min:0',
+                'remitted_previous' => 'nullable|numeric|min:0',
+                'over_remittance' => 'nullable|numeric|min:0',
+                'surcharge' => 'nullable|numeric|min:0',
+                'interest' => 'nullable|numeric|min:0',
+                'compromise' => 'nullable|numeric|min:0',
+                'penalties' => 'nullable|numeric|min:0',
+            ]);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::error('Validation errors:', $e->errors());
             return redirect()->back()->withErrors($e->errors());
         }
 
-                $withHolding = WithHolding::findOrFail($id);
+        $withHolding = WithHolding::findOrFail($id);
 
-                $orgSetupId = $withHolding->organization_id ?? session('organization_id');
-                if (!$orgSetupId) {
-                    return redirect()->back()->withErrors(['error' => 'Organization setup ID not found.']);
-                }
+        $orgSetupId = $withHolding->organization_id ?? session('organization_id');
+        if (!$orgSetupId) {
+            return redirect()->back()->withErrors(['error' => 'Organization setup ID not found.']);
+        }
 
-                $totalTaxesWithheld = $request->total_taxes_withheld ?? array_sum($request->tax_withheld ?? []);
+        $totalTaxesWithheld = $request->total_taxes_withheld ?? array_sum($request->tax_withheld ?? []);
 
-                $remittances1stMonth = $request->remittances_1st_month ?? 0;
-                $remittances2ndMonth = $request->remittances_2nd_month ?? 0;
-                $remittedPrevious = $request->remitted_previous ?? 0;
-                $overRemittance = $request->over_remittance ?? 0;
-                $otherPayments = $request->other_payments ?? 0;
+        $remittances1stMonth = $request->remittances_1st_month ?? 0;
+        $remittances2ndMonth = $request->remittances_2nd_month ?? 0;
+        $remittedPrevious = $request->remitted_previous ?? 0;
+        $overRemittance = $request->over_remittance ?? 0;
+        $otherPayments = $request->other_payments ?? 0;
 
-                $totalRemittancesMade = $remittances1stMonth + $remittances2ndMonth + $remittedPrevious + $overRemittance + $otherPayments;
-                $taxStillDue = $totalTaxesWithheld - $totalRemittancesMade;
+        $totalRemittancesMade = $remittances1stMonth + $remittances2ndMonth + $remittedPrevious + $overRemittance + $otherPayments;
+        $taxStillDue = $totalTaxesWithheld - $totalRemittancesMade;
 
-                $surcharge = $request->surcharge ?? 0;
-                $interest = $request->interest ?? 0;
-                $compromise = $request->compromise ?? 0;
-                $totalPenalties = $surcharge + $interest + $compromise;
+        $surcharge = $request->surcharge ?? 0;
+        $interest = $request->interest ?? 0;
+        $compromise = $request->compromise ?? 0;
+        $totalPenalties = $surcharge + $interest + $compromise;
 
-                $totalAmountDue = $taxStillDue + $totalPenalties;
-                // Save the form
+        $totalAmountDue = $taxStillDue + $totalPenalties;
+        // Save the form
 
-                try {
-                $form1601EQ = Form1601EQ::updateOrCreate(
-                    ['withholding_id' => $id],
-                    [
-                        'org_setup_id' => $withHolding->organization_id,
-                        'year' => $request->year,
-                        'quarter' => $request->quarter,
-                        'amended_return' => $request->amended_return,
-                        'any_taxes_withheld' => $request->any_taxes_withheld,
-                        'total_taxes_withheld' => $totalTaxesWithheld,
-                        'remittances_1st_month' => $remittances1stMonth,
-                        'remittances_2nd_month' => $remittances2ndMonth,
-                        'remitted_previous' => $remittedPrevious,
-                        'over_remittance' => $overRemittance,
-                        'other_payments' => $otherPayments,
-                        'total_remittances_made' => $totalRemittancesMade,
-                        'tax_still_due' => $taxStillDue,
-                        'surcharge' => $surcharge,
-                        'interest' => $interest,
-                        'compromise' => $compromise,
-                        'penalties' => $totalPenalties,
-                        'total_amount_due' => $totalAmountDue,
-                    ]
-                );
-                } catch (\Exception $e) {
+        try {
+            $form1601EQ = Form1601EQ::updateOrCreate(
+                ['withholding_id' => $id],
+                [
+                    'org_setup_id' => $withHolding->organization_id,
+                    'year' => $request->year,
+                    'quarter' => $request->quarter,
+                    'amended_return' => $request->amended_return,
+                    'any_taxes_withheld' => $request->any_taxes_withheld,
+                    'total_taxes_withheld' => $totalTaxesWithheld,
+                    'remittances_1st_month' => $remittances1stMonth,
+                    'remittances_2nd_month' => $remittances2ndMonth,
+                    'remitted_previous' => $remittedPrevious,
+                    'over_remittance' => $overRemittance,
+                    'other_payments' => $otherPayments,
+                    'total_remittances_made' => $totalRemittancesMade,
+                    'tax_still_due' => $taxStillDue,
+                    'surcharge' => $surcharge,
+                    'interest' => $interest,
+                    'compromise' => $compromise,
+                    'penalties' => $totalPenalties,
+                    'total_amount_due' => $totalAmountDue,
+                ]
+            );
+        } catch (\Exception $e) {
             Log::error('Exception occurred:', ['message' => $e->getMessage()]);
             dd('Exception:', $e->getMessage());
         }
@@ -289,6 +284,6 @@ class withHolding1601EQController extends Controller
             ->where('type', $type)
             ->where('organization_id', $organizationId)
             ->paginate($perPage);
-            
+
     }
 }

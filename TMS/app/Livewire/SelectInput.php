@@ -1,8 +1,8 @@
 <?php
 namespace App\Livewire;
 
-use Livewire\Component;
 use App\Models\Contacts;
+use Livewire\Component;
 
 class SelectInput extends Component
 {
@@ -10,12 +10,12 @@ class SelectInput extends Component
     public $options = [];
     public $labelKey;
     public $valueKey;
-    
+
     public $class;
     public $id;
     public $isGrouped;
     public $type;
-    public $selectedValue; 
+    public $selectedValue;
 
     protected $listeners = ['contactAddedToSelectContact' => 'updateOptions'];
 
@@ -32,8 +32,8 @@ class SelectInput extends Component
         $this->id = $id;
         $this->isGrouped = $isGrouped;
         $this->type = $type;
-        $this->selectedValue = $selectedValue ?: 'default';  // Default to "default" if not set
-    
+        $this->selectedValue = $selectedValue ?: 'default'; // Default to "default" if not set
+
         $this->updateOptions();
     }
     public function updatedSelectedValue($value)
@@ -41,16 +41,14 @@ class SelectInput extends Component
         $this->dispatch('contactSelected', $value); // Emit event with selected value
     }
     public function updated($field)
-{
-    $this->validateOnly($field);
-    $this->dispatch('contactSelected', $this->selectedValue);
-}
+    {
+        $this->validateOnly($field);
+        $this->dispatch('contactSelected', $this->selectedValue);
+    }
 
-protected $messages = [
-    'selectedValue.required' => 'Please select a contact.',
-];
-
-
+    protected $messages = [
+        'selectedValue.required' => 'Please select a contact.',
+    ];
 
     public function updateOptions($data = null)
     {
@@ -59,19 +57,18 @@ protected $messages = [
         } else {
             $this->options = $this->fetchOptions();
         }
-    
+
         // Ensure the selected value is still valid
         if (!collect($this->options)->pluck($this->valueKey)->contains($this->selectedValue)) {
             $this->selectedValue = 'default'; // Reset to default if invalid
         }
-    
+
         // Dispatch event to refresh Select2 dropdown
         $this->dispatch('refreshDropdown', [
             'id' => $this->id,
-            'options' => $this->options
+            'options' => $this->options,
         ]);
     }
-    
 
     protected function fetchOptions()
     {
@@ -83,8 +80,6 @@ protected $messages = [
             ];
         })->toArray();
     }
-    
-
 
     public function render()
     {

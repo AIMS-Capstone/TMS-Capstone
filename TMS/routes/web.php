@@ -46,7 +46,7 @@ use App\Http\Controllers\ContactsRecycleBinController;
 use App\Http\Controllers\EmployeesRecycleBinController;
 
 //Notes and Activities
-use App\Http\Controllers\SalesLogController;
+use App\Http\Controllers\ActivityLogController;
 
 //Client
 use App\Http\Controllers\ClientAuthController;
@@ -169,6 +169,10 @@ Route::middleware([
             Route::delete('/employees/bulk-delete', [EmployeesRecycleBinController::class, 'bulkDelete'])->name('recycle-bin.employees.bulkDelete');
 
         });//ending of recycle-bin prefix
+
+    //Notes and Activities
+        Route::get('/audit_log/index', [ActivityLogController::class, 'audit_log'])->name('audit_log');
+
     });//ending of auth role middleware
 
 
@@ -392,7 +396,7 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
         });//ending of tax_return/with_holding prefix
 
         //Notes and Activities
-        Route::get('/sales-transactions-log', [SalesLogController::class, 'index'])->name('transactions.log');
+        Route::get('/audit_log/index', [ActivityLogController::class, 'audit_log'])->name('audit_log.index');
 
     });//ending of organization middleware
 });//ending of built in auth of Laravel Jetstream

@@ -84,26 +84,25 @@ class withHolding1604CController extends Controller
         $year = $withHolding->year;
 
         // Fetch monthly data for the year
-$monthlyData = Form1601C::where('org_setup_id', $withHolding->organization_id)
-    ->where('withholding_id', $withHolding->id)
-    ->whereYear('filing_period', $year)
-    ->get();
+        $monthlyData = Form1601C::where('org_setup_id', $withHolding->organization_id)
+            ->where('withholding_id', $withHolding->id)
+            ->whereYear('filing_period', $year)
+            ->get();
 
-Log::debug('Raw Monthly Data:', $monthlyData->toArray());
+        Log::debug('Raw Monthly Data:', $monthlyData->toArray());
 
-$monthlyData->each(function ($item) {
-    Log::debug('Parsed Month:', [
-        'filing_period' => $item->filing_period,
-        'month' => Carbon::parse($item->filing_period)->format('F')
-    ]);
-});
+        $monthlyData->each(function ($item) {
+            Log::debug('Parsed Month:', [
+                'filing_period' => $item->filing_period,
+                'month' => Carbon::parse($item->filing_period)->format('F'),
+            ]);
+        });
 
-$groupedData = $monthlyData->groupBy(function ($item) {
-    return Carbon::parse($item->filing_period)->format('F');
-});
+        $groupedData = $monthlyData->groupBy(function ($item) {
+            return Carbon::parse($item->filing_period)->format('F');
+        });
 
-Log::debug('Grouped Monthly Data:', $groupedData->toArray());
-
+        Log::debug('Grouped Monthly Data:', $groupedData->toArray());
 
         // Aggregate totals by month
         $monthlyTotals = [];

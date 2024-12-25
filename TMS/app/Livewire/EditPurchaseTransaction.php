@@ -9,6 +9,8 @@ use App\Models\TaxType;
 use App\Models\Coa;
 use App\Models\Transactions;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class EditPurchaseTransaction extends Component
 {
@@ -138,38 +140,84 @@ class EditPurchaseTransaction extends Component
 
     public function saveTransaction()
     {
-        $this->transaction->update([
-            'date' => $this->date,
-            'contact' => $this->selectedContact,
-            'inv_number' => $this->inv_number,
-            'reference' => $this->reference,
-            'total_amount' => $this->totalAmount,
-            'vatable_purchase' => $this->vatablePurchase,
-            'non_vatable_purchase' => $this->nonVatablePurchase,
-            'vat_amount' => $this->vatAmount,
-            'status' => 'Draft',
-            'organization_id' => $this->organizationId
-        ]);
+        try {
+            $this->organizationId = session('organization_id');
 
-        // Remove old tax rows and save the updated ones
-        $this->transaction->taxRows()->delete(); // Delete old tax rows
+            $transactionData = [
+                'transaction_type' => 'Purchase',
+                'date' => $this->date,
+                'contact' => $this->selectedContact,
+                'inv_number' => $this->inv_number,
+                'reference' => $this->reference,
+                'total_amount' => $this->totalAmount,
+                'vatable_purchase' => $this->vatablePurchase,
+                'vat_amount' => $this->vatAmount,
+                'non_vatable_purchase' => $this->nonVatablePurchase,
+                'organization_id' => $this->organizationId,
+                'status' => 'Draft',
+            ];
 
-        foreach ($this->taxRows as $row) {
-            TaxRow::create([
-                'transaction_id' => $this->transaction->id,
-                'description' => $row['description'],
-                'amount' => $row['amount'],
-                'tax_code' => $row['tax_code'],
-                'tax_type' => $row['tax_type'],
-                'tax_amount' => $row['tax_amount'],
-                'atc_amount' => $row['atc_amount'],
-                'net_amount' => $row['net_amount'],
-                'coa' => !empty($row['coa']) ? $row['coa'] : null,
-            ]);
+            if ($this->transaction) {
+                // Update existing transaction
+                Transactions::$disableLogging = true;
+                $oldAttributes = $this->transaction->getOriginal();
+                $this->transaction->update($transactionData);
+                $changedAttributes = $this->transaction->getChanges();
+                Transactions::$disableLogging = false;
+
+                // Delete old tax rows
+                $this->transaction->taxRows()->delete();
+            } else {
+                // Create new transaction
+                $this->transaction = Transactions::create($transactionData);
+                $oldAttributes = [];
+                $changedAttributes = $this->transaction->getAttributes();
+            }
+
+            // Insert updated tax rows
+            foreach ($this->taxRows as $row) {
+                TaxRow::create([
+                    'transaction_id' => $this->transaction->id,
+                    'description' => $row['description'],
+                    'amount' => $row['amount'],
+                    'tax_code' => $row['tax_code'] ?? null,
+                    'tax_type' => $row['tax_type'],
+                    'tax_amount' => $row['tax_amount'],
+                    'net_amount' => $row['net_amount'],
+                    'coa' => $row['coa'] ?? null,
+                ]);
+            }
+
+            // Format changes in a readable way
+            $changes = [];
+            foreach ($changedAttributes as $key => $newValue) {
+                $oldValue = $oldAttributes[$key] ?? 'N/A';
+                $changes[$key] = [
+                    'old' => $oldValue,
+                    'new' => $newValue,
+                ];
+            }
+
+            // Log the update with IP, browser, and detailed changes
+            activity('transactions')
+                ->performedOn($this->transaction)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                    'organization_id' => $this->transaction->organization_id,
+                    'changes' => $changes,
+                ])
+                ->log("Updated Purchase Transaction Reference No.: {$this->transaction->reference}");
+
+            session()->flash('message', 'Purchase Transaction updated successfully!');
+            return redirect()->route('transactions.show', ['transaction' => $this->transaction->id]);
+
+        } catch (\Exception $e) {
+            // Log error and flash message if something goes wrong
+            Log::error('Error saving purchase transaction: ' . $e->getMessage());
+            session()->flash('error', 'There was an error saving the purchase transaction.');
         }
-
-        session()->flash('message', 'Transaction updated successfully!');
-        return redirect()->route('transactions.show', ['transaction' => $this->transaction->id]);
     }
 
     public function render()

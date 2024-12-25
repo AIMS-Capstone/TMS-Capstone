@@ -8,6 +8,7 @@ use App\Models\TaxType;
 use App\Models\Coa;
 use App\Models\Transactions;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class EditSalesTransaction extends Component
 {
@@ -135,8 +136,6 @@ class EditSalesTransaction extends Component
 
     public function saveTransaction()
     {
-      
-      
         try {
             $this->organization_id = session('organization_id');
             $transactionData = [
@@ -154,13 +153,18 @@ class EditSalesTransaction extends Component
             ];
 
             if ($this->transactionId) {
-                // Update existing transaction
+                Transactions::$disableLogging = true;
                 $transaction = Transactions::findOrFail($this->transactionId);
+                $oldAttributes = $transaction->getOriginal();
                 $transaction->update($transactionData);
-                $transaction->taxRows()->delete(); // Delete old tax rows
+                $changedAttributes = $transaction->getChanges();
+                Transactions::$disableLogging = false;
+
+                $transaction->taxRows()->delete();
             } else {
-                // Create a new transaction
                 $transaction = Transactions::create($transactionData);
+                $oldAttributes = [];
+                $changedAttributes = $transaction->getAttributes();
             }
 
             foreach ($this->taxRows as $row) {
@@ -176,9 +180,30 @@ class EditSalesTransaction extends Component
                 ]);
             }
 
+            // Store changes in a structured format
+            $changes = [];
+            foreach ($changedAttributes as $key => $newValue) {
+                $oldValue = $oldAttributes[$key] ?? 'N/A';
+                $changes[$key] = [
+                    'old' => $oldValue,
+                    'new' => $newValue,
+                ];
+            }
+
+            // Log the activity
+            activity('transactions')
+                ->performedOn($transaction)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                    'organization_id' => $transaction->organization_id,
+                    'changes' => $changes,
+                ])
+                ->log("Updated Sales Transaction Invoice No.: {$transaction->inv_number}");
+
             session()->flash('message', 'Transaction saved successfully!');
             return redirect()->route('transactions.show', ['transaction' => $transaction->id]);
-
         } catch (\Exception $e) {
             Log::error('Error saving transaction: ' . $e->getMessage());
             session()->flash('error', 'There was an error saving the transaction.');

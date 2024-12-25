@@ -7,6 +7,8 @@ use App\Models\Coa;
 use App\Models\Transactions;
 use App\Models\TaxRow; // Assuming this model exists for individual journal rows
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class EditJournalTransaction extends Component
 {
@@ -114,37 +116,72 @@ class EditJournalTransaction extends Component
             return;
         }
 
-        // Retrieve the existing transaction to update
-        $transaction = Transactions::findOrFail($this->transactionId);
-        
-        // Update the transaction details
-        $transaction->update([
-            'date' => $this->date,
-            'reference' => $this->reference,
-            'total_amount' => $this->totalAmount,
-            'total_amount_debit' => $this->totalAmountDebit,
-            'total_amount_credit' => $this->totalAmountCredit,
-            'contact' => $this->selectedContact, // Optionally link a contact
-        ]);
+        try {
+            $this->organizationId = session('organization_id');
 
-        // Delete the old journal rows (optional, or you can just update them)
-        TaxRow::where('transaction_id', $this->transactionId)->delete();
+            $transactionData = [
+                'date' => $this->date,
+                'reference' => $this->reference,
+                'total_amount' => $this->totalAmount,
+                'total_amount_debit' => $this->totalAmountDebit,
+                'total_amount_credit' => $this->totalAmountCredit,
+                'contact' => $this->selectedContact,
+            ];
 
-        // Save each journal row linked to the updated transaction
-        foreach ($this->journalRows as $row) {
-       
-            TaxRow::create([
-                'transaction_id' => $transaction->id,
-                'debit' => $row['debit'],
-                'credit' => $row['credit'],
-                'description' => $row['description'],
-                'coa' => $row['coa'], // Assuming 'coa' is the ID of the account
-            ]);
+            Transactions::$disableLogging = true;
+
+            // Retrieve existing transaction
+            $transaction = Transactions::findOrFail($this->transactionId);
+            $oldAttributes = $transaction->getOriginal();
+            $transaction->update($transactionData);
+            $changedAttributes = $transaction->getChanges();
+
+            Transactions::$disableLogging = false;
+
+            // Delete old journal rows
+            TaxRow::where('transaction_id', $this->transactionId)->delete();
+
+            // Save new journal rows
+            foreach ($this->journalRows as $row) {
+                TaxRow::create([
+                    'transaction_id' => $transaction->id,
+                    'debit' => $row['debit'],
+                    'credit' => $row['credit'],
+                    'description' => $row['description'],
+                    'coa' => $row['coa'],
+                ]);
+            }
+
+            // Format changes in a structured way
+            $changes = [];
+            foreach ($changedAttributes as $key => $newValue) {
+                $oldValue = $oldAttributes[$key] ?? 'N/A';
+                $changes[$key] = [
+                    'old' => $oldValue,
+                    'new' => $newValue,
+                ];
+            }
+
+            // Log activity with structured change details
+            activity('transactions')
+                ->performedOn($transaction)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                    'organization_id' => $transaction->organization_id,
+                    'changes' => $changes,
+                ])
+                ->log("Updated Journal Transaction Reference No.:{$transaction->reference}");
+
+            // Provide success feedback
+            session()->flash('message', 'Transaction updated successfully!');
+            return redirect()->route('transactions.show', ['transaction' => $transaction->id]);
+
+        } catch (\Exception $e) {
+            Log::error('Error updating journal transaction: ' . $e->getMessage());
+            session()->flash('error', 'There was an error updating the transaction.');
         }
-
-        // Provide feedback and redirect
-        session()->flash('message', 'Transaction updated successfully!');
-        return redirect()->route('transactions.show', ['transaction' => $transaction->id]);
     }
 
     public function render()

@@ -29,7 +29,8 @@ class CheckUserRole
         $restrictedRoutes = [
             'recycle-bin*', // Matches /recycle-bin and all sub-routes
             'user-management*', // Matches /user-management and all sub-routes
-        ];
+            'audit_log*',
+        ];  
 
         // Check if the user's role is "Accountant" and if they’re trying to access restricted routes
         if ($userRole === $role && $this->isRestrictedRoute($request, $restrictedRoutes)) {

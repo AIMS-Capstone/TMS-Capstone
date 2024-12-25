@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel as MaatExcel;
 use App\Exports\CoaExport;
 use Maatwebsite\Excel\Excel;
+use Illuminate\Support\Facades\Auth;
+use Spatie\Activitylog\Models\Activity;
 
 class CoaController extends Controller
 {
@@ -68,7 +70,7 @@ class CoaController extends Controller
                 'description' => 'nullable|string|max:255',
             ]);
 
-            Coa::create([
+            $coa = Coa::create([
                 'type' => $request->input('type'),
                 'sub_type' => $request->input('sub_type'),
                 'code' => $request->input('code'),
@@ -76,6 +78,20 @@ class CoaController extends Controller
                 'description' => $request->input('description'),
                 'organization_id' => $organizationId,
             ]);
+
+            // Log COA creation
+            activity('Charts of Accounts')
+                ->performedOn($coa)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'organization_id' => $organizationId,
+                    'coa_name' => $coa->name,
+                    'type' => $coa->type,
+                    'code' => $coa->code,
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log("COA {$coa->name} was created.");
 
             return redirect()->route('coa')->with('success', 'Account created successfully.');
         } elseif ($submitAction === 'import') {
@@ -106,10 +122,14 @@ class CoaController extends Controller
             'description' => 'nullable|string|max:255',
         ]);
 
+        // Retrieve COA and original attributes
         $coa = Coa::where('id', $id)
             ->where('organization_id', $organizationId)
             ->firstOrFail();
 
+        $oldAttributes = $coa->getOriginal();
+
+        // Perform update
         $coa->update([
             'type' => $request->input('account_type_input'),
             'sub_type' => $request->input('sub_type'),
@@ -117,6 +137,30 @@ class CoaController extends Controller
             'name' => $request->input('name'),
             'description' => $request->input('description'),
         ]);
+
+        // Get updated attributes and detect changes
+        $changedAttributes = $coa->getChanges();
+        $changes = [];
+
+        foreach ($changedAttributes as $key => $newValue) {
+            $oldValue = $oldAttributes[$key] ?? 'N/A';
+            $changes[$key] = [
+                'old' => $oldValue,
+                'new' => $newValue,
+            ];
+        }
+
+        // Log the changes
+        activity('Charts of Accounts')
+            ->performedOn($coa)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'organization_id' => $coa->organization_id,
+                'changes' => $changes,
+                'ip' => request()->ip(),
+                'browser' => request()->header('User-Agent'),
+            ])
+            ->log("COA {$coa->name} was updated.");
 
         return redirect()->route('coa')->with('success', 'Account updated successfully.');
     }
@@ -130,9 +174,28 @@ class CoaController extends Controller
             'ids.*' => 'exists:coas,id',
         ]);
 
-        Coa::whereIn('id', $request->ids)
+        $coas = Coa::whereIn('id', $request->ids)
             ->where('organization_id', $organizationId)
-            ->update(['status' => 'Inactive']);
+            ->get();
+
+        foreach ($coas as $coa) {
+            $oldStatus = $coa->status;
+
+            // Deactivate COA
+            $coa->update(['status' => 'Inactive']);
+
+            activity('Charts of Accounts')
+                ->performedOn($coa)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'organization_id' => $coa->organization_id,
+                    'old_status' => $oldStatus,
+                    'new_status' => 'Inactive',
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log("COA {$coa->name} was deactivated.");
+        }
 
         return response()->json(['message' => 'Selected CoAs have been deactivated.']);
     }
@@ -146,10 +209,24 @@ class CoaController extends Controller
             'ids.*' => 'exists:coas,id',
         ]);
 
-        Coa::whereIn('id', $request->ids)
+        $coas = Coa::whereIn('id', $request->ids)
             ->where('status', 'Inactive')
             ->where('organization_id', $organizationId)
-            ->delete();
+            ->get();
+
+        foreach ($coas as $coa) {
+            $coa->delete();
+
+            activity('Charts of Accounts')
+                ->performedOn($coa)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'organization_id' => $coa->organization_id,
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log("COA {$coa->name} was deleted.");
+        }
 
         return response()->json(['message' => 'Selected archived COAs have been deleted successfully.'], 200);
     }
@@ -190,9 +267,28 @@ class CoaController extends Controller
             'ids.*' => 'exists:coas,id',
         ]);
 
-        Coa::whereIn('id', $request->ids)
+        $coas = Coa::whereIn('id', $request->ids)
             ->where('organization_id', $organizationId)
-            ->update(['status' => 'Active']);
+            ->get();
+
+        foreach ($coas as $coa) {
+            $oldStatus = $coa->status;
+
+            // Restore COA
+            $coa->update(['status' => 'Active']);
+
+            activity('Charts of Accounts')
+                ->performedOn($coa)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'organization_id' => $coa->organization_id,
+                    'old_status' => $oldStatus,
+                    'new_status' => 'Active',
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log("COA {$coa->name} was restored.");
+        }
 
         return response()->json(['message' => 'Selected COAs have been restored successfully.'], 200);
     }
