@@ -7,30 +7,25 @@
                 <div class="px-10 py-6">
                     <nav class="flex" aria-label="Breadcrumb">
                         <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
-                            <li class="inline-flex items-center text-sm font-normal text-zinc-500">
-                            {{-- <a href="{{ route('vat_return') }}" class="inline-flex items-center text-sm font-normal text-zinc-500">
-                                
-                            </a> --}}
-                            Percentage Tax Return
-                            </li>
+                            <li class="inline-flex items-center text-sm font-normal text-zinc-500">Percentage Tax Return</li>
                             <li>
-                            <div class="flex items-center">
-                                <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                                </svg>
-                                <a href="{{ route('percentage_return') }}" 
-                                    class="ms-1 text-sm font-medium {{ Request::routeIs('percentage_return') ? 'font-bold text-blue-900' : 'text-zinc-500' }} md:ms-2">
-                                    2551M/Q
-                                </a>
-                            </div>
+                                <div class="flex items-center">
+                                    <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                                    </svg>
+                                    <a href="{{ route('percentage_return') }}" 
+                                        class="ms-1 text-sm font-medium {{ Request::routeIs('percentage_return') ? 'font-bold text-blue-900' : 'text-zinc-500' }} md:ms-2">
+                                        2551M/Q
+                                    </a>
+                                </div>
                             </li>
                             <li aria-current="page">
-                            <div class="flex items-center">
-                                <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                                </svg>
-                                <a href="" class="ms-1 text-sm font-bold text-blue-900 md:ms-2">Summary</a>
-                            </div>
+                                <div class="flex items-center">
+                                    <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                                    </svg>
+                                    <a href="" class="ms-1 text-sm font-bold text-blue-900 md:ms-2">Summary</a>
+                                </div>
                             </li>
                         </ol>
                     </nav>
@@ -47,7 +42,7 @@
                                     <input 
                                         type="search" 
                                         name="search" 
-                                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900" 
+                                        class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900" 
                                         aria-label="Search Term" 
                                         placeholder="Search..." 
                                         @input.debounce="$el.form.requestSubmit()" 
@@ -103,11 +98,11 @@
                     <div class="px-8 ps-10">
                         <!-- Navigation Tabs -->
                         <nav class="flex space-x-4 my-4">
-                            <a href="{{ route('percentage_return.slsp_data', $taxReturn->id) }}" class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('percentage_return.slsp_data') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }} px-3 py-2">
-                                SLSP Data
-                            </a>
                             <a href="{{ route('tax-returns.percentage-summary', $taxReturn->id) }}" class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('tax-returns.percentage-summary') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }} px-3 py-2">
                                 Summary
+                            </a>
+                            <a href="{{ route('percentage_return.slsp_data', $taxReturn->id) }}" class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('percentage_return.slsp_data') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }} px-3 py-2">
+                                Sources
                             </a>
                             <a href="{{ route('percentage_return.report', $taxReturn->id) }}" class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('percentage_return.report') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }} px-3 py-2">
                                 Report
@@ -135,6 +130,16 @@
                                             <td class="text-left py-3 px-2">{{ number_format($data['tax_due'], 2) }}</td>
                                         </tr>
                                     @endforeach
+                                    @if ($paginatedTaxRows->isEmpty())
+                                        <tr>
+                                            <td colspan="10" class="text-center p-4">
+                                                <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                                <h1 class="font-bold text-lg mt-2">No Transactions yet</h1>
+                                                <p class="text-sm text-neutral-500 mt-2">Start generating with the + button <br>at the top.</p>
+                                            </td>
+                                        </tr>
+                                    @else
+                                    @endif
                                 </tbody>
                             </table>
                         </div>

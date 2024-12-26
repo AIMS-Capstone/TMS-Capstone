@@ -44,10 +44,8 @@
                             <a href="{{ route('tax_return.summary', $taxReturn->id) }}" class="text-zinc-600 flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('summary') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }} px-3 py-2">
                                 Summary
                             </a>
-                            <a href="{{ route('tax_return.2551q.pdf', $taxReturn->id) }}" 
-                                class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap 
-                                {{ request()->routeIs('tax_return.2550q.pdf') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }}">
-                                 Report
+                            <a href="{{ route('tax_return.2550q.pdf', $taxReturn->id) }}" class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('tax_return.2550q.pdf') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }}">
+                                Report
                             </a>
                         </nav>
                     </div>

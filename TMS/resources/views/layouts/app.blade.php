@@ -83,7 +83,15 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                             </a>
                         </li>
 
-                        <li x-data="{ open: {{ request()->routeIs('income_return', 'vat_return', 'percentage_return', 'percentage_return.slsp_data') ? 'true' : 'false' }} }">
+                        <li x-data="{ open: {{ request()->routeIs('income_return', 'tax_return.income_input_summary', 'income_return.show', 'income_return.report', 'tax_return.income_show_sales', 'tax_return.income_show_coa', 'tax_return.background_information.update', 
+                            'tax_return.spouse_information', 'tax_return.sales_revenue', 'tax_return.background_information', 'tax_return.tax_option_rate.update',
+                            'vat_return', 'tax_return.slsp_data', 'tax_return.summary', 'tax_return.report', 'tax_return.2550q.pdf', 
+                            'percentage_return', 'percentage_return.slsp_data', 'tax-returns.percentage-summary', 'percentage_return.report', 'tax_return.2551q.pdf', 
+                            'with_holding.1601C', 'with_holding.1601C.generate', 'with_holding.1601C_summary', 'with_holding.1601C_sources', 'with_holding.1601C_sources_store', 'form1601C.create', 'form1601C.store', 'with_holding.1601C_import',
+                            'with_holding.0619E', 'with_holding.0619E.generate', 'form0619E.create', 'form0619E.store', 
+                            'with_holding.1601EQ', 'with_holding.1601EQ.generate', 'with_holding.1601EQ_Qap', 'with_holding.1601EQ_Qap.set', 'form1601EQ.create', 'form1601EQ.store',
+                            'with_holding.1604C', 'with_holding.1604C.generate', 'with_holding.1604C_remittances', 'with_holding.1604C_schedule1', 'with_holding.1604C_schedule2', 'form1604C.create', 'form1604C.store',
+                            'with_holding.1604E', 'with_holding.1604E.generate', 'with_holding.1604E_summary', 'with_holding.1604E_remittances', 'with_holding.1604E_sources', 'with_holding.1604E_schedule4', 'with_holding.1604E_store', 'form1604E.create', 'form1604E.store') ? 'true' : 'false' }} }">
                             <button @click="open = !open" type="button"
                                 :class="{
                                     'flex items-center w-full p-2 text-[14px] ease-in transition-all duration-500 rounded-r-full hover:font-bold px-6 py-2 group': true,
@@ -102,33 +110,38 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                     </svg>
                                 </div>
                             </button>
-                            <ul x-show="open" x-transition class="py-1 space-y-1 taxuri-color">
+                            <ul x-show="open" x-transition class="space-y-1 taxuri-color">
                                 <li>
-                                    <a href="{{ route('percentage_return') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
-                                    {{ request()->routeIs('percentage_return') || request()->routeIs('percentage_return.slsp_data') ? 'sidebar-submenu-active' : '' }}">
+                                    <a href="{{ route('percentage_return') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
+                                    {{ request()->routeIs('percentage_return') || request()->routeIs('percentage_return.slsp_data', 'tax-returns.percentage-summary', 'percentage_return.slsp_data', 'percentage_return.report', 'tax_return.2551q.pdf') ? 'sidebar-submenu-active' : '' }}">
                                         Percentage Tax Return
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('income_return') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
-                                    {{ request()->routeIs('income_return') ? 'sidebar-submenu-active' : '' }}">
+                                    <a href="{{ route('income_return') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
+                                    {{ request()->routeIs('income_return') || request()->routeIs('tax_return.income_input_summary', 'income_return.show', 'income_return.report', 'tax_return.income_show_coa', 'tax_return.income_show_sales', 
+                                    'tax_return.background_information.update', 'tax_return.spouse_information', 'tax_return.sales_revenue', 'tax_return.background_information', 'tax_return.tax_option_rate.update') ? 'sidebar-submenu-active' : '' }}">
                                         Income Tax Return
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('vat_return') }}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
-                                    {{ request()->routeIs('vat_return') ? 'sidebar-submenu-active' : '' }}">
+                                    <a href="{{ route('vat_return') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
+                                    {{ request()->routeIs('vat_return') || request()->routeIs('tax_return.slsp_data', 'tax_return.summary', 'tax_return.report', 'tax_return.2550q.pdf') ? 'sidebar-submenu-active' : '' }}">
                                         Value Added Tax Return
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('with_holding.1601C')}}" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group
-                                    {{ request()->routeIs('with_holding.1601C') ? 'sidebar-submenu-active' : '' }}">
+                                    <a href="{{ route('with_holding.1601C')}}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
+                                    {{ request()->routeIs('with_holding.1601C') || request()->routeIs('with_holding.1601C.generate', 'with_holding.1601C_summary', 'with_holding.1601C_sources', 'with_holding.1601C_sources_store', 'form1601C.create', 'form1601C.store', 'with_holding.1601C_import', 
+                                    'with_holding.0619E', 'with_holding.0619E.generate', 'form0619E.create', 'form0619E.store', 
+                                    'with_holding.1601EQ', 'with_holding.1601EQ.generate', 'with_holding.1601EQ_Qap', 'with_holding.1601EQ_Qap.set', 'form1601EQ.create', 'form1601EQ.store', 
+                                    'with_holding.1604C', 'with_holding.1604C.generate', 'with_holding.1604C_remittances', 'with_holding.1604C_schedule1', 'with_holding.1604C_schedule2', 'form1604C.create', 'form1604C.store',
+                                    'with_holding.1604E', 'with_holding.1604E.generate', 'with_holding.1604E_summary', 'with_holding.1604E_remittances', 'with_holding.1604E_sources', 'with_holding.1604E_schedule4', 'with_holding.1604E_store', 'form1604E.create', 'form1604E.store') ? 'sidebar-submenu-active' : '' }}">
                                         Withholding Tax Return
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="flex items-center w-full p-2 text-[14px] ease-in transition-all rounded-lg pl-11 group">
+                                    <a href="#" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group">
                                         Final Withholding Tax Return
                                     </a>
                                 </li>

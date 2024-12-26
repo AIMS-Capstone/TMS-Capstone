@@ -6,30 +6,25 @@
             <div class="px-10 py-6">
                 <nav class="flex" aria-label="Breadcrumb">
                     <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
-                        <li class="inline-flex items-center text-sm font-normal text-zinc-500">
-                        {{-- <a href="{{ route('vat_return') }}" class="inline-flex items-center text-sm font-normal text-zinc-500">
-                            
-                        </a> --}}
-                        Value Added Tax Return
-                        </li>
+                        <li class="inline-flex items-center text-sm font-normal text-zinc-500">Value Added Tax Return</li>
                         <li>
-                        <div class="flex items-center">
-                            <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                            </svg>
-                            <a href="{{ route('vat_return') }}" 
-                                class="ms-1 text-sm font-medium {{ Request::routeIs('vat_return') ? 'font-bold text-blue-900' : 'text-zinc-500' }} md:ms-2">
-                                2550M/Q
-                            </a>
-                        </div>
+                            <div class="flex items-center">
+                                <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                                </svg>
+                                <a href="{{ route('vat_return') }}" 
+                                    class="ms-1 text-sm font-medium {{ Request::routeIs('vat_return') ? 'font-bold text-blue-900' : 'text-zinc-500' }} md:ms-2">
+                                    2550M/Q
+                                </a>
+                            </div>
                         </li>
                         <li aria-current="page">
-                        <div class="flex items-center">
-                            <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                            </svg>
-                            <a href="" class="ms-1 text-sm font-bold text-blue-900 md:ms-2">SLSP Data</a>
-                        </div>
+                            <div class="flex items-center">
+                                <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                                </svg>
+                                <a href="" class="ms-1 text-sm font-bold text-blue-900 md:ms-2">SLSP Data</a>
+                            </div>
                         </li>
                     </ol>
                 </nav>
@@ -440,8 +435,7 @@ deleteRows() {
                     </div>
                 </div>
                
-                <div 
-                    x-data="{
+                <div x-data="{
                         open: false,
                         transactions: [],
                         selectedTransaction: null,
@@ -572,11 +566,9 @@ document.addEventListener('search', event => {
                 }
             });
         }
-        // Append sorted rows back to the table body
         table.innerHTML = '';
         sortedRows.forEach(row => table.appendChild(row));
     }
-    // Dropdown event listeners
     document.querySelectorAll('#dropdownMenu div[data-sort]').forEach(item => {
         item.addEventListener('click', function() {
             const criteria = this.getAttribute('data-sort');

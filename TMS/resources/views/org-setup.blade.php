@@ -410,7 +410,7 @@
     
     {{-- Edit Modal: Shows Error with "PUT" + not sure about the action + Selections of Address and RDO --}}
     <div x-data="{ showEdit: false, organization: {}, formatDate(date) {const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return new Date(date).toLocaleDateString(undefined, options); } }"
+        return new Date(date).toLocaleDateString(undefined, options); } }"
         x-show="showEdit"
         @open-edit-org-modal.window="showEdit = true; organization = $event.detail.organization" 
         x-on:close-modal.window="showEdit = false"
@@ -443,19 +443,13 @@
                     <div class="grid grid-cols-3 gap-6 mb-5">
                         <div class="w-full">
                             <label class="block text-sm font-bold text-zinc-700">Address Line<span class="text-red-500">*</span></label>
-                            <input 
-                                class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
-                                x-bind:value="organization.address_line" 
-                                name="address_line" 
-                                required>
+                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.address_line" name="address_line" required>
                         </div>
-                    
-                
-                    <!-- Region Dropdown -->
-                
+                        <!-- Region Dropdown -->
                         <div class="w-full">
-                            <x-field-label for="region" value="{{ __('Region') }}" class="mb-2 text-left" />
-                            <select wire:model="region" name="region" id="region" class="cursor-pointer border rounded-xl px-4 py-2 w-full text-sm border-gray-300 focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                            <x-field-label for="region" value="{{ __('Region') }}" class="block text-sm font-bold text-zinc-700" />
+                            <select wire:model="region" name="region" id="region" class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
                                 <option value="" disabled>Select Region</option>
                                 @foreach($regions as $region)
                                     <option value="{{ $region['designation'] }}" {{ $region['designation'] == old('region', $organization->region) ? 'selected' : '' }}>
@@ -464,13 +458,10 @@
                                 @endforeach
                             </select>
                         </div>
-               
-                
-                    <!-- Province Dropdown -->
-               
+                        <!-- Province Dropdown -->
                         <div class="w-full">
-                            <x-field-label for="province" value="{{ __('Province') }}" class="mb-2 text-left" />
-                            <select wire:model="province" name="province" id="province" class="cursor-pointer border rounded-xl px-4 py-2 w-full text-sm border-gray-300 focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                            <x-field-label for="province" value="{{ __('Province') }}" class="block text-sm font-bold text-zinc-700" />
+                            <select wire:model="province" name="province" id="province" class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
                                 <option value="" disabled>Select Province</option>
                             </select>
                         </div>
@@ -479,21 +470,20 @@
                     <!-- City and ZIP Code -->
                     <div class="grid grid-cols-3 gap-6 mb-5">
                         <div class="w-full">
-                            <x-field-label for="city" value="{{ __('City') }}" class="mb-2 text-left" />
-                            <select wire:model="city" name="city" id="city" class="cursor-pointer border rounded-xl px-4 py-2 w-full text-sm border-gray-300 focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                            <x-field-label for="city" value="{{ __('City') }}" class="block text-sm font-bold text-zinc-700" />
+                            <select wire:model="city" name="city" id="city" class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
                                 <option value="" disabled>Select City</option>
                             </select>
                         </div>
                         <div class="w-32">
-                            <x-field-label for="zip_code" value="{{ __('Zip Code') }}" class="mb-2 text-left readonly" />
-                            <x-input type="text" name="zip_code" id="zip_code" wire:model="zip_code" placeholder="1203" class="border rounded-xl px-4 py-2 w-full readonly" maxlength="4"  />
+                            <x-field-label for="zip_code" value="{{ __('Zip Code') }}" class="block text-sm font-bold text-zinc-700 readonly" />
+                            <input type="text" name="zip_code" id="zip_code" wire:model="zip_code" placeholder="1203" class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200" maxlength="4"  />
                         </div>
                     
-                    <!-- RDO Dropdown (Styled like Address Line) -->
-                  
+                        <!-- RDO Dropdown (Styled like Address Line) -->
                         <div class="w-full">
-                            <x-field-label for="rdo" value="{{ __('RDO') }}" class="mb-2 text-left" />
-                            <select name="rdo" id="rdo" class="cursor-pointer border rounded-xl px-4 py-2 w-full text-sm border-gray-300 focus:border-slate-500 focus:ring-slate-500 shadow-sm">
+                            <x-field-label for="rdo" value="{{ __('RDO') }}" class="block text-sm font-bold text-zinc-700" />
+                            <select name="rdo" id="rdo" class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
                                 <option value="" disabled>Select RDO</option>
                                 @foreach($rdos as $rdo)
                                     <option value="{{ $rdo->id }}" {{ $organization->rdo == $rdo->id ? 'selected' : '' }}>
@@ -508,20 +498,13 @@
                     <div class="grid grid-cols-3 gap-6 mb-5">
                         <div class="w-full">
                             <label class="block text-sm font-bold text-zinc-700">Contact Number<span class="text-red-500">*</span></label>
-                            <input 
-                                class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
-                                x-bind:value="organization.contact_number" 
-                                name="contact_number" 
-                                required>
+                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.contact_number" name="contact_number" required>
                         </div>
                         <div class="w-full">
                             <label class="block text-sm font-bold text-zinc-700">Email Address<span class="text-red-500">*</span></label>
-                            <input 
-                                class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
-                                x-bind:value="organization.email" 
-                                name="email" 
-                                type="email" 
-                                required>
+                            <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                            x-bind:value="organization.email" name="email" type="email" required>
                         </div>
                     </div>
                 
@@ -535,8 +518,6 @@
                         </button>
                     </div>
                 </form>
-                
-                
             </div>
         </div>
     </div>
