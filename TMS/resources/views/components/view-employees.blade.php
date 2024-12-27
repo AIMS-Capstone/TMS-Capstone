@@ -65,9 +65,26 @@
                         <label for="first_name" class="text-zinc-700 font-semibold whitespace-nowrap">
                             First Name </label>
                         <span class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
-                            <span x-bind:value="employee.first_name"></span>
+                            <span x-model="employee.first_name"></span>
                         </span>
                     </div>
+                    {{-- testing like on the edit --}}
+                     {{-- <div class="w-2/3 pr-4 flex items-center space-x-4">
+                            <label for="first_name" class="text-zinc-700 font-semibold whitespace-nowrap">
+                                First Name <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                    type="text" 
+                                    id="first_name" 
+                                    name="first_name" 
+                                    placeholder="First Name" 
+                                    class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
+                                    required
+                                    x-bind:value="employee.first_name"
+                                    disabled 
+                                    readonly
+                                    >
+                            </div> --}}
                     <div class="w-2/3 pr-4 flex items-center space-x-4">
                         <label for="date_of_birth" class="text-zinc-700 font-semibold whitespace-nowrap">
                             Date of Birth</label>

@@ -313,8 +313,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                             <th scope="col" class="text-left py-4 px-4">Contact</th>
                                             <th scope="col" class="text-left py-4 px-4">Nationality</th>
                                             <th scope="col" class="text-left py-4 px-4">Address</th>
-                                            <th scope="col" class="text-left py-4 px-4">Wage</th>
-                                            <th scope="col" class="text-left py-4 px-4">With Prev Employer</th>
+                                            <th scope="col" class="text-left py-4 px-4">Zip Code</th>
                                             <th scope="col" class="text-left py-4 px-4">Action</th>
                                         </tr>
                                     </thead>
@@ -335,7 +334,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                                     <td class="text-left py-3 px-4">
                                                         <x-view-employees />
                                                         <button
-                                                            @click="$dispatch('open-view-employee-modal', {{ json_encode($employee) }})" 
+                                                            @click="$dispatch('open-view-employee-modal', {{ @json_encode($employee) }})" 
                                                             class="hover:underline hover:text-blue-500">
                                                             {{ $employee->first_name }} {{ $employee->last_name }}
                                                         </button>
@@ -345,8 +344,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                                     <td class="text-left py-3 px-4">{{ $employee->contact_number }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->nationality }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->address->address ?? 'N/A' }}</td>
-                                                    <td class="text-left py-3 px-4">{{ $employee->employee_wage_status }}</td>
-                                                    <td class="text-left py-3 px-4">{{ $employee->with_prev_employer }}</td>
+                                                    <td class="text-left py-3 px-4">{{ $employee->address->zip_code ?? '0000' }}</td>
                                                     <td class="text-left py-3 px-4">
                                                         <x-edit-employees />
                                                         <button 
