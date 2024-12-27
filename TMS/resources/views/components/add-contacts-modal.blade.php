@@ -45,6 +45,17 @@
 
                 <!-- Form fields in a grid -->
                 <div class="mb-6 flex justify-between items-start">
+
+                    <!-- Name -->
+                    <div class="mb-6">
+                        <label for="bus_name" class="block font-semibold text-sm text-gray-700">
+                            Name <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="bus_name" id="bus_name" required
+                            placeholder="Customer Name"
+                            class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                    </div>
+
                     <!-- Contact Type -->
                     <div class="w-[50%] pr-4">
                         <label for="contact_type" class="block font-semibold text-sm text-gray-700">
@@ -53,11 +64,13 @@
                         <select name="contact_type" id="contact_type" required
                             class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                             <option value="" disabled selected>Select Contact Type</option>
-                            <option value="Individual">Individual</option>
-                            <option value="Non-Individual">Non-Individual</option>
+                            <option value="Customer">Customer</option>
+                            <option value="Vendor">Vendor</option>
                         </select>
                     </div>
+                </div>
 
+                <div class="mb-6 flex justify-between items-start">
                     <!-- TIN -->
                     <div class="w-2/3">
                         <label for="contact_tin" class="block font-semibold text-sm text-gray-700">
@@ -67,16 +80,18 @@
                             placeholder="000-000-000-000" maxlength="17"
                             class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                     </div>
-                </div>
-
-                 <!-- Name -->
-                 <div class="mb-6">
-                    <label for="bus_name" class="block font-semibold text-sm text-gray-700">
-                        Name <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" name="bus_name" id="bus_name" required
-                        placeholder="Customer Name"
-                        class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                    <!-- Classification -->
+                    <div class="w-[50%] pl-4">
+                        <label for="classification" class="block font-semibold text-sm text-gray-700">
+                            Classification <span class="text-red-500">*</span>
+                        </label>
+                        <select name="classification" id="classification" required
+                            class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                            <option value="" disabled selected>Select Classification</option>
+                            <option value="Individual">Individual</option>
+                            <option value="Non-Individual">Non-Individual</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="mb-6 flex justify-between items-start">

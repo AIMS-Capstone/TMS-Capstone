@@ -239,8 +239,9 @@
                                                 </label>
                                             </th>
                                             <th scope="col" class="text-left py-4 px-4">Name</th>
-                                            <th scope="col" class="text-left py-4 px-4">TIN</th>
                                             <th scope="col" class="text-left py-4 px-4">Contact Type</th>
+                                            <th scope="col" class="text-left py-4 px-4">TIN</th>
+                                            <th scope="col" class="text-left py-4 px-4">Classification</th>
                                             <th scope="col" class="text-left py-4 px-4">Address</th>
                                             <th scope="col" class="text-left py-4 px-4">City</th>
                                             <th scope="col" class="text-left py-4 px-4">Zip Code</th>
@@ -266,11 +267,16 @@
                                                             @click="$dispatch('open-view-contact-modal', {{ json_encode($contact) }})" 
                                                             class="hover:underline hover:text-blue-500"
                                                             >
-                                                            {{ $contact->bus_name }}
+                                                            {{ $contact->bus_name}}
                                                         </button>
                                                     </td>
+                                                    <td class="text-left py-3 px-4">
+                                                        <span class="inline-block bg-gray-100 text-gray-700 text-xs font-medium rounded-full px-3 py-1">
+                                                            {{ $contact->contact_type }}
+                                                        </span>
+                                                    </td>
                                                     <td class="text-left py-3 px-4">{{ $contact->contact_tin }}</td>
-                                                    <td class="text-left py-3 px-4">{{ $contact->contact_type }}</td>
+                                                    <td class="text-left py-3 px-4">{{ $contact->classification }}</td>
                                                     <td class="text-left py-3 px-4">{{ $contact->contact_address }}</td>
                                                     <td class="text-left py-3 px-4">{{ $contact->contact_city }}</td>
                                                     <td class="text-left py-3 px-4">{{ $contact->contact_zip }}</td>
@@ -278,7 +284,7 @@
                                             @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="6" class="text-center justify-center p-4">
+                                                <td colspan="8" class="text-center justify-center p-4">
                                                     <img src="{{ asset('images/no-account.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
                                                     <h1 class="font-bold text-neutral-600 text-lg mt-2">No Contacts Added Yet</h1>
                                                     <p class="text-sm text-neutral-500 mt-2">Start adding contacts and vendors by<br>clicking the + button above.</p>
