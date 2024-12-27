@@ -212,6 +212,8 @@ Route::post('/tax-return/store1701Q/{taxReturn}', [Tax1701QController::class, 's
             Route::post('/employees', 'store')->name('employees.store');
             Route::put('/employees/{employee}', [EmployeesController::class, 'update'])->name('employees.update'); 
             Route::delete('/employees/destroy', 'destroy')->name('employees.destroy');
+            Route::get('/employees/employee_template', [EmployeesController::class, 'employee_template']);
+
         });
 
           Route::post('percentage_return/{taxReturn}/2551q', [TaxReturnController::class, 'store2551Q'])

@@ -13,6 +13,7 @@ class ContactsController extends Controller
     {
         $search = $request->input('search');
         $type = $request->input('contact_type');
+        $classification = $request->input('classification');
         $perPage = $request->input('perPage', 5);
         $organizationId = session('organization_id');
 
@@ -30,6 +31,10 @@ class ContactsController extends Controller
             $query->where('contact_type', $type);
         }
 
+        if ($classification && $classification !== 'All') {
+            $query->where('classification', $classification);
+        }
+
         $contacts = $query->paginate($perPage);
 
         return view('contacts', compact('contacts'));
@@ -45,12 +50,12 @@ class ContactsController extends Controller
 
         $validated = $request->validate([
             'contact_type' => 'required|string',
-            'bus_name' => 'required|string|max:255',
-            'contact_email' => 'nullable|email|max:255',
-            'contact_phone' => 'nullable|string|max:20',
-            'contact_tin' => 'nullable|string|max:255',
-            'contact_city' => 'required|string|max:255',
-            'contact_zip' => 'required|string|max:20',
+            'classification' => 'required|string',
+            'bus_name' => 'required|string|max:50',
+            'contact_tin' => 'nullable|string|max:17',
+            'contact_address' => 'nullable|string|max:50',
+            'contact_city' => 'required|string|max:20',
+            'contact_zip' => 'required|string|max:4',
         ]);
 
         try {
@@ -79,10 +84,12 @@ class ContactsController extends Controller
     {
         $validated = $request->validate([
             'contact_type' => 'required|string',
-            'bus_name' => 'required|string|max:255',
-            'contact_tin' => 'nullable|string|max:255',
-            'contact_city' => 'required|string|max:255',
-            'contact_zip' => 'required|string|max:20',
+            'classification' => 'required|string',
+            'bus_name' => 'required|string|max:50',
+            'contact_tin' => 'nullable|string|max:17',
+            'contact_address' => 'nullable|string|max:50',
+            'contact_city' => 'required|string|max:20',
+            'contact_zip' => 'required|string|max:4',
         ]);
 
         try {

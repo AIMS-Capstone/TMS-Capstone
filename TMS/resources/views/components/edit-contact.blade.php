@@ -30,23 +30,37 @@
 
         <!-- Modal Body -->
         <div class="p-10">
-            <form id="editContactForm" method="POST" :action="'/contacts/' + contact.id">
+            <form id="editContactForm" method="POST" :action="'/contacts/' + contact.id" >
                 @csrf
                 @method('PUT')
 
                 <div class="mb-6 flex justify-between items-start">
-                    <!-- Contact Type -->
+                    <!-- Name -->
                     <div class="w-[50%] pr-4">
+                        <label for="contactName" class="block text-sm font-bold text-gray-700">Name <span class="text-red-500">*</span></label>
+                        <input 
+                            type="text" 
+                            id="contactName" 
+                            name="bus_name" 
+                            x-model="contact.bus_name" 
+                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                            placeholder="Contact Name"
+                            required>
+                    </div>
+                    <!-- Contact Type -->
+                    <div class="w-2/3">
                         <label for="contactType" class="block text-sm font-bold text-gray-700">Contact Type <span class="text-red-500">*</span></label>
                         <select id="contactType" name="contact_type" 
                             x-model="contact.contact_type" 
                             class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
                             required>
-                            <option value="Individual">Individual</option>
-                            <option value="Non-Individual">Non-Individual</option>
+                            <option value="Customer">Customer</option>
+                            <option value="Vendor">Vendor</option>
                         </select>
                     </div>
+                </div>
 
+                <div class="mb-6 flex justify-between items-start">
                     <!-- TIN -->
                     <div class="w-2/3">
                         <label for="contactTIN" class="block text-sm font-bold text-gray-700">Tax Identification Number (TIN) <span class="text-red-500">*</span></label>
@@ -59,19 +73,17 @@
                             placeholder="000-000-000-000" 
                             required>
                     </div>
-                </div>
-
-                <!-- Name -->
-                <div class="mb-5">
-                    <label for="contactName" class="block text-sm font-bold text-gray-700">Name <span class="text-red-500">*</span></label>
-                    <input 
-                        type="text" 
-                        id="contactName" 
-                        name="bus_name" 
-                        x-model="contact.bus_name" 
-                        class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
-                        placeholder="Contact Name" 
-                        required>
+                    <!-- Classification -->
+                    <div class="w-[50%] pl-4">
+                        <label for="classification" class="block text-sm font-bold text-gray-700">Classification <span class="text-red-500">*</span></label>
+                        <select id="classification" name="classification" 
+                            x-model="contact.classification" 
+                            class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
+                            required>
+                            <option value="Invidiual">Invidiual</option>
+                            <option value="Non-Invidiual">Non-Invidiual</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="mb-6 flex justify-between items-start">
@@ -115,6 +127,7 @@
                 <!-- Submit Button -->
                 <div class="flex justify-end mt-6">
                     <button 
+                        type="button"
                         x-on:click="$dispatch('close-modal')"
                         class="mr-2 font-semibold text-zinc-600 px-3 py-1 rounded-md hover:text-zinc-900 transition">
                         Cancel

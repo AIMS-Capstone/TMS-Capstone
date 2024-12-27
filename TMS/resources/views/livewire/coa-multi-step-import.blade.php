@@ -287,10 +287,3 @@
         </div>
     @endif
 </div>
-<script>
-    document.addEventListener('livewire:load', function () {
-        Livewire.on('reloadPage', () => {
-            window.location.reload();
-        });
-    });
-</script>

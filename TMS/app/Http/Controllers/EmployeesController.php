@@ -10,6 +10,7 @@ use App\Imports\EmployeesImport;
 use Maatwebsite\Excel\Facades\Excel as MaatExcel;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\Models\Activity;
+use App\Exports\employee_template;
 
 
 class EmployeesController extends Controller
@@ -22,7 +23,7 @@ class EmployeesController extends Controller
         $organizationId = session('organization_id');
 
         // Query employees with their address and employments
-        $query = Employee::with(['address', 'employments']);
+        $query = Employee::with(['address', 'employments.address']);
 
         if ($organizationId) {
             $query->where('organization_id', $organizationId);
@@ -49,27 +50,27 @@ class EmployeesController extends Controller
             // Validate the request data
             $validated = $request->validate([
                 // Employee details
-                'first_name' => 'required|string|max:255',
-                'middle_name' => 'nullable|string|max:255',
-                'last_name' => 'required|string|max:255',
+                'first_name' => 'required|string|max:30',
+                'middle_name' => 'nullable|string|max:15',
+                'last_name' => 'required|string|max:15',
                 'suffix' => 'nullable|string|max:10',
                 'date_of_birth' => 'required|date',
                 'tin' => 'required|string|max:17|unique:employees,tin',
-                'nationality' => 'nullable|string|max:255',
-                'contact_number' => 'nullable|string|max:15',
+                'nationality' => 'nullable|string|max:15',
+                'contact_number' => 'nullable|string|max:13',
 
                 // Employee address
                 'address' => 'required|string|max:255',
-                'zip_code' => 'required|string|max:10',
+                'zip_code' => 'required|string|max:4',
 
                 // Employer details
-                'employer_name' => 'required|string|max:255',
+                'employer_name' => 'required|string|max:50',
                 'employment_from' => 'required|date',
                 'employment_to' => 'nullable|date|after_or_equal:employment_from',
                 'rate' => 'required|numeric',
                 'rate_per_month' => 'required|numeric',
                 'employment_status' => 'required|string',
-                'reason_for_separation' => 'nullable|string|max:255',
+                'reason_for_separation' => 'nullable|string|max:50',
                 'employee_wage_status' => 'required|string',
                 'previous_employer_tin' => 'required|string',
                 'substituted_filing' => 'required|boolean',
@@ -80,8 +81,8 @@ class EmployeesController extends Controller
 
                 // Employer address
                 'prev_address' => 'required|string|max:255',
-                'prev_zip_code' => 'required|string|max:10',
-                'region' => 'required|string|max:255',
+                'prev_zip_code' => 'required|string|max:4',
+                'region' => 'required|string',
             ]);
 
             // Step 1: Store Employee
@@ -152,34 +153,39 @@ class EmployeesController extends Controller
             // Step 1: Validate the request data
             $validated = $request->validate([
                 // Employee details
-                'first_name' => 'required|string|max:255',
-                'middle_name' => 'nullable|string|max:255',
-                'last_name' => 'required|string|max:255',
+                'first_name' => 'required|string|max:30',
+                'middle_name' => 'nullable|string|max:15',
+                'last_name' => 'required|string|max:15',
                 'suffix' => 'nullable|string|max:10',
                 'date_of_birth' => 'required|date',
-                'tin' => 'required|string|max:17|unique:employees,tin,' . $id,
-                'nationality' => 'nullable|string|max:255',
-                'contact_number' => 'nullable|string|max:15',
+                'tin' => 'required|string|max:17|unique:employees,tin',
+                'nationality' => 'nullable|string|max:15',
+                'contact_number' => 'nullable|string|max:13',
 
                 // Employee address
                 'address' => 'required|string|max:255',
-                'zip_code' => 'required|string|max:10',
+                'zip_code' => 'required|string|max:4',
 
                 // Employer details
-                'employer_name' => 'required|string|max:255',
+                'employer_name' => 'required|string|max:50',
                 'employment_from' => 'required|date',
                 'employment_to' => 'nullable|date|after_or_equal:employment_from',
                 'rate' => 'required|numeric',
                 'rate_per_month' => 'required|numeric',
                 'employment_status' => 'required|string',
-                'reason_for_separation' => 'nullable|string|max:255',
+                'reason_for_separation' => 'nullable|string|max:50',
                 'employee_wage_status' => 'required|string',
+                'previous_employer_tin' => 'required|string',
                 'substituted_filing' => 'required|boolean',
+                'prev_employment_from' => 'required|date',
+                'prev_employment_to' => 'nullable|date|after_or_equal:prev_employment_from',
+                'prev_employment_status' => 'nullable|string',
+                'with_prev_employer' => 'required|boolean',
 
                 // Employer address
                 'prev_address' => 'required|string|max:255',
-                'prev_zip_code' => 'required|string|max:10',
-                'region' => 'required|string|max:255',
+                'prev_zip_code' => 'required|string|max:4',
+                'region' => 'required|string',
             ]);
 
             // Step 2: Find the employee by ID
@@ -316,6 +322,12 @@ class EmployeesController extends Controller
         MaatExcel::import(new EmployeesImport, $request->file('file'));
 
         return back()->with('success', 'Employees data imported successfully!');
+    }
+
+    //export
+    public function employee_template()
+    {
+        return MaatExcel::download(new employee_template, 'employee_template.xlsx');
     }
 
 }

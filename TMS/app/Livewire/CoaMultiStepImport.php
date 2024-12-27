@@ -143,11 +143,6 @@ class CoaMultiStepImport extends Component
             
             session()->forget(['importedData', 'mappedColumns']);
 
-            $this->dispatchBrowserEvent('reload-page');
-
-
-
-
         } catch (\Exception $e) {
             session()->flash('error', 'Error saving import: ' . $e->getMessage());
         }

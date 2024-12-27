@@ -173,7 +173,8 @@ class EmployeesMultiStepImport extends Component
 
             session()->forget(['importedData', 'mappedColumns']);
 
-            $this->dispatchBrowserEvent('reload-page');
+            $this->dispatchBrowserEvent('closeModalAndReload');
+
         } catch (\Exception $e) {
             session()->flash('error', 'Error saving import: ' . $e->getMessage());
         }

@@ -40,7 +40,17 @@
         <div class="p-10">
             <!-- Contact Type and TIN -->
             <div class="mb-6 flex justify-between items-start">
+                <!-- Name -->
                 <div class="w-[50%] pr-4">
+                    <label class="block text-sm font-semibold text-gray-700">Name</label>
+                    <input 
+                        class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                        x-bind:value="contact.bus_name" 
+                        disabled 
+                        readonly
+                    >
+                </div>
+                <div class="w-2/3">
                     <label class="block text-sm font-semibold text-gray-700">Contact Type</label>
                     <input 
                         class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
@@ -49,6 +59,10 @@
                         readonly
                     >
                 </div>
+            </div>
+
+            <div class="mb-6 flex justify-between items-start">
+                <!-- TIN -->
                 <div class="w-2/3">
                     <label class="block text-sm font-semibold text-gray-700">Tax Identification Number (TIN)</label>
                     <input 
@@ -58,17 +72,17 @@
                         readonly
                     >
                 </div>
-            </div>
+                <!-- Classification -->
+                <div class="w-[50%] pl-4">
+                    <label class="block text-sm font-semibold text-gray-700">Classification</label>
+                    <input 
+                        class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                        x-bind:value="contact.classification" 
+                        disabled 
+                        readonly
+                    >
+                </div>
 
-            <!-- Name -->
-            <div class="mb-5">
-                <label class="block text-sm font-semibold text-gray-700">Name</label>
-                <input 
-                    class="block w-full py-2 px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
-                    x-bind:value="contact.bus_name" 
-                    disabled 
-                    readonly
-                >
             </div>
 
             <!-- Address, City, and Zip Code -->
