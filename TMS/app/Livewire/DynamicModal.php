@@ -33,6 +33,8 @@ class DynamicModal extends Component
         'contact_address' => '',
         'contact_city' => '',
         'contact_zip' => '',
+        'contact_classification' => 'Customer',
+        'organization_id' => '',
     ];
 
     protected $listeners = ['triggerModal' => 'openModal'];
@@ -51,6 +53,8 @@ class DynamicModal extends Component
 
     public function save()
     {
+        $this->newContact['organization_id'] = session('organization_id'); 
+        $this->newContact['contact_classification'] = 'Customer';
         // Validate and create the new contact
         $validatedData = $this->validate([
             'newContact.bus_name' => 'required|string|max:255',
@@ -59,7 +63,10 @@ class DynamicModal extends Component
             'newContact.contact_address' => 'nullable|string|max:255',
             'newContact.contact_city' => 'nullable|string|max:255',
             'newContact.contact_zip' => 'nullable|string|max:255',
+            'newContact.organization_id' => 'required|integer',
+            'newContact.contact_classification' => 'required|string',
         ]);
+
 
         $contact = Contacts::create($validatedData['newContact']);
 
