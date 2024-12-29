@@ -14,6 +14,7 @@ class Contacts extends Model
 
     protected $fillable = [
         'contact_type',
+        'classification',
         'bus_name',
         'contact_email',
         'contact_phone',

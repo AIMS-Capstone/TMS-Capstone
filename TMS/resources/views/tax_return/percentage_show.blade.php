@@ -23,7 +23,7 @@
                                     <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
                                     </svg>
-                                    <a href="" class="ms-1 text-sm font-bold text-blue-900 md:ms-2">SLSP Data</a>
+                                    <a href="" class="ms-1 text-sm font-bold text-blue-900 md:ms-2">Sources</a>
                                 </div>
                             </li>
                         </ol>
@@ -41,7 +41,7 @@
                                     <input 
                                         type="search" 
                                         name="search" 
-                                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900 focus:border-sky-900" 
+                                        class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900 focus:border-sky-900" 
                                         aria-label="Search Term" 
                                         placeholder="Search..." 
                                         @input.debounce="$el.form.requestSubmit()" 
@@ -56,7 +56,8 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
                                         <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
                                     </svg>
-                                    <span id="selectedOption" class="font-normal text-md text-zinc-700 truncate">Sort by</span>
+                                    <span id="selectedOption" class="font-normal text-sm text-zinc-600 hover:text-zinc-800 truncate">Sort by</span>
+                                    <svg class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
                                 </button>
 
                                 <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
@@ -115,11 +116,11 @@
                     <div class="px-8 ps-10">
                         <!-- Navigation Tabs -->
                         <nav class="flex space-x-4 my-4">
-                            <a href="{{ route('percentage_return.slsp_data', $taxReturn->id) }}" class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('percentage_return.slsp_data') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }} px-3 py-2">
-                                SLSP Data
-                            </a>
                             <a href="{{ route('tax-returns.percentage-summary', $taxReturn->id) }}" class="text-zinc-600 flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('tax-returns.percentage-summary') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }} px-3 py-2">
                                 Summary
+                            </a>
+                            <a href="{{ route('percentage_return.slsp_data', $taxReturn->id) }}" class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('percentage_return.slsp_data') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }} px-3 py-2">
+                                Sources
                             </a>
                             <a href="{{ route('percentage_return.report', $taxReturn->id) }}" class="text-zinc-600 flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('percentage_return.report') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }} px-3 py-2">
                                 Report
@@ -262,6 +263,16 @@
                                             <td class="text-left py-3 px-2">{{ $taxRow->coaAccount->code }}</td>
                                         </tr>
                                     @endforeach
+                                    @if ($paginatedTaxRows->isEmpty())
+                                        <tr>
+                                            <td colspan="10" class="text-center p-4">
+                                                <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                                <h1 class="font-bold text-lg mt-2">No Transactions yet</h1>
+                                                <p class="text-sm text-neutral-500 mt-2">Start generating with the + button <br>at the top.</p>
+                                            </td>
+                                        </tr>
+                                    @else
+                                    @endif
                                 </tbody>
                                 
                                 <!-- Pagination links -->
@@ -345,8 +356,7 @@
                     </div>
                 </div>
 
-                <div 
-                    x-data="{
+                <div x-data="{
                         open: false,
                         transactions: [],
                         selectedTransaction: null,
@@ -380,14 +390,20 @@
                     @open-generate-modal.window="openModal($event.detail.year, $event.detail.monthOrQuarter)"
                     x-show="open" 
                     x-transition
-                    class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center"
+                    class="fixed inset-0 bg-gray-200 bg-opacity-50 z-50 flex items-center justify-center"
                     x-cloak
                     >
                     <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden" x-show="open" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
                         x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
                         <!-- Modal Header -->
-                        <div class="flex bg-blue-900 justify-center rounded-t-lg items-center p-3 border-b border-opacity-80 mx-auto">
+                        <div class="relative flex bg-blue-900 justify-center rounded-t-lg items-center p-3 border-b border-opacity-80 mx-auto">
                             <h1 class="text-lg font-bold text-white">Select Transaction</h1>
+                            <button @click="open = false" class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 8L16 16M8 16L16 8" stroke="#1e3a8a" class="transition duration-200 hover:stroke-gray-600"/>
+                                </svg>
+                            </button>
                         </div>
 
                         <!-- Modal Body -->
@@ -395,16 +411,10 @@
                             <form method="POST" action="{{ route('tax_return_transaction.addPercentage') }}">
                                 @csrf
                                 <div class="mb-4">
-                                    <label for="transaction-dropdown" class="block text-sm font-bold text-gray-700">Select a Transaction</label>
-                                    <select 
-                                    name="transaction_id"
-                                        id="transaction-dropdown" 
-                                        
-                                        x-model="selectedTransaction" 
-                                        class="w-full border-gray-300 rounded-md shadow-sm"
-                                        :disabled="transactions.length === 0"
-                                    >
-                                        <option value="">-- Select a transaction --</option>
+                                    <label for="transaction-dropdown" class="block text-sm font-bold text-zinc-700">Select a Transaction</label>
+                                    <select name="transaction_id" id="transaction-dropdown" x-model="selectedTransaction" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                                        :disabled="transactions.length === 0">
+                                        <option value="" disabled selected>Select a transaction</option>
                                         <template x-for="transaction in transactions" :key="transaction.id">
                                             <option :value="transaction.id" " x-text="transaction.contact_details.bus_name + ' - ' + transaction.inv_number + ' - ' + transaction.date"></option>
                                         </template>
@@ -415,10 +425,10 @@
                                 <input type="hidden" name="tax_return_id" value="{{ $taxReturn->id }}">
 
                                 <div class="flex justify-end mt-6">
-                                    <button type="button" @click="closeModal" class="mr-4 font-semibold text-zinc-700 px-3 py-1 rounded-md hover:text-zinc-900 transition">Cancel</button>
-                                    <button type="submit" :disabled="!selectedTransaction" class="font-semibold bg-blue-900 text-white text-center px-6 py-1.5 rounded-md hover:bg-blue-950 border-blue-900 hover:text-white transition disabled:bg-gray-300 disabled:cursor-not-allowed">
-                                        Submit
-                                    </button>
+                                    <div class="flex justify-end mt-4">
+                                        <button type="button" @click="closeModal" class="mr-2 hover:text-zinc-900 text-zinc-600 text-sm font-semibold py-2 px-4">Cancel</button>
+                                        <button type="submit" :disabled="!selectedTransaction" class="bg-blue-900 hover:bg-blue-950 text-white font-semibold text-sm py-1 px-6 rounded-lg">Add</button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -452,7 +462,9 @@ document.addEventListener('filter', event => {
     // FOR SORT BUTTON
     document.getElementById('sortButton').addEventListener('click', function() {
         const dropdown = document.getElementById('dropdownMenu');
+        const dropdownArrow = this.querySelector('svg:nth-child(3)');
         dropdown.classList.toggle('hidden');
+        dropdownArrow.classList.toggle('rotate-180');
     });
 
     // FOR SORT BY
@@ -477,19 +489,20 @@ document.addEventListener('filter', event => {
                 }
             });
         }
-
-        // Append sorted rows back to the table body
         table.innerHTML = '';
         sortedRows.forEach(row => table.appendChild(row));
     }
-
-    // Dropdown event listeners
     document.querySelectorAll('#dropdownMenu div[data-sort]').forEach(item => {
         item.addEventListener('click', function() {
             const criteria = this.getAttribute('data-sort');
             document.getElementById('selectedOption').textContent = this.textContent; // Update selected option text
             sortItems(criteria);
         });
+    });
+    window.addEventListener('click', (event) => {
+        if (!sortButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+            dropdownMenu.classList.add('hidden');
+        }
     });
 
     // FOR BUTTON OF SHOW ENTRIES

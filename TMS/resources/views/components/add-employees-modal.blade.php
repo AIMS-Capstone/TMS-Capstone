@@ -94,16 +94,51 @@
                                             class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
                                             required>
                                     </div>
-                                    <div class="w-2/3 pr-4 flex items-center space-x-4">
+                                    {{-- 15+ validation --}}
+                                    <div 
+                                        x-data="{ 
+                                            dob: '', 
+                                            error: '', 
+                                            maxDate: '' 
+                                        }"
+                                        x-init="
+                                            let today = new Date();
+                                            today.setFullYear(today.getFullYear() - 15);
+                                            maxDate = today.toISOString().split('T')[0];
+                                        "
+                                        class="w-2/3 pr-4 flex items-center space-x-4"
+                                    >
                                         <label for="date_of_birth" class="text-zinc-700 font-semibold whitespace-nowrap">
                                             Date of Birth <span class="text-red-500">*</span>
                                         </label>
+                                        
                                         <input 
                                             type="date" 
                                             id="date_of_birth" 
                                             name="date_of_birth" 
-                                            class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
-                                            required>
+                                            x-model="dob"
+                                            :max="maxDate"
+                                            x-on:change="
+                                                let today = new Date();
+                                                let birthDate = new Date(dob);
+                                                let age = today.getFullYear() - birthDate.getFullYear();
+                                                let monthDiff = today.getMonth() - birthDate.getMonth();
+                                                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                                                    age--;
+                                                }
+                                                if (age < 15) {
+                                                    error = 'The employee must be 15 years old or older.';
+                                                    dob = ''; 
+                                                } else {
+                                                    error = '';  // Clear error if valid
+                                                }
+                                            "
+                                            class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                                            required
+                                        >
+
+                                        <!-- Error Message -->
+                                        <p x-show="error" class="text-red-500 text-xs mt-1" x-text="error"></p>
                                     </div>
                                 </div>
 
@@ -160,35 +195,118 @@
 
                             <!-- Step 2: Present Employer -->
                             <div x-show="currentStep === 2" id="tab-2">
-                                <div class="mb-6 flex justify-between items-start">
-                                    <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                        <label for="employment_form" class="text-zinc-700 font-semibold whitespace-nowrap">Employment From <span class="text-red-500">*</span></label>
-                                        <input type="date" name="employment_from" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
-                                    </div>
-                                    <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                        <label for="rate" class="text-zinc-700 font-semibold whitespace-nowrap">Rate <span class="text-red-500">*</span></label>
-                                        <input type="number" name="rate" placeholder="0.00" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
-                                    </div>
-                                </div>
+                                <div 
+                                    x-data="{ 
+                                        fromDate: '', 
+                                        toDate: '', 
+                                        today: '', 
+                                        rate: 0, 
+                                        ratePerMonth: 0 
+                                    }" 
+                                    x-init="
+                                        let now = new Date();
+                                        today = now.toISOString().split('T')[0];
+                                    "
+                                >
+                                    <!-- Employment From & Rate -->
+                                    <div class="mb-6 flex justify-between items-start">
+                                        <div class="w-2/3 pr-4 flex items-center space-x-4">
+                                            <label for="employment_from" class="text-zinc-700 font-semibold whitespace-nowrap">
+                                                Employment From <span class="text-red-500">*</span>
+                                            </label>
+                                            <input 
+                                                type="date" 
+                                                name="employment_from" 
+                                                x-model="fromDate"
+                                                :max="today" 
+                                                x-on:change="
+                                                    if (toDate && fromDate > toDate) {
+                                                        alert('Employment From cannot be later than Employment To.');
+                                                        fromDate = '';
+                                                    }
+                                                " 
+                                                class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
+                                                required
+                                            >
+                                        </div>
 
-                                <div class="mb-6 flex justify-between items-start">
-                                    <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                        <label for="employment_to" class="text-zinc-700 font-semibold whitespace-nowrap">Employment To</label>
-                                        <input type="date" name="employment_to" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        <div class="w-2/3 pr-4 flex items-center space-x-4">
+                                            <label for="rate" class="text-zinc-700 font-semibold whitespace-nowrap">
+                                                Rate <span class="text-red-500">*</span>
+                                            </label>
+                                            <input 
+                                                type="number" 
+                                                name="rate" 
+                                                id="rate" 
+                                                x-model="rate"
+                                                x-on:input="
+                                                    ratePerMonth = (rate * 22).toFixed(2)
+                                                " 
+                                                placeholder="0.00" 
+                                                class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
+                                                required
+                                            >
+                                        </div>
                                     </div>
-                                    <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                        <label for="rate_per_month" class="text-zinc-700 font-semibold whitespace-nowrap">Rate per Month <span class="text-red-500">*</span></label>
-                                        <input type="number" name="rate_per_month" placeholder="0.00" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
+
+                                    <!-- Employment To & Rate per Month -->
+                                    <div class="mb-6 flex justify-between items-start">
+                                        <div class="w-2/3 pr-4 flex items-center space-x-4">
+                                            <label for="employment_to" class="text-zinc-700 font-semibold whitespace-nowrap">
+                                                Employment To
+                                            </label>
+                                            <input 
+                                                type="date" 
+                                                name="employment_to" 
+                                                x-model="toDate"
+                                                :max="today" 
+                                                x-on:change="
+                                                    if (fromDate && toDate < fromDate) {
+                                                        alert('Employment To cannot be earlier than Employment From.');
+                                                        toDate = '';
+                                                    }
+                                                " 
+                                                class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                                            >
+                                        </div>
+
+                                        <div class="w-2/3 pr-4 flex items-center space-x-4">
+                                            <label for="rate_per_month" class="text-zinc-700 font-semibold whitespace-nowrap">
+                                                Rate per Month <span class="text-red-500">*</span>
+                                            </label>
+                                            <input 
+                                                type="number" 
+                                                name="rate_per_month" 
+                                                x-model="ratePerMonth"
+                                                placeholder="0.00" 
+                                                class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
+                                                required
+                                            >
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="mb-6 flex justify-between items-start">
                                     <div class="w-2/3 pr-4 flex items-center space-x-4">
                                         <label for="region" class="text-zinc-700 font-semibold whitespace-nowrap">Region</label>
-                                        <select name="region" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        <select name="region" id="region" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                                             <option value="" disabled selected>Select Region</option>
-                                            <option value="Region 1">Region 1</option>
-                                            <option value="Region 2">Region 2</option>
-                                            <option value="Region 3">Region 3</option>
+                                            <option value="NCR">National Capital Region (NCR)</option>
+                                            <option value="CAR">Cordillera Administrative Region (CAR)</option>
+                                            <option value="Region 1">Region I - Ilocos Region</option>
+                                            <option value="Region 2">Region II - Cagayan Valley</option>
+                                            <option value="Region 3">Region III - Central Luzon</option>
+                                            <option value="Region 4A">Region IV-A - CALABARZON</option>
+                                            <option value="Region 4B">Region IV-B - MIMAROPA</option>
+                                            <option value="Region 5">Region V - Bicol Region</option>
+                                            <option value="Region 6">Region VI - Western Visayas</option>
+                                            <option value="Region 7">Region VII - Central Visayas</option>
+                                            <option value="Region 8">Region VIII - Eastern Visayas</option>
+                                            <option value="Region 9">Region IX - Zamboanga Peninsula</option>
+                                            <option value="Region 10">Region X - Northern Mindanao</option>
+                                            <option value="Region 11">Region XI - Davao Region</option>
+                                            <option value="Region 12">Region XII - SOCCSKSARGEN</option>
+                                            <option value="Region 13">Region XIII - Caraga</option>
+                                            <option value="BARMM">Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)</option>
                                         </select>
                                     </div>
                                     <div class="w-2/3 pr-4 flex items-center space-x-4">
@@ -197,7 +315,8 @@
                                             <option value="" disabled selected>Select Status</option>
                                             <option value="Permanent">Permanent</option>
                                             <option value="Contractual">Contractual</option>
-                                            <option value="Probationary">Probationary</option>
+                                            <option value="Self-Employed">Self-Employed</option>
+                                            <option value="Casual">Casual</option>
                                         </select>
                                     </div>
                                 </div>
@@ -239,6 +358,17 @@
 
                             <!-- Step 3: Previous Employer -->
                             <div x-show="currentStep === 3" id="tab-3">
+                                <div 
+                                x-data="{ 
+                                    prevFromDate: '', 
+                                    prevToDate: '', 
+                                    today: ''
+                                }"
+                                x-init="
+                                    let now = new Date();
+                                    today = now.toISOString().split('T')[0];
+                                "
+                            >
                                 <div class="mb-6 flex justify-between items-start">
                                     <div class="w-2/3 pr-4 flex items-center space-x-4">
                                         <label class="font-semibold text-zinc-700 whitespace-nowrap">With Previous Employer? <span class="text-red-500">*</span></label>
@@ -252,8 +382,22 @@
                                         </div>
                                     </div>
                                     <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                        <label for="prev_employment_from" class="font-semibold text-zinc-700 whitespace-nowrap">Employment From</label>
-                                        <input type="date" name="prev_employment_from" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"">
+                                        <label for="prev_employment_from" class="font-semibold text-zinc-700 whitespace-nowrap">
+                                            Employment From
+                                        </label>
+                                        <input 
+                                            type="date" 
+                                            name="prev_employment_from" 
+                                            x-model="prevFromDate" 
+                                            :max="today"
+                                            x-on:change="
+                                                if (prevToDate && prevFromDate > prevToDate) {
+                                                    alert('Previous Employment From cannot be later than Employment To.');
+                                                    prevFromDate = '';
+                                                }
+                                            "
+                                            class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                                        >
                                     </div>
                                 </div>
                                 <div class="mb-6 flex justify-between items-start">
@@ -261,11 +405,27 @@
                                         <label class="font-semibold text-zinc-700 whitespace-nowrap">Tax Identification Number <span class="text-red-500">*</span></label>
                                         <input type="text" name="previous_employer_tin" placeholder="000-000-000-000" maxlength="17" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"">
                                     </div>
-                                    <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                        <label class="font-semibold text-zinc-700 whitespace-nowrap">Employment To <span class="text-red-500">*</span></label>
-                                        <input type="date" name="prev_employment_to" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"">
+                                     <div class="w-2/3 pr-4 flex items-center space-x-4">
+                                        <label for="prev_employment_to" class="font-semibold text-zinc-700 whitespace-nowrap">
+                                            Employment To <span class="text-red-500">*</span>
+                                        </label>
+                                        <input 
+                                            type="date" 
+                                            name="prev_employment_to" 
+                                            x-model="prevToDate" 
+                                            :max="today"
+                                            x-on:change="
+                                                if (prevFromDate && prevToDate < prevFromDate) {
+                                                    alert('Previous Employment To cannot be earlier than Employment From.');
+                                                    prevToDate = '';
+                                                }
+                                            "
+                                            class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
+                                            required
+                                        >
                                     </div>
                                 </div>
+                            </div>
                                 <div class="mb-6 flex justify-between items-start">
                                     <div class="w-2/3 pr-4 flex items-center space-x-4">
                                         <label class="font-semibold text-zinc-700 whitespace-nowrap">Employer Name <span class="text-red-500">*</span></label>
@@ -277,7 +437,8 @@
                                             <option value="" disabled selected>Select Status</option>
                                             <option value="Permanent">Permanent</option>
                                             <option value="Contractual">Contractual</option>
-                                            <option value="Probationary">Probationary</option>
+                                            <option value="Self-Employed">Self-Employed</option>
+                                            <option value="Casual">Casual</option>
                                         </select>
                                     </div>
                                 </div>
@@ -339,7 +500,7 @@
                                     id="submitBtn"
                                     class="px-4 py-2 bg-blue-900 text-white font-semibold rounded-lg">
                                     Submit
-                                </button>
+                                </button>   
                             </div>
                         </form>
                     </div>
@@ -374,5 +535,50 @@
                 updateUI();
             }
         });
+    });
+
+    // Minimum wage rates ng regions
+    const minimumWage = {
+        "NCR": 645,
+        "CAR": 400,
+        "Region 1": 400,
+        "Region 2": 420,
+        "Region 3": 460,
+        "Region 4A": 470,
+        "Region 4B": 400,
+        "Region 5": 365,
+        "Region 6": 450,
+        "Region 7": 435,
+        "Region 8": 375,
+        "Region 9": 356,
+        "Region 10": 390,
+        "Region 11": 443,
+        "Region 12": 368,
+        "Region 13": 350,
+        "BARMM": 336
+    };
+
+    document.getElementById("submitBtn").addEventListener("click", function(event) {
+        const selectedRegion = document.getElementById("region").value;
+        const rateInput = document.getElementById("rate").value;
+
+        //Krazy alert for invalid minimum rate
+        if (minimumWage[selectedRegion] && rateInput < minimumWage[selectedRegion]) {
+            alert(`The minimum wage for ${selectedRegion} is ₱${minimumWage[selectedRegion]}. Please enter a rate equal to or above this.`);
+            event.preventDefault();  
+        }
+    });
+
+    document.getElementById("region").addEventListener("change", function() {
+        const selectedRegion = this.value;
+        const rateInput = document.getElementById("rate");
+
+        if (minimumWage[selectedRegion]) {
+            rateInput.min = minimumWage[selectedRegion];
+            rateInput.placeholder = minimumWage[selectedRegion].toFixed(2);
+        } else {
+            rateInput.min = 0;
+            rateInput.placeholder = "0.00";
+        }
     });
 </script>

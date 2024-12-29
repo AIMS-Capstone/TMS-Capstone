@@ -83,7 +83,7 @@
                                     <div class="flex justify-center mb-2 pl-14">
                                         <ul class="list-disc text-[11px] pl-2">
                                             <li>
-                                                <span class="inline-block align-top">a CSV file containing employees information (You can <a class="text-blue-600" href="{{ url('') }}">download</a> this template for importing transactions).</span>
+                                                <span class="inline-block align-top">a CSV file containing employees information (You can <a class="text-blue-600" href="{{ url('/employees/employee_template') }}">download</a> this template for importing transactions).</span>
                                             </li>
                                             <li>
                                                 <span class="inline-block align-top">Unique <b>Tax Identification Number (TIN)</b> for an employee.</span>
@@ -277,9 +277,11 @@
 </div>
 
 <script>
-    document.addEventListener('livewire:load', function () {
-        Livewire.on('reloadPage', () => {
-            window.location.reload();
-        });
+    window.addEventListener('closeModalAndReload', () => {
+        Livewire.emit('closeModal'); 
+
+        setTimeout(() => {
+            window.location.reload(); 
+        }, 200);
     });
 </script>
