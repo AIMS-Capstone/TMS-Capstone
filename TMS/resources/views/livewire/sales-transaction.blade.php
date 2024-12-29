@@ -289,7 +289,7 @@ document.addEventListener('livewire:initialized', function () {
     },
     language: {
         noResults: function() {
-            return "<a href='#' class='btn btn-danger use-anyway-btn'>Add a new contact</a>";
+            return "<a href='#' class='btn btn-danger use-anyway-btn'>Add a new customer</a>";
         }
     },
     escapeMarkup: function (markup) {
