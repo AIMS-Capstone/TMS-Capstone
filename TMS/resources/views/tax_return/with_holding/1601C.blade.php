@@ -13,15 +13,15 @@ $organizationId = session('organization_id');
                             Withholding Tax Return
                             </li>
                             <li>
-                            <div class="flex items-center">
-                                <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                                </svg>
-                                <a href="{{ route('with_holding.1601C') }}" 
-                                    class="ms-1 text-sm font-medium {{ Request::routeIs('with_holding.1601C') ? 'font-extrabold text-blue-900' : 'text-zinc-500' }} md:ms-2">
-                                    1601C
-                                </a>
-                            </div>
+                                <div class="flex items-center">
+                                    <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                                    </svg>
+                                    <a href="{{ route('with_holding.1601C') }}" 
+                                        class="ms-1 text-sm font-medium {{ Request::routeIs('with_holding.1601C') ? 'font-extrabold text-blue-900' : 'text-zinc-500' }} md:ms-2">
+                                        1601C
+                                    </a>
+                                </div>
                             </li>
                         </ol>
                     </nav>
@@ -115,20 +115,73 @@ $organizationId = session('organization_id');
                                     </form>
                                     <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                 </div>
-                                <div class="relative inline-block text-left">
-                                    <button id="sortButton" class="flex items-center text-zinc-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
-                                            <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
-                                        </svg>
-                                        <span id="selectedOption" class="font-normal text-sm text-zinc-600 hover:text-zinc-800 truncate">Sort by</span>
-                                        <svg class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
-                                    </button>
-                                    <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
-                                        <div class="py-2 px-2">
-                                            <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
-                                            <div data-sort="recently-added" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
-                                            <div data-sort="ascending" class="block px-4 py-2 w-full text-sm hover-dropdown">Ascending</div>
-                                            <div data-sort="descending" class="block px-4 py-2 w-full text-sm hover-dropdown">Descending</div>
+                                <div class="flex flex-row items-center space-x-4">
+                                    <div class="relative inline-block text-left sm:w-auto w-full z-30">
+                                        <button id="filterButton" class="flex items-center text-zinc-600 hover:text-zinc-800 w-full hover:shadow-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
+                                                <path fill="none" stroke="#696969" stroke-width="2" d="M18 4H6c-1.105 0-2.026.91-1.753 1.98a8.02 8.02 0 0 0 4.298 5.238c.823.394 1.455 1.168 1.455 2.08v6.084a1 1 0 0 0 1.447.894l2-1a1 1 0 0 0 .553-.894v-5.084c0-.912.632-1.686 1.454-2.08a8.02 8.02 0 0 0 4.3-5.238C20.025 4.91 19.103 4 18 4z"/>
+                                            </svg>
+                                            <span id="selectedFilter" class="font-normal text-sm text-zinc-600 truncate">Filter</span>
+                                            <svg id="dropdownArrow" class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
+                                        </button>
+                                    
+                                        <div id="dropdownFilter" class="absolute mt-2 w-[340px] rounded-lg shadow-lg bg-white hidden z-40">
+                                            <div class="py-2 px-2">
+                                                <span class="block px-4 py-2 text-xs font-bold text-zinc-700">Filter</span>
+                                                <span class="block px-4 py-1 text-zinc-700 font-bold text-xs">Timeframe</span>
+                                                <div class="px-4 py-2 text-xs colspan-2 flex justify-between items-center space-x-4">
+                                                    <div class="flex flex-col w-full">
+                                                        <label for="fromDate" class="text-xs text-zinc-700 font-semibold mb-1">Start Date</label>
+                                                        <input id="fromDate" type="date" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" placeholder="Start Date"/>
+                                                    </div>
+                                                    <p class="text-xs text-zinc-700 font-semibold">to</p>
+                                                    <div class="flex flex-col w-full">
+                                                        <label for="toDate" class="text-xs text-zinc-700 font-semibold mb-1">End Date</label>
+                                                        <input id="toDate" type="date" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" placeholder="End Date"/>
+                                                    </div>
+                                                </div>
+                                                <span class="block px-4 py-1 text-zinc-700 font-bold text-xs">Status</span>
+                                                <div id="statusFilterContainer" class="block px-4 py-2 text-xs">
+                                                    <label class="flex items-center space-x-2 py-1">
+                                                        <input type="checkbox" value="Filed" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Status" />
+                                                        <span>Filed</span>
+                                                    </label>
+                                                    <label class="flex items-center space-x-2 py-1">
+                                                        <input type="checkbox" value="Unfiled" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Status" />
+                                                        <span>Unfiled</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center space-x-4 px-4 py-1.5 mb-1.5">
+                                                <button id="applyFiltersButton" class="flex items-center bg-white border border-gray-300 hover:border-green-500 hover:bg-green-100 hover:text-green-500 transition rounded-md px-3 py-1.5 whitespace-nowrap group">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 fill-current group-hover:fill-green-500 hover:border-green-500 hover:text-green-500 transition" viewBox="0 0 32 32">
+                                                        <path fill="currentColor" d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5z"/>
+                                                    </svg>
+                                                    <span class="text-zinc-700 transition group-hover:text-green-500 text-xs">Apply Filter</span>
+                                                </button>
+                                                <button id="clearFiltersButton" class="text-xs text-zinc-600 hover:text-zinc-900 whitespace-nowrap">Clear all filters</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                    
+                                    <div class="h-6 border-l border-zinc-300"></div>
+
+                                    <!-- Sort by dropdown -->
+                                    <div class="relative inline-block text-left">
+                                        <button id="sortButton" class="flex items-center text-zinc-600 w-full hover:shadow-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24"><path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span id="selectedOption" class="font-normal text-sm text-zinc-600 hover:text-zinc-800 truncate">Sort by</span>
+                                            <svg class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
+                                        </button>
+                        
+                                        <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
+                                            <div class="py-2 px-2">
+                                                <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
+                                                <div data-sort="recently-added" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
+                                                <div data-sort="ascending" class="block px-4 py-2 w-full text-sm hover-dropdown">Ascending</div>
+                                                <div data-sort="descending" class="block px-4 py-2 w-full text-sm hover-dropdown">Descending</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -365,15 +418,11 @@ $organizationId = session('organization_id');
                                                         </div>
                                                     </label>
                                                 </td>
-                                                <td class="py-3 px-4 font-semibold hover:font-bold hover:underline hover:text-blue-500" 
+                                                <td class="py-3 px-4 font-bold hover:underline hover:text-blue-500" 
                                                     onclick="window.location='{{ route('with_holding.1601C_summary', ['id' => $with_holding->id]) }}'"> {{ $with_holding->title ?? 'N/A' }}</td>
                                                 <td class="py-3 px-4">{{ \Carbon\Carbon::createFromDate($with_holding->year, $with_holding->month, 1)->format('F Y') ?? 'N/A' }}</td>
                                                 <td class="py-3 px-4">{{ $with_holding->creator->name ?? 'N/A' }}</td>
-                                                <td class="py-3 px-4">
-                                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-zinc-100">
-                                                        {{ $with_holding->status ?? 'N/A' }}
-                                                    </span>
-                                                </td>
+                                                <td class="py-3 px-4"><span class="bg-zinc-100 text-zinc-800 text-xs px-4 py-2 rounded-full">{{ $with_holding->status ?? 'N/A' }}</span></td>
                                                 <td class="py-3 px-4">{{ $with_holding->created_at->format('F d, Y g:i A') ?? 'N/A' }}</td>
                                             </tr>
                                         @empty
@@ -482,8 +531,125 @@ $organizationId = session('organization_id');
             });
         }
 
+        //FILTER BUTTON
+        const filterButton = document.getElementById('filterButton');
+        const dropdownFilter = document.getElementById('dropdownFilter');
+        const applyFiltersButton = document.getElementById('applyFiltersButton');
+        const clearFiltersButton = document.getElementById('clearFiltersButton');
+        const selectedFilter = document.getElementById('selectedFilter');
+        const tableRows = document.querySelectorAll('tbody tr');
+        const dropdownArrow = document.getElementById('dropdownArrow');
+
+        filterButton.addEventListener('click', () => {
+            dropdownArrow.classList.toggle('rotate-180');
+            dropdownFilter.classList.toggle('hidden');
+        });
+        function getSelectedFilters() {
+            const filters = {};
+            document.querySelectorAll('.filter-checkbox:checked').forEach((checkbox) => {
+                const category = checkbox.dataset.category;
+                if (!filters[category]) filters[category] = [];
+                filters[category].push(checkbox.value);
+            });
+            return filters;
+        }
+        // Attach event listeners for the date inputs
+        document.getElementById('fromDate').addEventListener('input', updateApplyButtonState);
+        document.getElementById('toDate').addEventListener('input', updateApplyButtonState);
+
+        function applyFilters() {
+            const filters = getSelectedFilters();
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            tableRows.forEach((row) => {
+                let isVisible = true;
+                // Period filtering
+                const periodCell = row.cells[2]?.textContent.trim(); // Adjust to match Period column index
+                if (fromDate || toDate) {
+                    const periodDateMatch = periodCell.match(/(\w+)\s+(\d+)/); // Extract month and year
+                    if (periodDateMatch) {
+                        const month = periodDateMatch[1];
+                        const year = periodDateMatch[2];
+                        const rowDate = new Date(`${month} 1, ${year}`);
+                        const from = fromDate ? new Date(fromDate) : null;
+                        const to = toDate ? new Date(toDate) : null;
+
+                        if ((from && rowDate < from) || (to && rowDate > to)) {
+                            isVisible = false;
+                        }
+                    } else {
+                        isVisible = false; // Hide rows with invalid Period data
+                    }
+                }
+                // Status filtering
+                const statusCell = row.cells[4]?.textContent.trim(); // Adjust to match Status column index
+                if (filters.Status?.length && !filters.Status.includes(statusCell)) {
+                    isVisible = false;
+                }
+                row.style.display = isVisible ? '' : 'none';
+            });
+
+            dropdownFilter.classList.add('hidden');
+            selectedFilter.textContent = 'Filter';
+            updateApplyButtonState();
+        }
+        function updateApplyButtonState() {
+            const hasCheckboxSelection = document.querySelectorAll('.filter-checkbox:checked').length > 0;
+            const hasDateSelection = document.getElementById('fromDate').value || document.getElementById('toDate').value;
+            const isFilterActive = hasCheckboxSelection || hasDateSelection;
+            applyFiltersButton.disabled = !isFilterActive;
+            if (isFilterActive) {
+                applyFiltersButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                applyFiltersButton.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+        document.querySelectorAll('.filter-checkbox').forEach((checkbox) => {
+            checkbox.addEventListener('change', updateApplyButtonState);
+        });
+
+        function clearFilters() {
+            document.querySelectorAll('.filter-checkbox').forEach((checkbox) => (checkbox.checked = false));
+            document.getElementById('fromDate').value = '';
+            document.getElementById('toDate').value = '';
+            tableRows.forEach((row) => (row.style.display = ''));
+            dropdownFilter.classList.add('hidden');
+            selectedFilter.textContent = 'Filter';
+            updateApplyButtonState();
+        }
+        applyFiltersButton.addEventListener('click', applyFilters);
+        clearFiltersButton.addEventListener('click', clearFilters);
+
+        window.addEventListener('click', (event) => {
+            if (!filterButton.contains(event.target) && !dropdownFilter.contains(event.target)) {
+                dropdownFilter.classList.add('hidden');
+            }
+        });
+        // Initial setup: disable the "Apply Filter" button
+        applyFiltersButton.disabled = true;
+        applyFiltersButton.classList.add('opacity-50', 'cursor-not-allowed'); // Optional: Add styles for disabled state
+        function updateApplyButtonState() {
+            const hasSelection = document.querySelectorAll('.filter-checkbox:checked').length > 0;
+            applyFiltersButton.disabled = !hasSelection;
+            if (hasSelection) {
+                applyFiltersButton.classList.remove('opacity-50', 'cursor-not-allowed'); // Optional: Remove disabled styles
+            } else {
+                applyFiltersButton.classList.add('opacity-50', 'cursor-not-allowed'); // Optional: Add disabled styles
+            }
+        }
+        document.querySelectorAll('.filter-checkbox').forEach((checkbox) => {
+            checkbox.addEventListener('change', updateApplyButtonState);
+        });
+        clearFiltersButton.addEventListener('click', () => {
+            document.querySelectorAll('.filter-checkbox').forEach((checkbox) => (checkbox.checked = false));
+            tableRows.forEach((row) => (row.style.display = ''));
+            dropdownFilter.classList.add('hidden');
+            selectedFilter.textContent = 'Filter';
+            updateApplyButtonState();
+        });
+
         // FOR SORT BUTTON
-        document.getElementById('sortButton').addEventListener('click', function () {
+        document.getElementById('sortButton').addEventListener('click', function() {
             const dropdown = document.getElementById('dropdownMenu');
             const dropdownArrow = this.querySelector('svg:nth-child(3)');
             dropdown.classList.toggle('hidden');
@@ -495,40 +661,41 @@ $organizationId = session('organization_id');
             const table = document.querySelector('#table1601C tbody');
             const rows = Array.from(table.querySelectorAll('tr')).filter(row => row.style.display !== 'none');
             let sortedRows;
-
             if (criteria === 'recently-added') {
+                // Sort by 'Date Created' column (newest first)
                 sortedRows = rows.sort((a, b) => {
-                    const aDate = new Date(a.cells[5].textContent.trim());
+                    const aDate = new Date(a.cells[5].textContent.trim()); // Adjust index for "Date Created"
                     const bDate = new Date(b.cells[5].textContent.trim());
                     return bDate - aDate; // Newest first
                 });
-            } else if (criteria === 'ascending') {
+            } else if (criteria === 'ascending' || criteria === 'descending') {
                 sortedRows = rows.sort((a, b) => {
-                    const aPeriod = new Date(a.cells[2].textContent.trim());
-                    const bPeriod = new Date(b.cells[2].textContent.trim());
-                    return aPeriod - bPeriod;
+                    const aText = a.cells[3].textContent.trim().toLowerCase(); // Adjust index for "Created By"
+                    const bText = b.cells[3].textContent.trim().toLowerCase();
+
+                    if (criteria === 'ascending') {
+                        return aText.localeCompare(bText);
+                    } else if (criteria === 'descending') {
+                        return bText.localeCompare(aText);
+                    }
                 });
-            } else if (criteria === 'descending') {
-                sortedRows = rows.sort((a, b) => {
-                    const aPeriod = new Date(a.cells[2].textContent.trim());
-                    const bPeriod = new Date(b.cells[2].textContent.trim());
-                    return bPeriod - aPeriod;
-                });
+            } else {
+                console.error('Invalid sorting criteria:', criteria);
+                return; // Exit the function if criteria is invalid
             }
             table.innerHTML = '';
             sortedRows.forEach(row => table.appendChild(row));
         }
-
+        // Sort dropdown click event handling
         document.querySelectorAll('#dropdownMenu div[data-sort]').forEach(item => {
-            item.addEventListener('click', function () {
+            item.addEventListener('click', function() {
                 const criteria = this.getAttribute('data-sort');
-                document.getElementById('selectedOption').textContent = this.textContent; // Update selected option text
                 sortItems(criteria);
+                document.getElementById('selectedOption').textContent = this.textContent;
+                document.getElementById('dropdownMenu').classList.add('hidden');
             });
         });
         window.addEventListener('click', (event) => {
-            const sortButton = document.getElementById('sortButton');
-            const dropdownMenu = document.getElementById('dropdownMenu');
             if (!sortButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
                 dropdownMenu.classList.add('hidden');
             }

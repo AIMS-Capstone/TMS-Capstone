@@ -298,26 +298,37 @@
             @csrf
             <div class="container border border-gray-200 rounded-lg p-4 my-10 text-center max-w-full h-[500px] mx-auto flex flex-col">
                 
-                <!-- Classification Tab -->
-                <div x-show="currentTab === 0" class="space-y-6">
-                    <p class="p-10 text-zinc-600 font-medium text-lg">What is your organization classification?</p>
-                    <div class="flex justify-center space-x-8">
-                        <template x-for="type in ['Non-Individual', 'Individual']" :key="type">
-                            <label class="flex flex-col items-center cursor-pointer">
-                                <input 
-                                    type="radio" 
-                                    name="type" 
-                                    :value="type"
-                                    x-model="formData.type"
-                                    class="hidden peer">
-                                <div class="group flex items-center justify-center w-44 h-44 rounded-full bg-gray-100 border-2 border-transparent peer-checked:bg-blue-900 peer-checked:border-blue-900">
-                                    <!-- SVG icons here -->
-                                </div>
-                                <span class="text-blue-900 font-semibold mt-2" x-text="type"></span>
-                            </label>
-                        </template>
-                    </div>
+              <!-- Classification Tab -->
+<div x-show="currentTab === 0" class="space-y-6">
+    <p class="p-10 text-zinc-600 font-medium text-lg">What is your organization classification?</p>
+    <div class="flex justify-center space-x-8">
+        <template x-for="type in ['Non-Individual', 'Individual']" :key="type">
+            <label class="flex flex-col items-center cursor-pointer">
+                <input 
+                    type="radio" 
+                    name="type" 
+                    :value="type"
+                    x-model="formData.type"
+                    class="hidden peer">
+                <div class="group flex items-center justify-center w-44 h-44 rounded-full bg-gray-100 border-2 border-transparent peer-checked:bg-blue-900 peer-checked:border-blue-900">
+                    <!-- SVG icons here -->
+                    <template x-if="type === 'Non-Individual'">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20" viewBox="0 0 36 36">
+                            <path d="M31 8h-9v25h11V10a2 2 0 0 0-2-2m-5 17h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Zm4 10h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Z" class="group-peer-checked:fill-yellow-500 fill-gray-400"/>
+                            <path d="M17.88 3H6.12A2.12 2.12 0 0 0 4 5.12V33h5v-3h6v3h5V5.12A2.12 2.12 0 0 0 17.88 3M9 25H7v-2h2Zm0-5H7v-2h2Zm0-5H7v-2h2Zm0-5H7V8h2Zm4 15h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2V8h2Zm4 15h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2v-2h2Zm0-5h-2V8h2Z" class="group-peer-checked:fill-yellow-500 fill-gray-400"/>
+                        </svg>
+                    </template>
+                    <template x-if="type === 'Individual'">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20" viewBox="0 0 16 16">
+                            <path d="M8 8a3 3 0 1 0 0-6a3 3 0 0 0 0 6m4.735 6c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139z" class="group-peer-checked:fill-yellow-500 fill-gray-400"/>
+                        </svg>
+                    </template>
                 </div>
+                <span class="text-blue-900 font-semibold mt-2" x-text="type"></span>
+            </label>
+        </template>
+    </div>
+</div>
 
                 <!-- Background Tab -->
                 <div x-show="currentTab === 1" class="space-y-6">
