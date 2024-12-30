@@ -7,6 +7,7 @@ use Livewire\WithFileUploads;
 use App\Imports\SalesImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class MultiStepImportModal extends Component
 {
@@ -18,7 +19,12 @@ class MultiStepImportModal extends Component
     public $columns = [];
     public $mappedColumns = [];
     public $importedData = [];
+    public $validationErrors = [];
+    public $rowErrors = [];
+    public $hasErrors = false;
+    public $processedRowCount = 0;
     protected $import;
+
     public $databaseColumns = [
         'date' => 'Date',
         'contact_tin' => 'Contact TIN',
@@ -51,18 +57,36 @@ class MultiStepImportModal extends Component
 
     public function openModal()
     {
-        $this->reset(['file', 'step', 'columns', 'mappedColumns', 'importedData']);
+        $this->resetState();
         $this->modalOpen = true;
-        $this->import = new SalesImport();
     }
 
     public function closeModal()
     {
         $this->modalOpen = false;
-        $this->reset(['file', 'step', 'columns', 'mappedColumns', 'importedData']);
+        $this->resetState();
+        $this->cleanupTempFiles();
+    }
+
+    protected function resetState()
+    {
+        $this->reset([
+            'file',
+            'step',
+            'columns',
+            'mappedColumns',
+            'importedData',
+            'validationErrors',
+            'rowErrors',
+            'hasErrors',
+            'processedRowCount'
+        ]);
+        $this->import = new SalesImport();
         session()->forget(['importedData', 'mappedColumns']);
-        
-        // Cleanup any temporary files
+    }
+
+    protected function cleanupTempFiles()
+    {
         if ($this->file) {
             Storage::delete('temp/' . $this->file);
         }
@@ -78,23 +102,45 @@ class MultiStepImportModal extends Component
             $this->import = new SalesImport();
             $path = $this->file->store('temp');
             
+            // Log file details for debugging
+            Log::info('File uploaded: ' . $path);
+            Log::info('File size: ' . Storage::size($path));
+            
+            // Import the file
             Excel::import($this->import, storage_path('app/' . $path));
             
             $this->importedData = $this->import->getImportedData();
+            Log::info('Imported data count: ' . count($this->importedData));
             
-            if (!empty($this->importedData) && is_array($this->importedData) && count($this->importedData) > 0) {
+            if (!empty($this->importedData)) {
                 $this->columns = array_keys($this->importedData[0]);
                 $this->mappedColumns = [];
+                
+                // Auto-map columns with improved matching
+                foreach ($this->databaseColumns as $dbColumn => $displayName) {
+                    foreach ($this->columns as $fileColumn) {
+                        // Normalize both strings for comparison
+                        $normalizedDbColumn = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $dbColumn));
+                        $normalizedFileColumn = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $fileColumn));
+                        
+                        if ($normalizedFileColumn === $normalizedDbColumn) {
+                            $this->mappedColumns[$dbColumn] = $fileColumn;
+                            break;
+                        }
+                    }
+                }
+                
                 $this->step = 2;
             } else {
-                session()->flash('error', 'No data found in the uploaded file.');
-                $this->step = 1;
+                throw new \Exception('No data found in the uploaded file. Please check if the file contains data and has headers.');
             }
 
-            // Cleanup the temporary file
+            // Clean up the temporary file
             Storage::delete($path);
             
         } catch (\Exception $e) {
+            Log::error('File upload error: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
             session()->flash('error', 'Error processing file: ' . $e->getMessage());
             $this->step = 1;
         }
@@ -102,6 +148,10 @@ class MultiStepImportModal extends Component
 
     public function mapColumns()
     {
+        $this->validationErrors = [];
+        $this->rowErrors = [];
+        $this->hasErrors = false;
+        Log::info($this->importedData);
         $this->validate([
             'mappedColumns.*' => 'required',
         ], [
@@ -109,59 +159,111 @@ class MultiStepImportModal extends Component
         ]);
 
         try {
+            Log::info('Initial importedData count:', [count($this->importedData)]);
             if (empty($this->importedData)) {
                 throw new \Exception('No data to process. Please upload a file first.');
             }
-
-            // Store mapped columns in session
-            session()->put('mappedColumns', $this->mappedColumns);
-            
-            // Store imported data in session
-            $cleanData = array_map(function ($row) {
+        
+            $cleanData = [];
+            foreach ($this->importedData as $row) {
+                Log::info('Processing row:', $row);
                 $mappedRow = [];
                 foreach ($this->mappedColumns as $dbField => $excelColumn) {
                     $mappedRow[$dbField] = $row[$excelColumn] ?? null;
                 }
-                return $mappedRow;
-            }, $this->importedData);
+                Log::info('Mapped row:', $mappedRow);
+                $cleanData[] = $mappedRow;
+            }
+        
+            Log::info('Clean Data Count:', [count($cleanData)]);
+            if (!$this->import) {
+                $this->import = new SalesImport();
+                Log::info('reached number 2');
+            }
+            if (!$this->import->validateData($cleanData)) {
+                $errors = $this->import->getValidationErrors();
+                Log::info('Validation Errors:', $errors);
+                $this->validationErrors = $errors['validationErrors'];
+                $this->rowErrors = $errors['rowErrors'];
+                $this->hasErrors = true;
+                $this->step = 4;
+                return;
+            }
             
-            session()->put('importedData', $cleanData);
-            
+        
+            session(['mappedColumns' => $this->mappedColumns]);
+            session(['importedData' => $cleanData]);
+            $this->processedRowCount = count($cleanData);
             $this->step = 3;
+        
         } catch (\Exception $e) {
-            session()->flash('error', 'Error mapping columns: ' . $e->getMessage());
+            Log::error('Error in mapColumns:', ['message' => $e->getMessage()]);
+            $this->validationErrors[] = $e->getMessage();
+            $this->hasErrors = true;
+            $this->step = 4;
         }
+        
     }
 
     public function saveImport()
     {
         try {
+            $mappedColumns = session('mappedColumns');
+            $importedData = session('importedData');
+    
+            if (!$mappedColumns || !$importedData) {
+                throw new \Exception('Import data not found. Please try again.');
+            }
+    
             if (!$this->import) {
                 $this->import = new SalesImport();
             }
-
-            $mappedColumns = session()->get('mappedColumns');
-            if (!$mappedColumns) {
-                throw new \Exception('Column mapping not found.');
+    
+            // Process and save the data
+            if (method_exists($this->import, 'processAndSaveData')) {
+                $this->import->processAndSaveData($importedData);
+            } else {
+                throw new \Exception('Unable to process import data. Method not found.');
             }
-        
-            $this->import->processAndSaveData($mappedColumns);
             
+            // Clear any previous errors
+            $this->validationErrors = [];
+            $this->rowErrors = [];
+            $this->hasErrors = false;
+            
+            // Set success state
             session()->flash('message', 'Import completed successfully!');
+            $this->processedRowCount = count($importedData);
+            
+            // Move to completion step
             $this->step = 4;
             
-            // Clean up session
+            // Clean up session data
             session()->forget(['importedData', 'mappedColumns']);
+                
         } catch (\Exception $e) {
-            session()->flash('error', 'Error saving import: ' . $e->getMessage());
+            Log::error('Save import error: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
+            
+            // Set error state
+            $this->validationErrors = [$e->getMessage()];
+            $this->hasErrors = true;
+            $this->step = 4;
+            
+            // Clean up session in case of error
+            session()->forget(['importedData', 'mappedColumns']);
         }
     }
 
     public function render()
     {
         return view('livewire.multi-step-import-modal', [
-            'importedData' => session()->get('importedData'),
-            'previewData' => array_slice(session()->get('importedData', []), 0, 5) // Preview first 5 rows
+            'importedData' => session('importedData'),
+            'previewData' => array_slice(session('importedData', []), 0, 5),
+            'validationErrors' => $this->validationErrors,
+            'rowErrors' => $this->rowErrors,
+            'hasErrors' => $this->hasErrors,
+            'processedRowCount' => $this->processedRowCount
         ]);
     }
 }
