@@ -324,7 +324,7 @@ $organizationId = session('organization_id');
                                                     </td>
                                                     <td class="text-left py-3 px-4">{{ $taxReturn->user ? $taxReturn->user->first_name . ' ' . $taxReturn->user->last_name : 'N/A' }}</td>
                                                     <td class="text-left py-3 px-4"><span class="bg-zinc-100 text-zinc-800 text-xs px-4 py-2 rounded-full">{{ $taxReturn->status }}</span></td>
-                                                    <td class="text-left py-3 px-4">{{ \Carbon\Carbon::parse($taxReturn->created_at)->format('F j, Y') }}</td>
+                                                    <td class="text-left py-3 px-4">{{ \Carbon\Carbon::parse($taxReturn->created_at)->format('F d, Y g:i A') }}</td>
                                             @endforeach
                                         @endif
                                     </tbody>

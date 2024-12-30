@@ -4,211 +4,233 @@ $organizationId = session('organization_id');
 
 <x-app-layout>
     <div class="py-12">
-        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <!-- Page Header -->
-                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-                    <h1 class="text-lg font-semibold text-gray-700">Withholding Tax Return > 1601C > Sources</h1>
+                <div class="px-10 py-6">
+                    <nav class="flex" aria-label="Breadcrumb">
+                        <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+                            <li class="inline-flex items-center text-sm font-normal text-zinc-500">Withholding Tax Return</li>
+                            <li>
+                                <div class="flex items-center">
+                                    <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                                    </svg>
+                                    <a href="{{ route('with_holding.1601C') }}" 
+                                        class="ms-1 text-sm font-medium {{ Request::routeIs('with_holding.1601C') ? 'font-extrabold text-blue-900' : 'text-zinc-500' }} md:ms-2">
+                                        1601C
+                                    </a>
+                                </div>
+                            </li>
+                            <li aria-current="page">
+                                <div class="flex items-center">
+                                    <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                                    </svg>
+                                    <a href="" class="ms-1 text-sm font-bold text-blue-900 md:ms-2">Sources</a>
+                                </div>
+                            </li>
+                        </ol>
+                    </nav>
                 </div>
-
-                <!-- Tabs -->
-                <div class="px-6 py-4 flex space-x-4 border-b">
-                    <a href="{{ route('with_holding.1601C_summary', ['id' => $with_holding->id]) }}" class="pb-2 text-blue-500 border-b-2 border-blue-500 font-semibold">Summary</a>
-                    <a href="{{ route('with_holding.1601C_sources', ['id' => $with_holding->id]) }}" class="pb-2 text-gray-500 hover:text-blue-500">Sources</a>
-                    <a href="{{ route('form1601C.create', ['id' => $with_holding->id]) }}" class="pb-2 text-gray-500 hover:text-blue-500">Report</a>
-                    <a href="#" class="pb-2 text-gray-500 hover:text-blue-500">Notes and Activity</a>
-                </div>
+                <hr>
 
                 <!-- Actions -->
-                <div class="px-6 py-4 flex justify-between items-center">
+                <div class="flex flex-row space-x-2 items-center justify-between">
                     <!-- Search Bar -->
-                    <form action="/1601C_sources" method="GET" class="w-1/3">
-                        <div class="relative">
-                            <input 
-                                type="search" 
-                                name="search" 
-                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                                placeholder="Search sources..."
-                            >
-                            <i class="fa fa-search absolute left-3 top-3 text-gray-400"></i>
+                    <div class="flex flex-row space-x-2 items-center ps-6">
+                        <div class="relative w-80 p-4">
+                            <form action="/1601C_sources" method="GET">
+                                <div class="relative">
+                                    <input 
+                                        type="search" 
+                                        name="search" 
+                                        class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900"
+                                        placeholder="Search sources..."
+                                    >
+                                    <i class="fa fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                            </form>
                         </div>
-                    </form>
+
+                        <!-- Sort by dropdown -->
+                        <div class="relative inline-block text-left min-w-[150px]">
+                            <button id="sortButton" class="flex items-center text-zinc-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
+                                    <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
+                                </svg>
+                                <span id="selectedOption" class="font-normal text-sm text-zinc-600 hover:text-zinc-800 truncate">Sort by</span>
+                                <svg class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
+                            </button>
+                            <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
+                                <div class="py-2 px-2">
+                                    <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
+                                    <div data-sort="recently-added" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
+                                    <div data-sort="ascending" class="block px-4 py-2 w-full text-sm hover-dropdown">Ascending</div>
+                                    <div data-sort="descending" class="block px-4 py-2 w-full text-sm hover-dropdown">Descending</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Action Buttons -->
-                    <div class="flex space-x-4">
+                    <div class="flex space-x-4 items-center pr-10 ml-auto">
                             <!-- NILAGAY KO TALAGA DITO YUNG FORM, DAMING WAYS NA GINAWA KO LAHAT HINDI NAKAKAPAG TRIGGER NG SHOW KRAZY NIG -->
                             <div x-data="{ show: false, success: false }">
                                 <!-- Add Button -->
-                                <button 
-                                    x-on:click="show = true" 
-                                    class="px-4 py-2 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                                >
-                                    Add
+                                <button x-on:click="show = true" class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-green-500 hover:text-green-500 hover:bg-green-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-green-500" viewBox="0 0 256 256"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"><circle cx="128" cy="128" r="112"/><path d="M 79.999992,128 H 176.0001"/><path d="m 128.00004,79.99995 v 96.0001"/></g></svg>
+                                    <span class="text-zinc-600 transition group-hover:text-green-500">Add</span>
                                 </button>
 
                                 <!-- Add Modal -->
-                                <div 
-                                    x-show="show"
-                                    x-on:close-modal.window="show = false;"   
-                                    x-effect="document.body.classList.toggle('overflow-hidden', show || success)"
-                                    class="fixed z-50 inset-0 flex items-center justify-center m-2 px-6"
-                                    x-cloak
-                                >
+                                <div x-show="show" x-on:close-modal.window="show = false;" x-effect="document.body.classList.toggle('overflow-hidden', show || success)"
+                                    class="fixed z-50 inset-0 flex items-center justify-center m-2 px-6" x-cloak>
                                     <!-- Modal background -->
                                     <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
-
                                     <!-- Modal container -->
-                                    <div 
-                                        class="bg-white rounded-lg shadow-lg w-full max-w-4xl mx-auto z-10 overflow-hidden"
-                                        x-show="show" 
-                                        x-transition:enter="transition ease-out duration-300 transform" 
-                                        x-transition:enter-start="opacity-0 scale-90" 
-                                        x-transition:enter-end="opacity-100 scale-100"
-                                        x-transition:leave="transition ease-in duration-200 transform" 
-                                        x-transition:leave-start="opacity-100 scale-100" 
-                                        x-transition:leave-end="opacity-0 scale-90"
-                                    >
+                                    <div class="bg-white rounded-lg shadow-lg w-full h-auto max-w-6xl mx-auto z-10 overflow-hidden"
+                                        x-show="show" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
+                                        x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
                                         <!-- Modal header -->
-                                        <div class="bg-blue-900 text-center rounded-t-lg p-4">
-                                            <h1 class="text-lg font-bold text-white">New Compensation</h1>
+                                        <div class="relative p-3 bg-blue-900 border-opacity-80 w-full">
+                                            <h1 class="text-lg font-bold text-white text-center">New Compensation</h1>
+                                            <button @click="show = false" class="absolute right-4 top-4 items-center text-sm text-white hover:text-zinc-200">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 8L16 16M8 16L16 8" stroke="#1e3a8a" class="transition duration-200 hover:stroke-gray-600"/>
+                                                </svg>
+                                            </button>
                                         </div>      
-
                                         <!-- Modal Body -->
-                                        <div class="p-6 grid grid-cols-3 gap-6">
-                                            <!-- Left Column: Employee Details -->
-                                            <div class="col-span-2 space-y-4">
-                                                <!-- Employee Selection -->
-                                                <form id="add_sources" action="{{ route('with_holding.1601C_sources_store', ['id' => $with_holding->id]) }}" method="POST" enctype="multipart/form-data">
-                                                    @csrf
-                                                    <input type="hidden" name="withholding_id" value="{{ $with_holding->id }}">
-                                                    <input type="hidden" id="taxable_compensation_input" name="taxable_compensation" value="0">
-                                                    <div>
-                                                        <label for="employee_id" class="block text-sm font-medium text-gray-700">Employee <span class="text-red-500">*</span></label>
-                                                        <select 
-                                                            id="employee_id" 
-                                                            name="employee_id" 
-                                                            class="block w-full p-2 border-gray-300 rounded-lg shadow-sm"
-                                                            required
-                                                        >
-                                                            <option value="" disabled selected>Select Employee</option>
-                                                            @foreach ($employees as $employee)
-                                                                <option value="{{ $employee->id }}">
-                                                                    {{ $employee->first_name }} {{ $employee->last_name }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
+                                        <div class="p-10">
+                                            <form id="add_sources" action="{{ route('with_holding.1601C_sources_store', ['id' => $with_holding->id]) }}" method="POST" enctype="multipart/form-data">
+                                                @csrf
+                                                <input type="hidden" name="withholding_id" value="{{ $with_holding->id }}">
+                                                <input type="hidden" id="taxable_compensation_input" name="taxable_compensation" value="0">
+                                                <div class="grid grid-cols-3 gap-6">
+                                                    <!-- Left Column: Employee Details -->
+                                                    <div class="col-span-2">
+                                                        <!-- Employee Selection -->
+                                                        <div class="grid grid-cols-2 gap-6 mb-5">
+                                                            <div>
+                                                                <label for="employee_id" class="block font-bold text-sm text-zinc-700">Employee <span class="text-red-500">*</span></label>
+                                                                <select id="employee_id" name="employee_id" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
+                                                                    <option value="" disabled selected>Select Employee</option>
+                                                                    @foreach ($employees as $employee)
+                                                                        <option value="{{ $employee->id }}">
+                                                                            {{ $employee->first_name }} {{ $employee->last_name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                            <!-- Payment Date -->
+                                                            <div>
+                                                                <label for="payment_date" class="block font-bold text-sm text-zinc-700">Payment Date <span class="text-red-500">*</span></label>
+                                                                <input type="date" id="payment_date" name="payment_date" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="grid grid-cols-2 gap-6 mb-5">
+                                                            <!-- Display Employee Wage Status -->
+                                                            <div>
+                                                                <label for="employee_wage_status" class="block font-bold text-sm text-zinc-700">Employee Wage Status</label>
+                                                                <input type="text" id="employee_wage_status" name="employee_wage_status" class="mt-2 bg-zinc-100 text-zinc-800 text-xs px-4 py-2 border-zinc-100 rounded-full" 
+                                                                    value="{{ $employment->employee_wage_status ?? 'Not Available' }}" readonly>
+                                                            </div>
+                                                            <!-- Gross Compensation -->
+                                                            <div>
+                                                                <label for="gross_compensation" class="block font-bold text-sm text-zinc-700">Gross Compensation <span class="text-red-500">*</span></label>
+                                                                <input type="number" id="gross_compensation" name="gross_compensation" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <!-- Display Employee Wage Status -->
-                                                    <div>
-                                                        <label for="employee_wage_status" class="block text-sm font-medium text-gray-700">
-                                                            Employee Wage Status
-                                                        </label>
-                                                        <input 
-                                                            type="text" 
-                                                            id="employee_wage_status" 
-                                                            name="employee_wage_status" 
-                                                            class="block w-full p-2 border-gray-300 rounded-lg shadow-sm bg-gray-100" 
-                                                            value="{{ $employment->employee_wage_status ?? 'Not Available' }}" 
-                                                            readonly
-                                                        >
-                                                    </div>
-
-                                                    <!-- Payment Date -->
-                                                    <div>
-                                                        <label for="payment_date" class="block text-sm font-medium text-gray-700">Payment Date <span class="text-red-500">*</span></label>
-                                                        <input type="date" id="payment_date" name="payment_date" class="block w-full p-2 border-gray-300 rounded-lg shadow-sm" required>
-                                                    </div>
-
-                                                    <!-- Gross Compensation -->
-                                                    <div>
-                                                        <label for="gross_compensation" class="block text-sm font-medium text-gray-700">Gross Compensation <span class="text-red-500">*</span></label>
-                                                        <input type="number" id="gross_compensation" name="gross_compensation" step="0.01" class="block w-full p-2 border-gray-300 rounded-lg shadow-sm" required>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Right Column: Taxable Compensation Summary -->
-                                                <div class="col-span-1 bg-gray-100 rounded-lg p-4">
-                                                    <h2 class="text-lg font-semibold text-gray-800">Taxable Compensation</h2>
-                                                    <p id="taxable_compensation" class="text-2xl font-bold text-blue-900 text-center mt-4">0.00</p>
-                                                    <div>
-                                                        <label for="tax_due" class="block text-sm font-medium text-gray-700">Tax Due</label>
-                                                        <input type="number" id="tax_due" name="tax_due" step="0.01" class="w-full mt-1 p-2 border-gray-300 rounded-lg shadow-sm">
+    
+                                                    <!-- Right Column: Taxable Compensation Summary -->
+                                                    <div class="col-span-1 p-4">
+                                                        <h2 class="text-2xl font-bold text-blue-900">Taxable Compensation</h2>
+                                                        <p id="taxable_compensation" class="text-2xl text-zinc-700 mb-4">0.00</p>
+                                                        <div>
+                                                            <label for="tax_due" class="block font-bold text-sm text-zinc-700">Tax Due</label>
+                                                            <input type="number" id="tax_due" name="tax_due" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                
+                                                <hr class="mt-4">
+                                                <div class="col-span-3 mt-4">
+                                                    <h1 class="block font-bold text-sm text-zinc-700">Non-Taxable Compensation</h1>
+                                                    <div class="grid grid-cols-3 gap-6 my-5">
+                                                        <!-- Statutory Minimum Wage -->
+                                                        <div>
+                                                            <label for="statutory_minimum_wage" class="block font-bold text-sm text-zinc-700">Statutory Minimum Wage <span class="text-red-500">*</span></label>
+                                                            <input type="number" id="statutory_minimum_wage" name="statutory_minimum_wage" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
+                                                        </div>
 
-                                                <!-- Full Width: Non-Taxable Compensation Details -->
-                                                <div class="col-span-3 grid grid-cols-2 gap-4 mt-6">
-                                                    <!-- Statutory Minimum Wage -->
-                                                    <div>
-                                                        <label for="statutory_minimum_wage" class="block text-sm font-medium text-gray-700">Statutory Minimum Wage <span class="text-red-500">*</span></label>
-                                                        <input type="number" id="statutory_minimum_wage" name="statutory_minimum_wage" step="0.01" class="w-full mt-1 p-2 border-gray-300 rounded-lg shadow-sm" required>
+                                                        <!-- Hazard Pay -->
+                                                        <div>
+                                                            <label for="hazard_pay" class="block font-bold text-sm text-zinc-700">Hazard Pay</label>
+                                                            <input type="number" id="hazard_pay" name="hazard_pay" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                                        </div>
+
+                                                        <!-- Other Non-Taxable Compensation -->
+                                                        <div>
+                                                            <label for="other_non_taxable_compensation" class="block font-bold text-sm text-zinc-700">Other Non-Taxable Compensation</label>
+                                                            <input type="number" id="other_non_taxable_compensation" name="other_non_taxable_compensation" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                                        </div>
                                                     </div>
 
-                                                    <!-- Holiday Pay -->
-                                                    <div>
-                                                        <label for="holiday_pay" class="block text-sm font-medium text-gray-700">Holiday Pay</label>
-                                                        <input type="number" id="holiday_pay" name="holiday_pay" step="0.01" class="w-full mt-1 p-2 border-gray-300 rounded-lg shadow-sm">
+                                                    <div class="grid grid-cols-3 gap-6 mb-5">
+                                                        <!-- Holiday Pay -->
+                                                        <div>
+                                                            <label for="holiday_pay" class="block font-bold text-sm text-zinc-700">Holiday Pay</label>
+                                                            <input type="number" id="holiday_pay" name="holiday_pay" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                                        </div>
+
+                                                        <!-- 13th Month Pay -->
+                                                        <div>
+                                                            <label for="month_13_pay" class="block font-bold text-sm text-zinc-700">13th Month Pay and Other Benefits</label>
+                                                            <input type="number" id="month_13_pay" name="month_13_pay" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                                        </div>
+
                                                     </div>
 
-                                                    <!-- Overtime Pay -->
-                                                    <div>
-                                                        <label for="overtime_pay" class="block text-sm font-medium text-gray-700">Overtime Pay</label>
-                                                        <input type="number" id="overtime_pay" name="overtime_pay" step="0.01" class="w-full mt-1 p-2 border-gray-300 rounded-lg shadow-sm">
-                                                    </div>
+                                                    <div class="grid grid-cols-3 gap-6 mb-5">
+                                                        <!-- Overtime Pay -->
+                                                        <div>
+                                                            <label for="overtime_pay" class="block font-bold text-sm text-zinc-700">Overtime Pay</label>
+                                                            <input type="number" id="overtime_pay" name="overtime_pay" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                                        </div>
 
-                                                    <!-- Night Shift Differential -->
-                                                    <div>
-                                                        <label for="night_shift_differential" class="block text-sm font-medium text-gray-700">Night Shift Differential</label>
-                                                        <input type="number" id="night_shift_differential" name="night_shift_differential" step="0.01" class="w-full mt-1 p-2 border-gray-300 rounded-lg shadow-sm">
-                                                    </div>
+                                                        <!-- De Minimis Benefits -->
+                                                        <div>
+                                                            <label for="de_minimis_benefits" class="block font-bold text-sm text-zinc-700">De Minimis Benefits</label>
+                                                            <input type="number" id="de_minimis_benefits" name="de_minimis_benefits" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                                        </div>
 
-                                                    <!-- Hazard Pay -->
-                                                    <div>
-                                                        <label for="hazard_pay" class="block text-sm font-medium text-gray-700">Hazard Pay</label>
-                                                        <input type="number" id="hazard_pay" name="hazard_pay" step="0.01" class="w-full mt-1 p-2 border-gray-300 rounded-lg shadow-sm">
                                                     </div>
+                                                    <div class="grid grid-cols-3 gap-6 mb-5">
+                                                        <!-- Night Shift Differential -->
+                                                        <div>
+                                                            <label for="night_shift_differential" class="block font-bold text-sm text-zinc-700">Night Shift Differential</label>
+                                                            <input type="number" id="night_shift_differential" name="night_shift_differential" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                                        </div>
 
-                                                    <!-- 13th Month Pay -->
-                                                    <div>
-                                                        <label for="month_13_pay" class="block text-sm font-medium text-gray-700">13th Month Pay and Other Benefits</label>
-                                                        <input type="number" id="month_13_pay" name="month_13_pay" step="0.01" class="w-full mt-1 p-2 border-gray-300 rounded-lg shadow-sm">
-                                                    </div>
+                                                        <!-- SSS, GSIS, PHIC, HDMF, Union Dues -->
+                                                        <div>
+                                                            <label for="sss_gsis_phic_hdmf_union_dues" class="block font-bold text-sm text-zinc-700">SSS, GSIS, PHIC, HDMF, Union Dues</label>
+                                                            <input type="number" id="sss_gsis_phic_hdmf_union_dues" name="sss_gsis_phic_hdmf_union_dues" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                                        </div>
 
-                                                    <!-- De Minimis Benefits -->
-                                                    <div>
-                                                        <label for="de_minimis_benefits" class="block text-sm font-medium text-gray-700">De Minimis Benefits</label>
-                                                        <input type="number" id="de_minimis_benefits" name="de_minimis_benefits" step="0.01" class="w-full mt-1 p-2 border-gray-300 rounded-lg shadow-sm">
-                                                    </div>
-
-                                                    <!-- SSS, GSIS, PHIC, HDMF, Union Dues -->
-                                                    <div>
-                                                        <label for="sss_gsis_phic_hdmf_union_dues" class="block text-sm font-medium text-gray-700">SSS, GSIS, PHIC, HDMF, Union Dues</label>
-                                                        <input type="number" id="sss_gsis_phic_hdmf_union_dues" name="sss_gsis_phic_hdmf_union_dues" step="0.01" class="w-full mt-1 p-2 border-gray-300 rounded-lg shadow-sm">
-                                                    </div>
-
-                                                    <!-- Other Non-Taxable Compensation -->
-                                                    <div>
-                                                        <label for="other_non_taxable_compensation" class="block text-sm font-medium text-gray-700">Other Non-Taxable Compensation</label>
-                                                        <input type="number" id="other_non_taxable_compensation" name="other_non_taxable_compensation" step="0.01" class="w-full mt-1 p-2 border-gray-300 rounded-lg shadow-sm">
                                                     </div>
                                                 </div>
-                                            </div>
-
-                                            <!-- Modal footer -->
-                                            <div class="flex justify-end p-6 border-t border-gray-200">
-                                                <button 
-                                                    type="button" 
-                                                    x-on:click="show = false" 
-                                                    class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 mr-2"
-                                                >
-                                                    Cancel
-                                                </button>
-                                                <button 
-                                                    type="submit" 
-                                                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                                                >
-                                                    Save
-                                                </button>
+                                                <!-- Modal footer -->
+                                                <div class="flex justify-end px-6">
+                                                    <button type="button" x-on:click="show = false" class="mr-2 hover:text-zinc-900 text-zinc-600 text-sm font-semibold py-2 px-4">
+                                                        Cancel
+                                                    </button>
+                                                    <button type="submit" class="bg-blue-900 hover:bg-blue-950 text-white font-semibold text-sm py-1 px-8 rounded-lg">
+                                                        Save
+                                                    </button>
+                                                </div>
                                             </form>
                                         </div>
                                     </div>
@@ -218,72 +240,191 @@ $organizationId = session('organization_id');
                         <!-- Livewire Source Import -->
                         <livewire:source-import :withholdingId="$with_holding->id" />
 
-                        <button class="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600">
-                            Delete
+                        <button type="button" @click="showCheckboxes = !showCheckboxes;    showDeleteCancelButtons: false, showDeleteCancelButtons = !showDeleteCancelButtons; $el.disabled = true;" 
+                            :disabled="selectedRows.length === 1"
+                            class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-red-500 hover:text-red-500 hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                            >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
+                            <span class="text-zinc-600 transition group-hover:text-red-500">Delete</span>
                         </button>
-                        <button class="px-4 py-2 text-sm bg-gray-500 text-white rounded-lg hover:bg-gray-600">
-                            Download
+                        <button type="button" class="border px-3 py-2 text-sm text-zinc-600 rounded-lg hover:border-green-500 hover:text-green-500 hover:bg-green-100 transition flex items-center group">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5 transition group-hover:text-green-500" viewBox="0 0 24 24">
+                                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
+                            </svg> 
+                            <span class="text-zinc-600 transition group-hover:text-green-500">Download</span>
                         </button>
+
+                        <div class="relative inline-block space-x-4 text-left">
+                            <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" class="flex items-center text-zinc-500 hover:text-zinc-700" type="button">
+                                <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
+                                    <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
+                                </svg>
+                            </button>
+                            <div id="dropdownDots" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-44 origin-top-right">
+                                <div class="py-2 px-2 text-sm text-zinc-700" aria-labelledby="dropdownMenuIconButton">
+                                    <span class="block px-4 py-2 text-sm font-bold text-zinc-700 text-left">Show Entries</span>
+                                    <div onclick="setEntries(5)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">5 per page</div>
+                                    <div onclick="setEntries(25)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">25 per page</div>
+                                    <div onclick="setEntries(50)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">50 per page</div>
+                                    <div onclick="setEntries(100)" class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">100 per page</div>
+                                    <input type="hidden" name="search" value="{{ request('search') }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Filtering Tab/Third Header -->
+                <div x-data="{selectedTab: 'Sources', init() {this.selectedTab = (new URL(window.location.href)).searchParams.get('type') || 'Sources'; }
+                    }" x-init="init" class="w-full p-5">
+                    <div @keydown.right.prevent="$focus.wrap().next()" 
+                        @keydown.left.prevent="$focus.wrap().previous()" 
+                        class="flex flex-row text-center overflow-x-auto ps-5" 
+                        role="tablist" 
+                        aria-label="tab options">
+                        
+                        <!-- Tab 1: Summary -->
+                        <a href="{{ route('with_holding.1601C_summary', ['id' => $with_holding->id]) }}">
+                            <button @click="selectedTab = 'Summary'; $dispatch('filter', { type: 'Summary' })"
+                                :aria-selected="selectedTab === 'Summary'" 
+                                :tabindex="selectedTab === 'Summary' ? '0' : '-1'" 
+                                :class="selectedTab === 'Summary' 
+                                    ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
+                                    : 'text-zinc-600 font-medium hover:text-blue-900'"
+                                class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
+                                type="button" 
+                                role="tab" 
+                                aria-controls="tabpanelSummary">
+                                Summary
+                            </button>
+                        </a>
+                        <!-- Tab 2: Sources -->
+                        <button @click="selectedTab = 'Sources'" 
+                            :aria-selected="selectedTab === 'Sources'" 
+                            :tabindex="selectedTab === 'Sources' ? '0' : '-1'" 
+                            :class="selectedTab === 'Sources' 
+                                ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
+                                : 'text-zinc-600 font-medium hover:text-blue-900'" 
+                            class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
+                            type="button" 
+                            role="tab" 
+                            aria-controls="tabpanelSources">
+                            Sources
+                        </button>
+                        <!-- Tab 3: Report -->
+                        <a href="{{ route('form1601C.create', ['id' => $with_holding->id]) }}">
+                            <button @click="selectedTab = 'Report'" 
+                                :aria-selected="selectedTab === 'Report'" 
+                                :tabindex="selectedTab === 'Report' ? '0' : '-1'" 
+                                :class="selectedTab === 'Report' 
+                                    ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
+                                    : 'text-zinc-600 font-medium hover:text-blue-900'" 
+                                class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
+                                type="button" 
+                                role="tab" 
+                                aria-controls="tabpanelReport">
+                                Report
+                            </button>
+                        </a>
                     </div>
                 </div>
 
                 <!-- Sources Table -->
-                <div class="px-6 py-4 overflow-x-auto">
-                    <table class="w-full border-collapse min-w-[500px]">
-                        <thead class="bg-gray-100">
-                        <tr>
-                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">Employee</th>
-                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">Wage Status</th>
-                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">Payment Date</th>
-                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">Gross Compensation</th>
-                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">Tax Due</th>
-                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">Statutory Minimum Wage</th>
-                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">Holiday Pay, OT Pay, etc.</th>
-                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">13th Month Pay and Other Benefits</th>
-                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">De Minimis Benefits</th>
-                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">SSS, GSIS, PHIC, HDMF etc.</th>
-                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">Other Non-Taxable Compensation</th>
-                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">Total Non-Taxable Compensation</th>
-                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">Taxable Compensation</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($sources as $source)
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="py-3 px-4">
-                                    {{ $source->employee->first_name ?? 'N/A' }} {{ $source->employee->last_name ?? '' }}
-                                </td>
-                                <td class="py-3 px-4">{{ $source->employment->employee_wage_status ?? 'N/A' }}</td>
-                                <td class="py-3 px-4">{{ $source->payment_date ?? 'N/A' }}</td>
-                                <td class="py-3 px-4 text-right">{{ number_format($source->gross_compensation, 2) ?? 'N/A' }}</td>
-                                <td class="py-3 px-4 text-right">{{ number_format($source->tax_due, 2) ?? 'N/A' }}</td>
-                                <td class="py-3 px-4 text-right">{{ number_format($source->statutory_minimum_wage, 2) ?? 'N/A' }}</td>
-                                <td class="py-3 px-4 text-right">
-                                    {{ number_format($source->holiday_pay + $source->overtime_pay + $source->night_shift_differential + $source->hazard_pay, 2) ?? 'N/A' }}
-                                </td>
-                                <td class="py-3 px-4 text-right">{{ number_format($source->month_13_pay, 2) ?? 'N/A' }}</td>
-                                <td class="py-3 px-4 text-right">{{ number_format($source->de_minimis_benefits, 2) ?? 'N/A' }}</td>
-                                <td class="py-3 px-4 text-right">{{ number_format($source->sss_gsis_phic_hdmf_union_dues, 2) ?? 'N/A' }}</td>
-                                <td class="py-3 px-4 text-right">{{ number_format($source->other_non_taxable_compensation, 2) ?? 'N/A' }}</td>
-                                <td class="py-3 px-4 text-right">
-                                    {{ number_format($source->holiday_pay + $source->overtime_pay + $source->night_shift_differential + $source->hazard_pay + $source->statutory_minimum_wage + $source->month_13_pay + $source->de_minimis_benefits + $source->sss_gsis_phic_hdmf_union_dues + $source->other_non_taxable_compensation, 2) ?? 'N/A' }}
-                                </td>
-                                <td class="py-3 px-4 text-right">{{ number_format($source->taxable_compensation, 2) ?? 'N/A' }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="12" class="py-3 px-4 text-center text-gray-500">
-                                    No sources found.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                    </table>
-                </div>
+                <div class="container mx-auto overflow-hidden">
+                    <!-- Transactions Header -->
+                    <div class="container mx-auto ps-8">
+                        <div class="flex flex-row space-x-2 items-center justify-center">
+                            <div x-data="{
+                                    selectedType: new URLSearchParams(window.location.search).get('type') || 'Compensation',
+                                    filterTransactions() {
+                                        const url = new URL(window.location.href);
+                                        url.searchParams.set('type', this.selectedType);
+                                        window.location.href = url.toString();
+                                    }
+                                }" class="w-full">
+                                <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-8 border-neutral-300" role="tablist" aria-label="tab options">
+                                    <button 
+                                        @click="selectedType = 'Compensation'; filterTransactions()" 
+                                        :aria-selected="selectedType === 'Compensation'"
+                                        :tabindex="selectedType === 'Compensation' ? '0' : '-1'" 
+                                        :class="selectedType === 'Compensation' ? 'font-bold text-blue-900 ' : 'text-neutral-600 font-normal hover:border-b-blue-900 hover:text-blue-900 hover:font-bold'" 
+                                        class="h-min py-2 text-base relative" 
+                                        type="button" 
+                                        role="tab" 
+                                        aria-controls="tabpanelsales">
+                                        <span class="block">Compensation</span>
+                                        <span 
+                                            :class="selectedType === 'Compensation' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- Pagination -->
-                <div class="px-6 py-4">
-                    {{ $sources->links('vendor.pagination.custom') }}
+                    <hr>
+
+                    <div class="mb-12 mt-6 mx-12 overflow-hidden max-w-full border-neutral-300">
+                        <div class="overflow-x-auto custom-scrollbar">
+                            <table class="w-full text-left text-[13px] text-neutral-600" id="tableid">
+                                <thead class="bg-neutral-100 text-xs text-neutral-700">
+                                    <tr>
+                                        <th class="py-2 px-4 text-gray-700">Employee</th>
+                                        <th class="py-2 px-4 text-gray-700">Wage Status</th>
+                                        <th class="py-2 px-4 text-gray-700">Payment Date</th>
+                                        <th class="py-2 px-4 text-gray-700">Gross Compensation</th>
+                                        <th class="py-2 px-4 text-gray-700">Tax Due</th>
+                                        <th class="py-2 px-4 text-gray-700">Statutory Minimum Wage</th>
+                                        <th class="py-2 px-4 text-gray-700">Holiday Pay, OT Pay, etc.</th>
+                                        <th class="py-2 px-4 text-gray-700">13th Month Pay and Other Benefits</th>
+                                        <th class="py-2 px-4 text-gray-700">De Minimis Benefits</th>
+                                        <th class="py-2 px-4 text-gray-700">SSS, GSIS, PHIC, HDMF etc.</th>
+                                        <th class="py-2 px-4 text-gray-700">Other Non-Taxable Compensation</th>
+                                        <th class="py-2 px-4 text-gray-700">Total Non-Taxable Compensation</th>
+                                        <th class="py-2 px-4 text-gray-700">Taxable Compensation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($sources as $source)
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="py-3 px-4">{{ $source->employee->first_name ?? 'N/A' }} {{ $source->employee->last_name ?? '' }}</td>
+                                            <td class="py-3 px-4"><span class="bg-zinc-100 text-zinc-700 text-xs font-medium me-2 px-4 py-1.5 rounded-full">{{ $source->employment->employee_wage_status ?? 'N/A' }}</span></td>
+                                            <td class="py-3 px-4">{{ \Carbon\Carbon::parse($source->payment_date ?? 'N/A')->format('F j, Y') }}</td>
+                                            <td class="py-3 px-4">{{ number_format($source->gross_compensation, 2) ?? 'N/A' }}</td>
+                                            <td class="py-3 px-4">{{ number_format($source->tax_due, 2) ?? 'N/A' }}</td>
+                                            <td class="py-3 px-4">{{ number_format($source->statutory_minimum_wage, 2) ?? 'N/A' }}</td>
+                                            <td class="py-3 px-4">
+                                                {{ number_format($source->holiday_pay + $source->overtime_pay + $source->night_shift_differential + $source->hazard_pay, 2) ?? 'N/A' }}
+                                            </td>
+                                            <td class="py-3 px-4">{{ number_format($source->month_13_pay, 2) ?? 'N/A' }}</td>
+                                            <td class="py-3 px-4">{{ number_format($source->de_minimis_benefits, 2) ?? 'N/A' }}</td>
+                                            <td class="py-3 px-4">{{ number_format($source->sss_gsis_phic_hdmf_union_dues, 2) ?? 'N/A' }}</td>
+                                            <td class="py-3 px-4">{{ number_format($source->other_non_taxable_compensation, 2) ?? 'N/A' }}</td>
+                                            <td class="py-3 px-4">
+                                                {{ number_format($source->holiday_pay + $source->overtime_pay + $source->night_shift_differential + $source->hazard_pay + $source->statutory_minimum_wage + $source->month_13_pay + $source->de_minimis_benefits + $source->sss_gsis_phic_hdmf_union_dues + $source->other_non_taxable_compensation, 2) ?? 'N/A' }}
+                                            </td>
+                                            <td class="py-3 px-4">{{ number_format($source->taxable_compensation, 2) ?? 'N/A' }}</td>
+                                        </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="14" class="text-center p-4">
+                                            <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
+                                            <h1 class="font-bold text-lg mt-2">No Compensations Added yet</h1>
+                                            <p class="text-sm text-neutral-500 mt-2">Start adding with the + button <br>at the top.</p>
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (count($sources) > 0)
+                            <div class="mt-4">
+                                {{ $sources->links('vendor.pagination.custom') }}
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -402,4 +543,79 @@ $organizationId = session('organization_id');
         }
         return taxDue;
     };
+
+    // Buttons
+    // FOR SORT BUTTON
+    document.getElementById('sortButton').addEventListener('click', function() {
+        const dropdown = document.getElementById('dropdownMenu');
+        const dropdownArrow = this.querySelector('svg:nth-child(3)');
+        dropdown.classList.toggle('hidden');
+        dropdownArrow.classList.toggle('rotate-180');
+    });
+
+    // FOR SORT BY
+    function sortItems(criteria) {
+        const table = document.querySelector('table tbody');
+        const rows = Array.from(table.querySelectorAll('tr')).filter(row => row.querySelector('td')); // Filter rows with data
+        let sortedRows;
+
+        if (criteria === 'recently-added') {
+            // Sort by the order of rows (assuming they are in the order of addition)
+            sortedRows = rows.reverse();
+        } else {
+            // Sort by text content of the 'Contact' column
+            sortedRows = rows.sort((a, b) => {
+                const aText = a.querySelector('td:nth-child(2)').textContent.trim().toLowerCase();
+                const bText = b.querySelector('td:nth-child(2)').textContent.trim().toLowerCase();
+
+                if (criteria === 'ascending') {
+                    return aText.localeCompare(bText);
+                } else if (criteria === 'descending') {
+                    return bText.localeCompare(aText);
+                }
+            });
+        }
+        table.innerHTML = '';
+        sortedRows.forEach(row => table.appendChild(row));
+    }
+    document.querySelectorAll('#dropdownMenu div[data-sort]').forEach(item => {
+        item.addEventListener('click', function() {
+            const criteria = this.getAttribute('data-sort');
+            document.getElementById('selectedOption').textContent = this.textContent; // Update selected option text
+            sortItems(criteria);
+        });
+    });
+    window.addEventListener('click', (event) => {
+        if (!sortButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+            dropdownMenu.classList.add('hidden');
+        }
+    });
+    
+    // FOR BUTTON OF SHOW ENTRIES
+     document.getElementById('dropdownMenuIconButton').addEventListener('click', function() {
+        const dropdown = document.getElementById('dropdownDots');
+        dropdown.classList.toggle('hidden');
+    });
+    // FOR SHOWING/SETTING ENTRIES
+    function setEntries(entries) {
+        const form = document.createElement('form');
+        form.method = 'GET';
+        form.action = "{{ route('with_holding.1601C_sources', ['id' => $with_holding->id]) }}";
+        // Create a hidden input for perPage
+        const perPageInput = document.createElement('input');
+        perPageInput.type = 'hidden';
+        perPageInput.name = 'perPage';
+        perPageInput.value = entries;
+        // Add search input value if needed
+        const searchInput = document.createElement('input');
+        searchInput.type = 'hidden';
+        searchInput.name = 'search';
+        searchInput.value = "{{ request('search') }}";
+        // Append inputs to form
+        form.appendChild(perPageInput);
+        form.appendChild(searchInput);
+        // Append the form to the body and submit
+        document.body.appendChild(form);
+        form.submit();
+    }
 </script>
