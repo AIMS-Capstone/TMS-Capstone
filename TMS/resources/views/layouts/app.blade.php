@@ -22,7 +22,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         
-        @vite(['resources/css/app.css', 'resources/css/custom.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/css/custom.css', 'resources/js/app.js', 'resources/css/select.css'])
         <!-- Styles -->
         @livewireStyles
     </head>
