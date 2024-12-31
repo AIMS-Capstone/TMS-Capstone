@@ -141,7 +141,7 @@
             </div>
 
             <div class="flex flex-row items-center space-x-4">
-                <div class="relative inline-block text-left sm:w-auto w-full z-30">
+                <div class="relative inline-block text-left sm:w-auto w-full">
                     <button id="filterButton" class="flex items-center text-zinc-600 hover:text-zinc-800 w-full hover:shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
                             <path fill="none" stroke="#696969" stroke-width="2" d="M18 4H6c-1.105 0-2.026.91-1.753 1.98a8.02 8.02 0 0 0 4.298 5.238c.823.394 1.455 1.168 1.455 2.08v6.084a1 1 0 0 0 1.447.894l2-1a1 1 0 0 0 .553-.894v-5.084c0-.912.632-1.686 1.454-2.08a8.02 8.02 0 0 0 4.3-5.238C20.025 4.91 19.103 4 18 4z"/>
@@ -536,6 +536,122 @@
         });
     });
 
+    //FILTER BUTTON
+    const filterButton = document.getElementById('filterButton');
+    const dropdownFilter = document.getElementById('dropdownFilter');
+    const applyFiltersButton = document.getElementById('applyFiltersButton');
+    const clearFiltersButton = document.getElementById('clearFiltersButton');
+    const selectedFilter = document.getElementById('selectedFilter');
+    const tableRows = document.querySelectorAll('tbody tr');
+    const dropdownArrow = document.getElementById('dropdownArrow');
+
+    filterButton.addEventListener('click', () => {
+        dropdownArrow.classList.toggle('rotate-180');
+        dropdownFilter.classList.toggle('hidden');
+    });
+    function getSelectedFilters() {
+        const filters = {};
+        document.querySelectorAll('.filter-checkbox:checked').forEach((checkbox) => {
+            const category = checkbox.dataset.category;
+            if (!filters[category]) filters[category] = [];
+            filters[category].push(checkbox.value);
+        });
+        return filters;
+    }
+    // Attach event listeners for the date inputs
+    document.getElementById('fromDate').addEventListener('input', updateApplyButtonState);
+    document.getElementById('toDate').addEventListener('input', updateApplyButtonState);
+
+    function applyFilters() {
+        const filters = getSelectedFilters();
+        const fromDate = document.getElementById('fromDate').value;
+        const toDate = document.getElementById('toDate').value;
+
+        tableRows.forEach((row) => {
+            let isVisible = true;
+
+            const dateCell = row.cells[2]?.getAttribute('data-date');
+            const rowDate = dateCell ? new Date(dateCell) : null;
+            if (fromDate || toDate) {
+                const from = fromDate ? new Date(fromDate) : null;
+                const to = toDate ? new Date(toDate) : null;
+                if ((from && rowDate < from) || (to && rowDate > to)) {
+                    isVisible = false;
+                }
+            }
+            for (const category in filters) {
+                const selectedValues = filters[category];
+                let cellText = '';
+                if (category === 'Status') {
+                    // Adjust the column index to match the status column
+                    cellText = row.cells[8]?.querySelector('span')?.textContent.trim(); // Adjusted for nested span
+                }
+                if (selectedValues.length && !selectedValues.includes(cellText)) {
+                    isVisible = false;
+                    break;
+                }
+            }
+            row.style.display = isVisible ? '' : 'none';
+        });
+
+        dropdownFilter.classList.add('hidden');
+        selectedFilter.textContent = 'Filter';
+        updateApplyButtonState();
+    }
+    function updateApplyButtonState() {
+        const hasCheckboxSelection = document.querySelectorAll('.filter-checkbox:checked').length > 0;
+        const hasDateSelection = document.getElementById('fromDate').value || document.getElementById('toDate').value;
+        const isFilterActive = hasCheckboxSelection || hasDateSelection;
+        applyFiltersButton.disabled = !isFilterActive;
+        if (isFilterActive) {
+            applyFiltersButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        } else {
+            applyFiltersButton.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+    }
+    document.querySelectorAll('.filter-checkbox').forEach((checkbox) => {
+        checkbox.addEventListener('change', updateApplyButtonState);
+    });
+
+    function clearFilters() {
+        document.querySelectorAll('.filter-checkbox').forEach((checkbox) => (checkbox.checked = false));
+        document.getElementById('fromDate').value = '';
+        document.getElementById('toDate').value = '';
+        tableRows.forEach((row) => (row.style.display = ''));
+        dropdownFilter.classList.add('hidden');
+        selectedFilter.textContent = 'Filter';
+        updateApplyButtonState();
+    }
+    applyFiltersButton.addEventListener('click', applyFilters);
+    clearFiltersButton.addEventListener('click', clearFilters);
+
+    window.addEventListener('click', (event) => {
+        if (!filterButton.contains(event.target) && !dropdownFilter.contains(event.target)) {
+            dropdownFilter.classList.add('hidden');
+        }
+    });
+    // Initial setup: disable the "Apply Filter" button
+    applyFiltersButton.disabled = true;
+    applyFiltersButton.classList.add('opacity-50', 'cursor-not-allowed'); // Optional: Add styles for disabled state
+    function updateApplyButtonState() {
+        const hasSelection = document.querySelectorAll('.filter-checkbox:checked').length > 0;
+        applyFiltersButton.disabled = !hasSelection;
+        if (hasSelection) {
+            applyFiltersButton.classList.remove('opacity-50', 'cursor-not-allowed'); // Optional: Remove disabled styles
+        } else {
+            applyFiltersButton.classList.add('opacity-50', 'cursor-not-allowed'); // Optional: Add disabled styles
+        }
+    }
+    document.querySelectorAll('.filter-checkbox').forEach((checkbox) => {
+        checkbox.addEventListener('change', updateApplyButtonState);
+    });
+    clearFiltersButton.addEventListener('click', () => {
+        document.querySelectorAll('.filter-checkbox').forEach((checkbox) => (checkbox.checked = false));
+        tableRows.forEach((row) => (row.style.display = ''));
+        dropdownFilter.classList.add('hidden');
+        selectedFilter.textContent = 'Filter';
+        updateApplyButtonState();
+    });
 
     // FOR SORT BUTTON
     document.getElementById('sortButton').addEventListener('click', function() {

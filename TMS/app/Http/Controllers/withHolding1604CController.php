@@ -127,7 +127,7 @@ class withHolding1604CController extends Controller
      */
     public function show1604Cschedule1(Request $request, $id)
     {
-        return $this->fetchSchedule($id, 'Above Minimum Wage Earner', 'tax_return.with_holding.1604C_schedule1');
+        return $this->fetchSchedule($id, 'Above Minimum Wage Earner', 'tax_return.with_holding.1604C_schedule1', $request);
     }
 
     /**
@@ -135,13 +135,13 @@ class withHolding1604CController extends Controller
      */
     public function show1604Cschedule2(Request $request, $id)
     {
-        return $this->fetchSchedule($id, 'Minimum Wage Earner', 'tax_return.with_holding.1604C_schedule2');
+        return $this->fetchSchedule($id, 'Minimum Wage Earner', 'tax_return.with_holding.1604C_schedule2', $request);
     }
 
     /**
      * Handle fetching schedules (above or minimum wage earners).
      */
-    private function fetchSchedule($id, $wageStatus, $view)
+    private function fetchSchedule($id, $wageStatus, $view, Request $request)
     {
         $organizationId = session('organization_id');
 
@@ -149,6 +149,9 @@ class withHolding1604CController extends Controller
             ->where('organization_id', $organizationId)
             ->where('type', '1604C')
             ->firstOrFail();
+
+        // Get the perPage value from the request, default to 5
+        $perPage = $request->input('perPage', 5);
 
         $sourcesQuery = Source::with(['employee', 'employment'])
             ->whereHas('withholding', function ($query) use ($organizationId, $withHolding) {
@@ -160,7 +163,8 @@ class withHolding1604CController extends Controller
                 $query->where('employee_wage_status', $wageStatus);
             });
 
-        $paginatedSources = $sourcesQuery->paginate(5);
+        // Paginate with the perPage value
+        $paginatedSources = $sourcesQuery->paginate($perPage);
 
         $aggregatedData = collect($paginatedSources->items())->groupBy('employee_id')->map(function ($sources) {
             $employee = $sources->first()->employee;
@@ -169,14 +173,14 @@ class withHolding1604CController extends Controller
                 'gross_compensation' => $sources->sum('gross_compensation'),
                 'non_taxable_compensation' => $sources->sum(function ($source) {
                     return $source->statutory_minimum_wage +
-                    $source->holiday_pay +
-                    $source->overtime_pay +
-                    $source->night_shift_differential +
-                    $source->hazard_pay +
-                    $source->month_13_pay +
-                    $source->de_minimis_benefits +
-                    $source->sss_gsis_phic_hdmf_union_dues +
-                    $source->other_non_taxable_compensation;
+                        $source->holiday_pay +
+                        $source->overtime_pay +
+                        $source->night_shift_differential +
+                        $source->hazard_pay +
+                        $source->month_13_pay +
+                        $source->de_minimis_benefits +
+                        $source->sss_gsis_phic_hdmf_union_dues +
+                        $source->other_non_taxable_compensation;
                 }),
                 'taxable_compensation' => $sources->sum('taxable_compensation'),
                 'tax_due' => $sources->sum('tax_due'),
