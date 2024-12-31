@@ -276,24 +276,69 @@
                     </div>
                 @endif 
 
-                <!-- Step 4: Success Message -->
-                @if($step === 4)
-                    <div class="px-20">
-                        <div class="p-10 text-center border border-emerald-500 rounded bg-emerald-100">
-                            <div class="flex justify-center mb-4">
-                                <img src="{{ asset('images/Success.png') }}" alt="Import Successful" class="w-28 h-28">
-                            </div>
-                            <p class="text-2xl text-emerald-500 font-bold ">Import Successful</p>
-                            <p class="text-zinc-700">Your CSV with filename <strong>[FILENAME]</strong> was successfully imported.</p>
-                        </div>
+               <!-- Step 4: Success/Error Message -->
+@if($step === 4)
+<div class="px-20">
+    @if($hasErrors)
+        <div class="p-10 text-center border border-red-500 rounded bg-red-100">
+            <div class="flex justify-center mb-4">
+                <svg class="w-16 h-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <h3 class="text-2xl text-red-500 font-bold mb-4">Import Failed</h3>
+            
+            @if(!empty($validationErrors))
+                <div class="mb-4 text-left">
+                    <h4 class="font-bold text-red-700 mb-2">General Errors:</h4>
+                    <ul class="list-disc list-inside">
+                        @foreach($validationErrors as $error)
+                            <li class="text-red-600">{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-                        <div class="flex w-full justify-end mt-4 mb-6">
-                            <button wire:click="closeModal" class="font-bold bg-blue-900 text-white px-6 py-1.5 hover:bg-blue-950 rounded-md">
-                                Done
-                            </button>
-                        </div>
+            @if(!empty($rowErrors))
+                <div class="text-left">
+                    <h4 class="font-bold text-red-700 mb-2">Row-specific Errors:</h4>
+                    <div class="max-h-60 overflow-y-auto">
+                        @foreach($rowErrors as $row => $errors)
+                            <div class="mb-2">
+                                <p class="font-semibold">Row {{ $row }}:</p>
+                                <ul class="list-disc list-inside ml-4">
+                                    @foreach($errors as $error)
+                                        <li class="text-red-600">{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endforeach
                     </div>
-                @endif
+                </div>
+            @endif
+        </div>
+    @else
+        <div class="p-10 text-center border border-emerald-500 rounded bg-emerald-100">
+            <div class="flex justify-center mb-4">
+                <img src="{{ asset('images/Success.png') }}" alt="Import Successful" class="w-28 h-28">
+            </div>
+            <p class="text-2xl text-emerald-500 font-bold">Import Successful</p>
+            <p class="text-zinc-700">Your CSV file was successfully imported.</p>
+        </div>
+    @endif
+
+    <div class="flex w-full justify-end mt-4 mb-6">
+        @if($hasErrors)
+            <button wire:click="$set('step', 2)" class="font-bold border border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white px-6 py-1.5 rounded-md mr-2">
+                Back to Mapping
+            </button>
+        @endif
+        <button wire:click="closeModal" class="font-bold bg-blue-900 text-white px-6 py-1.5 hover:bg-blue-950 rounded-md">
+            {{ $hasErrors ? 'Close' : 'Done' }}
+        </button>
+    </div>
+</div>
+@endif
             </div>
         </div>
     @endif
