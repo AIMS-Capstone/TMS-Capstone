@@ -21,6 +21,7 @@ use FPDM;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class TaxReturnController extends Controller
 {
@@ -803,76 +804,144 @@ public function showVatReport($id)
     }
     
       // Function for Creating 2551Q Percentage Tax Return Report
-     public function store2551Q(Request $request, $taxReturn)
-     {
-         // Validate the incoming request data
-         $validatedData = $request->validate([
-             'period' => 'required|string',
-             'year_ended' => 'required|date',
-             'quarter' => 'required|string',
-             'amended_return' => 'required|string',
-             'sheets_attached' => 'required|integer',
-             'tin' => 'required|string',
-             'rdo_code' => 'required|string',
-             'taxpayer_name' => 'required|string',
-             'registered_address' => 'required|string',
-             'zip_code' => 'required|string',
-             'contact_number' => 'required|string',
-             'email_address' => 'required|email',
-             'tax_relief' => 'required|string',
-             'yes_specify' => 'nullable|string',
-             'availed_tax_rate' => 'required|string',
-             'tax_due' => 'required|numeric',
-             'creditable_tax' => 'required|numeric',
-             'amended_tax' => 'nullable|numeric',
-             'other_tax_specify' => 'nullable|string',
-             'other_tax_amount' => 'nullable|numeric',
-             'total_tax_credits' => 'required|numeric',
-             'tax_still_payable' => 'required|numeric',
-             'surcharge' => 'nullable|numeric',
-             'interest' => 'nullable|numeric',
-             'compromise' => 'nullable|numeric',
-             'total_penalties' => 'nullable|numeric',
-             'total_amount_payable' => 'required|numeric',
-             'schedule' => 'nullable|array', // Ensure 'schedule' is an array
-         ]);
-         
-         // Add the tax_return_id to the validated data before creating/updating the record
-         $validatedData['tax_return_id'] = $taxReturn;
-         
-         
-         // Use updateOrCreate to either update the existing Tax2551Q or create a new one
-         $tax2551Q = Tax2551Q::updateOrCreate(
-             ['tax_return_id' => $taxReturn], // Search for a record with the same tax_return_id
-             $validatedData // Update with the new validated data
-         );
-         
-         // Check if 'schedule' data exists and process it
-         if (isset($validatedData['schedule']) && !empty($validatedData['schedule'])) {
-             foreach ($validatedData['schedule'] as $scheduleData) {
-                // Clean and validate tax_base for each schedule item
-              
-            $scheduleData['taxable_amount'] = preg_replace('/[^0-9.]/', '', $scheduleData['taxable_amount']); // Remove commas
-            $scheduleData['taxable_amount'] = (float) $scheduleData['taxable_amount']; // Ensure it's a valid number
-                 // Check if a schedule entry for the same tax_return_id already exists
-                 Tax2551QSchedule::updateOrCreate(
-                     [
-                         '2551q_id' => $tax2551Q->id, // Use the ID of the newly created or updated Tax2551Q
-                         'atc_code' => $scheduleData['atc_code'], // Assuming ATC code is unique
-                     ],
-                     [
-                         'tax_base' => $scheduleData['taxable_amount'],
-                         'tax_rate' => $scheduleData['tax_rate'],
-                         'tax_due' => $scheduleData['tax_due'],
-                     ]
-                 );
-             }
-         }
-         
-         // Redirect back or to a specific page with a success message
-         return redirect()->route('tax_return.2551q.pdf', ['taxReturn' => $taxReturn])
-        ->with('success', 'Tax return successfully submitted and PDF generated.');
-     }
+      public function store2551Q(Request $request, $taxReturn)
+      {
+          try {
+              // Custom validation messages
+              $messages = [
+                  'period.required' => 'The period field is required.',
+                  'year_ended.required' => 'The year ended field is required.',
+                  'year_ended.date' => 'The year ended must be a valid date.',
+                  'quarter.required' => 'The quarter field is required.',
+                  'amended_return.required' => 'Please specify if this is an amended return.',
+                  'sheets_attached.required' => 'The number of sheets attached is required.',
+                  'sheets_attached.integer' => 'The sheets attached must be a number.',
+                  'tin.required' => 'TIN is required.',
+                  'rdo_code.required' => 'RDO code is required.',
+                  'taxpayer_name.required' => 'Taxpayer name is required.',
+                  'registered_address.required' => 'Registered address is required.',
+                  'zip_code.required' => 'ZIP code is required.',
+                  'contact_number.required' => 'Contact number is required.',
+                  'email_address.required' => 'Email address is required.',
+                  'email_address.email' => 'Please enter a valid email address.',
+                  'tax_relief.required' => 'Tax relief information is required.',
+                  'availed_tax_rate.required' => 'Availed tax rate is required.',
+                  'tax_due.required' => 'Tax due amount is required.',
+                  'tax_due.numeric' => 'Tax due must be a number.',
+                  'creditable_tax.required' => 'Creditable tax amount is required.',
+                  'creditable_tax.numeric' => 'Creditable tax must be a number.',
+                  'amended_tax.numeric' => 'Amended tax must be a number.',
+                  'other_tax_amount.numeric' => 'Other tax amount must be a number.',
+                  'total_tax_credits.required' => 'Total tax credits is required.',
+                  'total_tax_credits.numeric' => 'Total tax credits must be a number.',
+                  'tax_still_payable.required' => 'Tax still payable amount is required.',
+                  'tax_still_payable.numeric' => 'Tax still payable must be a number.',
+                  'surcharge.numeric' => 'Surcharge must be a number.',
+                  'interest.numeric' => 'Interest must be a number.',
+                  'compromise.numeric' => 'Compromise must be a number.',
+                  'total_penalties.numeric' => 'Total penalties must be a number.',
+                  'total_amount_payable.required' => 'Total amount payable is required.',
+                  'total_amount_payable.numeric' => 'Total amount payable must be a number.',
+                  'schedule.array' => 'Schedule must be an array.'
+              ];
+      
+              // Validate with custom messages
+              $validatedData = $request->validate([
+                  'period' => 'required|string',
+                  'year_ended' => 'required|date',
+                  'quarter' => 'required|string',
+                  'amended_return' => 'required|string',
+                  'sheets_attached' => 'required|integer',
+                  'tin' => 'required|string',
+                  'rdo_code' => 'required|string',
+                  'taxpayer_name' => 'required|string',
+                  'registered_address' => 'required|string',
+                  'zip_code' => 'required|string',
+                  'contact_number' => 'required|string',
+                  'email_address' => 'required|email',
+                  'tax_relief' => 'required|string',
+                  'yes_specify' => 'nullable|string',
+                  'availed_tax_rate' => 'required|string',
+                  'tax_due' => 'required|numeric',
+                  'creditable_tax' => 'required|numeric',
+                  'amended_tax' => 'nullable|numeric',
+                  'other_tax_specify' => 'nullable|string',
+                  'other_tax_amount' => 'nullable|numeric',
+                  'total_tax_credits' => 'required|numeric',
+                  'tax_still_payable' => 'required|numeric',
+                  'surcharge' => 'nullable|numeric',
+                  'interest' => 'nullable|numeric',
+                  'compromise' => 'nullable|numeric',
+                  'total_penalties' => 'nullable|numeric',
+                  'total_amount_payable' => 'required|numeric',
+                  'schedule' => 'nullable|array',
+              ], $messages);
+      
+              // Add the tax_return_id to the validated data
+              $validatedData['tax_return_id'] = $taxReturn;
+      
+              // Database transaction to ensure data integrity
+              DB::beginTransaction();
+      
+              try {
+                  // Create or update Tax2551Q
+                  $tax2551Q = Tax2551Q::updateOrCreate(
+                      ['tax_return_id' => $taxReturn],
+                      $validatedData
+                  );
+      
+                  // Process schedule if exists
+                  if (isset($validatedData['schedule']) && !empty($validatedData['schedule'])) {
+                      foreach ($validatedData['schedule'] as $scheduleData) {
+                          // Validate schedule data
+                          if (!isset($scheduleData['taxable_amount']) || !isset($scheduleData['atc_code'])) {
+                              throw new \Exception('Invalid schedule data provided');
+                          }
+      
+                          // Clean and validate tax_base for each schedule item
+                          $scheduleData['taxable_amount'] = preg_replace('/[^0-9.]/', '', $scheduleData['taxable_amount']);
+                          $scheduleData['taxable_amount'] = (float) $scheduleData['taxable_amount'];
+      
+                          Tax2551QSchedule::updateOrCreate(
+                              [
+                                  '2551q_id' => $tax2551Q->id,
+                                  'atc_code' => $scheduleData['atc_code'],
+                              ],
+                              [
+                                  'tax_base' => $scheduleData['taxable_amount'],
+                                  'tax_rate' => $scheduleData['tax_rate'],
+                                  'tax_due' => $scheduleData['tax_due'],
+                              ]
+                          );
+                      }
+                  }
+      
+                  DB::commit();
+      
+                  return redirect()
+                      ->route('tax_return.2551q.pdf', ['taxReturn' => $taxReturn])
+                      ->with('success', 'Tax return successfully submitted and PDF generated.');
+      
+              } catch (\Exception $e) {
+                  DB::rollBack();
+                  return redirect()
+                      ->back()
+                      ->withInput()
+                      ->with('error', 'Error processing schedule data: ' . $e->getMessage());
+              }
+      
+          } catch (\Illuminate\Validation\ValidationException $e) {
+              return redirect()
+                  ->back()
+                  ->withErrors($e->validator)
+                  ->withInput();
+          } catch (\Exception $e) {
+              return redirect()
+                  ->back()
+                  ->withInput()
+                  ->with('error', 'An unexpected error occurred: ' . $e->getMessage());
+          }
+      }
      // Function for showing SLSP Data of Value Added Tax Return
      public function showSlspData(TaxReturn $taxReturn, Request $request)
      {
