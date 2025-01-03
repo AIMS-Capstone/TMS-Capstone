@@ -356,6 +356,12 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
                 // Route for creating the 0619E
                 Route::get('/{id}/0619E_form', [withHolding0619EController::class, 'createForm0619E'])->name('form0619E.create');
                 Route::post('/{id}/0619E/store', [withHolding0619EController::class, 'storeForm0619E'])->name('form0619E.store');
+                // Route for previewing the 0619E form if it existingers
+                Route::get('/{id}/0619E/preview', [withHolding0619EController::class, 'showFormOrPreview'])->name('form0619E.preview');
+                // Route for editing slight krazy 0619E form
+                Route::get('/{id}/0619E/edit', [withHolding0619EController::class, 'editForm0619E'])->name('form0619E.edit');
+                Route::put('/{id}/0619E/update', [withHolding0619EController::class, 'updateForm0619E'])->name('form0619E.update');
+                Route::get('/{id}/0619E/download', [withHolding0619EController::class, 'downloadForm0619E'])->name('form0619E.download');
             
             // Routes for generating withholding tax return for 1601EQ
                 Route::get('/1601EQ', [withHolding1601EQController::class, 'index1601EQ'])->name('with_holding.1601EQ');
@@ -364,6 +370,10 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
                 //QAP nig
                 Route::get('/{id}/1601EQ_Qap', [withHolding1601EQController::class, 'showQap1601EQ'])->name('with_holding.1601EQ_Qap');
                 Route::post('/{id}/1601EQ_Qap/set', [withHolding1601EQController::class, 'setQap1601EQ'])->name('with_holding.1601EQ_Qap.set');
+                Route::get('/{id}/1601EQ_Qap/archive', [withHolding1601EQController::class, 'archiveQAP'])->name('with_holding.1601EQ_Qap.archive');
+                Route::post('/{id}/1601EQ_Qap/activate', [withHolding1601EQController::class, 'activateQapTransaction'])->name('with_holding.1601EQ_Qap.activate');
+                Route::post('/{id}/1601EQ_Qap/deactivate', [withHolding1601EQController::class, 'deactivateQapTransaction'])->name('with_holding.1601EQ_Qap.deactivate');
+                Route::post('/{id}/1601EQ_Qap/unassign', [withHolding1601EQController::class, 'destroyQapTransaction'])->name('with_holding.1601EQ_Qap.unassign');
 
                 // Route for creating 1601EQ
                 Route::get('/{id}/1601EQ_form', [withHolding1601EQController::class, 'createForm1601EQ'])->name('form1601EQ.create');
