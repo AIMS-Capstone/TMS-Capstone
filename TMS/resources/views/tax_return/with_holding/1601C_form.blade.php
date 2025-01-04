@@ -34,7 +34,7 @@
     </div>
     
     <div class="max-w-6xl mx-auto bg-white shadow-sm rounded-lg">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mt-6 p-4">
+        <div class="overflow-hidden shadow-sm sm:rounded-lg mt-6 p-4">
             <form action="{{ route('form1601C.store', ['id' => $withHolding->id]) }}" method="POST">
                 @csrf
                 <input type="hidden" name="withholding_id" value="{{ $withHolding->id }}">

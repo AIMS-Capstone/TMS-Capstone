@@ -149,7 +149,7 @@ class WithHoldingController extends Controller
     }
 
     //1601C Sources functions
-    public function showSources1601C($id)
+    public function showSources1601C($id, Request $request)
     {
         // Fetch the withholding tax record and ensure it is type 1601C
         $withHolding = WithHolding::where('id', $id)
@@ -163,10 +163,13 @@ class WithHoldingController extends Controller
             ->where('organization_id', $organizationId)
             ->get();
 
+        // Get the perPage value from the request, default to 5
+        $perPage = $request->input('perPage', 5);
+
         // Fetch sources with related employee and employment data
         $sources = $withHolding->sources()
             ->with(['employee.latestEmployment'])
-            ->paginate(5);
+            ->paginate($perPage);
 
         return view('tax_return.with_holding.1601C_sources', [
             'with_holding' => $withHolding,
@@ -174,7 +177,7 @@ class WithHoldingController extends Controller
             'employees' => $employees,
         ]);
     }
-
+    
     public function store1601C(Request $request, $id)
     {
         $request->validate([

@@ -371,24 +371,24 @@ $organizationId = session('organization_id');
                             <table class="w-full text-left text-[13px] text-neutral-600" id="tableid">
                                 <thead class="bg-neutral-100 text-xs text-neutral-700">
                                     <tr>
-                                        <th class="py-2 px-4 text-gray-700">Employee</th>
-                                        <th class="py-2 px-4 text-gray-700">Wage Status</th>
-                                        <th class="py-2 px-4 text-gray-700">Payment Date</th>
-                                        <th class="py-2 px-4 text-gray-700">Gross Compensation</th>
-                                        <th class="py-2 px-4 text-gray-700">Tax Due</th>
-                                        <th class="py-2 px-4 text-gray-700">Statutory Minimum Wage</th>
-                                        <th class="py-2 px-4 text-gray-700">Holiday Pay, OT Pay, etc.</th>
-                                        <th class="py-2 px-4 text-gray-700">13th Month Pay and Other Benefits</th>
-                                        <th class="py-2 px-4 text-gray-700">De Minimis Benefits</th>
-                                        <th class="py-2 px-4 text-gray-700">SSS, GSIS, PHIC, HDMF etc.</th>
-                                        <th class="py-2 px-4 text-gray-700">Other Non-Taxable Compensation</th>
-                                        <th class="py-2 px-4 text-gray-700">Total Non-Taxable Compensation</th>
-                                        <th class="py-2 px-4 text-gray-700">Taxable Compensation</th>
+                                        <th class="py-2 px-4">Employee</th>
+                                        <th class="py-2 px-4">Wage Status</th>
+                                        <th class="py-2 px-4">Payment Date</th>
+                                        <th class="py-2 px-4">Gross Compensation</th>
+                                        <th class="py-2 px-4">Tax Due</th>
+                                        <th class="py-2 px-4">Statutory Minimum Wage</th>
+                                        <th class="py-2 px-4">Holiday Pay, OT Pay, etc.</th>
+                                        <th class="py-2 px-4">13th Month Pay and Other Benefits</th>
+                                        <th class="py-2 px-4">De Minimis Benefits</th>
+                                        <th class="py-2 px-4">SSS, GSIS, PHIC, HDMF etc.</th>
+                                        <th class="py-2 px-4">Other Non-Taxable Compensation</th>
+                                        <th class="py-2 px-4">Total Non-Taxable Compensation</th>
+                                        <th class="py-2 px-4">Taxable Compensation</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="divide-y divide-neutral-300 text-left py-[7px]">
                                     @forelse ($sources as $source)
-                                        <tr class="border-b hover:bg-gray-50">
+                                        <tr class="hover:bg-blue-50 cursor-pointer ease-in-out">
                                             <td class="py-3 px-4">{{ $source->employee->first_name ?? 'N/A' }} {{ $source->employee->last_name ?? '' }}</td>
                                             <td class="py-3 px-4"><span class="bg-zinc-100 text-zinc-700 text-xs font-medium me-2 px-4 py-1.5 rounded-full">{{ $source->employment->employee_wage_status ?? 'N/A' }}</span></td>
                                             <td class="py-3 px-4">{{ \Carbon\Carbon::parse($source->payment_date ?? 'N/A')->format('F j, Y') }}</td>
