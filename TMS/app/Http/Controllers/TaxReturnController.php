@@ -160,83 +160,111 @@ class TaxReturnController extends Controller
     
     // Function for showing Percentage Report Preview
     public function showPercentageReport($id)
-{
-    $taxReturn = TaxReturn::findOrFail($id);
-    $organization_id = session("organization_id");
-
-    // Ensure correct relationship loading with lowercase 'rdo'
-    $organization = OrgSetup::with("rdo")
-        ->where('id', $organization_id)
-        ->first();
-
-    $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
-
-    // Parse the start_date using Carbon
-    $startDate = Carbon::parse($organization->start_date);
-
-    // Determine the year ended based on the start_date
-    $yearEnded = null;
-    if ($startDate->month == 1 && $startDate->day == 1) {
-        // Calendar year - Ends on December 31 of the next year
-        $yearEnded = $startDate->addYear()->endOfYear();
-    } else {
-        // Fiscal year - Ends on the last day of the same month next year
-        $yearEnded = $startDate->addYear()->lastOfMonth();
-    }
-    // Check whether the organization follows a calendar or fiscal period
-    $period = ($yearEnded->month == 12 && $yearEnded->day == 31) ? 'calendar' : 'fiscal';
-
-    // Format the year ended date as 'YYYY-MM'
-    $yearEndedFormatted = $yearEnded->format('Y-m');
-    $yearEndedFormattedForDisplay = $yearEnded->format('m/Y'); // e.g., "12/2024"
-
-    // Get the transaction IDs related to this tax return
-    $transactionIds = $taxReturn->transactions->pluck('id');
-
-    // Get the TaxRows and calculate the summary data
-    $taxRows = TaxRow::whereHas('transaction', function ($query) use ($transactionIds) {
-        $query->where('tax_type', 2)
-              ->where('transaction_type', 'sales')
-              ->where('status', 'draft')
-              ->whereIn('id', $transactionIds);
-    })->with(['transaction.contactDetails', 'atc', 'taxType'])
-      ->get();
-
-    $totalZeroRatedSales ="";
-    // Group the TaxRows by ATC and calculate the summary       
-    $groupedData = $taxRows->groupBy(function ($taxRow) {
-        return $taxRow->atc->tax_code; // Group by ATC code
-    });
-
-    $summaryData = $groupedData->map(function ($group) {
-        $taxableAmount = 0;
-        $taxRate = 0;
-        $taxDue = 0;
-
-        foreach ($group as $taxRow) {
-            $taxableAmount += $taxRow->net_amount;
-            $taxRate = $taxRow->atc->tax_rate;
-            $taxDue += $taxRow->atc_amount;
+    {
+        $taxReturn = TaxReturn::findOrFail($id);
+        
+        // Check if 2551q form already exists for this tax return
+        $existing2551q = Tax2551Q::where('tax_return_id', $taxReturn->id)->first();
+        
+        if ($existing2551q) {
+            // If form exists, redirect to the PDF viewer
+            return redirect()->route('tax_return.2551q.pdf', ['taxReturn' => $taxReturn->id]);
         }
+        
+        // If no form exists, continue with preview logic
+        $organization_id = session("organization_id");
+        
+        // Ensure correct relationship loading with lowercase 'rdo'
+        $organization = OrgSetup::with("rdo")
+            ->where('id', $organization_id)
+            ->first();
+    
+        $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
+    
+        // Parse the start_date using Carbon
+        $startDate = Carbon::parse($organization->start_date);
+    
+        // Determine the year ended based on the start_date
+        $yearEnded = null;
+        if ($startDate->month == 1 && $startDate->day == 1) {
+            // Calendar year - Ends on December 31 of the next year
+            $yearEnded = $startDate->addYear()->endOfYear();
+        } else {
+            // Fiscal year - Ends on the last day of the same month next year
+            $yearEnded = $startDate->addYear()->lastOfMonth();
+        }
+        
+        // Check whether the organization follows a calendar or fiscal period
+        $period = ($yearEnded->month == 12 && $yearEnded->day == 31) ? 'calendar' : 'fiscal';
+    
+        // Format the year ended date as 'YYYY-MM'
+        $yearEndedFormatted = $yearEnded->format('Y-m');
+        $yearEndedFormattedForDisplay = $yearEnded->format('m/Y');
+    
+        // Get the transaction IDs related to this tax return
+        $transactionIds = $taxReturn->transactions->pluck('id');
+    
+        // Get the TaxRows and calculate the summary data
+        $taxRows = TaxRow::whereHas('transaction', function ($query) use ($transactionIds) {
+            $query->where('tax_type', 2)
+                  ->where('transaction_type', 'sales')
+                  ->where('status', 'draft')
+                  ->whereIn('id', $transactionIds);
+        })->with(['transaction.contactDetails', 'atc', 'taxType'])
+          ->get();
+    
+        $totalZeroRatedSales = "";
+        
+        // Group the TaxRows by ATC and calculate the summary       
+        $groupedData = $taxRows->groupBy(function ($taxRow) {
+            return $taxRow->atc->tax_code;
+        });
+    
+        $summaryData = $groupedData->map(function ($group) {
+            $taxableAmount = 0;
+            $taxRate = 0;
+            $taxDue = 0;
+    
+            foreach ($group as $taxRow) {
+                $taxableAmount += $taxRow->net_amount;
+                $taxRate = $taxRow->atc->tax_rate;
+                $taxDue += $taxRow->atc_amount;
+            }
+    
+            return [
+                'taxable_amount' => $taxableAmount,
+                'tax_rate' => $taxRate,
+                'tax_due' => $taxDue,
+            ];
+        });
+    
+        // Pass the summary data to the view
+        return view('tax_return.percentage_report_preview', compact(
+            'taxReturn',
+            'organization',
+            'yearEndedFormatted',
+            'yearEndedFormattedForDisplay',
+            'period',
+            'rdoCode',
+            'summaryData'
+        ));
+    }
 
-        return [
-            'taxable_amount' => $taxableAmount,
-            'tax_rate' => $taxRate,
-            'tax_due' => $taxDue,
-        ];
-    });
-
-    // Pass the summary data to the view
-    return view('tax_return.percentage_report_preview', compact(
-        'taxReturn',
-        'organization',
-        'yearEndedFormatted',
-        'yearEndedFormattedForDisplay',
-        'period',
-        'rdoCode',
-        'summaryData' // Add the summary data to the view
-    ));
-}
+    public function markAsFiled($id)
+    {
+        $taxReturn = TaxReturn::findOrFail($id);
+        
+        // Check if the current status is not already "Filed"
+        if ($taxReturn->status === 'Filed') {
+            return redirect()->back()->with('error', 'This tax return is already marked as Filed.');
+        }
+        
+        // Update the status to "Filed"
+        $taxReturn->status = 'Filed';
+        $taxReturn->save();
+        
+        return redirect()->route('tax_return.2551q.pdf', $taxReturn->id)->with('success', 'Tax return has been marked as Filed.');
+    }
   // Function for showing Value Added Tax Report Preview
 public function showVatReport($id)
 {
@@ -1810,10 +1838,75 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
             'pdfPath' => asset('storage/filled_report.pdf'), // Serve the PDF from public storage
         ]);
     }
+    public function percentageEdit($id)
+    {
+        // Get the organization ID from the session
+        $organizationId = session('organization_id');
+    
+        if (!$organizationId) {
+            return redirect()->route('organizations.index')->with('error', 'Please select an organization.');
+        }
+    
+        // Retrieve the tax return
+        $taxReturn = TaxReturn::where('id', $id)
+                              ->where('organization_id', $organizationId)
+                              ->firstOrFail();
+    
+        // Get the related form data
+        $formData = Tax2551Q::where('tax_return_id', $taxReturn->id)->first();
+    
+        // Get the organization data (assuming you have a relationship set up)
+        $organization = OrgSetup::find($organizationId);
+    
+        // Get the transaction IDs related to this tax return
+        $transactionIds = $taxReturn->transactions->pluck('id');
+    
+        // Retrieve the TaxRows based on transactions
+        $taxRows = TaxRow::whereHas('transaction', function ($query) use ($transactionIds) {
+            $query->where('tax_type', 2)
+                  ->where('transaction_type', 'sales')
+                  ->where('status', 'draft')
+                  ->whereIn('id', $transactionIds);
+        })->with(['transaction.contactDetails', 'atc', 'taxType'])
+          ->get();
+    
+        // Group the TaxRows by ATC and calculate the summary
+        $groupedData = $taxRows->groupBy(function ($taxRow) {
+            return $taxRow->atc->tax_code;
+        });
+    
+        // Calculate summary data for each group
+        $summaryData = $groupedData->map(function ($group) {
+            $taxableAmount = 0;
+            $taxRate = 0;
+            $taxDue = 0;
+    
+            foreach ($group as $taxRow) {
+                $taxableAmount += $taxRow->net_amount;
+                $taxRate = $taxRow->atc->tax_rate;
+                $taxDue += $taxRow->atc_amount;
+            }
+    
+            return [
+                'taxable_amount' => $taxableAmount,
+                'tax_rate' => $taxRate,
+                'tax_due' => $taxDue,
+            ];
+        });
+    
+        // Pass the form data, tax return, organization, and summary data to the view for editing
+        return view('tax_return.percentage_report_edit', [
+            'taxReturn' => $taxReturn,
+            'formData' => $formData,
+            'organization' => $organization,
+            'summaryData' => $summaryData, // Add the summary data to the view
+        ]);
+    }
+    
     
     public function showVatReportPDF(TaxReturn $taxReturn)
     {
-        // Get data from the `2551q` table
+        // Get data from the `2550q` table
         $formData = Tax2550Q::where('tax_return_id', $taxReturn->id)->first();
         if (!$formData) {
             return dd('No data found in the 2550q table for this tax return.');

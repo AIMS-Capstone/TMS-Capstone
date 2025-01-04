@@ -123,6 +123,7 @@ Route::middleware([
     
     Route::get('/transactions/{id}/edit-sales', [TransactionsController::class, 'edit'])->name('transactions.edit');
     Route::post('/transactions/{id}', [TransactionsController::class, 'update'])->name('transactions.update');
+    Route::post('/tax-return/{id}/mark-filed', [TaxReturnController::class, 'markAsFiled'])->name('tax-return.mark-filed');
 
     Route::post('/org_accounts', [OrgAccountController::class, 'store'])->name('org_accounts.store');
 
@@ -231,6 +232,8 @@ Route::post('/tax-return/store1701Q/{taxReturn}', [Tax1701QController::class, 's
         Route::get('/income_return', [TaxReturnController::class, 'incomeReturn'])->name('income_return');
         Route::get('/percentage_return/{id}/report', [TaxReturnController::class, 'showPercentageReport'])
     ->name('percentage_return.report');
+    Route::get('/percentage_return/{id}/edit', [TaxReturnController::class, 'percentageEdit'])
+    ->name('percentage_return.edit');
     Route::get('/vat_return/{id}/report', [TaxReturnController::class, 'showVatReport'])
     ->name('tax_return.report');
     Route::get('/income_return/{id}/report', [TaxReturnController::class, 'showIncomeReport'])

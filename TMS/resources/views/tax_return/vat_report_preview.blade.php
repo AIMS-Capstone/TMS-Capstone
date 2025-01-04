@@ -221,7 +221,7 @@
                 >
         </div>
         <div class="indent-4 flex items-center">
-            <label class="block text-zinc-700 text-sm"><span class="font-bold mr-2">16</span>Creditable VAT Withheld (From Part V - Schedule 3, Column D) .
+            <label class="block text-zinc-700 text-sm"><span class="font-bold mr-2">16</span>Creditable VAT Withheld (From Part V - Schedule 3, Column D) 
 
             </label>
         </div>
@@ -321,11 +321,21 @@
                 class="w-full p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
                 >
         </div>
-        <div class="indent-4 flex items-center">
-            <label class="block text-zinc-700 text-sm"> Add: Penalties<br><span class="font-bold mr-2">22</span>Surcharge</label>
+        <div class="indent-4">
+            <!-- "Add: Penalties" as a standalone line -->
+            <div class="col-span-3">
+                <label class="block text-zinc-700 text-sm mb-2">Add: Penalties</label>
+            </div>
+            
+            <!-- "Surcharge" label with number -->
+            <div class="flex items-center">
+                <span class="font-bold mr-2">22</span>
+                <label class="block text-zinc-700 text-sm">Surcharge</label>
+            </div>
         </div>
         <div>
         </div>
+        
         <div>
             <input 
                 type="text" 
@@ -334,6 +344,7 @@
                 class="w-full p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
             >
         </div>
+        
         <div class="flex items-center">
             <label class="indent-4 block text-zinc-700 text-sm"><span class="font-bold mr-2">23</span>Interest</label>
         </div>
