@@ -19,6 +19,8 @@ class Form0619E extends Model
         'amended_return',
         'any_taxes_withheld',
         'tax_code',
+        'atc_id',
+        'category',
         'amount_of_remittance',
         'remitted_previous',
         'net_amount_of_remittance',
@@ -43,6 +45,11 @@ class Form0619E extends Model
     public function withholding()
     {
         return $this->belongsTo(WithHolding::class, 'withholding_id');
+    }
+
+    public function atc()
+    {
+        return $this->belongsTo(Atc::class, 'atc_id');
     }
 
     /**

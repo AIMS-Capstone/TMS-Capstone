@@ -1,6 +1,15 @@
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <button onclick="history.back()" class="flex items-center text-gray-600 hover:text-gray-800 transition duration-150">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M16 12H8m4-4l-4 4l4 4"/>
+                    </g>
+                </svg>
+                <span class="text-sm font-medium">Go Back</span>
+            </button>
             <div class="px-6 py-4 bg-white shadow-sm sm:rounded-lg">
                 <h1 class="text-sm font-semibold text-sky-900">BIR Form No. 0619-E</h1>
                 <h2 class="text-xl font-semibold text-sky-900 mt-1">Monthly Remittance Form 
@@ -86,7 +95,9 @@
                         <select id="atc_id" name="atc_id" class="mt-1 block w-full border border-gray-300 rounded-md" required>
                             <option value="" disabled selected>Select Tax Code</option>
                             @foreach ($atcs as $atc)
-                                <option value="{{ $atc->id }}">{{ $atc->tax_code }} - {{ $atc->description }}</option>
+                                <option value="{{ $atc->id }}" {{ old('atc_id', $form->atc_id ?? '') == $atc->id ? 'selected' : '' }}>
+                                    {{ $atc->tax_code }} - {{ $atc->description }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -129,14 +140,20 @@
                             <input type="text" id="contact_number" name="contact_number" class="mt-1 p-2 block w-full border border-gray-300 rounded-md bg-gray-100" readonly value="{{ $orgSetup->contact_number }}">
                         </div>
 
-                        <!-- Category of Withholding Agent -->
-                        <div class="mb-6 px-8 flex flex-row justify-between gap-96">
-                            <label for="agent_category" class="block text-sm font-medium text-gray-700">Category of Withholding Agent</label>
-                            <select id="agent_category" name="agent_category" class="mt-1 block w-full border border-gray-300 rounded-md" required>
-                                <option value="Private" {{ $orgSetup->type === 'Private' ? 'selected' : '' }}>Private</option>
-                                <option value="Government" {{ $orgSetup->type === 'Government' ? 'selected' : '' }}>Government</option>
-                            </select>
+                        <!-- Any Taxes Withheld -->
+                    <div class="mb-6 px-8 flex flex-row justify-between gap-96">
+                        <label class="block text-sm font-medium text-gray-700">Category of Withholding Agent</label>
+                        <div class="mt-2 space-x-4">
+                            <label>
+                                <input type="radio" name="category" value="1" required>
+                                Private
+                            </label>
+                            <label>
+                                <input type="radio" name="category" value="0" required>
+                                Government
+                            </label>
                         </div>
+                    </div>
 
                         <!-- Email -->
                         <div class="mb-6 px-8 flex flex-row justify-between gap-96">

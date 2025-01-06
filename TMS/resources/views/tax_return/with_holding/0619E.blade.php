@@ -353,16 +353,16 @@ $organizationId = session('organization_id');
                                                             <option value="" disabled>Select Month</option>
                                                             <option value="1">January</option>
                                                             <option value="2">February</option>
-                                                            <option value="3">March</option>
+                                                            {{-- Quarter 1(april 30) --}}
                                                             <option value="4">April</option>
                                                             <option value="5">May</option>
-                                                            <option value="6">June</option>
+                                                            {{-- Quarter 2(june 30) --}}
                                                             <option value="7">July</option>
                                                             <option value="8">August</option>
-                                                            <option value="9">September</option>
+                                                            {{-- Quarter 3(september 30)) --}}
                                                             <option value="10">October</option>
                                                             <option value="11">November</option>
-                                                            <option value="12">December</option>
+                                                            {{-- Quarter 4(december 30) --}}
                                                         </select>
                                                     </div>
                                                 </div>

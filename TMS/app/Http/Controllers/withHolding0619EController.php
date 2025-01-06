@@ -15,15 +15,15 @@ use App\Models\atc;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 class withHolding0619EController extends Controller
 {
     //0619E function
     public function index0619E(Request $request)
     {
         $organizationId = session('organization_id');
-        $with_holdings = $this->getWithHoldings($organizationId, '0619E');
-        // Get the perPage value from the request, default to 5
-        $perPage = $request->input('perPage', 5);
+        $perPage = $request->input('perPage', 5); // Get the perPage value from the request, default to 5
         $with_holdings = $this->getWithHoldings($organizationId, '0619E', $perPage);
         
         return view('tax_return.with_holding.0619E', compact('with_holdings'));
@@ -46,11 +46,19 @@ class withHolding0619EController extends Controller
             ->where('month', $request->month)
             ->where('year', $request->year)
             ->where('organization_id', $organizationId)
-            ->exists();
+            ->first();
 
-        if ($existingRecord) {
-            return redirect()->back()->withErrors(['error' => 'A record for this month and year already exists.']);
-        }
+            if ($existingRecord) {
+                // Check if 0619E form already exists for this withholding
+                $existingForm = Form0619E::where('withholding_id', $existingRecord->id)->first();
+
+                if ($existingForm) {
+                    return redirect()->route('form0619E.preview', ['id' => $existingForm->id]);
+                }
+
+                return redirect()->route('form0619E.create', ['id' => $existingRecord->id])
+                    ->with('success', 'Withholding Tax Return for 0619E has been generated.');
+            }
 
         // Create the record
         $withHolding = WithHolding::create([
@@ -114,20 +122,28 @@ class withHolding0619EController extends Controller
 
     public function createForm0619E($id)
     {
-        // Fetch the withholding tax record and ensure it is type 0619E
-        $withHolding = WithHolding::findOrFail($id);
+        $existingForm = Form0619E::where('withholding_id', $id)->first();
 
-        // Retrieve organization setup and related data
+        if ($existingForm) {
+            // Redirect to preview, but pass withholding ID, not form ID
+            return redirect()->route('form0619E.preview', ['id' => $existingForm->withholding_id]);
+        }
+
+        $withHolding = WithHolding::findOrFail($id);
         $orgSetup = OrgSetup::find(session('organization_id'));
 
         if (!$orgSetup) {
             return redirect()->back()->withErrors(['error' => 'Organization setup not found.']);
         }
 
-        $atcs = Atc::all(); 
-        $taxTypeCodes = ['WC' => 'Withholding Tax - Creditable/Expanded']; 
+        $atcs = Atc::where('category', 'Withholding')
+            ->orWhere(function ($query) {
+                $query->where('tax_code', 'like', 'WI%')
+                    ->orWhere('tax_code', 'like', 'WC%');
+            })->get();
 
-        // Pass data to the Blade template
+        $taxTypeCodes = ['WE' => 'Withholding Tax - Expanded'];
+
         return view('tax_return.with_holding.0619E_form', [
             'withHolding' => $withHolding,
             'orgSetup' => $orgSetup,
@@ -137,19 +153,120 @@ class withHolding0619EController extends Controller
     }
 
     public function storeForm0619E(Request $request, $id)
-{
-    // Log the beginning of the method
-    Log::info("Initiating 0619E form submission", ['withholding_id' => $id]);
+    {
+        // Log the beginning of the method
+        Log::info("Initiating 0619E form submission", ['withholding_id' => $id]);
 
-    // Log incoming data
-    Log::info("Incoming Request Data", $request->all());
+        // Log incoming data
+        Log::info("Incoming Request Data", $request->all());
 
-    try {
-        $request->validate([
+        try {
+            $request->validate([
+                'for_month' => 'required|date_format:Y-m',
+                'due_date' => 'required|date',
+                'amended_return' => 'required|boolean',
+                'tax_code' => 'required|string',
+                'atc_id' => 'required|exists:atcs,id',
+                'category' => 'required|boolean',
+                'any_taxes_withheld' => 'required|boolean',
+                'amount_of_remittance' => 'required|numeric|min:0',
+                'remitted_previous' => 'nullable|numeric|min:0',
+                'surcharge' => 'nullable|numeric|min:0',
+                'interest' => 'nullable|numeric|min:0',
+                'compromise' => 'nullable|numeric|min:0',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error("Validation failed", [
+                'errors' => $e->errors()
+            ]);
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        }
+
+        // Fetch the withholding record
+        $withHolding = WithHolding::findOrFail($id);
+        Log::info("Fetched withholding record", ['organization_id' => $withHolding->organization_id]);
+
+        // Calculate penalties and total amount due
+        $totalPenalties = ($request->surcharge ?? 0) + ($request->interest ?? 0) + ($request->compromise ?? 0);
+        $totalAmountDue = ($request->amount_of_remittance ?? 0) - ($request->remitted_previous ?? 0) + $totalPenalties;
+
+        Log::info("Calculated totals", [
+            'totalPenalties' => $totalPenalties,
+            'totalAmountDue' => $totalAmountDue
+        ]);
+
+        // Create the form record
+        $form = Form0619E::create([
+            'org_setup_id' => $withHolding->organization_id,
+            'withholding_id' => $id,
+            'for_month' => $request->for_month,
+            'due_date' => $request->due_date,
+            'amended_return' => $request->amended_return,
+            'tax_code' => $request->tax_code,
+            'atc_id' => $request->atc_id,
+            'category' => $request->category,
+            'any_taxes_withheld' => $request->any_taxes_withheld,
+            'amount_of_remittance' => $request->amount_of_remittance,
+            'remitted_previous' => $request->remitted_previous,
+            'net_amount_of_remittance' => ($request->amount_of_remittance ?? 0) - ($request->remitted_previous ?? 0),
+            'surcharge' => $request->surcharge,
+            'interest' => $request->interest,
+            'compromise' => $request->compromise,
+            'total_penalties' => $totalPenalties,
+            'total_amount_due' => $totalAmountDue,
+        ]);
+
+        Log::info("0619E Form created successfully", [
+            'form_id' => $form->id,
+            'form_data' => $form->toArray()
+        ]);
+
+        // Redirect back with a success message
+        return redirect()->route('with_holding.0619E')
+            ->with('success', '0619E Form has been successfully submitted.');
+    }
+
+    public function showFormOrPreview($id)
+    {
+        $withHolding = WithHolding::findOrFail($id);
+        $form = Form0619E::where('withholding_id', $id)->first();
+
+        if ($form) {
+            // If form exists, redirect to preview
+            return view('tax_return.with_holding.0619E_preview', compact('form'));
+        }
+
+        // Otherwise, proceed to create form
+        return redirect()->route('form0619E.create', ['id' => $withHolding->id]);
+    }
+
+    //Edit 0619E form
+    public function editForm0619E($id)
+    {
+        $form = Form0619E::with(['organization', 'withholding'])->findOrFail($id);
+        $atcs = Atc::where('tax_code', 'like', 'WI%')
+            ->orWhere('tax_code', 'like', 'WC%')
+            ->get();
+        $taxTypeCodes = ['WE' => 'Withholding Tax - Expanded'];
+
+        return view('tax_return.with_holding.0619E_edit', [
+            'form' => $form,
+            'atcs' => $atcs,
+            'taxTypeCodes' => $taxTypeCodes,
+        ]);
+    }
+
+    public function updateForm0619E(Request $request, $id)
+    {
+        $form = Form0619E::findOrFail($id);
+
+        $validated = $request->validate([
             'for_month' => 'required|date_format:Y-m',
             'due_date' => 'required|date',
             'amended_return' => 'required|boolean',
             'tax_code' => 'required|string',
+            'atc_id' => 'required|exists:atcs,id',
+            'category' => 'required|boolean',
             'any_taxes_withheld' => 'required|boolean',
             'amount_of_remittance' => 'required|numeric|min:0',
             'remitted_previous' => 'nullable|numeric|min:0',
@@ -157,56 +274,40 @@ class withHolding0619EController extends Controller
             'interest' => 'nullable|numeric|min:0',
             'compromise' => 'nullable|numeric|min:0',
         ]);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        Log::error("Validation failed", [
-            'errors' => $e->errors()
-        ]);
-        return redirect()->back()->withErrors($e->errors())->withInput();
+
+        // Calculate penalties and total amount due
+        $totalPenalties = ($validated['surcharge'] ?? 0) + ($validated['interest'] ?? 0) + ($validated['compromise'] ?? 0);
+        $totalAmountDue = ($validated['amount_of_remittance'] ?? 0) - ($validated['remitted_previous'] ?? 0) + $totalPenalties;
+
+        // Update form details
+        $form->update(array_merge($validated, [
+            'net_amount_of_remittance' => ($validated['amount_of_remittance'] ?? 0) - ($validated['remitted_previous'] ?? 0),
+            'total_penalties' => $totalPenalties,
+            'total_amount_due' => $totalAmountDue,
+        ]));
+
+        // Redirect to preview using the withholding ID
+        return redirect()->route('form0619E.preview', ['id' => $form->withholding_id])
+            ->with('success', 'Form 0619E has been successfully updated.');
     }
 
-    // Fetch the withholding record
-    $withHolding = WithHolding::findOrFail($id);
-    Log::info("Fetched withholding record", ['organization_id' => $withHolding->organization_id]);
+    public function downloadForm0619E($id)
+    {
+        // Fetch the form details with related organization and ATC
+        $form = Form0619E::with(['atc', 'organization'])->findOrFail($id);
 
-    // Calculate penalties and total amount due
-    $totalPenalties = ($request->surcharge ?? 0) + ($request->interest ?? 0) + ($request->compromise ?? 0);
-    $totalAmountDue = ($request->amount_of_remittance ?? 0) - ($request->remitted_previous ?? 0) + $totalPenalties;
+        // Get the related organization from the form
+        $organization = $form->organization;
 
-    Log::info("Calculated totals", [
-        'totalPenalties' => $totalPenalties,
-        'totalAmountDue' => $totalAmountDue
-    ]);
+        // Load the PDF view and pass the form and organization data
+        $pdf = Pdf::loadView('tax_return.with_holding.0619E_pdf', compact('form', 'organization'));
 
-    // Create the form record
-    $form = Form0619E::create([
-        'org_setup_id' => $withHolding->organization_id,
-        'withholding_id' => $id,
-        'for_month' => $request->for_month,
-        'due_date' => $request->due_date,
-        'amended_return' => $request->amended_return,
-        'tax_code' => $request->tax_code,
-        'any_taxes_withheld' => $request->any_taxes_withheld,
-        'amount_of_remittance' => $request->amount_of_remittance,
-        'remitted_previous' => $request->remitted_previous,
-        'net_amount_of_remittance' => ($request->amount_of_remittance ?? 0) - ($request->remitted_previous ?? 0),
-        'surcharge' => $request->surcharge,
-        'interest' => $request->interest,
-        'compromise' => $request->compromise,
-        'total_penalties' => $totalPenalties,
-        'total_amount_due' => $totalAmountDue,
-    ]);
+        // Customize the filename
+        $filename = '0619E_Form_' . $form->for_month . '.pdf';
 
-    Log::info("0619E Form created successfully", [
-        'form_id' => $form->id,
-        'form_data' => $form->toArray()
-    ]);
-
-    // Redirect back with a success message
-    return redirect()->route('with_holding.0619E')
-        ->with('success', '0619E Form has been successfully submitted.');
-}
-
-
+        // Return PDF download response
+        return $pdf->download($filename);
+    }
 
     private function getWithHoldings($organizationId, $type)
     {
