@@ -117,58 +117,9 @@
                                         @enderror
                                     </div>
 
-                                    @if ($individualBackground->civil_status === 'married')
-                                        <!-- Spouse Tax Option Rate -->
-                                        <div class="mt-6">
-                                            <h4 class="text-lg font-semibold">Spouse's Tax Option Rate</h4>
-                                            <p class="text-sm text-gray-700 mb-2">Set the tax option rate for the spouse if applicable.</p>
+                                 
 
-                                            <div class="mb-4">
-                                                <label class="block text-sm font-medium text-gray-700">Spouse's Tax Option</label>
-                                                <div class="mt-2 flex items-center space-x-4">
-                                                    <label class="inline-flex items-center">
-                                                        <input type="radio" name="spouse_rate_type" value="graduated_rates" 
-                                                            x-model="selectedSpouseRate"
-                                                            @change="resetSpouseDeduction"
-                                                            class="form-radio text-blue-600">
-                                                        <span class="ml-2">Graduated Rates</span>
-                                                    </label>
-                                                    <label class="inline-flex items-center">
-                                                        <input type="radio" name="spouse_rate_type" value="8_percent" 
-                                                            x-model="selectedSpouseRate"
-                                                            @change="resetSpouseDeduction"
-                                                            class="form-radio text-blue-600">
-                                                        <span class="ml-2">8% Gross Sales/Receipts</span>
-                                                    </label>
-                                                </div>
-                                                @error('spouse_rate_type')
-                                                    <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
-                                                @enderror
-                                            </div>
-
-                                            <!-- Additional field for spouse when "Graduated Rates" is selected -->
-                                            <div x-show="toggleSpouseDeductionOption()" class="mb-4">
-                                                <label class="block text-sm font-medium text-gray-700">Spouse's Deduction Method</label>
-                                                <div class="mt-2 flex items-center space-x-4">
-                                                    <label class="inline-flex items-center">
-                                                        <input type="radio" name="spouse_deduction_method" value="itemized" 
-                                                            x-model="selectedSpouseDeductionMethod"
-                                                            class="form-radio text-blue-600">
-                                                        <span class="ml-2">Itemized Deductions</span>
-                                                    </label>
-                                                    <label class="inline-flex items-center">
-                                                        <input type="radio" name="spouse_deduction_method" value="osd" 
-                                                            x-model="selectedSpouseDeductionMethod"
-                                                            class="form-radio text-blue-600">
-                                                        <span class="ml-2">Optional Standard Deduction (OSD)</span>
-                                                    </label>
-                                                </div>
-                                                @error('spouse_deduction_method')
-                                                    <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    @endif
+                                         
 
                                     <div class="mt-6">
                                         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">

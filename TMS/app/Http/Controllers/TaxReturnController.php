@@ -742,6 +742,99 @@ public function showVatReport($id)
     public function store2550Q(Request $request, $taxReturn)
     {
 
+        $messages = [
+            'period.required' => 'The period field is required.',
+        'period.string' => 'The period must be a valid string.',
+        'year_ended.required' => 'The year ended field is required.',
+        'year_ended.date_format' => 'The year ended must be in the format Y-m.',
+        'quarter.required' => 'The quarter field is required.',
+        'quarter.string' => 'The quarter must be a valid string.',
+        'return_from.required' => 'The return from date is required.',
+        'return_from.date' => 'The return from date must be a valid date.',
+        'return_to.required' => 'The return to date is required.',
+        'return_to.date' => 'The return to date must be a valid date.',
+        'amended_return.required' => 'The amended return field is required.',
+        'amended_return.in' => 'The amended return field must be yes or no.',
+        'short_period_return.required' => 'The short period return field is required.',
+        'short_period_return.in' => 'The short period return field must be yes or no.',
+        'tin.required' => 'The TIN field is required.',
+        'tin.string' => 'The TIN must be a valid string.',
+        'tin.max' => 'The TIN should not exceed 20 characters.',
+        'rdo_code.required' => 'The RDO code field is required.',
+        'rdo_code.string' => 'The RDO code must be a valid string.',
+        'rdo_code.max' => 'The RDO code should not exceed 5 characters.',
+        'taxpayer_name.required' => 'The taxpayer name is required.',
+        'taxpayer_name.string' => 'The taxpayer name must be a valid string.',
+        'taxpayer_name.max' => 'The taxpayer name should not exceed 255 characters.',
+        'registered_address.required' => 'The registered address is required.',
+        'registered_address.string' => 'The registered address must be a valid string.',
+        'registered_address.max' => 'The registered address should not exceed 255 characters.',
+        'zip_code.required' => 'The zip code is required.',
+        'zip_code.string' => 'The zip code must be a valid string.',
+        'zip_code.max' => 'The zip code should not exceed 10 characters.',
+        'contact_number.max' => 'The contact number should not exceed 15 characters.',
+        'email_address.email' => 'The email address must be a valid email.',
+        'email_address.max' => 'The email address should not exceed 255 characters.',
+        'taxpayer_classification.required' => 'The taxpayer classification is required.',
+        'taxpayer_classification.string' => 'The taxpayer classification must be a valid string.',
+        'taxpayer_classification.max' => 'The taxpayer classification should not exceed 50 characters.',
+        'tax_relief.required' => 'The tax relief field is required.',
+        'tax_relief.in' => 'The tax relief field must be yes or no.',
+        'yes_specify.max' => 'The specify field should not exceed 255 characters.',
+        'creditable_vat_withheld.numeric' => 'The creditable VAT withheld must be a number.',
+        'advance_vat_payment.numeric' => 'The advance VAT payment must be a number.',
+        'vat_paid_if_amended.numeric' => 'The VAT paid if amended must be a number.',
+        'other_credits_specify.max' => 'The other credits specify field should not exceed 255 characters.',
+        'other_credits_specify_amount.numeric' => 'The other credits specify amount must be a number.',
+        'total_tax_credits.numeric' => 'The total tax credits must be a number.',
+        'tax_still_payable.numeric' => 'The tax still payable must be a number.',
+        'surcharge.numeric' => 'The surcharge must be a number.',
+        'interest.numeric' => 'The interest must be a number.',
+        'compromise.numeric' => 'The compromise must be a number.',
+        'total_penalties.numeric' => 'The total penalties must be a number.',
+        'total_amount_payable.numeric' => 'The total amount payable must be a number.',
+        'vatable_sales.numeric' => 'The vatable sales must be a number.',
+        'vatable_sales_tax_amount.numeric' => 'The vatable sales tax amount must be a number.',
+        'zero_rated_sales.numeric' => 'The zero rated sales must be a number.',
+        'exempt_sales.numeric' => 'The exempt sales must be a number.',
+        'total_sales.numeric' => 'The total sales must be a number.',
+        'total_output_tax.numeric' => 'The total output tax must be a number.',
+        'uncollected_receivable_vat.numeric' => 'The uncollected receivable VAT must be a number.',
+        'recovered_uncollected_receivables.numeric' => 'The recovered uncollected receivables must be a number.',
+        'total_adjusted_output_tax.numeric' => 'The total adjusted output tax must be a number.',
+        'input_carried_over.numeric' => 'The input carried over must be a number.',
+        'input_tax_deferred.numeric' => 'The input tax deferred must be a number.',
+        'transitional_input_tax.numeric' => 'The transitional input tax must be a number.',
+        'presumptive_input_tax.numeric' => 'The presumptive input tax must be a number.',
+        'other_specify.max' => 'The other specify field should not exceed 255 characters.',
+        'other_input_tax.numeric' => 'The other input tax must be a number.',
+        'total_input_tax.numeric' => 'The total input tax must be a number.',
+        'domestic_purchase.numeric' => 'The domestic purchase must be a number.',
+        'domestic_purchase_input_tax.numeric' => 'The domestic purchase input tax must be a number.',
+        'services_non_resident.numeric' => 'The services non-resident must be a number.',
+        'services_non_resident_input_tax.numeric' => 'The services non-resident input tax must be a number.',
+        'importations.numeric' => 'The importations must be a number.',
+        'importations_input_tax.numeric' => 'The importations input tax must be a number.',
+        'purchases_others_specify.max' => 'The other specify field should not exceed 255 characters.',
+        'purchases_others_specify_amount.numeric' => 'The other specify amount must be a number.',
+        'purchases_others_specify_input_tax.numeric' => 'The other specify input tax must be a number.',
+        'domestic_no_input.numeric' => 'The domestic no input must be a number.',
+        'tax_exempt_importation.numeric' => 'The tax exempt importation must be a number.',
+        'total_current_purchase.numeric' => 'The total current purchase must be a number.',
+        'total_current_purchase_input_tax.numeric' => 'The total current purchase input tax must be a number.',
+        'total_available_input_tax.numeric' => 'The total available input tax must be a number.',
+        'importation_million_deferred_input_tax.numeric' => 'The importation million deferred input tax must be a number.',
+        'attributable_vat_exempt_input_tax.numeric' => 'The attributable VAT exempt input tax must be a number.',
+        'vat_refund_input_tax.numeric' => 'The VAT refund input tax must be a number.',
+        'unpaid_payables_input_tax.numeric' => 'The unpaid payables input tax must be a number.',
+        'other_deduction_specify.max' => 'The other deduction specify field should not exceed 255 characters.',
+        'other_deduction_specify_input_tax.numeric' => 'The other deduction specify input tax must be a number.',
+        'total_deductions_input_tax.numeric' => 'The total deductions input tax must be a number.',
+        'settled_unpaid_input_tax.numeric' => 'The settled unpaid input tax must be a number.',
+        'adjusted_deductions_input_tax.numeric' => 'The adjusted deductions input tax must be a number.',
+        'total_allowable_input_Tax.numeric' => 'The total allowable input tax must be a number.',
+        'excess_input_tax.numeric' => 'The excess input tax must be a number.',
+    ];
      // Step 1: Validate incoming data
         $validatedData = $request->validate([
             'period' => 'required|string',
@@ -814,8 +907,7 @@ public function showVatReport($id)
             'adjusted_deductions_input_tax' => 'nullable|numeric',
             'total_allowable_input_Tax' => 'nullable|numeric',
             'excess_input_tax' => 'nullable|numeric',
-        ]);
-    
+        ], $messages);
         // Step 2: Attach the tax return ID to the validated data
         $validatedData['tax_return_id'] = $taxReturn;
   
@@ -827,8 +919,11 @@ public function showVatReport($id)
         );
     
         // Step 4: Return a response
-        return redirect()->route('tax_return.2550q.pdf', ['taxReturn' => $taxReturn])
-        ->with('success', 'Tax return successfully submitted and PDF generated.');
+        return redirect()
+            ->route('tax_return.2550q.pdf', ['taxReturn' => $taxReturn])
+            ->with('success', 'Tax return successfully submitted and PDF generated.');
+            
+        
     }
     
       // Function for Creating 2551Q Percentage Tax Return Report

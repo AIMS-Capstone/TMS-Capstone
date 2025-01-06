@@ -112,9 +112,9 @@ Route::middleware([
     Route::post('/org-account-destroy', [OrgAccountController::class, 'destroy'])->name('orgaccount.destroy');
     Route::post('/user-account-destroy', [UserController::class, 'destroy'])->name('users.destroy');
     Route::post('/user-account-store', [UserController::class, 'store'])->name('users.store');
-    Route::get('/export-atc/{type}', [AtcController::class, 'exportAtcs']);
+    Route::get('/export-atc/{type}', [AtcController::class, 'exportAtcs'])->name('export.atcs');
     Route::get('/export-coa', [CoaController::class, 'exportCoas']);
-    Route::get('/export-tax-type/{type}', [TaxTypeController::class, 'exportTaxType']);
+    Route::get('/export-tax-type/{type}', [TaxTypeController::class, 'exportTaxType'])->name('export.taxType');
     Route::get('/edit-sales/{transaction}', [TransactionsController::class, 'editSales']);
     Route::get('/tax-return/{taxReturn}/2551q-pdf', [TaxReturnController::class, 'showPercentageReportPDF'])
     ->name('tax_return.2551q.pdf');
