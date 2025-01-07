@@ -43,7 +43,7 @@ class OrgSetup extends Model
     // Relationship to RDO
     public function rdo()
     {
-        return $this->belongsTo(RDO::class, 'rdo');
+        return $this->belongsTo(Rdo::class, 'rdo');
     }
 
     // Relationship to User model for deleted_by

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\AtcExport;
-use App\Models\atc;
+use App\Models\Atc;
 use App\Http\Requests\StoreatcRequest;
 use App\Http\Requests\UpdateatcRequest;
 use Maatwebsite\Excel\Facades\Excel;
