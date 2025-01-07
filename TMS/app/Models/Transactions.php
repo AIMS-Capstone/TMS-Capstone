@@ -13,7 +13,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Transactions extends Model
 {
     use HasFactory, SoftDeletes, LogsActivity;
-    protected $fillable = ['transaction_type', 'date', 'inv_number', 'reference', 'total_amount', 'contact', 'itr_include', 'total_amount_credit', 'total_amount_debit', 'vatable_sales','vatable_purchase', 'vat_amount', 'non_vatable_sales','non_vatable_purchase','status', 'organization_id', 'deleted_by', 'withholding_id', ];
+    protected $fillable = ['transaction_type', 'date', 'inv_number', 'reference', 'total_amount', 'contact', 'itr_include', 'total_amount_credit', 'total_amount_debit', 'vatable_sales','vatable_purchase', 'vat_amount', 'non_vatable_sales','non_vatable_purchase','status', 'QAP', 'organization_id', 'deleted_by', 'withholding_id', ];
 
     public static $disableLogging = false;
 
@@ -22,7 +22,7 @@ class Transactions extends Model
         return LogOptions::defaults()
             ->logOnly([
                 'transaction_type', 'date', 'inv_number', 'reference', 
-                'total_amount', 'status', 'organization_id', 'ip', 'browser',
+                'total_amount', 'status', 'QAP', 'organization_id', 'ip', 'browser',
             ])
             ->logOnlyDirty()
             ->useLogName('transactions')

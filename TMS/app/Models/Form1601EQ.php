@@ -9,7 +9,7 @@ class Form1601EQ extends Model
 {
     use HasFactory;
 
-    protected $table = '1601EQ_forms';
+    protected $table = '1601eq_forms';
 
     protected $fillable = [
         'org_setup_id',
@@ -18,15 +18,16 @@ class Form1601EQ extends Model
         'quarter',
         'amended_return',
         'any_taxes_withheld',
+        'category',
         'number_of_sheets',
         'total_taxes_withheld',
-        'remittances_1st_month', // Added field
-        'remittances_2nd_month', // Added field
-        'remitted_previous', // Added field
+        'remittances_1st_month', 
+        'remittances_2nd_month', 
+        'remitted_previous',
         'over_remittance',
-        'other_payments', // Added field
-        'total_remittances_made', // Optional field to store sum if needed
-        'tax_still_due', // Added field for computation
+        'other_payments', 
+        'total_remittances_made', 
+        'tax_still_due', 
         'surcharge',
         'interest',
         'compromise',
@@ -46,7 +47,7 @@ class Form1601EQ extends Model
 
     public function atcDetails()
     {
-        return $this->hasMany(Form1601EQAtcDetail::class, 'form_1601eq_id');
+        return $this->hasMany(Form1601EQAtcDetail::class, 'withholding_id', 'withholding_id');
     }
     /**
      * Relationship with OrgSetup

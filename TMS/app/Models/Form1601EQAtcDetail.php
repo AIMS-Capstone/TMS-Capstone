@@ -12,7 +12,7 @@ class Form1601EQAtcDetail extends Model
     protected $table = '1601eq_atc_details';
 
     protected $fillable = [
-        'form_1601eq_id',
+        'withholding_id', 
         'atc_id',
         'tax_base',
         'tax_rate',
@@ -20,11 +20,11 @@ class Form1601EQAtcDetail extends Model
     ];
 
     /**
-     * Relationship with Form1601EQ.
+     * Relationship with WithHolding.
      */
-    public function form1601EQ()
+    public function withholding()
     {
-        return $this->belongsTo(Form1601EQ::class, 'form_1601eq_id');
+        return $this->belongsTo(WithHolding::class, 'withholding_id');
     }
 
     /**
