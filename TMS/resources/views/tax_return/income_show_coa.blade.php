@@ -126,22 +126,7 @@ class="mb-12 mx-12 overflow-hidden max-w-full rounded-md border-neutral-300 dark
 >
 <div class="container mx-auto">
     <!-- Tab system to toggle between Individual and Spouse -->
-    <div class="flex justify-between items-center space-x-4 mb-4">
-        <button
-        @click="setTab('individual')"
-            :class="{'bg-blue-900 text-white': activeTab === 'individual', 'bg-gray-200 text-gray-600': activeTab !== 'individual'}"
-            class="px-4 py-2 rounded-lg transition"
-        >
-            Individual Transactions
-        </button>
-        <button
-        @click="setTab('spouse')"
-            :class="{'bg-blue-900 text-white': activeTab === 'spouse', 'bg-gray-200 text-gray-600': activeTab !== 'spouse'}"
-            class="px-4 py-2 rounded-lg transition"
-        >
-            Spouse Transactions
-        </button>
-    </div>
+  
 
     <!-- Search and Add Existing Transaction Buttons -->
     <div class="flex flex-row space-x-2 items-center justify-between mb-4">

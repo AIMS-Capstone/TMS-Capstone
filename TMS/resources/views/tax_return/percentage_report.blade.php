@@ -32,20 +32,34 @@
 
                 <hr>
                 <div class="container mx-auto">
-                    <div class="px-8 ps-10">
+                    <div class="flex justify-between items-center px-8 ps-10 my-4">
                         <!-- Navigation Tabs -->
-                        <nav class="flex space-x-4 my-4">
-                            <a href="{{ route('tax-returns.percentage-summary', $taxReturn->id) }}" class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('tax-returns.percentage-summary') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }} px-3 py-2">
+                        <nav class="flex space-x-4">
+                            <a href="{{ route('tax-returns.percentage-summary', $taxReturn->id) }}" class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('tax-returns.percentage-summary') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }}">
                                 Summary
                             </a>
-                            <a href="{{ route('percentage_return.slsp_data', $taxReturn->id) }}" class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('percentage_return.slsp_data') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }} px-3 py-2">
+                            <a href="{{ route('percentage_return.slsp_data', $taxReturn->id) }}" class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('percentage_return.slsp_data') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }}">
                                 Sources
                             </a>
                             <a href="{{ route('tax_return.2551q.pdf', $taxReturn->id) }}" class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('tax_return.2551q.pdf') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }}">
                                 Report
                             </a>
                         </nav>
+
+                        <!-- Buttons -->
+                        <div class="flex space-x-4">
+                            <a href="{{ route('percentage_return.edit', $taxReturn->id) }}" class="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600">
+                                Edit Report
+                            </a>
+                            <form action="{{ route('tax-return.mark-filed', $taxReturn->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-lg hover:bg-green-600">
+                                    File Report
+                                </button>
+                            </form>
+                        </div>
                     </div>
+
                     <div class="mb-12 mt-6 mx-12 overflow-hidden max-w-full">
                         <iframe src="{{ $pdfPath }}" width="100%" height="600px"></iframe>
                     </div>

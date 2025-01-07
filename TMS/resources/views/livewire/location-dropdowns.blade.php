@@ -78,7 +78,7 @@ let initializingSelect2 = false;
 function initSelect2() {
     if (initializingSelect2) return;
     initializingSelect2 = true;
-    
+
     try {
         // Region Select2
         if (!$('#region.select2').data('select2')) {
@@ -87,19 +87,12 @@ function initSelect2() {
                 dropdownParent: $(document.body)
             }).on('change', function (e) {
                 const selectedValue = $(this).val();
-                
-                // Clear dependent fields in formData
-                window.dispatchEvent(new CustomEvent('region-selected', {
-                    detail: {
-                        region: selectedValue,
-                        clearDependents: true
-                    }
-                }));
-                
-                // Reset dependent select2 fields
-                $('#province.select2').val(null).trigger('change');
-                $('#city.select2').val(null).trigger('change');
-                
+
+                // Clear dependent fields and reset placeholders
+                resetDropdown('#province', "Select Province");
+                resetDropdown('#city', "Select City");
+
+                // Dispatch Livewire event
                 Livewire.dispatch('selectedRegion', { value: selectedValue });
             });
         }
@@ -111,18 +104,11 @@ function initSelect2() {
                 dropdownParent: $(document.body)
             }).on('change', function (e) {
                 const selectedValue = $(this).val();
-                
-                // Clear dependent fields in formData
-                window.dispatchEvent(new CustomEvent('province-selected', {
-                    detail: {
-                        province: selectedValue,
-                        clearDependents: true
-                    }
-                }));
-                
-                // Reset dependent select2 field
-                $('#city.select2').val(null).trigger('change');
-                
+
+                // Clear dependent field and reset placeholder
+                resetDropdown('#city', "Select City");
+
+                // Dispatch Livewire event
                 Livewire.dispatch('selectedProvince', { value: selectedValue });
             });
         }
@@ -134,9 +120,6 @@ function initSelect2() {
                 dropdownParent: $(document.body)
             }).on('change', function (e) {
                 const selectedValue = $(this).val();
-                window.dispatchEvent(new CustomEvent('city-selected', {
-                    detail: selectedValue
-                }));
                 Livewire.dispatch('selectedCity', { value: selectedValue });
             });
         }
@@ -145,6 +128,13 @@ function initSelect2() {
     } finally {
         initializingSelect2 = false;
     }
+}
+
+// Helper function to reset dropdown and ensure placeholder selection
+function resetDropdown(selector, placeholderText) {
+    const $dropdown = $(selector);
+    $dropdown.val(null).trigger('change'); // Clear selection
+    $dropdown.html(`<option value="" disabled selected>${placeholderText}</option>`); // Reset placeholder
 }
 
 // Initialize when Livewire loads

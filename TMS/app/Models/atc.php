@@ -17,5 +17,9 @@ class atc extends Model
         'type',
         'tax_rate',
     ];
+    public function scopeForSales($query)
+{
+    return $query->where('transaction_type', 'Sales');
+}
     
 }

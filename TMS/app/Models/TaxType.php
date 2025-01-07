@@ -17,4 +17,8 @@ class TaxType extends Model
         'category'
 
     ];
+    public function scopeForSales($query)
+{
+    return $query->where('transaction_type', 'Sales');
+}
 }
