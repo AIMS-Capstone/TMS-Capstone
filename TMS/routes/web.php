@@ -377,10 +377,13 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
                 Route::post('/{id}/1601EQ_Qap/activate', [withHolding1601EQController::class, 'activateQapTransaction'])->name('with_holding.1601EQ_Qap.activate');
                 Route::post('/{id}/1601EQ_Qap/deactivate', [withHolding1601EQController::class, 'deactivateQapTransaction'])->name('with_holding.1601EQ_Qap.deactivate');
                 Route::post('/{id}/1601EQ_Qap/unassign', [withHolding1601EQController::class, 'destroyQapTransaction'])->name('with_holding.1601EQ_Qap.unassign');
-
                 // Route for creating 1601EQ
                 Route::get('/{id}/1601EQ_form', [withHolding1601EQController::class, 'createForm1601EQ'])->name('form1601EQ.create');
                 Route::post('/{id}/1601EQ/store', [withHolding1601EQController::class, 'storeForm1601EQ'])->name('form1601EQ.store');
+                Route::get('/{id}/1601EQ/preview', [withHolding1601EQController::class, 'previewForm1601EQ'])->name('form1601EQ.preview');
+                Route::get('/{id}/1601EQ/edit', [withHolding1601EQController::class, 'editForm1601EQ'])->name('form1601EQ.edit');
+                Route::put('/{id}/1601EQ/update', [withHolding1601EQController::class, 'updateForm1601EQ'])->name('form1601EQ.update');
+                Route::get('/{id}/1601EQ/download', [WithHolding1601EQController::class, 'downloadForm1601EQ'])->name('form1601EQ.download');
                 
             // Route for generating witholding tax return for 1604C
                 Route::get('/1604C', [withHolding1604CController::class, 'index1604C'])->name('with_holding.1604C');

@@ -13,42 +13,80 @@
                     <a href="{{ route('form1601EQ.create', ['id' => $withHolding->id]) }}" class="pb-2 text-gray-500 hover:text-blue-500">Form</a>
                 </div>
 
-                <div x-data="{
-                    showCheckboxes: false,
-                    checkAll: false,
-                    selectedRows: [],
-                    showDeleteCancelButtons: false,
+                        <!-- Second Header -->
+                            <div class="container mx-auto ps-8">
+                                <div class="flex flex-row space-x-2 items-center justify-center">
+                                    <div x-data="{ selectedTab: 'Qap' }" class="w-full">
+                                        <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-24 border-neutral-300" role="tablist" aria-label="tab options">
+                                            <button 
+                                                @click="selectedTab = 'Qap'" 
+                                                :aria-selected="selectedTab === 'Qap'" 
+                                                :tabindex="selectedTab === 'Qap' ? '0' : '-1'" 
+                                                :class="selectedTab === 'Qap' ? 'font-bold text-blue-900 ' : 'text-neutral-600 font-medium hover:border-b-blue-900 hover:text-blue-900 hover:font-bold'" 
+                                                class="h-min py-2 text-base relative" 
+                                                type="button" 
+                                                role="tab" 
+                                                aria-controls="tabpanelQap">
+                                                <span class="block">Qap</span>
+                                                <span 
+                                                    :class="selectedTab === 'Qap' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
+                                                </span>
+                                            </button>
+                                            <a href="{{ route('with_holding.1601EQ_Qap.archive', ['id' => $withHolding->id]) }}">
+                                                <button @click="selectedTab = 'Archive Qap'" :aria-selected="selectedTab === 'Archive Qap'" 
+                                                    :tabindex="selectedTab === 'Archive Qap' ? '0' : '-1'" 
+                                                    :class="selectedTab === 'Archive Qap' ? 'font-bold text-blue-900' : 'text-neutral-600 font-medium hover:border-b-blue-900 hover:text-blue-900 hover:font-bold'"
+                                                    class="h-min py-2 text-base relative" 
+                                                    type="button" 
+                                                    role="tab" 
+                                                    aria-controls="tabpanelArchive Qap" >
+                                                    <span class="block">Archive Qap</span>
+                                                    <span
+                                                        :class="selectedTab === 'Archive Qap' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
+                                                    </span>
+                                                </button>
+                                            </a>
+                                        </div>
+                                    </div>  
+                                </div>
+                            </div>
+                        <hr>
 
-                    // Toggle a single row
-                    toggleCheckbox(id) {
-                        if (this.selectedRows.includes(id)) {
-                            this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
-                        } else {
-                        this.selectedRows.push(id);
-                        }
-                        console.log(this.selectedRows); // Debugging line
-                    },
-                                        
-                    // Toggle all rows
-                    toggleAll() {
-                    this.checkAll = !this.caheckAll;
-                    if (this.checkAll) {
-                        this.selectedRows = {{ json_encode($withHolding->pluck('id')->toArray()) }}; 
-                    } else {
-                        this.selectedRows = []; 
-                    }
-                        console.log(this.selectedRows); // Debugging line
-                    },
-
-                    // Handle deletion
-                    deleteRows() {
-                        if (this.selectedRows.length === 0) {
-                            alert('No rows selected for deletion.');
-                            return;
-                        }
-
-                        if (confirm('Are you sure you want to archive the selected row/s?')) {
-                            fetch('/tax_return/with_holding/1604E/destroy', {
+                    <!-- Krazy table interaction -->
+                    <div class="p-6" x-data="{
+                        showCheckboxes: false,
+                        checkAll: false,
+                        selectedRows: [],
+                        showDeleteCancelButtons: false,
+                        showConfirmArchiveModal: false,
+                        
+                        toggleCheckbox(id) {
+                            if (this.selectedRows.includes(id)) {
+                                this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
+                            } else {
+                                this.selectedRows.push(id);
+                            }
+                        },
+                        
+                        toggleAll() {
+                            this.checkAll = !this.checkAll;
+                            if (this.checkAll) {
+                                this.selectedRows = @json($taxRows->pluck('transaction.id'));
+                            } else {
+                                this.selectedRows = [];
+                            }
+                        },
+                        
+                        deactivate() {
+                            if (this.selectedRows.length === 0) {
+                                alert('No rows selected for deactivation.');
+                                return;
+                            }
+                            this.showConfirmArchiveModal = true;
+                        },
+                        
+                        confirmDeactivation() {
+                            fetch('{{ route('with_holding.1601EQ_Qap.deactivate', ['id' => $withHolding->id]) }}', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -56,35 +94,33 @@
                                 },
                                 body: JSON.stringify({ ids: this.selectedRows })
                             })
-                            .then(response => {
-                                if (response.ok) {
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
                                     location.reload();
                                 } else {
-                                    alert('Error deleting rows.');
+                                    alert('Failed to deactivate transactions.');
                                 }
                             });
+                        },
+                        
+                        cancelSelection() {
+                            this.selectedRows = [];
+                            this.showCheckboxes = false;
+                            this.showDeleteCancelButtons = false;
+                        },
+                        
+                        get selectedCount() {
+                            return this.selectedRows.length;
                         }
-                    },
-
-                    // Cancel selection
-                    cancelSelection() {
-                        this.selectedRows = []; 
-                        this.checkAll = false;
-                        this.showCheckboxes = false; 
-                        this.showDeleteCancelButtons = false;
-                    },
-
-                    get selectedCount() {
-                        return this.selectedRows.length;
-                    }
-                }" class="mb-12 mx-12 overflow-hidden max-w-full rounded-md border-neutral-300 dark:border-neutral-700">
+                    }">
 
                     <!-- Fourth Header -->
                     <div class="container mx-auto">
                         <div class="flex flex-row space-x-2 items-center justify-between">
                             <!-- Search row -->
                             <div class="relative w-80 p-4">
-                                <form x-target="transaction" action="/1604E_schedule4" role="search" aria-label="Table" autocomplete="off">
+                                <form x-target="QAP" action="/1601EQ_Qap" role="search" aria-label="Table" autocomplete="off">
                                     <input 
                                         type="search" 
                                         name="search" 
@@ -111,10 +147,10 @@
 
                                 <button 
                                     type="button" 
-                                    @click="showCheckboxes = !showCheckboxes; showDeleteCancelButtons = !showDeleteCancelButtons" 
-                                    class="border px-3 py-2 rounded-lg text-sm hover:border-red-500 hover:text-red-500 transition"
-                                >
-                                    <i class="fa fa-trash"></i> Delete
+                                    @click="showCheckboxes = !showCheckboxes; showDeleteCancelButtons = !showDeleteCancelButtons; $el.disabled = true;" 
+                                    :disabled="selectedRows.length === 1"
+                                    class="border px-3 py-2 rounded-lg text-sm text-gray-600 hover:border-gray-800 hover:text-gray-800 hover:bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <i class="fa fa-trash"></i> Deactivate
                                 </button>
 
                                 <button type="button">
@@ -124,54 +160,78 @@
                         </div>
                     </div>
 
-                    <div class="px-6 py-4">
-                        <!-- Transactions Table -->
-                        <div class="bg-gray-50 p-4 rounded-md">
-                            <table class="min-w-full divide-y divide-gray-300">
-                                <thead class="bg-gray-100">
+                        <div class="overflow-x-auto">
+                            <table class="w-full items-start text-left text-sm text-neutral-600" id="QAP">
+                                <thead class="bg-neutral-100 text-sm text-neutral-700">
                                     <tr>
-                                        <th class="py-2 px-4 text-left text-sm font-medium text-gray-700">Vendor</th>
-                                        <th class="py-2 px-4 text-left text-sm font-medium text-gray-700">Description</th>
-                                        <th class="py-2 px-4 text-left text-sm font-medium text-gray-700">Reference</th>
-                                        <th class="py-2 px-4 text-left text-sm font-medium text-gray-700">ATC</th>
-                                        <th class="py-2 px-4 text-left text-sm font-medium text-gray-700">Date</th>
-                                        <th class="py-2 px-4 text-right text-sm font-medium text-gray-700">Amount</th>
-                                        <th class="py-2 px-4 text-right text-sm font-medium text-gray-700">Withheld</th>
-                                        <th class="py-2 px-4 text-right text-sm font-medium text-gray-700">Tax Rate</th>
+                                        <th class="py-2 px-4">
+                                            <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer">
+                                                <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"/>
+                                            </label>
+                                        </th>
+                                        <th scope="col" class="py-4 px-4">Vendor</th>
+                                        <th scope="col" class="py-4 px-4">Description</th>
+                                        <th scope="col" class="py-4 px-4">Reference</th>
+                                        <th scope="col" class="py-4 px-4">ATC</th>
+                                        <th scope="col" class="py-4 px-4">Date</th>
+                                        <th scope="col" class="py-4 px-4">Amount</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-200">
-                                    @forelse($transactions as $transaction)
-                                        <tr>
-                                            <td class="py-2 px-4">
-                                                {{ $transaction->contactDetails->bus_name ?? 'N/A' }}<br>
-                                                {{ $transaction->contactDetails->contact_address ?? 'N/A' }}<br>
-                                                {{ $transaction->contactDetails->contact_tin ?? 'N/A' }}
+                                <tbody class="divide-y divide-neutral-300">
+                                    @foreach ($taxRows as $taxRow)
+                                        <tr class="hover:bg-blue-50">
+                                            <td class="p-4">
+                                                <label x-show="showCheckboxes" class="flex items-center cursor-pointer">
+                                                    <input type="checkbox" @click="toggleCheckbox('{{ $taxRow->transaction->id }}')" :checked="selectedRows.includes('{{ $taxRow->transaction->id }}')" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"/>
+                                                </label>
                                             </td>
-                                            <td class="py-2 px-4">{{ $transaction->transaction_type ?? 'N/A' }}</td>
-                                            <td class="py-2 px-4">{{ $transaction->reference }}</td>
-                                            <td class="py-2 px-4">{{ $transaction->withholding->tax_code ?? 'N/A' }}</td>
-                                            <td class="py-2 px-4">{{ \Carbon\Carbon::parse($transaction->date)->format('d/m/Y') }}</td>
-                                            <td class="py-2 px-4 text-right">{{ number_format($transaction->total_amount, 2) }}</td>
-                                            <td class="py-2 px-4 text-right">{{ number_format($transaction->total_amount * 0.1, 2) }}</td> <!-- Assuming withheld is 10% -->
-                                            <td class="py-2 px-4 text-right">10%</td> <!-- Hardcoded tax rate -->
+                                            <td class="py-2 px-4">{{ optional($taxRow->transaction->contactDetails)->bus_name ?? 'N/A' }}</td>
+                                            <td class="py-2 px-4">{{ $taxRow->description ?? 'N/A' }}</td>
+                                            <td class="py-2 px-4">{{ $taxRow->transaction->reference ?? 'N/A' }}</td>
+                                            <td class="py-2 px-4">{{ optional($taxRow->atc)->tax_code ?? 'N/A' }}</td>
+                                            <td class="py-2 px-4">{{ \Carbon\Carbon::parse($taxRow->transaction->date ?? now())->format('d/m/Y') }}</td>
+                                            <td class="py-2 px-4">{{ number_format($taxRow->transaction->total_amount ?? 0, 2) }}</td>
                                         </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="8" class="py-4 text-center text-gray-500">No transactions associated with this withholding ID.</td>
-                                        </tr>
-                                    @endforelse
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
 
-                        <!-- Pagination -->
-                        <div class="mt-4">
-                            {{ $transactions->links('vendor.pagination.custom') }}
+                        <div class="flex justify-center mb-4 py-6 space-x-8" x-cloak>
+                            <button x-show="showDeleteCancelButtons" @click="deactivate"
+                                class="bg-red-500 text-white px-4 py-2 rounded">
+                                Deactivate Selected (<span x-text="selectedCount"></span>)
+                            </button>
+                            <button x-show="showDeleteCancelButtons" @click="cancelSelection"
+                                class="bg-gray-500 text-white px-4 py-2 rounded">
+                                Cancel
+                            </button>
+                        </div>
+
+                        @if (count($taxRows) > 0)   
+                            {{ $taxRows->links('vendor.pagination.custom') }}
+                        @endif
+
+                        <!-- Confirmation Modal -->
+                        <div x-show="showConfirmArchiveModal" x-cloak
+                            class="fixed inset-0 bg-opacity-50 flex items-center justify-center">
+                            <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                                <h2 class="text-xl font-bold mb-4">Confirm Deactivation</h2>
+                                <p>Are you sure you want to deactivate the selected transactions?</p>
+                                <div class="flex justify-end space-x-4 mt-6">
+                                    <button @click="showConfirmArchiveModal = false"
+                                        class="px-4 py-2 bg-gray-300 rounded">
+                                        Cancel
+                                    </button>
+                                    <button @click="confirmDeactivation"
+                                        class="px-4 py-2 bg-red-500 text-white rounded">
+                                        Confirm
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                </div>
             </div>
         </div>
     </div>

@@ -10,6 +10,7 @@
                 <form action="{{ route('form1601EQ.store', ['id' => $withHolding->id]) }}" method="POST">
                     @csrf
                     <input type="hidden" name="withholding_id" value="{{ $withHolding->id }}">
+                    <input type="hidden" id="atcDetailsData" value='@json($atcDetails)' />  
 
                     <!-- Filing Period -->
                     
@@ -184,8 +185,7 @@
                                     <input 
                                         type="radio" 
                                         name="category" 
-                                        value="Private" 
-                                        {{ $orgSetup->type === 'Private' ? 'checked' : '' }} 
+                                        value="1" 
                                         required
                                     > Private
                                 </label>
@@ -193,8 +193,7 @@
                                     <input 
                                         type="radio" 
                                         name="category" 
-                                        value="Government" 
-                                        {{ $orgSetup->type === 'Government' ? 'checked' : '' }} 
+                                        value="0" 
                                         required
                                     > Government
                                 </label>
@@ -215,32 +214,30 @@
 
                     <!-- Tax Computation -->
                     <h2 class="text-lg font-semibold text-gray-800 mt-8">Computation of Tax</h2>
-                        <!-- Nag lagay muna akong 6. Pero baka maging variable yan, bibilangin ata existing forms -->
-                        @for ($i = 0; $i < 6; $i++)
-                            <div class="mb-6 px-8 flex flex-row justify-between gap-96">
-                                <label for="atc_{{ $i }}" class="block text-sm font-medium text-gray-700">ATC</label>
-                                <select id="atc_{{ $i }}" name="atc[]" class="atc-dropdown mt-1 block w-full border border-gray-300 rounded-md" data-index="{{ $i }}">
-                                    <option value="" disabled selected>Select Option</option>
-                                    @foreach ($atcs as $atc)
-                                        <option value="{{ $atc->id }}" data-tax-rate="{{ $atc->tax_rate }}">
-                                            {{ $atc->tax_code }} - {{ $atc->description }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label for="tax_base_{{ $i }}" class="block text-sm font-medium text-gray-700">Tax Base</label>
-                                <input type="number" id="tax_base_{{ $i }}" name="tax_base[]" class="mt-1 p-2 block w-full border border-gray-300 rounded-md">
-                            </div>
-                            <div class="mb-6 px-8 flex flex-row justify-between gap-96">
-                                <label for="tax_rate_{{ $i }}" class="block text-sm font-medium text-gray-700">Tax Rate</label>
-                                <input type="number" id="tax_rate_{{ $i }}" name="tax_rate[]" class="mt-1 p-2 block w-full border border-gray-300 rounded-md" readonly>
-                            </div>
-                            <div class="mb-6 px-8 flex flex-row justify-between gap-96">   
-                                <label for="tax_withheld_{{ $i }}" class="block text-sm font-medium text-gray-700">Tax Withheld</label>
-                                <input type="number" id="tax_withheld_{{ $i }}" name="tax_withheld[]" class="mt-1 p-2 block w-full border border-gray-300 rounded-md">
-                            </div>
-                        @endfor
+                    <table class="min-w-full mt-4">
+                        <thead>
+                            <tr>
+                                <th>Tax Code</th>
+                                <th>Tax Base</th>
+                                <th>Tax Rate</th>
+                                <th>Tax Withheld</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($atcDetails as $detail)
+                                <tr>
+                                    <td>{{ optional($detail->atc)->tax_code ?? 'N/A' }}</td>
+                                    <td><input type="text" value="{{ $detail->tax_base }}" readonly class="form-input"></td>
+                                    <td><input type="text" value="{{ $detail->tax_rate }}" readonly class="form-input"></td>
+                                    <td><input type="text" value="{{ $detail->tax_withheld }}" readonly class="form-input tax-withheld"></td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-gray-500">No ATC details available.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
 
                         <!-- Computation of Total Taxes Withheld -->
                             <div class="mb-6 px-8 flex flex-row justify-between gap-96">
@@ -256,14 +253,31 @@
                                 >
                             </div>
 
-                        <!-- Other Computations -->
-                            <div class="mb-6 px-8 flex flex-row justify-between gap-96">   
-                                <label for="remittances_1st_month" class="block text-sm font-medium text-gray-700">20. Remittances Made: 1st Month</label>
-                                <input type="number" id="remittances_1st_month" name="remittances_1st_month" class="mt-1 p-2 block w-full border border-gray-300 rounded-md">
-                            </div>
+                        <!-- Other Computations --> 
+                            <!-- Remittances Made: 1st Month -->
                             <div class="mb-6 px-8 flex flex-row justify-between gap-96">
-                                <label for="remittances_2nd_month" class="block text-sm font-medium text-gray-700">21. Remittances Made: 2nd Month</label>
-                                <input type="number" id="remittances_2nd_month" name="remittances_2nd_month" class="mt-1 p-2 block w-full border border-gray-300 rounded-md">
+                                <label for="remittances_1st_month" class="block text-sm font-medium text-gray-700">
+                                    20. Remittances Made: 1st Month
+                                </label>
+                                <input type="number" 
+                                    id="remittances_1st_month" 
+                                    name="remittances_1st_month" 
+                                    class="mt-1 p-2 block w-full border border-gray-300 rounded-md bg-gray-100" 
+                                    value="{{ $remittanceData->remittance_1st_month ?? 0 }}" 
+                                    readonly />
+                            </div>
+
+                            <!-- Remittances Made: 2nd Month -->
+                            <div class="mb-6 px-8 flex flex-row justify-between gap-96">
+                                <label for="remittances_2nd_month" class="block text-sm font-medium text-gray-700">
+                                    21. Remittances Made: 2nd Month
+                                </label>
+                                <input type="number" 
+                                    id="remittances_2nd_month" 
+                                    name="remittances_2nd_month" 
+                                    class="mt-1 p-2 block w-full border border-gray-300 rounded-md bg-gray-100" 
+                                    value="{{ $remittanceData->remittance_2nd_month ?? 0 }}" 
+                                    readonly />
                             </div>
                             <div class="mb-6 px-8 flex flex-row justify-between gap-96"> 
                                 <label for="remitted_previous" class="block text-sm font-medium text-gray-700">22. Tax Remitted Previously</label>
@@ -271,7 +285,7 @@
                             </div>
                             <div class="mb-6 px-8 flex flex-row justify-between gap-96">
                                 <label for="over_remittance" class="block text-sm font-medium text-gray-700">23. Over-remittance</label>
-                                <input type="number" id="over_remittance" name="over_remittance" class="mt-1 p-2 block w-full border border-gray-300 rounded-md">
+                                <input type="number" id="over_remittance" name="over_remittance" class="mt-1 p-2 block w-full border border-gray-300 rounded-md bg-gray-100" readonly>
                             </div>
                             <div class="mb-6 px-8 flex flex-row justify-between gap-96">
                                 <label for="other_payments" class="block text-sm font-medium text-gray-700">24. Other Payments Made</label>
@@ -330,106 +344,90 @@
 
     <!-- Script to calculate total amount due -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            console.log('DOM fully loaded and parsed.');
+            document.addEventListener('DOMContentLoaded', function () {
+                console.log('DOM fully loaded and parsed.');
 
-            const fields = {
-                totalTaxesWithheld: document.getElementById('total_taxes_withheld'),
-                remittances1stMonth: document.getElementById('remittances_1st_month'),
-                remittances2ndMonth: document.getElementById('remittances_2nd_month'),
-                remittedPrevious: document.getElementById('remitted_previous'),
-                overRemittance: document.getElementById('over_remittance'),
-                otherPayments: document.getElementById('other_payments'),
-                totalRemittancesMade: document.getElementById('total_remittances_made'),
-                taxStillDue: document.getElementById('tax_still_due'),
-                surcharge: document.getElementById('surcharge'),
-                interest: document.getElementById('interest'),
-                compromise: document.getElementById('compromise'),
-                totalPenalties: document.getElementById('penalties'),
-                totalAmountDue: document.getElementById('total_amount_due'),
-            };
+                const fields = {
+                    totalTaxesWithheld: document.getElementById('total_taxes_withheld'),
+                    remittances1stMonth: document.getElementById('remittances_1st_month'),
+                    remittances2ndMonth: document.getElementById('remittances_2nd_month'),
+                    remittedPrevious: document.getElementById('remitted_previous'),
+                    overRemittance: document.getElementById('over_remittance'),
+                    otherPayments: document.getElementById('other_payments'),
+                    totalRemittancesMade: document.getElementById('total_remittances_made'),
+                    taxStillDue: document.getElementById('tax_still_due'),
+                    surcharge: document.getElementById('surcharge'),
+                    interest: document.getElementById('interest'),
+                    compromise: document.getElementById('compromise'),
+                    totalPenalties: document.getElementById('penalties'),
+                    totalAmountDue: document.getElementById('total_amount_due'),
+                };
 
-            const taxWithheldFields = document.querySelectorAll('input[name="tax_withheld[]"]');
-            const atcDropdowns = document.querySelectorAll('.atc-dropdown');
+                function calculateTotalTaxesWithheld() {
+                    console.log('Fetching and calculating total taxes withheld...');
+                    
+                    // Fetch ATC details from hidden input
+                    const atcDetails = JSON.parse(document.getElementById('atcDetailsData').value || '[]');
+                    let totalTaxes = atcDetails.reduce((sum, detail) => sum + parseFloat(detail.tax_withheld || 0), 0);
 
-            // Debug: Log ATC dropdown fields
-            console.log('ATC Dropdown Fields:', atcDropdowns);
+                    console.log('Total Taxes Withheld:', totalTaxes);
+                    fields.totalTaxesWithheld.value = totalTaxes.toFixed(2);
+                }
 
-            // Function to autofill the tax_rate based on the selected ATC
-            function autofillTaxRate(event) {
-                const dropdown = event.target;
-                const index = dropdown.getAttribute('data-index');
-                const selectedOption = dropdown.options[dropdown.selectedIndex];
-                const taxRate = selectedOption.getAttribute('data-tax-rate');
+                function calculateTotalRemittances() {
+                    const remittances = [
+                        parseFloat(fields.remittances1stMonth.value) || 0,
+                        parseFloat(fields.remittances2ndMonth.value) || 0,
+                        parseFloat(fields.remittedPrevious.value) || 0,
+                        parseFloat(fields.otherPayments.value) || 0,
+                    ];
+                    const totalRemittances = remittances.reduce((a, b) => a + b, 0);
+                    fields.totalRemittancesMade.value = totalRemittances.toFixed(2);
+                }
 
-                console.log(`ATC Selected [Index ${index}]:`, selectedOption.value, 'Tax Rate:', taxRate);
+                function calculateTotalPenalties() {
+                    const penalties = (parseFloat(fields.surcharge.value) || 0) +
+                        (parseFloat(fields.interest.value) || 0) +
+                        (parseFloat(fields.compromise.value) || 0);
+                    fields.totalPenalties.value = penalties.toFixed(2);
+                }
 
-                // Update the corresponding tax_rate input field
-                const taxRateInput = document.getElementById(`tax_rate_${index}`);
-                taxRateInput.value = taxRate || '';
-            }
+                function calculateTotals() {
+                    console.log('Calculating all totals...');
+                    calculateTotalTaxesWithheld();
+                    calculateTotalRemittances();
+                    calculateTotalPenalties();
 
-            // Attach change event listeners to each ATC dropdown
-            atcDropdowns.forEach(dropdown => {
-                dropdown.addEventListener('change', autofillTaxRate);
-            });
+                    const totalTaxes = parseFloat(fields.totalTaxesWithheld.value) || 0;
+                    const totalRemittances = parseFloat(fields.totalRemittancesMade.value) || 0;
+                    const penalties = parseFloat(fields.totalPenalties.value) || 0;
 
-            function calculateTotalTaxesWithheld() {
-                console.log('Calculating total taxes withheld...');
-                let totalTaxes = 0;
-                taxWithheldFields.forEach((field, index) => {
-                    const value = parseFloat(field.value) || 0;
-                    console.log(`Tax Withheld Field [${index}]:`, value);
-                    totalTaxes += value;
+                    // Calculate tax due or over-remittance
+                    let taxDue = 0;
+                    let overRemittance = 0;
+
+                    if (totalRemittances >= totalTaxes) {
+                        overRemittance = totalRemittances - totalTaxes;
+                    } else {
+                        taxDue = totalTaxes - totalRemittances;
+                    }
+
+                    // Update fields
+                    fields.overRemittance.value = overRemittance.toFixed(2);
+                    fields.taxStillDue.value = taxDue > 0 ? taxDue.toFixed(2) : '0.00';
+
+                    // Total amount due calculation
+                    const totalAmountDue = taxDue + penalties;
+                    fields.totalAmountDue.value = totalAmountDue.toFixed(2);
+                }
+
+                Object.values(fields).forEach((field) => {
+                    if (field) {
+                        field.addEventListener('input', calculateTotals);
+                    }
                 });
-                console.log('Total Taxes Withheld:', totalTaxes);
-                fields.totalTaxesWithheld.value = totalTaxes.toFixed(2); // Set the calculated value
-            }
 
-            function calculateTotals() {
-                console.log('Calculating all totals...');
-                calculateTotalTaxesWithheld(); // Ensure totalTaxesWithheld is updated first.
-
-                const totalTaxes = parseFloat(fields.totalTaxesWithheld.value) || 0;
-                const remittances = [
-                    parseFloat(fields.remittances1stMonth.value) || 0,
-                    parseFloat(fields.remittances2ndMonth.value) || 0,
-                    parseFloat(fields.remittedPrevious.value) || 0,
-                    parseFloat(fields.overRemittance.value) || 0,
-                    parseFloat(fields.otherPayments.value) || 0,
-                ];
-                console.log('Remittances:', remittances);
-
-                const totalRemittances = remittances.reduce((a, b) => a + b, 0);
-                console.log('Total Remittances:', totalRemittances);
-                fields.totalRemittancesMade.value = totalRemittances.toFixed(2);
-
-                const taxDue = totalTaxes - totalRemittances;
-                console.log('Tax Still Due:', taxDue);
-                fields.taxStillDue.value = taxDue.toFixed(2);
-
-                const penalties = (parseFloat(fields.surcharge.value) || 0) +
-                                (parseFloat(fields.interest.value) || 0) +
-                                (parseFloat(fields.compromise.value) || 0);
-                console.log('Total Penalties:', penalties);
-                fields.totalPenalties.value = penalties.toFixed(2);
-
-                const totalAmountDue = taxDue + penalties;
-                console.log('Total Amount Due:', totalAmountDue);
-                fields.totalAmountDue.value = totalAmountDue.toFixed(2);
-            }
-
-            // Attach event listeners to relevant fields
-            [...taxWithheldFields, ...Object.values(fields)].forEach((field, index) => {
-                console.log(`Attaching input listener to field [${index}]`, field);
-                field.addEventListener('input', calculateTotals);
+                calculateTotals();
             });
-
-            // Initial calculation on page load
-            console.log('Performing initial calculations...');
-            calculateTotals();
-        });
-
-
-    </script>
+        </script>
 </x-app-layout>
