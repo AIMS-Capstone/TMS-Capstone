@@ -245,37 +245,8 @@ $organizationId = session('organization_id');
                                     aria-controls="tabpanel1601C">
                                     1601C
                                 </button>
-                                <!-- Tab 2: 0619E -->
-                                <a href="{{ route('with_holding.0619E') }}">
-                                    <button @click="selectedTab = '0619E'" 
-                                        :aria-selected="selectedTab === '0619E'" 
-                                        :tabindex="selectedTab === '0619E' ? '0' : '-1'" 
-                                        :class="selectedTab === '0619E' 
-                                            ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
-                                            : 'text-zinc-600 font-medium hover:text-blue-900'" 
-                                        class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
-                                        type="button" 
-                                        role="tab" 
-                                        aria-controls="tabpanel0619E">
-                                        0619E
-                                    </button>
-                                </a>
-                                <!-- Tab 3: 1601EQ -->
-                                <a href="{{ route('with_holding.1601EQ') }}">
-                                    <button @click="selectedTab = '1601EQ'" 
-                                        :aria-selected="selectedTab === '1601EQ'" 
-                                        :tabindex="selectedTab === '1601EQ' ? '0' : '-1'" 
-                                        :class="selectedTab === '1601EQ' 
-                                            ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
-                                            : 'text-zinc-600 font-medium hover:text-blue-900'" 
-                                        class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
-                                        type="button" 
-                                        role="tab" 
-                                        aria-controls="tabpanel1601EQ">
-                                        1601EQ
-                                    </button>
-                                </a>
-                                <!-- Tab 4: 1604C -->
+                                {{-- Pang Ready --}}
+                                {{-- <!-- Tab 4: 1604C -->
                                 <a href="{{ route('with_holding.1604C') }}">
                                     <button @click="selectedTab = '1604C'" 
                                         :aria-selected="selectedTab === '1604C'" 
@@ -289,22 +260,7 @@ $organizationId = session('organization_id');
                                         aria-controls="tabpanel1604C">
                                         1604C
                                     </button>
-                                </a>
-                                <!-- Tab 5: 1604E -->
-                                <a href="{{ route('with_holding.1604E') }}">
-                                    <button @click="selectedTab = '1604E'" 
-                                        :aria-selected="selectedTab === '1604E'" 
-                                        :tabindex="selectedTab === '1604E' ? '0' : '-1'" 
-                                        :class="selectedTab === '1604E' 
-                                            ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
-                                            : 'text-zinc-600 font-medium hover:text-blue-900'" 
-                                        class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
-                                        type="button" 
-                                        role="tab" 
-                                        aria-controls="tabpanel1604E">
-                                        1604E
-                                    </button>
-                                </a>
+                                </a> --}}
                             </div>
                             <div x-data="{ open: false, month: '', year: '' }" @open-generate-modal.window="open = true" x-cloak>
                                 <!-- Modal Background -->

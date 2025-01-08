@@ -131,18 +131,19 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('with_holding.1601C')}}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
-                                    {{ request()->routeIs('with_holding.1601C') || request()->routeIs('with_holding.1601C.generate', 'with_holding.1601C_summary', 'with_holding.1601C_sources', 'with_holding.1601C_sources_store', 'form1601C.create', 'form1601C.store', 'with_holding.1601C_import', 
-                                    'with_holding.0619E', 'with_holding.0619E.generate', 'form0619E.create', 'form0619E.store', 
+                                    <a href="{{ route('with_holding.0619E') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
+                                    {{ request()->routeIs('with_holding.0619E') || request()->routeIs('with_holding.0619E.generate', 'form0619E.create', 'form0619E.store', 
                                     'with_holding.1601EQ', 'with_holding.1601EQ.generate', 'with_holding.1601EQ_Qap', 'with_holding.1601EQ_Qap.set', 'form1601EQ.create', 'form1601EQ.store', 
-                                    'with_holding.1604C', 'with_holding.1604C.generate', 'with_holding.1604C_remittances', 'with_holding.1604C_schedule1', 'with_holding.1604C_schedule2', 'form1604C.create', 'form1604C.store',
-                                    'with_holding.1604E', 'with_holding.1604E.generate', 'with_holding.1604E_summary', 'with_holding.1604E_remittances', 'with_holding.1604E_sources', 'with_holding.1604E_schedule4', 'with_holding.1604E_store', 'form1604E.create', 'form1604E.store') ? 'sidebar-submenu-active' : '' }}">
-                                        Withholding Tax Return
+                                    'with_holding.1604E', 'with_holding.1604E.generate', 'with_holding.1604E_summary', 'with_holding.1604E_remittances', 'with_holding.1604E_sources', 'with_holding.1604E_schedule4', 'with_holding.1604E_store', 'form1604E.create', 'form1604E.store') 
+                                    ? 'sidebar-submenu-active' : '' }}">
+                                        Withholding - Expanded
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group">
-                                        Final Withholding Tax Return
+                                    <a href="{{ route('with_holding.1601C') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
+                                    {{ request()->routeIs('with_holding.1601C') || request()->routeIs('with_holding.1601C.generate', 'with_holding.1601C_summary', 'with_holding.1601C_sources', 'with_holding.1601C_sources_store', 'form1601C.create', 'form1601C.store', 'with_holding.1601C_import') 
+                                    ? 'sidebar-submenu-active' : '' }}">
+                                        Withholding - Compensation
                                     </a>
                                 </li>
                             </ul>
