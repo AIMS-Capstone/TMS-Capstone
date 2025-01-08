@@ -17,7 +17,7 @@ $organizationId = session('organization_id');
                                     </svg>
                                     <a href="{{ route('vat_return') }}" 
                                         class="ms-1 text-sm font-medium {{ Request::routeIs('vat_return') ? 'font-extrabold text-blue-900' : 'text-zinc-500' }} md:ms-2">
-                                        2550M/Q
+                                        2550Q
                                     </a>
                                 </div>
                             </li>
@@ -241,7 +241,7 @@ $organizationId = session('organization_id');
                                     type="button" 
                                     role="tab" 
                                     aria-controls="tabpanelAll">
-                                    2550M/Q
+                                    2550Q
                                 </button>
                             </div>
                         </div>

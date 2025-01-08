@@ -89,7 +89,7 @@
                                             </li>
                                             <li class="pl-2">
                                                 <span class="inline-block align-top">
-                                                    a <b>Tax Type</b> column to specify the tax rate for each transaction:
+                                                    a <a href="{{ route('export.taxType', 'sales') }}"> <b>Tax Type</b> </a>column to specify the tax rate for each transaction:
                                                     <p>V or VOS = Vat on Sales</p>
                                                     <p>S or STG = Sales to Government</p>
                                                     <p>Z or ZRS = Zero Rated Sales</p>
@@ -100,7 +100,7 @@
                                                 <span class="inline-block align-top">a <b>Category</b> column which specifies whether it is for <b>Goods</b> or <b>Services</b>.</span>
                                             </li>
                                             <li class="pl-2">
-                                                <span class="inline-block align-top">an ATC Column added to your VAT on Sales transactions (download list). This is optional but can speed up the importing.</span>
+                                                <span class="inline-block align-top">an ATC Column added to your VAT on Sales transactions <a href="{{ route('export.atcs', 'sales') }}">(download list).</a> This is optional but can speed up the importing.</span>
                                             </li>
                                             <li class="pl-2">
                                                 <span class="inline-block align-top">a COA/Chart of Accounts column added to your Sales transactions (download list). This is a required field.</span>

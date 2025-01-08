@@ -268,7 +268,7 @@ $organizationId = session('organization_id');
                                 aria-controls="tabpanelAssets">
                                 1702Q
                             </button>
-                            <!-- Tab 3: 1701 -->
+                            {{-- <!-- Tab 3: 1701 -->
                             <button @click="selectedTab = '1701'; $dispatch('filter', { type: '1701' })" 
                                 :aria-selected="selectedTab === '1701'" 
                                 :tabindex="selectedTab === '1701' ? '0' : '-1'" 
@@ -321,7 +321,7 @@ $organizationId = session('organization_id');
                                 1702EX
                             </button>
                         </div>
-                        
+                         --}}
                         <div x-data="{ open: false, selectedType: '', month: '' }" @open-generate-modal.window="open = true" x-cloak>
                             <div x-show="open" class="fixed inset-0 bg-gray-200 bg-opacity-50 z-50 flex items-center justify-center transition-opacity"
                                 x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"

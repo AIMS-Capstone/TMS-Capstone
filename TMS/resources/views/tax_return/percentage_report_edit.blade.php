@@ -61,11 +61,11 @@
                     <div class="flex items-center space-x-4 w-2/3">
                         <label class="flex items-center text-zinc-700 text-sm">
                             <input type="radio" name="period" value="calendar" class="mr-2" 
-                                @if($period == 'calendar') checked @endif> Calendar
+                                @if($formData->period == 'calendar') checked @endif> Calendar
                         </label>
                         <label class="flex items-center text-zinc-700 text-sm">
                             <input type="radio" name="period" value="fiscal" class="mr-2" 
-                                @if($period == 'fiscal') checked @endif> Fiscal
+                                @if($formData->period == 'fiscal') checked @endif> Fiscal
                         </label>
                     </div>
                 </div>
@@ -103,7 +103,7 @@
                 </label>
                 
                 <!-- Input for Year Ended (Month selector) -->
-                <input type="month" name="year_ended" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" value="{{ old('year_ended', $yearEndedFormatted) }}">
+                <input type="month" name="year_ended" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" value="{{ old('year_ended', $formData->getAttribute('year_ended')) }}">
             </div>
             
             
@@ -190,15 +190,17 @@
                 </label>
             
                 <!-- Radio Buttons for selecting Amended Return -->
-                <div class="flex items-center space-x-4 w-2/3">
-                    <label class="flex items-center text-zinc-700 text-sm">
-                        <input type="radio" name="amended_return" value="yes" class="mr-2" {{ old('amended_return') == 'yes' ? 'checked' : '' }}> Yes
-                    </label>
-                    <label class="flex items-center text-zinc-700 text-sm">
-                        <input type="radio" name="amended_return" value="no" class="mr-2"  {{ old('amended_return') == 'no' ? 'checked' : '' }}> No
-                    </label>
-                </div>
-            </div>
+       <div class="flex items-center space-x-4 w-2/3">
+    <label class="flex items-center text-zinc-700 text-sm">
+        <input type="radio" name="amended_return" value="yes" class="mr-2" 
+               {{ old('amended_return', $formData->amended_return ?? '') == 'yes' ? 'checked' : '' }}> Yes
+    </label>
+    <label class="flex items-center text-zinc-700 text-sm">
+        <input type="radio" name="amended_return" value="no" class="mr-2"  
+               {{ old('amended_return', $formData->amended_return ?? '') == 'no' ? 'checked' : '' }}> No
+    </label>
+</div>
+</div>
 
             <!-- Number of Sheets Attached -->
             <div x-data="{ showTooltip: false }" class="mb-4 flex items-start">
@@ -226,7 +228,10 @@
                     </span>
                 </label>
             
-                <input type="number"  name="sheets_attached" value="{{ old('sheets_attached') }}" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                <input type="number" name="sheets_attached" 
+                value="{{ old('sheets_attached', $formData->sheets_attached ?? '') }}" 
+                class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+         
             </div>
             
         </div>
@@ -294,7 +299,7 @@
                 </label>
             
 
-                <input type="text" name="rdo_code" placeholder="000-000-000-000" value="{{ $rdoCode }}" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                <input type="text" name="rdo_code" readonly placeholder="000-000-000-000" value="{{ $formData->rdo_code  }}" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
             </div>
             
 
@@ -325,7 +330,7 @@
                 </label>
             
                 <!-- Display the Taxpayer's Name automatically fetched from the organization setup -->
-                <input type="text" name="taxpayer_name" placeholder="e.g. Dela Cruz, Juan, Protacio" value="{{ $organization->registration_name }}" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                <input type="text" readonly name="taxpayer_name" placeholder="e.g. Dela Cruz, Juan, Protacio" value="{{ $organization->registration_name }}" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
             </div>
             
 
@@ -357,7 +362,7 @@
                 </label>
             
                 <!-- Display the Registered Address automatically fetched from the organization setup -->
-                <input type="text" name="registered_address" value="{{ $organization->address_line . ', ' . $organization->city . ', ' . $organization->province . ', ' . $organization->region }}" placeholder="e.g. 145 Yakal St. ESL Bldg., San Antonio Village Makati NCR" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                <input type="text" readonly name="registered_address" value="{{ $organization->address_line . ', ' . $organization->city . ', ' . $organization->province . ', ' . $organization->region }}" placeholder="e.g. 145 Yakal St. ESL Bldg., San Antonio Village Makati NCR" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
             </div>
             
 
@@ -389,7 +394,7 @@
                 </label>
             
                 <!-- Display the Zip Code automatically fetched from the organization setup -->
-                <input type="text" name="zip_code" value="{{ $organization->zip_code }}" placeholder="e.g. 1203" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                <input readonly type="text" name="zip_code" value="{{ $organization->zip_code }}" placeholder="e.g. 1203" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
             </div>
             
      
@@ -420,7 +425,7 @@
                 </label>
             
                 <!-- Display the Contact Number automatically fetched from the organization setup -->
-                <input type="number" name="contact_number" value="{{ $organization->contact_number }}" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                <input type="number" readonly name="contact_number" value="{{ $organization->contact_number }}" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
             </div>
             
             <div x-data="{ showTooltip: false }" class="mb-4 flex items-start">
@@ -450,7 +455,7 @@
                 </label>
             
                 <!-- Display the Email Address automatically fetched from the organization setup -->
-                <input type="text" name="email_address" value="{{ $organization->email }}" placeholder="pedro@gmail.com" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                <input type="text" readonly name="email_address" value="{{ $organization->email }}" placeholder="pedro@gmail.com" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
             </div>
             
             <div x-data="{ showTooltip: false }" class="mb-4 flex items-start">
@@ -481,12 +486,15 @@
                 <!-- Radio options for tax relief selection -->
                 <div class="flex items-center space-x-4 w-2/3 h-full mt-2">
                     <label class="flex items-center text-zinc-700 text-sm">
-                        <input type="radio" name="tax_relief" value="yes" class="mr-2" {{ old('tax_relief') == 'yes' ? 'checked' : '' }}> Yes
+                        <input type="radio" name="tax_relief" value="yes" class="mr-2" 
+                               {{ old('tax_relief', $formData->tax_relief ?? '') == 'yes' ? 'checked' : '' }}> Yes
                     </label>
                     <label class="flex items-center text-zinc-700 text-sm">
-                        <input type="radio" name="tax_relief" value="no" class="mr-2" {{ old('tax_relief') == 'no' ? 'checked' : '' }}> No
+                        <input type="radio" name="tax_relief" value="no" class="mr-2" 
+                               {{ old('tax_relief', $formData->tax_relief ?? '') == 'no' ? 'checked' : '' }}> No
                     </label>
                 </div>
+                
                 
                 
             </div>
@@ -516,7 +524,8 @@
                 </label>
             
                 <!-- Input field to specify the tax relief -->
-                <input type="text" name="yes_specify" value="{{ old('yes_specify') }}"placeholder="Specified Tax Treaty" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                <input type="text" name="yes_specify" value="{{ old('yes_specify', $formData->yes_specify ?? '') }}" placeholder="Specified Tax Treaty" class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+
             </div>
             
             <div x-data="{ showTooltip: false }" class="mb-4 flex items-start">
@@ -548,12 +557,13 @@
                 <!-- Radio buttons for tax rate selection -->
                 <div class="flex items-center space-x-4 w-2/3 mt-10">
                     <label class="flex items-center text-zinc-700 text-sm">
-                        <input type="radio" name="availed_tax_rate" value="Graduated" {{ old('availed_tax_rate') == 'Graduated' ? 'checked' : '' }} class="mr-2"> Graduated income tax rate on net taxable income 
+                        <input type="radio" name="availed_tax_rate" value="Graduated" {{ old('availed_tax_rate', $formData->availed_tax_rate ?? '') == 'Graduated' ? 'checked' : '' }} class="mr-2"> Graduated income tax rate on net taxable income 
                     </label>
                     <label class="flex items-center text-zinc-700 text-sm">
-                        <input type="radio" name="availed_tax_rate" value="Flat_rate" {{ old('availed_tax_rate') == 'Flat_rate' ? 'checked' : '' }} class="mr-2"> 8% income tax rate on gross sales/receipts/others
+                        <input type="radio" name="availed_tax_rate" value="Flat_rate" {{ old('availed_tax_rate', $formData->availed_tax_rate ?? '') == 'Flat_rate' ? 'checked' : '' }} class="mr-2"> 8% income tax rate on gross sales/receipts/others
                     </label>
                 </div>
+                
             </div>
             
     </div>
@@ -629,9 +639,10 @@
     type="number" 
     name="creditable_tax" 
     id="creditable_tax" 
-    value="{{ old('creditable_tax', '0.00') }}" 
+    value="{{ old('creditable_tax', $formData->creditable_tax ?? '0.00') }}" 
     placeholder="e.g. 1000.00" 
     class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+
 </div>
 
 
@@ -667,12 +678,13 @@
 
     <!-- Input field for amended tax -->
     <input 
-        type="number" 
-        name="amended_tax" 
-        id="amended_tax" 
-        value="{{ old('amended_tax', '0.00') }}" 
-        placeholder="e.g. 500.00" 
-        class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+    type="number" 
+    name="amended_tax" 
+    id="amended_tax" 
+    value="{{ old('amended_tax', $formData->amended_tax ?? '0.00') }}" 
+    placeholder="e.g. 500.00" 
+    class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+
 </div>
 
         
@@ -707,19 +719,21 @@
 
     <!-- Input fields for other tax credit/payment -->
     <input 
-        type="text" 
-        name="other_tax_specify" 
-        id="other_tax_specify" 
-        value="{{ old('other_tax_specify') }}" 
-        placeholder="Specify source" 
-        class="w-1/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-    <input 
-        type="number" 
-        name="other_tax_amount" 
-        id="other_tax_amount" 
-        value="{{ old('other_tax_amount', '0.00') }}" 
-        placeholder="e.g. 1000.00" 
-        class="w-1/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+    type="text" 
+    name="other_tax_specify" 
+    id="other_tax_specify" 
+    value="{{ old('other_tax_specify', $formData->other_tax_specify ?? '') }}" 
+    placeholder="Specify source" 
+    class="w-1/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+
+<input 
+    type="number" 
+    name="other_tax_amount" 
+    id="other_tax_amount" 
+    value="{{ old('other_tax_amount', $formData->other_tax_amount ?? '0.00') }}" 
+    placeholder="e.g. 1000.00" 
+    class="w-1/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+
 </div>
 
         
@@ -753,12 +767,12 @@
 
     <!-- Read-only field for total tax credits -->
     <input 
-        type="number" 
-        name="total_tax_credits" 
-        id="total_tax_credits" 
-        value="{{ old('total_tax_credits', '0.00') }}" 
-        readonly 
-        class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+    type="number" 
+    name="total_tax_credits" 
+    id="total_tax_credits" 
+    value="{{ old('total_tax_credits', $formData->total_tax_credits ?? '0.00') }}" 
+    readonly 
+    class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
 </div>
 
  <!-- Tax Still Payable/(Overpayment) -->
@@ -790,12 +804,12 @@
 
     <!-- Read-only field for tax payable or overpayment -->
     <input 
-        type="number" 
-        name="tax_still_payable" 
-        id="tax_still_payable" 
-        value="{{ old('tax_still_payable', '0.00') }}" 
-        readonly 
-        class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+    type="number" 
+    name="tax_still_payable" 
+    id="tax_still_payable" 
+    value="{{ old('tax_still_payable', $formData->tax_still_payable ?? '0.00') }}" 
+    readonly 
+    class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
 </div>
 
     
@@ -827,11 +841,11 @@
 
     <!-- Input field for surcharge -->
     <input 
-        type="number" 
-        name="surcharge" 
-        id="surcharge" 
-        value="{{ old('surcharge', '0.00') }}" 
-        class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+    type="number" 
+    name="surcharge" 
+    id="surcharge" 
+    value="{{ old('surcharge', $formData->surcharge ?? '0.00') }}" 
+    class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
 </div>
 
    <!-- Interest -->
@@ -862,12 +876,12 @@
 
     <!-- Input field for interest -->
     <input 
-        type="number" 
-        name="interest" 
-        id="interest" 
-        value="{{ old('interest', '0.00') }}" 
-        placeholder="e.g. 50.00" 
-        class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+    type="number" 
+    name="interest" 
+    id="interest" 
+    value="{{ old('interest', $formData->interest ?? '0.00') }}" 
+    placeholder="e.g. 50.00" 
+    class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
 </div>
 
 <!-- Compromise -->
@@ -898,12 +912,12 @@
 
     <!-- Input field for compromise -->
     <input 
-        type="number" 
-        name="compromise" 
-        id="compromise" 
-        value="{{ old('compromise', '0.00') }}" 
-        placeholder="e.g. 200.00" 
-        class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+    type="number" 
+    name="compromise" 
+    id="compromise" 
+    value="{{ old('compromise', $formData->compromise ?? '0.00') }}" 
+    placeholder="e.g. 200.00" 
+    class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
 </div>
 <!-- Total Penalties -->
 <div x-data="{ showTooltip: false }" class="mb-4 flex items-start">
@@ -932,12 +946,12 @@
     </label>
 
     <input 
-        type="number" 
-        name="total_penalties" 
-        id="total_penalties" 
-        value="{{ old('total_penalties', '0.00') }}" 
-        readonly 
-        class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+    type="number" 
+    name="total_penalties" 
+    id="total_penalties" 
+    value="{{ old('total_penalties', $formData->total_penalties ?? '0.00') }}" 
+    readonly 
+    class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
 </div>
 
 <!-- Total Amount Payable/(Overpayment) -->
@@ -967,12 +981,12 @@
     </label>
 
     <input 
-        type="number" 
-        name="total_amount_payable" 
-        id="total_amount_payable" 
-        value="{{ old('total_amount_payable', '0.00') }}" 
-        readonly 
-        class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+    type="number" 
+    name="total_amount_payable" 
+    id="total_amount_payable" 
+    value="{{ old('total_amount_payable', $formData->total_amount_payable ?? '0.00') }}" 
+    readonly 
+    class="w-2/3 p-2 block px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
 </div>
 
 

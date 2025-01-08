@@ -17,7 +17,7 @@ $organizationId = session('organization_id');
                                     </svg>
                                     <a href="{{ route('percentage_return') }}" 
                                         class="ms-1 text-sm font-medium {{ Request::routeIs('percentage_return') ? 'font-extrabold text-blue-900' : 'text-zinc-500' }} md:ms-2">
-                                        2551M/Q
+                                        2551Q
                                     </a>
                                 </div>
                             </li>
@@ -240,7 +240,7 @@ $organizationId = session('organization_id');
                                     type="button" 
                                     role="tab" 
                                     aria-controls="tabpanelAll">
-                                    2551M/Q
+                                    2551Q
                                 </button>
                             </div>
                         </div>

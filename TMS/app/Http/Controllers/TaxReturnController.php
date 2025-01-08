@@ -21,6 +21,7 @@ use FPDM;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class TaxReturnController extends Controller
 {
@@ -159,83 +160,111 @@ class TaxReturnController extends Controller
     
     // Function for showing Percentage Report Preview
     public function showPercentageReport($id)
-{
-    $taxReturn = TaxReturn::findOrFail($id);
-    $organization_id = session("organization_id");
-
-    // Ensure correct relationship loading with lowercase 'rdo'
-    $organization = OrgSetup::with("rdo")
-        ->where('id', $organization_id)
-        ->first();
-
-    $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
-
-    // Parse the start_date using Carbon
-    $startDate = Carbon::parse($organization->start_date);
-
-    // Determine the year ended based on the start_date
-    $yearEnded = null;
-    if ($startDate->month == 1 && $startDate->day == 1) {
-        // Calendar year - Ends on December 31 of the next year
-        $yearEnded = $startDate->addYear()->endOfYear();
-    } else {
-        // Fiscal year - Ends on the last day of the same month next year
-        $yearEnded = $startDate->addYear()->lastOfMonth();
-    }
-    // Check whether the organization follows a calendar or fiscal period
-    $period = ($yearEnded->month == 12 && $yearEnded->day == 31) ? 'calendar' : 'fiscal';
-
-    // Format the year ended date as 'YYYY-MM'
-    $yearEndedFormatted = $yearEnded->format('Y-m');
-    $yearEndedFormattedForDisplay = $yearEnded->format('m/Y'); // e.g., "12/2024"
-
-    // Get the transaction IDs related to this tax return
-    $transactionIds = $taxReturn->transactions->pluck('id');
-
-    // Get the TaxRows and calculate the summary data
-    $taxRows = TaxRow::whereHas('transaction', function ($query) use ($transactionIds) {
-        $query->where('tax_type', 2)
-              ->where('transaction_type', 'sales')
-              ->where('status', 'draft')
-              ->whereIn('id', $transactionIds);
-    })->with(['transaction.contactDetails', 'atc', 'taxType'])
-      ->get();
-
-    $totalZeroRatedSales ="";
-    // Group the TaxRows by ATC and calculate the summary       
-    $groupedData = $taxRows->groupBy(function ($taxRow) {
-        return $taxRow->atc->tax_code; // Group by ATC code
-    });
-
-    $summaryData = $groupedData->map(function ($group) {
-        $taxableAmount = 0;
-        $taxRate = 0;
-        $taxDue = 0;
-
-        foreach ($group as $taxRow) {
-            $taxableAmount += $taxRow->net_amount;
-            $taxRate = $taxRow->atc->tax_rate;
-            $taxDue += $taxRow->atc_amount;
+    {
+        $taxReturn = TaxReturn::findOrFail($id);
+        
+        // Check if 2551q form already exists for this tax return
+        $existing2551q = Tax2551Q::where('tax_return_id', $taxReturn->id)->first();
+        
+        if ($existing2551q) {
+            // If form exists, redirect to the PDF viewer
+            return redirect()->route('tax_return.2551q.pdf', ['taxReturn' => $taxReturn->id]);
         }
+        
+        // If no form exists, continue with preview logic
+        $organization_id = session("organization_id");
+        
+        // Ensure correct relationship loading with lowercase 'rdo'
+        $organization = OrgSetup::with("rdo")
+            ->where('id', $organization_id)
+            ->first();
+    
+        $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
+    
+        // Parse the start_date using Carbon
+        $startDate = Carbon::parse($organization->start_date);
+    
+        // Determine the year ended based on the start_date
+        $yearEnded = null;
+        if ($startDate->month == 1 && $startDate->day == 1) {
+            // Calendar year - Ends on December 31 of the next year
+            $yearEnded = $startDate->addYear()->endOfYear();
+        } else {
+            // Fiscal year - Ends on the last day of the same month next year
+            $yearEnded = $startDate->addYear()->lastOfMonth();
+        }
+        
+        // Check whether the organization follows a calendar or fiscal period
+        $period = ($yearEnded->month == 12 && $yearEnded->day == 31) ? 'calendar' : 'fiscal';
+    
+        // Format the year ended date as 'YYYY-MM'
+        $yearEndedFormatted = $yearEnded->format('Y-m');
+        $yearEndedFormattedForDisplay = $yearEnded->format('m/Y');
+    
+        // Get the transaction IDs related to this tax return
+        $transactionIds = $taxReturn->transactions->pluck('id');
+    
+        // Get the TaxRows and calculate the summary data
+        $taxRows = TaxRow::whereHas('transaction', function ($query) use ($transactionIds) {
+            $query->where('tax_type', 2)
+                  ->where('transaction_type', 'sales')
+                  ->where('status', 'draft')
+                  ->whereIn('id', $transactionIds);
+        })->with(['transaction.contactDetails', 'atc', 'taxType'])
+          ->get();
+    
+        $totalZeroRatedSales = "";
+        
+        // Group the TaxRows by ATC and calculate the summary       
+        $groupedData = $taxRows->groupBy(function ($taxRow) {
+            return $taxRow->atc->tax_code;
+        });
+    
+        $summaryData = $groupedData->map(function ($group) {
+            $taxableAmount = 0;
+            $taxRate = 0;
+            $taxDue = 0;
+    
+            foreach ($group as $taxRow) {
+                $taxableAmount += $taxRow->net_amount;
+                $taxRate = $taxRow->atc->tax_rate;
+                $taxDue += $taxRow->atc_amount;
+            }
+    
+            return [
+                'taxable_amount' => $taxableAmount,
+                'tax_rate' => $taxRate,
+                'tax_due' => $taxDue,
+            ];
+        });
+    
+        // Pass the summary data to the view
+        return view('tax_return.percentage_report_preview', compact(
+            'taxReturn',
+            'organization',
+            'yearEndedFormatted',
+            'yearEndedFormattedForDisplay',
+            'period',
+            'rdoCode',
+            'summaryData'
+        ));
+    }
 
-        return [
-            'taxable_amount' => $taxableAmount,
-            'tax_rate' => $taxRate,
-            'tax_due' => $taxDue,
-        ];
-    });
-
-    // Pass the summary data to the view
-    return view('tax_return.percentage_report_preview', compact(
-        'taxReturn',
-        'organization',
-        'yearEndedFormatted',
-        'yearEndedFormattedForDisplay',
-        'period',
-        'rdoCode',
-        'summaryData' // Add the summary data to the view
-    ));
-}
+    public function markAsFiled($id)
+    {
+        $taxReturn = TaxReturn::findOrFail($id);
+        
+        // Check if the current status is not already "Filed"
+        if ($taxReturn->status === 'Filed') {
+            return redirect()->back()->with('error', 'This tax return is already marked as Filed.');
+        }
+        
+        // Update the status to "Filed"
+        $taxReturn->status = 'Filed';
+        $taxReturn->save();
+        
+        return redirect()->route('tax_return.2551q.pdf', $taxReturn->id)->with('success', 'Tax return has been marked as Filed.');
+    }
   // Function for showing Value Added Tax Report Preview
 public function showVatReport($id)
 {
@@ -713,6 +742,99 @@ public function showVatReport($id)
     public function store2550Q(Request $request, $taxReturn)
     {
 
+        $messages = [
+            'period.required' => 'The period field is required.',
+        'period.string' => 'The period must be a valid string.',
+        'year_ended.required' => 'The year ended field is required.',
+        'year_ended.date_format' => 'The year ended must be in the format Y-m.',
+        'quarter.required' => 'The quarter field is required.',
+        'quarter.string' => 'The quarter must be a valid string.',
+        'return_from.required' => 'The return from date is required.',
+        'return_from.date' => 'The return from date must be a valid date.',
+        'return_to.required' => 'The return to date is required.',
+        'return_to.date' => 'The return to date must be a valid date.',
+        'amended_return.required' => 'The amended return field is required.',
+        'amended_return.in' => 'The amended return field must be yes or no.',
+        'short_period_return.required' => 'The short period return field is required.',
+        'short_period_return.in' => 'The short period return field must be yes or no.',
+        'tin.required' => 'The TIN field is required.',
+        'tin.string' => 'The TIN must be a valid string.',
+        'tin.max' => 'The TIN should not exceed 20 characters.',
+        'rdo_code.required' => 'The RDO code field is required.',
+        'rdo_code.string' => 'The RDO code must be a valid string.',
+        'rdo_code.max' => 'The RDO code should not exceed 5 characters.',
+        'taxpayer_name.required' => 'The taxpayer name is required.',
+        'taxpayer_name.string' => 'The taxpayer name must be a valid string.',
+        'taxpayer_name.max' => 'The taxpayer name should not exceed 255 characters.',
+        'registered_address.required' => 'The registered address is required.',
+        'registered_address.string' => 'The registered address must be a valid string.',
+        'registered_address.max' => 'The registered address should not exceed 255 characters.',
+        'zip_code.required' => 'The zip code is required.',
+        'zip_code.string' => 'The zip code must be a valid string.',
+        'zip_code.max' => 'The zip code should not exceed 10 characters.',
+        'contact_number.max' => 'The contact number should not exceed 15 characters.',
+        'email_address.email' => 'The email address must be a valid email.',
+        'email_address.max' => 'The email address should not exceed 255 characters.',
+        'taxpayer_classification.required' => 'The taxpayer classification is required.',
+        'taxpayer_classification.string' => 'The taxpayer classification must be a valid string.',
+        'taxpayer_classification.max' => 'The taxpayer classification should not exceed 50 characters.',
+        'tax_relief.required' => 'The tax relief field is required.',
+        'tax_relief.in' => 'The tax relief field must be yes or no.',
+        'yes_specify.max' => 'The specify field should not exceed 255 characters.',
+        'creditable_vat_withheld.numeric' => 'The creditable VAT withheld must be a number.',
+        'advance_vat_payment.numeric' => 'The advance VAT payment must be a number.',
+        'vat_paid_if_amended.numeric' => 'The VAT paid if amended must be a number.',
+        'other_credits_specify.max' => 'The other credits specify field should not exceed 255 characters.',
+        'other_credits_specify_amount.numeric' => 'The other credits specify amount must be a number.',
+        'total_tax_credits.numeric' => 'The total tax credits must be a number.',
+        'tax_still_payable.numeric' => 'The tax still payable must be a number.',
+        'surcharge.numeric' => 'The surcharge must be a number.',
+        'interest.numeric' => 'The interest must be a number.',
+        'compromise.numeric' => 'The compromise must be a number.',
+        'total_penalties.numeric' => 'The total penalties must be a number.',
+        'total_amount_payable.numeric' => 'The total amount payable must be a number.',
+        'vatable_sales.numeric' => 'The vatable sales must be a number.',
+        'vatable_sales_tax_amount.numeric' => 'The vatable sales tax amount must be a number.',
+        'zero_rated_sales.numeric' => 'The zero rated sales must be a number.',
+        'exempt_sales.numeric' => 'The exempt sales must be a number.',
+        'total_sales.numeric' => 'The total sales must be a number.',
+        'total_output_tax.numeric' => 'The total output tax must be a number.',
+        'uncollected_receivable_vat.numeric' => 'The uncollected receivable VAT must be a number.',
+        'recovered_uncollected_receivables.numeric' => 'The recovered uncollected receivables must be a number.',
+        'total_adjusted_output_tax.numeric' => 'The total adjusted output tax must be a number.',
+        'input_carried_over.numeric' => 'The input carried over must be a number.',
+        'input_tax_deferred.numeric' => 'The input tax deferred must be a number.',
+        'transitional_input_tax.numeric' => 'The transitional input tax must be a number.',
+        'presumptive_input_tax.numeric' => 'The presumptive input tax must be a number.',
+        'other_specify.max' => 'The other specify field should not exceed 255 characters.',
+        'other_input_tax.numeric' => 'The other input tax must be a number.',
+        'total_input_tax.numeric' => 'The total input tax must be a number.',
+        'domestic_purchase.numeric' => 'The domestic purchase must be a number.',
+        'domestic_purchase_input_tax.numeric' => 'The domestic purchase input tax must be a number.',
+        'services_non_resident.numeric' => 'The services non-resident must be a number.',
+        'services_non_resident_input_tax.numeric' => 'The services non-resident input tax must be a number.',
+        'importations.numeric' => 'The importations must be a number.',
+        'importations_input_tax.numeric' => 'The importations input tax must be a number.',
+        'purchases_others_specify.max' => 'The other specify field should not exceed 255 characters.',
+        'purchases_others_specify_amount.numeric' => 'The other specify amount must be a number.',
+        'purchases_others_specify_input_tax.numeric' => 'The other specify input tax must be a number.',
+        'domestic_no_input.numeric' => 'The domestic no input must be a number.',
+        'tax_exempt_importation.numeric' => 'The tax exempt importation must be a number.',
+        'total_current_purchase.numeric' => 'The total current purchase must be a number.',
+        'total_current_purchase_input_tax.numeric' => 'The total current purchase input tax must be a number.',
+        'total_available_input_tax.numeric' => 'The total available input tax must be a number.',
+        'importation_million_deferred_input_tax.numeric' => 'The importation million deferred input tax must be a number.',
+        'attributable_vat_exempt_input_tax.numeric' => 'The attributable VAT exempt input tax must be a number.',
+        'vat_refund_input_tax.numeric' => 'The VAT refund input tax must be a number.',
+        'unpaid_payables_input_tax.numeric' => 'The unpaid payables input tax must be a number.',
+        'other_deduction_specify.max' => 'The other deduction specify field should not exceed 255 characters.',
+        'other_deduction_specify_input_tax.numeric' => 'The other deduction specify input tax must be a number.',
+        'total_deductions_input_tax.numeric' => 'The total deductions input tax must be a number.',
+        'settled_unpaid_input_tax.numeric' => 'The settled unpaid input tax must be a number.',
+        'adjusted_deductions_input_tax.numeric' => 'The adjusted deductions input tax must be a number.',
+        'total_allowable_input_Tax.numeric' => 'The total allowable input tax must be a number.',
+        'excess_input_tax.numeric' => 'The excess input tax must be a number.',
+    ];
      // Step 1: Validate incoming data
         $validatedData = $request->validate([
             'period' => 'required|string',
@@ -785,8 +907,7 @@ public function showVatReport($id)
             'adjusted_deductions_input_tax' => 'nullable|numeric',
             'total_allowable_input_Tax' => 'nullable|numeric',
             'excess_input_tax' => 'nullable|numeric',
-        ]);
-    
+        ], $messages);
         // Step 2: Attach the tax return ID to the validated data
         $validatedData['tax_return_id'] = $taxReturn;
   
@@ -798,81 +919,152 @@ public function showVatReport($id)
         );
     
         // Step 4: Return a response
-        return redirect()->route('tax_return.2550q.pdf', ['taxReturn' => $taxReturn])
-        ->with('success', 'Tax return successfully submitted and PDF generated.');
+        return redirect()
+            ->route('tax_return.2550q.pdf', ['taxReturn' => $taxReturn])
+            ->with('success', 'Tax return successfully submitted and PDF generated.');
+            
+        
     }
     
       // Function for Creating 2551Q Percentage Tax Return Report
-     public function store2551Q(Request $request, $taxReturn)
-     {
-         // Validate the incoming request data
-         $validatedData = $request->validate([
-             'period' => 'required|string',
-             'year_ended' => 'required|date',
-             'quarter' => 'required|string',
-             'amended_return' => 'required|string',
-             'sheets_attached' => 'required|integer',
-             'tin' => 'required|string',
-             'rdo_code' => 'required|string',
-             'taxpayer_name' => 'required|string',
-             'registered_address' => 'required|string',
-             'zip_code' => 'required|string',
-             'contact_number' => 'required|string',
-             'email_address' => 'required|email',
-             'tax_relief' => 'required|string',
-             'yes_specify' => 'nullable|string',
-             'availed_tax_rate' => 'required|string',
-             'tax_due' => 'required|numeric',
-             'creditable_tax' => 'required|numeric',
-             'amended_tax' => 'nullable|numeric',
-             'other_tax_specify' => 'nullable|string',
-             'other_tax_amount' => 'nullable|numeric',
-             'total_tax_credits' => 'required|numeric',
-             'tax_still_payable' => 'required|numeric',
-             'surcharge' => 'nullable|numeric',
-             'interest' => 'nullable|numeric',
-             'compromise' => 'nullable|numeric',
-             'total_penalties' => 'nullable|numeric',
-             'total_amount_payable' => 'required|numeric',
-             'schedule' => 'nullable|array', // Ensure 'schedule' is an array
-         ]);
-         
-         // Add the tax_return_id to the validated data before creating/updating the record
-         $validatedData['tax_return_id'] = $taxReturn;
-         
-         
-         // Use updateOrCreate to either update the existing Tax2551Q or create a new one
-         $tax2551Q = Tax2551Q::updateOrCreate(
-             ['tax_return_id' => $taxReturn], // Search for a record with the same tax_return_id
-             $validatedData // Update with the new validated data
-         );
-         
-         // Check if 'schedule' data exists and process it
-         if (isset($validatedData['schedule']) && !empty($validatedData['schedule'])) {
-             foreach ($validatedData['schedule'] as $scheduleData) {
-                // Clean and validate tax_base for each schedule item
-              
-            $scheduleData['taxable_amount'] = preg_replace('/[^0-9.]/', '', $scheduleData['taxable_amount']); // Remove commas
-            $scheduleData['taxable_amount'] = (float) $scheduleData['taxable_amount']; // Ensure it's a valid number
-                 // Check if a schedule entry for the same tax_return_id already exists
-                 Tax2551QSchedule::updateOrCreate(
-                     [
-                         '2551q_id' => $tax2551Q->id, // Use the ID of the newly created or updated Tax2551Q
-                         'atc_code' => $scheduleData['atc_code'], // Assuming ATC code is unique
-                     ],
-                     [
-                         'tax_base' => $scheduleData['taxable_amount'],
-                         'tax_rate' => $scheduleData['tax_rate'],
-                         'tax_due' => $scheduleData['tax_due'],
-                     ]
-                 );
-             }
-         }
-         
-         // Redirect back or to a specific page with a success message
-         return redirect()->route('tax_return.2551q.pdf', ['taxReturn' => $taxReturn])
-        ->with('success', 'Tax return successfully submitted and PDF generated.');
-     }
+      public function store2551Q(Request $request, $taxReturn)
+      {
+          try {
+              // Custom validation messages
+              $messages = [
+                  'period.required' => 'The period field is required.',
+                  'year_ended.required' => 'The year ended field is required.',
+                  'year_ended.date' => 'The year ended must be a valid date.',
+                  'quarter.required' => 'The quarter field is required.',
+                  'amended_return.required' => 'Please specify if this is an amended return.',
+                  'sheets_attached.required' => 'The number of sheets attached is required.',
+                  'sheets_attached.integer' => 'The sheets attached must be a number.',
+                  'tin.required' => 'TIN is required.',
+                  'rdo_code.required' => 'RDO code is required.',
+                  'taxpayer_name.required' => 'Taxpayer name is required.',
+                  'registered_address.required' => 'Registered address is required.',
+                  'zip_code.required' => 'ZIP code is required.',
+                  'contact_number.required' => 'Contact number is required.',
+                  'email_address.required' => 'Email address is required.',
+                  'email_address.email' => 'Please enter a valid email address.',
+                  'tax_relief.required' => 'Tax relief information is required.',
+                  'availed_tax_rate.required' => 'Availed tax rate is required.',
+                  'tax_due.required' => 'Tax due amount is required.',
+                  'tax_due.numeric' => 'Tax due must be a number.',
+                  'creditable_tax.required' => 'Creditable tax amount is required.',
+                  'creditable_tax.numeric' => 'Creditable tax must be a number.',
+                  'amended_tax.numeric' => 'Amended tax must be a number.',
+                  'other_tax_amount.numeric' => 'Other tax amount must be a number.',
+                  'total_tax_credits.required' => 'Total tax credits is required.',
+                  'total_tax_credits.numeric' => 'Total tax credits must be a number.',
+                  'tax_still_payable.required' => 'Tax still payable amount is required.',
+                  'tax_still_payable.numeric' => 'Tax still payable must be a number.',
+                  'surcharge.numeric' => 'Surcharge must be a number.',
+                  'interest.numeric' => 'Interest must be a number.',
+                  'compromise.numeric' => 'Compromise must be a number.',
+                  'total_penalties.numeric' => 'Total penalties must be a number.',
+                  'total_amount_payable.required' => 'Total amount payable is required.',
+                  'total_amount_payable.numeric' => 'Total amount payable must be a number.',
+                  'schedule.array' => 'Schedule must be an array.'
+              ];
+      
+              // Validate with custom messages
+              $validatedData = $request->validate([
+                  'period' => 'required|string',
+                  'year_ended' => 'required|date',
+                  'quarter' => 'required|string',
+                  'amended_return' => 'required|string',
+                  'sheets_attached' => 'required|integer',
+                  'tin' => 'required|string',
+                  'rdo_code' => 'required|string',
+                  'taxpayer_name' => 'required|string',
+                  'registered_address' => 'required|string',
+                  'zip_code' => 'required|string',
+                  'contact_number' => 'required|string',
+                  'email_address' => 'required|email',
+                  'tax_relief' => 'required|string',
+                  'yes_specify' => 'nullable|string',
+                  'availed_tax_rate' => 'required|string',
+                  'tax_due' => 'required|numeric',
+                  'creditable_tax' => 'required|numeric',
+                  'amended_tax' => 'nullable|numeric',
+                  'other_tax_specify' => 'nullable|string',
+                  'other_tax_amount' => 'nullable|numeric',
+                  'total_tax_credits' => 'required|numeric',
+                  'tax_still_payable' => 'required|numeric',
+                  'surcharge' => 'nullable|numeric',
+                  'interest' => 'nullable|numeric',
+                  'compromise' => 'nullable|numeric',
+                  'total_penalties' => 'nullable|numeric',
+                  'total_amount_payable' => 'required|numeric',
+                  'schedule' => 'nullable|array',
+              ], $messages);
+      
+              // Add the tax_return_id to the validated data
+              $validatedData['tax_return_id'] = $taxReturn;
+      
+              // Database transaction to ensure data integrity
+              DB::beginTransaction();
+      
+              try {
+                  // Create or update Tax2551Q
+                  $tax2551Q = Tax2551Q::updateOrCreate(
+                      ['tax_return_id' => $taxReturn],
+                      $validatedData
+                  );
+      
+                  // Process schedule if exists
+                  if (isset($validatedData['schedule']) && !empty($validatedData['schedule'])) {
+                      foreach ($validatedData['schedule'] as $scheduleData) {
+                          // Validate schedule data
+                          if (!isset($scheduleData['taxable_amount']) || !isset($scheduleData['atc_code'])) {
+                              throw new \Exception('Invalid schedule data provided');
+                          }
+      
+                          // Clean and validate tax_base for each schedule item
+                          $scheduleData['taxable_amount'] = preg_replace('/[^0-9.]/', '', $scheduleData['taxable_amount']);
+                          $scheduleData['taxable_amount'] = (float) $scheduleData['taxable_amount'];
+      
+                          Tax2551QSchedule::updateOrCreate(
+                              [
+                                  '2551q_id' => $tax2551Q->id,
+                                  'atc_code' => $scheduleData['atc_code'],
+                              ],
+                              [
+                                  'tax_base' => $scheduleData['taxable_amount'],
+                                  'tax_rate' => $scheduleData['tax_rate'],
+                                  'tax_due' => $scheduleData['tax_due'],
+                              ]
+                          );
+                      }
+                  }
+      
+                  DB::commit();
+      
+                  return redirect()
+                      ->route('tax_return.2551q.pdf', ['taxReturn' => $taxReturn])
+                      ->with('success', 'Tax return successfully submitted and PDF generated.');
+      
+              } catch (\Exception $e) {
+                  DB::rollBack();
+                  return redirect()
+                      ->back()
+                      ->withInput()
+                      ->with('error', 'Error processing schedule data: ' . $e->getMessage());
+              }
+      
+          } catch (\Illuminate\Validation\ValidationException $e) {
+              return redirect()
+                  ->back()
+                  ->withErrors($e->validator)
+                  ->withInput();
+          } catch (\Exception $e) {
+              return redirect()
+                  ->back()
+                  ->withInput()
+                  ->with('error', 'An unexpected error occurred: ' . $e->getMessage());
+          }
+      }
      // Function for showing SLSP Data of Value Added Tax Return
      public function showSlspData(TaxReturn $taxReturn, Request $request)
      {
@@ -1741,10 +1933,75 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
             'pdfPath' => asset('storage/filled_report.pdf'), // Serve the PDF from public storage
         ]);
     }
+    public function percentageEdit($id)
+    {
+        // Get the organization ID from the session
+        $organizationId = session('organization_id');
+    
+        if (!$organizationId) {
+            return redirect()->route('organizations.index')->with('error', 'Please select an organization.');
+        }
+    
+        // Retrieve the tax return
+        $taxReturn = TaxReturn::where('id', $id)
+                              ->where('organization_id', $organizationId)
+                              ->firstOrFail();
+    
+        // Get the related form data
+        $formData = Tax2551Q::where('tax_return_id', $taxReturn->id)->first();
+    
+        // Get the organization data (assuming you have a relationship set up)
+        $organization = OrgSetup::find($organizationId);
+    
+        // Get the transaction IDs related to this tax return
+        $transactionIds = $taxReturn->transactions->pluck('id');
+    
+        // Retrieve the TaxRows based on transactions
+        $taxRows = TaxRow::whereHas('transaction', function ($query) use ($transactionIds) {
+            $query->where('tax_type', 2)
+                  ->where('transaction_type', 'sales')
+                  ->where('status', 'draft')
+                  ->whereIn('id', $transactionIds);
+        })->with(['transaction.contactDetails', 'atc', 'taxType'])
+          ->get();
+    
+        // Group the TaxRows by ATC and calculate the summary
+        $groupedData = $taxRows->groupBy(function ($taxRow) {
+            return $taxRow->atc->tax_code;
+        });
+    
+        // Calculate summary data for each group
+        $summaryData = $groupedData->map(function ($group) {
+            $taxableAmount = 0;
+            $taxRate = 0;
+            $taxDue = 0;
+    
+            foreach ($group as $taxRow) {
+                $taxableAmount += $taxRow->net_amount;
+                $taxRate = $taxRow->atc->tax_rate;
+                $taxDue += $taxRow->atc_amount;
+            }
+    
+            return [
+                'taxable_amount' => $taxableAmount,
+                'tax_rate' => $taxRate,
+                'tax_due' => $taxDue,
+            ];
+        });
+    
+        // Pass the form data, tax return, organization, and summary data to the view for editing
+        return view('tax_return.percentage_report_edit', [
+            'taxReturn' => $taxReturn,
+            'formData' => $formData,
+            'organization' => $organization,
+            'summaryData' => $summaryData, // Add the summary data to the view
+        ]);
+    }
+    
     
     public function showVatReportPDF(TaxReturn $taxReturn)
     {
-        // Get data from the `2551q` table
+        // Get data from the `2550q` table
         $formData = Tax2550Q::where('tax_return_id', $taxReturn->id)->first();
         if (!$formData) {
             return dd('No data found in the 2550q table for this tax return.');

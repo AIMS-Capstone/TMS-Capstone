@@ -22,7 +22,7 @@
                 <i class="fas fa-plus-circle mr-1"></i>
                 Add Transaction
             </button>
-            <div id="dropdown" class="absolute z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-md w-48 mt-2">
+            <div id="dropdown" class="absolute z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-md w-48 mt-2">
                 <ul class="py-2 px-2 text-sm text-gray-700" aria-labelledby="dropdownDefaultButton">
                     <!-- Options for Sales tab -->
                     <li x-show="selectedTab === 'Sales'">
@@ -400,7 +400,7 @@
                                 <td class="text-left py-4 px-4">{{$transaction ->inv_number}}</td>
                                 <td class="text-left py-4 px-4">{{$transaction ->reference}}</td>
                                 <td class="text-left py-4 px-4"><span class="bg-zinc-100 text-zinc-700 text-xs font-medium me-2 px-4 py-1.5 rounded-full">{{$transaction ->transaction_type}}</span></td>
-                                <td class="text-left py-4 px-4">{{$transaction ->vat_amount}}</td>
+                                <td class="text-left py-4 px-4">{{$transaction ->total_amount}}</td>
                                 <td class="text-left py-4 px-4">
                                     @if($transaction->Paidstatus === 'Unpaid')
                                         <div class="flex items-center space-x-2">
@@ -410,7 +410,7 @@
                                     @elseif($transaction->Paidstatus === 'Partial')
                                         Partially Paid
                                     @else
-                                        <div class="flex items-center space-x-2">
+                                        <div class="flex items-center space-x-2"> 
                                             <div class="w-2 h-2 shrink-0 rounded-full bg-emerald-500"></div>
                                             <span class="text-zinc-600">Paid</span>
                                         </div>
