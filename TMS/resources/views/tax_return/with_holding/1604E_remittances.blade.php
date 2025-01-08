@@ -11,17 +11,8 @@
                 <div class="px-6 py-4 flex space-x-4 border-b">
                     <a href="{{ route('with_holding.1604E_summary', ['id' => $with_holding->id]) }}" class="pb-2 text-blue-500 border-b-2 border-blue-500 font-semibold">Summary</a>
                     <a href="{{ route('with_holding.1604E_remittances', ['id' => $with_holding->id]) }}" class="pb-2 text-gray-500 hover:text-blue-500">Remittance</a>
-                    <a href="{{ route('with_holding.1604E_schedule4', ['id' => $with_holding->id]) }}" class="pb-2 text-gray-500 hover:text-blue-500">Sources</a>
+                    <a href="{{ route('with_holding.1604E_sources', ['id' => $with_holding->id]) }}" class="pb-2 text-gray-500 hover:text-blue-500">Sources</a>
                     <a href="{{ route('form1604E.create', ['id' => $with_holding->id]) }}" class="pb-2 text-gray-500 hover:text-blue-500">Form</a>
-                </div>
-
-                <div class="flex flex-row justify-center items-center space-x-4">
-                    <div class="flex border-b-8 border-sky-900">
-                        <a href="{{ route('with_holding.1604E_remittances', ['id' => $with_holding->id]) }}"><p>Schedule 1</p></a>
-                    </div>
-                    <div>
-                        {{-- <a href="{{ route('with_holding.1604E_schedule2', ['id' => $with_holding->id]) }}"><p>Schedule 2</p></a> --}}
-                    </div>
                 </div>
 
                 <div class="px-6 py-4">
