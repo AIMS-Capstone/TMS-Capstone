@@ -230,21 +230,6 @@ $organizationId = session('organization_id');
                                 class="flex flex-row text-center overflow-x-auto ps-6" 
                                 role="tablist" 
                                 aria-label="tab options">
-                                <!-- Tab 1: 1601C -->
-                                <a href="{{ route('with_holding.1601C') }}">
-                                    <button @click="selectedTab = '1601C'"
-                                        :aria-selected="selectedTab === '1601C'" 
-                                        :tabindex="selectedTab === '1601C' ? '0' : '-1'" 
-                                        :class="selectedTab === '1601C' 
-                                            ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
-                                            : 'text-zinc-600 font-medium hover:text-blue-900'"
-                                        class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
-                                        type="button" 
-                                        role="tab" 
-                                        aria-controls="tabpanel1601C">
-                                        1601C
-                                    </button>
-                                </a>
                                 <!-- Tab 2: 0619E -->
                                 <a href="{{ route('with_holding.0619E') }}">
                                     <button @click="selectedTab = '0619E'" 
@@ -273,21 +258,6 @@ $organizationId = session('organization_id');
                                         role="tab" 
                                         aria-controls="tabpanel1601EQ">
                                         1601EQ
-                                    </button>
-                                </a>
-                                <!-- Tab 4: 1604C -->
-                                <a href="{{ route('with_holding.1604C') }}">
-                                    <button @click="selectedTab = '1604C'" 
-                                        :aria-selected="selectedTab === '1604C'" 
-                                        :tabindex="selectedTab === '1604C' ? '0' : '-1'" 
-                                        :class="selectedTab === '1604C' 
-                                            ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
-                                            : 'text-zinc-600 font-medium hover:text-blue-900'" 
-                                        class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
-                                        type="button" 
-                                        role="tab" 
-                                        aria-controls="tabpanel1604C">
-                                        1604C
                                     </button>
                                 </a>
                                 <!-- Tab 5: 1604E -->
