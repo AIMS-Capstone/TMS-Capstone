@@ -406,9 +406,13 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
                 Route::get('/{id}/1604E_sources', [WithHolding1604EController::class, 'showSources1604E'])->name('with_holding.1604E_sources');
                 Route::get('/{id}/1604E_schedule4', [WithHolding1604EController::class, 'showSchedule41604E'])->name('with_holding.1604E_schedule4');
                 Route::post('/{id}/1604E_schedule4', [WithHolding1604EController::class, 'storeSchedule41604E'])->name('with_holding.1604E_store');
-
+                //form
                 Route::get('/{id}/1604E_form', [withHolding1604EController::class, 'createForm1604E'])->name('form1604E.create');
                 Route::post('/{id}/1604E/store', [withHolding1604EController::class, 'storeForm1604E'])->name('form1604E.store');
+                Route::get('/{id}/1604E/preview', [withHolding1604EController::class, 'previewForm1604E'])->name('form1604E.preview');
+                Route::get('/{id}/1604E/edit', [withHolding1604EController::class, 'editForm1604E'])->name('form1604E.edit');
+                Route::put('/{id}/1604E/update', [withHolding1604EController::class, 'updateForm1604E'])->name('form1604E.update');
+                Route::get('/{id}/1604E/download', [WithHolding1604EController::class, 'downloadForm1604E'])->name('form1604E.download');
 
 
         });//ending of tax_return/with_holding prefix

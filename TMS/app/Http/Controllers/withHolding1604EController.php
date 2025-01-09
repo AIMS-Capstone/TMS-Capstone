@@ -7,11 +7,13 @@ use App\Models\Contacts;
 use App\Models\Form1601EQ;
 use App\Models\Form1604E;
 use App\Models\OrgSetup;
-use App\Models\Payees;
+use App\Models\Transactions;    
 use App\Models\WithHolding;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class withHolding1604EController extends Controller
 {
@@ -38,17 +40,29 @@ class withHolding1604EController extends Controller
             return redirect()->back()->withErrors(['error' => 'Organization setup ID not found.']);
         }
 
-        // Check for existing record
-        $existingRecord = WithHolding::where('type', '1604E')
+        // Check for existing WithHolding record
+        $existingWithHolding = WithHolding::where('type', '1604E')
             ->where('year', $request->year)
             ->where('organization_id', $organizationId)
-            ->exists();
+            ->first();
 
-        if ($existingRecord) {
-            return redirect()->back()->withErrors(['error' => 'A record for this year already exists.']);
+        // Check for existing Form1604E record
+        $existingForm1604E = Form1604E::where('year', $request->year)
+            ->where('org_setup_id', $organizationId)
+            ->first();
+
+        // Redirect if either exists
+        if ($existingWithHolding) {
+            return redirect()->route('form1604E.preview', ['id' => $existingWithHolding->id])
+                ->with('warning', '1604E Withholding form already exists for this year.');
         }
 
-        // Create new withholding record
+        if ($existingForm1604E) {
+            return redirect()->route('form1604E.preview', ['id' => $existingForm1604E->id])
+                ->with('warning', '1604E form already exists for this year.');
+        }
+
+        // Create new withholding record if neither exists
         $withHolding = WithHolding::create([
             'type' => $request->type,
             'organization_id' => $organizationId,
@@ -67,19 +81,25 @@ class withHolding1604EController extends Controller
         // Fetch the withholding record for type 1604E
         $withHolding = WithHolding::where('id', $id)
             ->where('type', '1604E')
-            ->with('creator', 'organization') // Fetch creator and organization for display
+            ->with('creator', 'organization')
             ->firstOrFail();
 
-        // Fetch related 1601EQ records for the same year
         $year = $withHolding->year;
         $orgSetupId = $withHolding->organization_id;
 
-        // Fetch all Form1601EQ records
+        // Fetch all Form1601EQ records for the year
         $form1601EQRecords = Form1601EQ::where('org_setup_id', $orgSetupId)
             ->where('year', $year)
             ->get();
 
-        // Map quarters with months
+        // Calculate totals from Form 1601-EQ (no need to fetch 0619-E separately)
+        $totalTaxesWithheld = $form1601EQRecords->sum('total_taxes_withheld');
+        $totalRemitted = $form1601EQRecords->sum('total_remittances_made');
+
+        // Calculate over-remittance (if any)
+        $overRemittance = max(0, $totalRemitted - $totalTaxesWithheld);
+
+        // Map quarters
         $quarterNames = [
             1 => ['name' => '1st Quarter (January - March)'],
             2 => ['name' => '2nd Quarter (April - June)'],
@@ -87,31 +107,26 @@ class withHolding1604EController extends Controller
             4 => ['name' => '4th Quarter (October - December)'],
         ];
 
-        // Ensure all quarters are present, even if no data exists
+        // Aggregate data per quarter
         $quarters = collect($quarterNames)->map(function ($quarterInfo, $quarter) use ($form1601EQRecords) {
-            // Find all records for this quarter
             $records = $form1601EQRecords->where('quarter', $quarter);
 
-            // Return aggregated data if records exist, otherwise default to 0
             return [
                 'name' => $quarterInfo['name'],
                 'taxes_withheld' => $records->sum('total_taxes_withheld'),
-                'penalties' => $records->sum(function ($record) {
-                    return $record->calculateTotalPenalties();
-                }),
-                'total_remitted' => $records->sum(function ($record) {
-                    return $record->calculateTotalRemittances();
-                }),
+                'penalties' => $records->sum(fn($record) => $record->calculateTotalPenalties()),
+                'total_remitted' => $records->sum(fn($record) => $record->calculateTotalRemittances()),
             ];
         });
 
-        // Fetch creator's TIN (if available)
         $employeeTIN = $withHolding->creator->tin ?? 'N/A';
 
-        // Pass data to the Blade view
         return view('tax_return.with_holding.1604E_summary', [
             'with_holding' => $withHolding,
-            'quarters' => $quarters, // All quarters with default or aggregated values
+            'quarters' => $quarters,
+            'totalRemitted' => $totalRemitted,
+            'totalTaxesWithheld' => $totalTaxesWithheld,
+            'overRemittance' => $overRemittance,
             'employee_tin' => $employeeTIN,
         ]);
     }
@@ -156,122 +171,238 @@ class withHolding1604EController extends Controller
         ]);
     }
 
-    // 1604E Schedule 4 Show
-    public function showSchedule41604E($withholdingId)
+    public function showSources1604E($withholdingId)
     {
-        // Fetch the withholding record for 1604E
+        // Fetch withholding record for 1604-E
         $withHolding = WithHolding::findOrFail($withholdingId);
+        $year = $withHolding->year;
+        $organizationId = $withHolding->organization_id;
 
-        // Get the withholding year
-        $withholdingYear = $withHolding->year;
+        // Fetch all transactions marked as QAP (active) for the given year
+        $qapTransactions = Transactions::where('organization_id', $organizationId)
+            ->whereYear('date', $year)
+            ->where('QAP', 'active')
+            ->whereNotNull('withholding_id')
+            ->with(['contactDetails', 'taxRows.atc']) 
+            ->get();    
 
-        // Fetch all payees associated with this withholding record
-        $payees = Payees::with(['atc', 'contact'])
-            ->where('withholding_id', $withholdingId)
-            ->paginate(5);
-
-        // Fetch all ATCs
-        $atcs = Atc::all();
-
-        // Fetch all contacts with their associated ATCs, filtered by the transaction year
-        $contacts = Contacts::with(['transactions' => function ($query) use ($withholdingYear) {
-            $query->whereYear('date', $withholdingYear); // Filter transactions by the year
-        }, 'transactions.taxRows.atc'])
-            ->get()
-            ->map(function ($contact) {
-                // Map each contact to their unique ATCs based on the filtered transactions
-                $contact->atcs = $contact->transactions->flatMap(function ($transaction) {
-                    return $transaction->taxRows->map->atc;
-                })->unique('id');
-
-                return $contact;
+        // Group transactions by contact and ATC
+        $payeeSummary = $qapTransactions->map(function ($transaction) {
+            return $transaction->taxRows->map(function ($taxRow) use ($transaction) {
+                $contact = $transaction->contactDetails;
+                $atc = $taxRow->atc;
+                return [
+                    'vendor' => $contact->bus_name,
+                    'tin' => $contact->contact_tin ?? 'N/A',
+                    'address' => $contact->contact_address ?? 'N/A',
+                    'amount' => $taxRow->net_amount,
+                    'tax_withheld' => $taxRow->atc_amount,
+                    'atc' => $atc->tax_code ?? 'N/A',
+                    'tax_rate' => $atc->tax_rate ?? 0,
+                ];
             });
+        })->collapse();  // Flatten the collection
 
-        // Return the view with data
-        return view('tax_return.with_holding.1604E_schedule4', [
+        // Paginate manually if necessary
+        $currentPage = request()->get('page', 1);
+        $perPage = 5;
+        $paginatedSummary = $payeeSummary->slice(($currentPage - 1) * $perPage, $perPage)->values();
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+            $paginatedSummary,
+            $payeeSummary->count(),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        // Return the view with aggregated data
+        return view('tax_return.with_holding.1604E_sources', [
             'withHolding' => $withHolding,
-            'payees' => $payees,
-            'atcs' => $atcs,
-            'contacts' => $contacts,
+            'payeeSummary' => $paginatedSummary,
+            'year' => $year,
+            'qapTransactions' => $paginator,
         ]);
-    }
-
-    //1604E schedule 4 store
-    public function storeSchedule41604E(Request $request, $withholdingId)
-    {
-        // Validate incoming data
-        $request->validate([
-            'payees' => 'required|array|min:1', // Ensure payees is an array and contains at least one entry
-            'payees.*.contact_id' => 'required|exists:contacts,id', // Validate each contact_id
-            'payees.*.atc_id' => 'required|exists:atcs,id', // Validate each atc_id
-            'payees.*.amount' => 'required|numeric|min:0', // Validate each amount
-        ]);
-
-        try {
-            // Loop through each payee in the request and create an entry
-            foreach ($request->payees as $payeeData) {
-                Payees::create([
-                    'organization_id' => session('organization_id'), // Assuming organization ID is stored in session
-                    'withholding_id' => $withholdingId,
-                    'contact_id' => $payeeData['contact_id'],
-                    'atc_id' => $payeeData['atc_id'],
-                    'amount' => $payeeData['amount'], // Store the amount field
-                ]);
-            }
-
-            // Log success
-            Log::info('Payees added successfully', [
-                'withholding_id' => $withholdingId,
-                'payees' => $request->payees,
-            ]);
-
-            return redirect()->back()->with('success', 'Payees have been successfully added.');
-        } catch (\Exception $e) {
-            // Log error for debugging
-            Log::error('Error adding payees', [
-                'withholding_id' => $withholdingId,
-                'error' => $e->getMessage(),
-            ]);
-
-            return redirect()->back()->withErrors(['error' => 'An error occurred while adding payees.']);
-        }
     }
 
     public function createForm1604E($id)
     {
-        $withHolding = WithHolding::where('id', $id)->where('type', '1604E')->firstOrFail();
+        $existingForm1604E = Form1604E::where('withholding_id', $id)->first();
+
+        // If the form already exists, redirect to the preview page
+        if ($existingForm1604E) {
+            return redirect()->route('form1604E.preview', ['id' => $id])
+                ->with('warning', 'Form 1604E for this year has already been submitted. You cannot submit another.');
+        }
+
+        $withHolding = WithHolding::where('id', $id)
+            ->where('type', '1604E')
+            ->firstOrFail();
 
         $orgSetup = OrgSetup::findOrFail(session('organization_id'));
 
-        $form1604E = Form1604E::where('withholding_id', $id)->first();
-
-        return view('tax_return.with_holding.1604E_form', compact('withHolding', 'orgSetup', 'form1604E'));
+        return view('tax_return.with_holding.1604E_form', compact('withHolding', 'orgSetup'));
     }
 
     /**
-     * Store a 1604C form.
+     * Store a 1604E form.
      */
     public function storeForm1604E(Request $request, $id)
     {
         $request->validate([
-            'year' => 'required|string|digits:4',
+            'year' => 'required|numeric|digits:4|min:1900|max:' . date('Y'),
             'amended_return' => 'required|boolean',
             'number_of_sheets' => 'nullable|integer|min:1',
             'agent_category' => 'required|string|in:Government,Private',
-            'agent_top' => 'nullable|required_if:agent_category,Private|string',
+            'agent_top' => 'nullable|required_if:agent_category,Private|in:Yes,No',
         ]);
 
         $organizationId = session('organization_id');
 
         $form1604E = Form1604E::updateOrCreate(
             ['withholding_id' => $id],
-            array_merge($request->all(), [
+            $request->only(['year', 'amended_return', 'number_of_sheets', 'agent_category', 'agent_top']) + [
                 'org_setup_id' => $organizationId,
-            ])
+            ]
         );
 
-        return redirect()->route('with_holding.1604E', ['id' => $form1604E->id])
+        // Redirect with withholding ID
+        return redirect()->route('form1604E.preview', ['id' => $id])
             ->with('success', 'Form 1604E submitted successfully.');
+    }
+
+    public function previewForm1604E($id)
+    {
+        $withHolding = WithHolding::where('id', $id)
+            ->where('type', '1604E')
+            ->with('creator', 'organization')
+            ->firstOrFail();
+
+        $year = $withHolding->year;
+        $orgSetupId = $withHolding->organization_id;
+
+        $form1604E = Form1604E::where('withholding_id', $id)->first();
+
+        $form1601EQRecords = Form1601EQ::where('org_setup_id', $orgSetupId)
+            ->where('year', $year)
+            ->get();
+
+        $totalTaxesWithheld = $form1601EQRecords->sum('total_taxes_withheld');
+        $totalRemitted = $form1601EQRecords->sum('total_remittances_made');
+        $totalPenalties = $form1601EQRecords->sum('penalties');
+        $overRemittance = max(0, $totalRemitted - $totalTaxesWithheld);
+
+        $quarterNames = [
+            1 => ['name' => '1st Quarter (January - March)'],
+            2 => ['name' => '2nd Quarter (April - June)'],
+            3 => ['name' => '3rd Quarter (July - September)'],
+            4 => ['name' => '4th Quarter (October - December)'],
+        ];
+
+        $quarters = collect($quarterNames)->map(function ($quarterInfo, $quarter) use ($form1601EQRecords) {
+            $records = $form1601EQRecords->where('quarter', $quarter);
+
+            return [
+                'name' => $quarterInfo['name'],
+                'taxes_withheld' => $records->sum('total_taxes_withheld'),
+                'penalties' => $records->sum(fn($record) => $record->calculateTotalPenalties()),
+                'total_remitted' => $records->sum(fn($record) => $record->calculateTotalRemittances()),
+                'remittance_date' => $records->max('date_of_remittance') 
+                                    ? Carbon::parse($records->max('date_of_remittance'))->format('m/d/Y') 
+                                    : Carbon::parse($records->max('created_at'))->format('m/d/Y'),
+            ];
+        });
+
+        return view('tax_return.with_holding.1604E_preview', [
+            'with_holding' => $withHolding,
+            'quarters' => $quarters,
+            'totalRemitted' => $totalRemitted,
+            'totalTaxesWithheld' => $totalTaxesWithheld,
+            'totalPenalties' => $totalPenalties,
+            'overRemittance' => $overRemittance,
+            'form1604E' => $form1604E,
+            'form1601EQRecords' => $form1601EQRecords,
+        ]);
+    }
+
+    public function editForm1604E($id)
+    {
+        // Fetch the Form1604E record with the associated withholding record
+        $form1604E = Form1604E::where('withholding_id', $id)->firstOrFail();
+
+        // Pass the form data to the edit view
+        return view('tax_return.with_holding.1604E_edit', compact('form1604E'));
+    }
+
+    public function updateForm1604E(Request $request, $id)
+    {
+        $request->validate([
+            'amended_return' => 'required|boolean',
+            'agent_category' => 'required|string|in:Government,Private',
+        ]);
+
+        $form1604E = Form1604E::where('withholding_id', $id)->firstOrFail();
+
+        // Update the fields
+        $form1604E->update([
+            'amended_return' => $request->amended_return,
+            'agent_category' => $request->agent_category,
+        ]);
+
+        return redirect()->route('form1604E.preview', ['id' => $id])
+            ->with('success', 'Form 1604E submitted successfully.');
+    }
+
+    public function downloadForm1604E($id)
+    {
+        $form = Form1604E::with(['organization', 'withholding'])->findOrFail($id);
+        $withHolding = $form->withholding;
+
+        $year = $withHolding->year;
+        $orgSetupId = $withHolding->organization_id;
+
+        $form1601EQRecords = Form1601EQ::where('org_setup_id', $orgSetupId)
+            ->where('year', $year)
+            ->get();
+
+        $totalTaxesWithheld = $form1601EQRecords->sum('total_taxes_withheld');
+        $totalRemitted = $form1601EQRecords->sum('total_remittances_made');
+        $totalPenalties = $form1601EQRecords->sum('penalties');
+        $overRemittance = max(0, $totalRemitted - $totalTaxesWithheld);
+
+        $quarterNames = [
+            1 => ['name' => '1st Quarter (January - March)'],
+            2 => ['name' => '2nd Quarter (April - June)'],
+            3 => ['name' => '3rd Quarter (July - September)'],
+            4 => ['name' => '4th Quarter (October - December)'],
+        ];
+
+        $quarters = collect($quarterNames)->map(function ($quarterInfo, $quarter) use ($form1601EQRecords) {
+            $records = $form1601EQRecords->where('quarter', $quarter);
+
+            return [
+                'name' => $quarterInfo['name'],
+                'taxes_withheld' => $records->sum('total_taxes_withheld'),
+                'penalties' => $records->sum(fn($record) => $record->calculateTotalPenalties()),
+                'total_remitted' => $records->sum(fn($record) => $record->calculateTotalRemittances()),
+                'remittance_date' => $records->max('date_of_remittance') 
+                                    ? Carbon::parse($records->max('date_of_remittance'))->format('m/d/Y') 
+                                    : Carbon::parse($records->max('created_at'))->format('m/d/Y'),
+            ];
+        });
+
+        $pdf = Pdf::loadView('tax_return.with_holding.1604E_pdf', [
+            'form' => $form,
+            'organization' => $form->organization,
+            'quarters' => $quarters,
+            'totalTaxesWithheld' => $totalTaxesWithheld,
+            'totalRemitted' => $totalRemitted,
+            'totalPenalties' => $totalPenalties,
+            'overRemittance' => $overRemittance,
+        ]);
+
+        $filename = '1604E_Form_' . $form->year . '.pdf';
+
+        return $pdf->download($filename);
     }
 
     private function getWithHoldings($organizationId, $type, $perPage = 5)
