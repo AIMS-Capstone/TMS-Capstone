@@ -2,7 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Models\ATC;
+use App\Models\Atc;
 use App\Models\Coa;
 use App\Models\TaxType;
 use Illuminate\Support\Facades\Log;
@@ -46,7 +46,7 @@ class TaxRow extends Component
 
         // Load dropdown options
         $this->taxTypes = TaxType::where('transaction_type', $this->type)->get();
-        $this->atcs = ATC::where('transaction_type', $this->type)->get();
+        $this->atcs = Atc::where('transaction_type', $this->type)->get();
         $this->coas = Coa::where('status', 'Active')->get();
 
         // Populate default or passed taxRow data

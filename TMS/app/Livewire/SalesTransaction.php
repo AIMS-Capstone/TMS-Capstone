@@ -3,7 +3,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\TaxRow;
-use App\Models\ATC;
+use App\Models\Atc;
 use App\Models\TaxType;
 use App\Models\Coa;
 use App\Models\Transactions;
@@ -185,7 +185,7 @@ private function numberToOrdinal($number)
             $taxRate = $taxType ? $taxType->VAT : 0; // Get VAT or PT rate
     
             // Find ATC and its rate
-            $atc = ATC::find($taxCode);
+            $atc = Atc::find($taxCode);
             $atcRate = $atc ? $atc->tax_rate : 0;  // ATC rate if applicable
     
             // If it's Percentage Tax (PT)
