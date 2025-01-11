@@ -72,24 +72,27 @@ class TaxRow extends Component
     public function calculateTax()
     {
         Log::info("nae nega nae ");
+        
+        // Ensure amount is a numeric value
+        $amount = isset($this->taxRow['amount']) && is_numeric($this->taxRow['amount']) ? (float)$this->taxRow['amount'] : 0.0;
         $taxRate = $this->getTaxRateByType($this->taxRow['tax_type']);
-
-        if ($taxRate > 0) {
-            $vatExclusiveAmount = $this->taxRow['amount'] / (1 + ($taxRate / 100));
-            $this->taxRow['tax_amount'] = round($this->taxRow['amount'] - $vatExclusiveAmount, 2);
+    
+        if ($taxRate > 0 && $amount > 0) {
+            $vatExclusiveAmount = $amount / (1 + ($taxRate / 100));
+            $this->taxRow['tax_amount'] = round($amount - $vatExclusiveAmount, 2);
             $this->taxRow['net_amount'] = round($vatExclusiveAmount, 2);
         } else {
             $this->taxRow['tax_amount'] = 0;
-            $this->taxRow['net_amount'] = $this->taxRow['amount'];
+            $this->taxRow['net_amount'] = $amount;
         }
-
+    
         // Dispatch event after calculation with specific target
         $this->dispatch('taxRowUpdated', [
             'index' => $this->index,
             'taxRow' => $this->taxRow,
         ]);
     }
-
+    
     // Determine parent component for event dispatch
     protected function getParentComponentClass()
     {
