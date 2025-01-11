@@ -28,6 +28,7 @@ class Source extends Model
         'de_minimis_benefits',
         'sss_gsis_phic_hdmf_union_dues',
         'other_non_taxable_compensation',
+        'status',
     ];
 
     public function withholding()

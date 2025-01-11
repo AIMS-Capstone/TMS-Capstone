@@ -28,13 +28,16 @@ class Form1601C extends Model
         'interest',
         'compromise',
         'total_amount_due',
-        //fillable for 0619E ni re-use ko nalang masyadong mabigat pag nag add ng new migration and model (green coding kuno HAHA)
         'amount_of_remittance',
         'penalties',
         'due_date',
         'remitted_previous',
-        //fillable for 1601EQ
         'quarter',
+        // New fields added
+        'agent_category',
+        'tax_relief',
+        'adjustment_taxes_withheld',
+        'tax_remitted_return',
     ];
 
     /**
@@ -51,6 +54,14 @@ class Form1601C extends Model
     public function atc()
     {
         return $this->belongsTo(Atc::class, 'atc_id');
+    }
+
+    /**
+     * Relationship with WithHolding.
+     */
+    public function withholding()
+    {
+        return $this->belongsTo(WithHolding::class, 'withholding_id');
     }
 
     /**
@@ -89,15 +100,23 @@ class Form1601C extends Model
         return $taxDue + $surcharge + $interest + $compromise;
     }
 
-    //backend calculation naman ni 0619E
     public function calculateTotalPenalties()
     {
-        return $this->surcharge + $this->interest + $this->compromise;
+        return ($this->surcharge ?? 0) + ($this->interest ?? 0) + ($this->compromise ?? 0);
     }
 
     public function calculateNetRemittance()
     {
-        return $this->amount_of_remittance - $this->remitted_previous;
+        return ($this->amount_of_remittance ?? 0) - ($this->remitted_previous ?? 0);
     }
 
+    public function calculateTaxStillDue()
+    {
+        return $this->calculateTotalAmountDue() - ($this->tax_remitted_return ?? 0) - ($this->adjustment_taxes_withheld ?? 0);
+    }
+
+    public function calculateFinalAmount()
+    {
+        return $this->calculateTaxStillDue() + $this->calculateTotalPenalties();
+    }
 }
