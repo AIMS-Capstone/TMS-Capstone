@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\atc;
+use App\Models\Atc;
 use App\Models\Form1601EQ;
 use App\Models\Form0619E;
 use App\Models\Form1601EQAtcDetail;

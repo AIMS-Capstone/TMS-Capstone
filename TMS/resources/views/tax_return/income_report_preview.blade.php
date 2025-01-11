@@ -11,8 +11,8 @@
         </a>
 
         <!-- Header -->
-        <h1 class="text-2xl font-bold text-blue-700 mb-2">BIR Form No. 2550Q</h1>
-        <h2 class="text-xl font-semibold text-gray-800">Quarterly VAT Tax Return</h2>
+        <h1 class="text-2xl font-bold text-blue-700 mb-2">BIR Form No. 1701Q</h1>
+        <h2 class="text-xl font-semibold text-gray-800">Quarterly Income Tax Return</h2>
         <p class="text-gray-600 mb-6">Verify the tax information below, with some fields pre-filled from your organization’s setup. Select options as needed, then click 'Proceed to Report' to generate the BIR form. Hover over icons for additional guidance on specific fields.</p>
 
         <!-- Filing Period Section -->
@@ -259,129 +259,7 @@
     @endif
 
     <!-- Background Information On Spouse Section -->
-    @if($individualBackground->civil_status === 'married' && $spouseBackground)
-        <div class="border-b">
-            <h3 class="font-semibold text-gray-700 text-lg mb-4">Background Information On Spouse</h3>
 
-    
-    <!-- TIN -->
-    <div class="mb-4 flex items-start">
-        <label class="block text-gray-700 text-sm font-medium w-1/3">17 Spouse's Taxpayer Identification Number (TIN)</label>
-        <input type="text" name="spouse_tin" placeholder="000-000-000-000" value = "{{$spouseBackground->tin;}} "class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-    </div>
-
-    <!-- RDO Code -->
-    <div class="mb-4 flex items-start">
-        <label class="block text-gray-700 text-sm font-medium w-1/3">18 Spouse's Revenue District Office (RDO) Code</label>
-        <input type="text" name="spouse_rdo" value="{{ $spouseBackground->rdo; }}" readonly class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-    </div>
-    
-    <div class="mb-4 flex items-start">
-        <label class="block text-gray-700 text-sm font-medium w-1/3">19 Filer's Spouse Type Taxpayer/Filer Type</label>
-        <div class="w-2/3">
-            <!-- Text input for Filer Type (readonly) -->
-            <input type="text" name="spouse_filer_type" 
-                   value="{{ $spouseBackground->filer_type == 'single_proprietor' ? 'Single Proprietor' : 
-                           ($spouseBackground->filer_type == 'professional' ? 'Professional' : 
-                           ($spouseBackground->filer_type == 'estate' ? 'Estate' : 
-                           'Trust')) }}" 
-                   readonly class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-        </div>
-    </div>
-    <div class="mb-4 flex items-start">
-        <label class="block text-gray-700 text-sm font-medium w-1/3">20 Spouse's Alphanumeric Tax Code (ATC)</label>
-        <div class="w-2/3">
-            <!-- Read-only text field for Alphanumeric Tax Code (ATC) -->
-            <input type="text" name="spouse_alphanumeric_tax_code" value="{{ $spouseBackground->alphanumeric_tax_code }}" 
-                   class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300" readonly>
-        </div>
-    </div>
-    
-    
-    
-    
-    
-
-
-    <!-- Spouse's Name -->
-    <div class="mb-4 flex items-start">
-        <label class="block text-gray-700 text-sm font-medium w-1/3">Spouse's Name</label>
-        <div class="w-2/3">
-            <input type="text" name="spouse_name" 
-                   value="{{ $spouseBackground ? $spouseBackground->last_name . ', ' . $spouseBackground->first_name . ', ' . $spouseBackground->middle_name : '' }}" 
-                   class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                   placeholder="Last Name, First Name, Middle Name">
-        </div>
-    </div>
-    
-    
-
-
-    <div class="mb-4 flex items-start">
-        <label class="block text-gray-700 text-sm font-medium w-1/3">13 Citizenship</label>
-        <div class="w-2/3">
-            <!-- Readonly text input for Spouse Citizenship -->
-            <input type="text" name="spouse_citizenship" 
-                   value="{{ $spouseBackground->citizenship }}" 
-                   readonly class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-        </div>
-    </div>
-<!-- Spouse Foreign Tax Number Field (Readonly) -->
-<div class="mb-4 flex items-start">
-<label class="block text-gray-700 text-sm font-medium w-1/3">14 Foreign Tax Number</label>
-<div class="w-2/3">
-<!-- Readonly text input for Foreign Tax Number -->
-<input type="text" name="spouse_foreign_tax_number" 
-       value="{{ $spouseBackground->foreign_tax_number }}" 
-       readonly class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-</div>
-</div>
-    
-<!--Spouse  Claiming Foreign Tax Credits Field  (Readonly Radio Buttons) -->
-<div class="mb-4 flex items-start">
-<label class="block text-gray-700 text-sm font-medium w-1/3">15 Claiming Foreign Tax Credits?</label>
-<div class="w-2/3">
-<!-- Radio button for Yes (Readonly) -->
-<label class="inline-flex items-center mr-6">
-    <input type="radio" name="spouse_claiming_foreign_credits" value="1" 
-           {{ $spouseBackground->claiming_foreign_credits == 1 ? 'checked' : 'disabled' }} 
-           readonly class="form-radio text-blue-600">
-    <span class="ml-2">Yes</span>
-</label>
-
-<!-- Radio button for No (Readonly) -->
-<label class="inline-flex items-center mr-6">
-    <input type="radio" name="spouse_claiming_foreign_credits" value="0" 
-           {{$spouseBackground->claiming_foreign_credits ==  0 ? 'checked' : 'disabled' }} 
-           readonly class="form-radio text-blue-600">
-    <span class="ml-2">No</span>
-</label>
-</div>
-</div>
- 
-            <!-- Spouse's Deduction Method (Disabled and Matches Individual's Selection) -->
-            @if($individualTaxOptionRate && $individualTaxOptionRate->rate_type === 'graduated_rates')
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Spouse's Deduction Method</label>
-                    <div class="mt-2 flex items-center space-x-4">
-                        <label class="inline-flex items-center">
-                            <input type="radio" name="spouse_deduction_method" value="itemized"
-                                   {{ $individualTaxOptionRate->deduction_method === 'itemized' ? 'checked' : 'disabled' }}
-                                   disabled class="form-radio text-blue-600">
-                            <span class="ml-2">Itemized Deductions</span>
-                        </label>
-                        <label class="inline-flex items-center">
-                            <input type="radio" name="spouse_deduction_method" value="osd"
-                                   {{ $individualTaxOptionRate->deduction_method === 'osd' ? 'checked' : 'disabled' }}
-                                   disabled class="form-radio text-blue-600">
-                            <span class="ml-2">Optional Standard Deduction (OSD)</span>
-                        </label>
-                    </div>
-                </div>
-            @endif
-        </div>
-    @endif
-</div>
 
 <!-- Item 26: Tax Due (From Part V, Schedule I-Item 46 OR Schedule II-Item 54) -->
 <div class="grid grid-cols-3 gap-4 pt-2">
@@ -391,19 +269,13 @@
         </label>
     </div>
     <div>
-        <input 
-            type="text" 
-            name="show_tax_due" 
-            id="show_tax_due"
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            readonly
-        >
+      
     </div>
     <div>
         <input 
             type="text" 
-            name="show_spouse_tax_due" 
-            id="show_spouse_tax_due"
+            name="show_tax_due" 
+            id="show_tax_due"
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
             readonly
         >
@@ -418,22 +290,16 @@
         </label>
     </div>
     <div>
-        <input 
-            type="text" 
-            name="show_tax_credits_payments" 
-            id="show_tax_credits_payments"
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            readonly
-        >
+   
     </div>
     <div>
         <input 
-            type="text" 
-            name="show_spouse_tax_credits_payments" 
-            id="show_spouse_tax_credits_payments"
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            readonly
-        >
+        type="text" 
+        name="show_tax_credits_payments" 
+        id="show_tax_credits_payments"
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        readonly
+    >
     </div>
 </div>
 
@@ -445,22 +311,17 @@
         </label>
     </div>
     <div>
-        <input 
-            type="text" 
-            name="show_tax_payable" 
-            id="show_tax_payable"
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            readonly
-        >
+       
     </div>
     <div>
         <input 
-            type="text" 
-            name="show_spouse_tax_payable" 
-            id="show_spouse_tax_payable"
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            readonly
-        >
+        type="text" 
+        name="show_tax_payable" 
+        id="show_tax_payable"
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        readonly
+    >
+    
     </div>
 </div>
 
@@ -472,22 +333,17 @@
         </label>
     </div>
     <div>
-        <input 
-            type="text" 
-            name="show_total_penalties" 
-            id="show_total_penalties"
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            readonly
-        >
+    
     </div>
     <div>
         <input 
-            type="text" 
-            name="show_spouse_total_penalties" 
-            id="show_spouse_total_penalties"
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            readonly
-        >
+        type="text" 
+        name="show_total_penalties" 
+        id="show_total_penalties"
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        readonly
+    >
+     
     </div>
 </div>
 
@@ -499,22 +355,17 @@
         </label>
     </div>
     <div>
-        <input 
-            type="text" 
-            name="show_total_amount_payable" 
-            id="show_total_amount_payable"
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            readonly
-        >
+      
     </div>
     <div>
         <input 
-            type="text" 
-            name="show_spouse_total_amount_payable" 
-            id="show_spouse_total_amount_payable"
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            readonly
-        >
+        type="text" 
+        name="show_total_amount_payable" 
+        id="show_total_amount_payable"
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        readonly
+    >
+     
     </div>
 </div>
 
@@ -548,8 +399,9 @@
                 <div class="grid grid-cols-3 gap-4 pt-2">
                     <!-- Header Row -->
                     <div class="font-semibold text-gray-700 text-sm">Declaration this Quarter</div>
+                    <div> </div>
                     <div class="font-semibold text-gray-700 text-sm">A) Taxpayer/Filer</div>
-                    <div class="font-semibold text-gray-700 text-sm">B) Spouse</div>
+           
                 </div>
                 <!-- Item 36: Sales/Revenues/Receipts/Fees -->
            
@@ -560,22 +412,17 @@
                         </label>
                     </div>
                     <div>
-                        <input 
-                            type="text" 
-                            name="sales_revenues" 
-                            id="sales_revenues"
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            value="{{ number_format($individualNetAmount, 2) }}" 
-                            onchange="calculateTotals()">
+                       
                     </div>
                     <div>
                         <input 
-                            type="text" 
-                            name="spouse_sales_revenues" 
-                            id="spouse_sales_revenues" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            value="{{ number_format($spouseNetAmount, 2) }}" 
-                            onchange="calculateTotals()">
+                        type="text" 
+                        name="sales_revenues" 
+                        id="sales_revenues"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                        value="{{ number_format($individualNetAmount, 2) }}" 
+                        onchange="calculateTotals()">
+                    
                     </div>
                 </div>
           
@@ -589,22 +436,16 @@
                         </label>
                     </div>
                     <div>
-                        <input 
-                            type="text" 
-                            name="cost_of_sales" 
-                            id="cost_of_sales" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            value="{{ number_format($individualCOGS, 2) }}" 
-                            onchange="calculateTotals()">
+                   
                     </div>
                     <div>
                         <input 
-                            type="text" 
-                            name="spouse_cost_of_sales" 
-                            id="spouse_cost_of_sales" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            value="{{ number_format($spouseCOGS, 2) }}" 
-                            onchange="calculateTotals()">
+                        type="text" 
+                        name="cost_of_sales" 
+                        id="cost_of_sales" 
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                        value="{{ number_format($individualCOGS, 2) }}" 
+                        onchange="calculateTotals()">
                     </div>
                 </div>
                 
@@ -617,20 +458,16 @@
                         </label>
                     </div>
                     <div>
-                        <input 
-                            type="text" 
-                            name="gross_income" 
-                            id="gross_income" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                       
                     </div>
                     <div>
                         <input 
-                            type="text" 
-                            name="spouse_gross_income" 
-                            id="spouse_gross_income" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                        type="text" 
+                        name="gross_income" 
+                        id="gross_income" 
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                        onchange="calculateTotals()">
+                     
                     </div>
                 </div>
     
@@ -643,20 +480,16 @@
                         </label>
                     </div>
                     <div>
-                        <input 
-                            type="text" 
-                            name="total_itemized_deductions" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            value="{{ number_format($individualItemizedDeduction, 2) }}" 
-                            onchange="calculateTotals()">
+                       
                     </div>
                     <div>
                         <input 
-                            type="text" 
-                            name="spouse_total_itemized_deductions" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            value="{{ number_format($spouseItemizedDeduction, 2) }}" 
-                            onchange="calculateTotals()">
+                        type="text" 
+                        name="total_itemized_deductions" 
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                        value="{{ number_format($individualItemizedDeduction, 2) }}" 
+                        onchange="calculateTotals()">
+                    
                     </div>
                 </div>
     
@@ -669,20 +502,16 @@
                         </label>
                     </div>
                     <div>
-                        <input 
-                            type="text" 
-                            name="osd" 
-                            id="osd"
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+            
                     </div>
                     <div>
                         <input 
-                            type="text" 
-                            name="spouse_osd" 
-                             id="spouse_osd"
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                        type="text" 
+                        name="osd" 
+                        id="osd"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                        onchange="calculateTotals()">
+                     
                     </div>
                 </div>
     
@@ -695,20 +524,16 @@
                         </label>
                     </div>
                     <div>
-                        <input 
-                            type="text" 
-                            name="net_income" 
-                            id="net_income" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                      
                     </div>
                     <div>
                         <input 
-                            type="text" 
-                            name="spouse_net_income" 
-                            id="spouse_net_income" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                        type="text" 
+                        name="net_income" 
+                        id="net_income" 
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                        onchange="calculateTotals()">
+                      
                     </div>
                 </div>
     
@@ -721,20 +546,16 @@
                         </label>
                     </div>
                     <div>
-                        <input 
-                            type="text" 
-                            name="taxable_income" 
-                            id="taxable_income"
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                       
                     </div>
                     <div>
                         <input 
-                            type="text" 
-                            name="spouse_taxable_income" 
-                            id="spouse_taxable_income" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                        type="text" 
+                        name="taxable_income" 
+                        id="taxable_income"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                        onchange="calculateTotals()">
+                      
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-4 pt-2">
@@ -742,30 +563,25 @@
                         <label class="block text-gray-700 text-sm font-medium">
                               43 Non-Operating Income (specify)
                         </label>
-                        <div>
-                            <input 
-                                type="text" 
-                                name="graduated_non_op_specify" 
-                                id="graduated_non_op_specify"
-                                class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                                onchange="calculateTotals()">
-                        </div>
+                 
                     </div>
                     <div>
                         <input 
-                            type="text" 
-                            name="graduated_non_op" 
-                            id="graduated_non_op"
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                        type="text" 
+                        name="graduated_non_op_specify" 
+                        id="graduated_non_op_specify"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                        onchange="calculateTotals()">
+                      
                     </div>
                     <div>
                         <input 
-                            type="text" 
-                            name="spouse_graduated_non_op" 
-                            id="spouse_graduated_non_op" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                        type="text" 
+                        name="graduated_non_op" 
+                        id="graduated_non_op"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                        onchange="calculateTotals()">
+                    
                     </div>
                 </div>
       
@@ -778,20 +594,16 @@
                
                     </div>
                     <div>
-                        <input 
-                            type="text" 
-                            name="partner_gpp" 
-                            id="partner_gpp"
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                      
                     </div>
                     <div>
                         <input 
-                            type="text" 
-                            name="spouse_partner_gpp" 
-                            id="spouse_partner_gpp" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                        type="text" 
+                        name="partner_gpp" 
+                        id="partner_gpp"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                        onchange="calculateTotals()">
+                    
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-4 pt-2">
@@ -802,20 +614,16 @@
                
                     </div>
                     <div>
-                        <input 
-                            type="text" 
-                            name="graduated_total_taxable_income" 
-                            id="graduated_total_taxable_income"
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+
                     </div>
                     <div>
                         <input 
-                            type="text" 
-                            name="graduated_spouse_total_taxable_income" 
-                            id="graduated_spouse_total_taxable_income" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                        type="text" 
+                        name="graduated_total_taxable_income" 
+                        id="graduated_total_taxable_income"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                        onchange="calculateTotals()">
+            
                     </div>
                 </div>
     
@@ -827,22 +635,17 @@
         </label>
     </div>
     <div>
-        <input 
-            type="text" 
-            name="graduated_tax_due" 
-            id="graduated_tax_due"
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            readonly
-        >
+      
     </div>
     <div>
         <input 
-            type="text" 
-            name="graduated_spouse_tax_due" 
-            id="graduated_spouse_tax_due" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            readonly 
-        >
+        type="text" 
+        name="graduated_tax_due" 
+        id="graduated_tax_due"
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        readonly
+    >
+
     </div>
 </div>
 
@@ -853,8 +656,9 @@
                 <div class="grid grid-cols-3 gap-4 pt-2">
                     <!-- Header Row -->
                     <div class="font-semibold text-gray-700 text-sm">Declaration this Quarter</div>
+                    <div></div>
                     <div class="font-semibold text-gray-700 text-sm">A) Taxpayer/Filer</div>
-                    <div class="font-semibold text-gray-700 text-sm">B) Spouse</div>
+               
                 </div>
                 <!-- Item 47: Sales/Revenues/Receipts/Fees -->
           
@@ -866,20 +670,17 @@
                     </div>
                     <div>
 
-                        <input 
-                            type="text" 
-                            name="sales_revenues_8" 
-                            value="{{ number_format($individualNetAmount, 2) }}"
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                       
                     </div>
                     <div>
+
                         <input 
-                            type="text" 
-                            name="spouse_sales_revenues_8" 
-                            value="{{ number_format($individualNetAmount, 2) }}"
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                        type="text" 
+                        name="sales_revenues_8" 
+                        value="{{ number_format($individualNetAmount, 2) }}"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                        onchange="calculateTotals()">
+                  
                     </div>
                 </div>
     
@@ -890,28 +691,22 @@
                         <label class="block text-gray-700 text-sm font-medium">
                             48. Add: Non-Operating Income (specify)
                         </label>
-                        <div>
-                            <input 
-                                type="text" 
-                                name="non_op_specify_8" 
-                                id="non_op_specify_8"
-                                class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                                onchange="calculateTotals()">
-                        </div>
+                     
+                    </div>
+                    <div>
+                        <input 
+                        type="text" 
+                        name="non_op_specify_8" 
+                        id="non_op_specify_8"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                        onchange="calculateTotals()">
+                       
                     </div>
                     <div>
                         <input 
                             type="text" 
                             name="non_operating_8" 
                             id="non_operating_8" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
-                    </div>
-                    <div>
-                        <input 
-                            type="text" 
-                            name="spouse_non_operating_8" 
-                            id="spouse_non_operating_8" 
                             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                             onchange="calculateTotals()">
                     </div>
@@ -926,18 +721,15 @@
                                 49. Total Income for the Quarter (Sum of Items 47 and 48)
                             </label>
                         </div>
-                        <input 
-                            type="text" 
-                            name="total_income_8" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                      <div></div>
                
                     <div>
                         <input 
-                            type="text" 
-                            name="spouse_total_income_8" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                        type="text" 
+                        name="total_income_8" 
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                        onchange="calculateTotals()">
+                  
                     </div>
                
                 </div>
@@ -950,7 +742,9 @@
                             50 Add: Total Taxable Income/(Loss) Previous Quarter (Item 51 of previous quarter)
                         </label>
                     </div>
-                    <div>
+                    <div> </div>
+                   
+                <div>
                     <input 
                         type="text" 
                         name="total_prev_8" 
@@ -958,13 +752,6 @@
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                         onchange="calculateTotals()">
                     </div>
-                <div>
-                    <input 
-                        type="text" 
-                        name="spouse_total_prev_8" 
-                        id="total_prev_8" 
-                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                        onchange="calculateTotals()">
                 </div>
             </div>
                    <!-- 51 Cumulative Taxable Income/(Loss) as of This Quarter (Sum of Items 49 and 50) -->
@@ -977,20 +764,16 @@
 
                         </label>
                     </div>
-                    <input 
-                        type="text" 
-                        name="cumulative_taxable_income_8" 
-                        id="cumulative_taxable_income_8" 
-                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                        onchange="calculateTotals()">
-           
+                   
+           <div></div>
                 <div>
                     <input 
-                        type="text" 
-                        name="spouse_cumulative_taxable_income_8" 
-                        id="spouse_cumulative_taxable_income_8" 
-                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                        onchange="calculateTotals()">
+                    type="text" 
+                    name="cumulative_taxable_income_8" 
+                    id="cumulative_taxable_income_8" 
+                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                    onchange="calculateTotals()">
+                 
                 </div>
            
             </div>
@@ -1007,21 +790,17 @@ and/or professionals in the amount of P 250,000 -->
                     </label>
                 </div>
                 <div>
-                <input 
-                    type="text" 
-                    name="allowable_reduction_8" 
-                    id="allowable_reduction_8" 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                    onchange="calculateTotals()">
+               
                 </div>
        
             <div>
                 <input 
-                    type="text" 
-                    name="spouse_allowable_reduction_8" 
-                    id="spouse_allowable_reduction_8" 
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                    onchange="calculateTotals()">
+                type="text" 
+                name="allowable_reduction_8" 
+                id="allowable_reduction_8" 
+                class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                onchange="calculateTotals()">
+              
             </div>
        
         </div>
@@ -1035,20 +814,16 @@ and/or professionals in the amount of P 250,000 -->
                         </label>
                     </div>
                     <div>
-                        <input 
-                            type="text" 
-                            name="taxable_income_8" 
-                            id="taxable_income_8" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                      
                     </div>
                     <div>
                         <input 
-                            type="text" 
-                            name="spouse_taxable_income_8" 
-                            id="spouse_taxable_income_8" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                        type="text" 
+                        name="taxable_income_8" 
+                        id="taxable_income_8" 
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                        onchange="calculateTotals()">
+                     
                     </div>
                 </div>
     
@@ -1061,20 +836,16 @@ and/or professionals in the amount of P 250,000 -->
                         </label>
                     </div>
                     <div>
-                        <input 
-                            type="text" 
-                            name="tax_due_8" 
-                              id="tax_due_8"
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                  
                     </div>
                     <div>
                         <input 
-                            type="text" 
-                            name="spouse_tax_due_8" 
-                            id="spouse_tax_due_8" 
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                            onchange="calculateTotals()">
+                        type="text" 
+                        name="tax_due_8" 
+                          id="tax_due_8"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                        onchange="calculateTotals()">
+                       
                     </div>
                 </div>
             </div>
@@ -1090,20 +861,16 @@ and/or professionals in the amount of P 250,000 -->
         </label>
     </div>
     <div>
-        <input 
-            type="text" 
-            name="prior_year_credits" 
-            id="prior_year_credits" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            onchange="calculateTotals()">
+    
     </div>
     <div>
         <input 
-            type="text" 
-            name="spouse_prior_year_credits" 
-            id="spouse_prior_year_credits" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            onchange="calculateTotals()">
+        type="text" 
+        name="prior_year_credits" 
+        id="prior_year_credits" 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        onchange="calculateTotals()">
+       
     </div>
 
     <!-- Item 56: Tax Payment/s for the Previous Quarter/s -->
@@ -1113,20 +880,16 @@ and/or professionals in the amount of P 250,000 -->
         </label>
     </div>
     <div>
-        <input 
-            type="text" 
-            name="tax_payments_prev_quarters" 
-            id="tax_payments_prev_quarters" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            onchange="calculateTotals()">
+     
     </div>
     <div>
         <input 
-            type="text" 
-            name="spouse_tax_payments_prev_quarters" 
-            id="spouse_tax_payments_prev_quarters" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            onchange="calculateTotals()">
+        type="text" 
+        name="tax_payments_prev_quarters" 
+        id="tax_payments_prev_quarters" 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        onchange="calculateTotals()">
+     
     </div>
 
     <!-- Item 57: Creditable Tax Withheld for the Previous Quarter/s -->
@@ -1136,20 +899,15 @@ and/or professionals in the amount of P 250,000 -->
         </label>
     </div>
     <div>
-        <input 
-            type="text" 
-            name="creditable_tax_withheld_prev_quarters" 
-            id="creditable_tax_withheld_prev_quarters" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            onchange="calculateTotals()">
+   
     </div>
     <div>
         <input 
-            type="text" 
-            name="spouse_creditable_tax_withheld_prev_quarters" 
-            id="spouse_creditable_tax_withheld_prev_quarters" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            onchange="calculateTotals()">
+        type="text" 
+        name="creditable_tax_withheld_prev_quarters" 
+        id="creditable_tax_withheld_prev_quarters" 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        onchange="calculateTotals()">
     </div>
 
     <!-- Item 58: Creditable Tax Withheld per BIR Form No. 2307 for this Quarter -->
@@ -1159,20 +917,15 @@ and/or professionals in the amount of P 250,000 -->
         </label>
     </div>
     <div>
-        <input 
-            type="text" 
-            name="creditable_tax_withheld_bir" 
-            id="creditable_tax_withheld_bir" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            onchange="calculateTotals()">
+     
     </div>
     <div>
         <input 
-            type="text" 
-            name="spouse_creditable_tax_withheld_bir" 
-            id="spouse_creditable_tax_withheld_bir" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            onchange="calculateTotals()">
+        type="text" 
+        name="creditable_tax_withheld_bir" 
+        id="creditable_tax_withheld_bir" 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        onchange="calculateTotals()">
     </div>
 
     <!-- Item 59: Tax Paid in Return Previously Filed, if this is an Amended Return -->
@@ -1182,20 +935,16 @@ and/or professionals in the amount of P 250,000 -->
         </label>
     </div>
     <div>
-        <input 
-            type="text" 
-            name="tax_paid_prev_return" 
-            id="tax_paid_prev_return" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            onchange="calculateTotals()">
+       
     </div>
     <div>
         <input 
-            type="text" 
-            name="spouse_tax_paid_prev_return" 
-            id="spouse_tax_paid_prev_return" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            onchange="calculateTotals()">
+        type="text" 
+        name="tax_paid_prev_return" 
+        id="tax_paid_prev_return" 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        onchange="calculateTotals()">
+
     </div>
 
     <!-- Item 60: Foreign Tax Credits, if applicable -->
@@ -1205,20 +954,16 @@ and/or professionals in the amount of P 250,000 -->
         </label>
     </div>
     <div>
-        <input 
-            type="text" 
-            name="foreign_tax_credits" 
-            id="foreign_tax_credits" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            onchange="calculateTotals()">
+    
     </div>
     <div>
         <input 
-            type="text" 
-            name="spouse_foreign_tax_credits" 
-            id="spouse_foreign_tax_credits" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            onchange="calculateTotals()">
+        type="text" 
+        name="foreign_tax_credits" 
+        id="foreign_tax_credits" 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        onchange="calculateTotals()">
+  
     </div>
 
     <!-- Item 61: Other Tax Credits/Payments -->
@@ -1228,20 +973,15 @@ and/or professionals in the amount of P 250,000 -->
         </label>
     </div>
     <div>
-        <input 
-            type="text" 
-            name="other_tax_credits" 
-            id="other_tax_credits" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            onchange="calculateTotals()">
+   
     </div>
     <div>
         <input 
-            type="text" 
-            name="spouse_other_tax_credits" 
-            id="spouse_other_tax_credits" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            onchange="calculateTotals()">
+        type="text" 
+        name="other_tax_credits" 
+        id="other_tax_credits" 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        onchange="calculateTotals()">
     </div>
 
     <!-- Item 62: Total Tax Credits/Payments -->
@@ -1251,20 +991,16 @@ and/or professionals in the amount of P 250,000 -->
         </label>
     </div>
     <div>
-        <input 
-            type="text" 
-            name="total_tax_credits" 
-            id="total_tax_credits" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            readonly>
+       
     </div>
     <div>
         <input 
-            type="text" 
-            name="spouse_total_tax_credits" 
-            id="spouse_total_tax_credits" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            readonly>
+        type="text" 
+        name="total_tax_credits" 
+        id="total_tax_credits" 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        readonly>
+  
     </div>
 
     <!-- Item 63: Tax Payable/(Overpayment) -->
@@ -1274,20 +1010,16 @@ and/or professionals in the amount of P 250,000 -->
         </label>
     </div>
     <div>
-        <input 
-            type="text" 
-            name="tax_payable" 
-            id="tax_payable" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            readonly>
+     
     </div>
     <div>
         <input 
-            type="text" 
-            name="spouse_tax_payable" 
-            id="spouse_tax_payable" 
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            readonly>
+        type="text" 
+        name="tax_payable" 
+        id="tax_payable" 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        readonly>
+    
     </div>
 
 
@@ -1301,7 +1033,10 @@ and/or professionals in the amount of P 250,000 -->
     </div>
     <div>
         
-        <input 
+     
+    </div>
+    <div>
+           <input 
             type="text" 
             name="surcharge" 
             id="surcharge" 
@@ -1309,16 +1044,8 @@ and/or professionals in the amount of P 250,000 -->
         
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
             >
-    </div>
-    <div>
         
-        <input 
-            type="text" 
-            name="spouse_surcharge" 
-            id="spouse_surcharge" 
-         onchange="calculateTotals()"
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            >
+ 
     </div>
     <div class="flex items-center">
         <label class="block text-gray-700 text-sm font-medium"> 65 Interest 
@@ -1328,7 +1055,10 @@ and/or professionals in the amount of P 250,000 -->
     </div>
   
     <div>
-        
+
+    </div>
+    <div>
+                
         <input 
             type="text" 
             name="interest" 
@@ -1336,16 +1066,7 @@ and/or professionals in the amount of P 250,000 -->
            onchange="calculateTotals()"
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
             >
-    </div>
-    <div>
-        
-        <input 
-            type="text" 
-            name="spouse_interest" 
-            id="spouse_interest" 
-           onchange="calculateTotals()"
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            >
+
     </div>
     <div class="flex items-center">
         <label class="block text-gray-700 text-sm font-medium">66 Compromise
@@ -1354,24 +1075,18 @@ and/or professionals in the amount of P 250,000 -->
     </div>
     <div>
         
-        <input 
-            type="text" 
-            name="compromise" 
-            id="compromise" 
-           onchange="calculateTotals()"
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            >
+      
     </div>
 
     <div>
-        
         <input 
-            type="text" 
-            name="spouse_compromise" 
-            id="spouse_compromise" 
-           onchange="calculateTotals()"
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            >
+        type="text" 
+        name="compromise" 
+        id="compromise" 
+       onchange="calculateTotals()"
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        >
+
     </div>
     <div class="flex items-center">
         <label class="block text-gray-700 text-sm font-medium"> 67 Total Penalties (Sum of Items 22 to 24) 
@@ -1382,23 +1097,17 @@ and/or professionals in the amount of P 250,000 -->
  
     <div>
         
-        <input 
-            type="text" 
-            name="total_penalties" 
-            id="total_penalties" 
-           
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            >
+      
     </div>
     <div>
         
         <input 
-            type="text" 
-            name="spouse_total_penalties" 
-            id="spouse_total_penalties" 
-           
-            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            >
+        type="text" 
+        name="total_penalties" 
+        id="total_penalties" 
+       
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        >
     </div>
     <div>
     
@@ -1421,12 +1130,12 @@ and/or professionals in the amount of P 250,000 -->
 <script>
 
  function calculateAggregateAmountPayable() {
-        // Get the values for Total Amount Payable (Item 30A) and Spouse Total Amount Payable (Item 30B)
+        // Get the values for Total Amount Payable (Item 30A)
         const totalAmountPayable = parseFloat(document.getElementById('show_total_amount_payable')?.value) || 0;
-        const spouseTotalAmountPayable = parseFloat(document.getElementById('show_spouse_total_amount_payable')?.value) || 0;
+   
 
         // Calculate the Aggregate Amount Payable (Item 31)
-        const aggregateAmountPayable = totalAmountPayable + spouseTotalAmountPayable;
+        const aggregateAmountPayable = totalAmountPayable;
 
         // Update the Aggregate Amount Payable field
         document.getElementById('aggregate_amount_payable').value = aggregateAmountPayable.toFixed(2);
@@ -1435,37 +1144,37 @@ and/or professionals in the amount of P 250,000 -->
     // Fetch the deduction method value passed from backend (Laravel Blade)
     const deductionMethod = "{{ $deductionMethod }}"; // This value comes from backend
     function calculateTotalAmountPayable() {
-        // Get values for Tax Payable (Item 28) and Total Penalties (Item 29) for individual and spouse
+        // Get values for Tax Payable (Item 28) and Total Penalties (Item 29) for individual 
         const taxPayable = parseFloat(document.getElementById('show_tax_payable')?.value) || 0;
-        const spouseTaxPayable = parseFloat(document.getElementById('show_spouse_tax_payable')?.value) || 0;
+   
         
         const totalPenalties = parseFloat(document.getElementById('show_total_penalties')?.value) || 0;
-        const spouseTotalPenalties = parseFloat(document.getElementById('show_spouse_total_penalties')?.value) || 0;
+    
 
-        // Calculate Total Amount Payable (Item 30) for individual and spouse
+        // Calculate Total Amount Payable (Item 30) for individual 
         const totalAmountPayable = taxPayable + totalPenalties;
-        const spouseTotalAmountPayable = spouseTaxPayable + spouseTotalPenalties;
+    
 
         // Update the Total Amount Payable fields
         document.getElementById('show_total_amount_payable').value = totalAmountPayable.toFixed(2);
-        document.getElementById('show_spouse_total_amount_payable').value = spouseTotalAmountPayable.toFixed(2);
+
     }
     
     function calculateTaxPayable() {
         // Get the values for Tax Due (Item 26) and Tax Credits/Payments (Item 27)
         const taxDue = parseFloat(document.getElementById('show_tax_due')?.value) || 0;
-        const spouseTaxDue = parseFloat(document.getElementById('show_spouse_tax_due')?.value) || 0;
+      
         
         const taxCreditsPayments = parseFloat(document.getElementById('show_tax_credits_payments')?.value) || 0;
-        const spouseTaxCreditsPayments = parseFloat(document.getElementById('show_spouse_tax_credits_payments')?.value) || 0;
+     
 
         // Calculate Tax Payable/(Overpayment) (Item 28) for individual and spouse
         const taxPayable = taxDue - taxCreditsPayments;
-        const spouseTaxPayable = spouseTaxDue - spouseTaxCreditsPayments;
+
 
         // Update the Tax Payable/(Overpayment) fields
         document.getElementById('show_tax_payable').value = taxPayable.toFixed(2);
-        document.getElementById('show_spouse_tax_payable').value = spouseTaxPayable.toFixed(2);
+    
     }
 
 
@@ -1475,68 +1184,58 @@ and/or professionals in the amount of P 250,000 -->
     const interest = parseFloat(document.getElementById('interest').value) || 0;
     const compromise = parseFloat(document.getElementById('compromise').value) || 0;
 
-    // Get values from the input fields for the spouse
-    const spouseSurcharge = parseFloat(document.getElementById('spouse_surcharge').value) || 0;
-    const spouseInterest = parseFloat(document.getElementById('spouse_interest').value) || 0;
-    const spouseCompromise = parseFloat(document.getElementById('spouse_compromise').value) || 0;
 
     // Calculate Total Penalties (Item 67) for individual
     const totalPenalties = surcharge + interest + compromise;
 
-    // Calculate Total Penalties (Item 67) for spouse
-    const spouseTotalPenalties = spouseSurcharge + spouseInterest + spouseCompromise;
 
     // Update the total penalties fields
     document.getElementById('total_penalties').value = totalPenalties.toFixed(2);
     document.getElementById('show_total_penalties').value = totalPenalties.toFixed(2);
-    document.getElementById('spouse_total_penalties').value = spouseTotalPenalties.toFixed(2);
-    document.getElementById('show_spouse_total_penalties').value = spouseTotalPenalties.toFixed(2);
+
 }
 
 
 function calculateCredits() {
     // Get values from the input fields for both individual and spouse
     const priorYearCredits = parseFloat(document.getElementById('prior_year_credits')?.value) || 0;
-    const spousePriorYearCredits = parseFloat(document.getElementById('spouse_prior_year_credits')?.value) || 0;
+
 
     const taxPaymentsPrevQuarters = parseFloat(document.getElementById('tax_payments_prev_quarters')?.value) || 0;
-    const spouseTaxPaymentsPrevQuarters = parseFloat(document.getElementById('spouse_tax_payments_prev_quarters')?.value) || 0;
+   
 
     const creditableTaxWithheldPrevQuarters = parseFloat(document.getElementById('creditable_tax_withheld_prev_quarters')?.value) || 0;
-    const spouseCreditableTaxWithheldPrevQuarters = parseFloat(document.getElementById('spouse_creditable_tax_withheld_prev_quarters')?.value) || 0;
+   
 
     const creditableTaxWithheldBIR = parseFloat(document.getElementById('creditable_tax_withheld_bir')?.value) || 0;
-    const spouseCreditableTaxWithheldBIR = parseFloat(document.getElementById('spouse_creditable_tax_withheld_bir')?.value) || 0;
+
 
     const taxPaidPrevReturn = parseFloat(document.getElementById('tax_paid_prev_return')?.value) || 0;
-    const spouseTaxPaidPrevReturn = parseFloat(document.getElementById('spouse_tax_paid_prev_return')?.value) || 0;
+  
 
     const foreignTaxCredits = parseFloat(document.getElementById('foreign_tax_credits')?.value) || 0;
-    const spouseForeignTaxCredits = parseFloat(document.getElementById('spouse_foreign_tax_credits')?.value) || 0;
+   
 
     const otherTaxCredits = parseFloat(document.getElementById('other_tax_credits')?.value) || 0;
-    const spouseOtherTaxCredits = parseFloat(document.getElementById('spouse_other_tax_credits')?.value) || 0;
+  
 
     // Calculate Total Tax Credits (Item 62)
     const totalTaxCredits =
         (priorYearCredits + taxPaymentsPrevQuarters + creditableTaxWithheldPrevQuarters + creditableTaxWithheldBIR + 
         taxPaidPrevReturn + foreignTaxCredits + otherTaxCredits);
 
-    const spouseTotalTaxCredits =
-        (spousePriorYearCredits + spouseTaxPaymentsPrevQuarters + spouseCreditableTaxWithheldPrevQuarters + 
-        spouseCreditableTaxWithheldBIR + spouseTaxPaidPrevReturn + spouseForeignTaxCredits + spouseOtherTaxCredits);
+
 
     // Update total tax credits fields
     document.getElementById('total_tax_credits').value = totalTaxCredits.toFixed(2);
     document.getElementById('show_tax_credits_payments').value = totalTaxCredits.toFixed(2);
-    document.getElementById('spouse_total_tax_credits').value = spouseTotalTaxCredits.toFixed(2);
-    document.getElementById('show_spouse_tax_credits_payments').value = spouseTotalTaxCredits.toFixed(2);
+
 
     // Get the tax option rate for the individual (Graduated Rates or 8% Gross Sales/Receipts)
     const individualTaxOptionRate = document.querySelector('input[name="individual_rate_type"]:checked')?.value;
 
     let individualTaxDue = 0;
-    let spouseTaxDue = 0;
+
 
     // Separate calculations based on selected tax option (Graduated Rates or 8% Gross Sales/Receipts)
     if (individualTaxOptionRate === 'graduated_rates') {
@@ -1545,29 +1244,23 @@ function calculateCredits() {
         if (graduatedTaxDue) {
             individualTaxDue = parseFloat(graduatedTaxDue.value) || 0;
         }
-        const spouseGraduatedTaxDue = document.getElementById('spouse_graduated_tax_due');
-        if (spouseGraduatedTaxDue) {
-            spouseTaxDue = parseFloat(spouseGraduatedTaxDue.value) || 0;
-        }
+   
     } else if (individualTaxOptionRate === '8_percent') {
         // If "8% Gross Sales/Receipts" is selected, use Item 54 (Tax Due with 8% Tax Rate)
         const taxDue8 = document.getElementById('tax_due_8');
         if (taxDue8) {
             individualTaxDue = parseFloat(taxDue8.value) || 0;
         }
-        const spouseTaxDue8 = document.getElementById('spouse_tax_due_8');
-        if (spouseTaxDue8) {
-            spouseTaxDue = parseFloat(spouseTaxDue8.value) || 0;
-        }
+        
     }
 
     // Calculate Tax Payable/(Overpayment) (Item 63) for individual
     const individualTaxPayable = individualTaxDue - totalTaxCredits;
-    const spouseTaxPayable = spouseTaxDue - spouseTotalTaxCredits;
+
 
     // Update tax payable fields
     document.getElementById('tax_payable').value = individualTaxPayable.toFixed(2);
-    document.getElementById('spouse_tax_payable').value = spouseTaxPayable.toFixed(2);
+
 }
 
 
@@ -1587,18 +1280,8 @@ function calculateCredits() {
     document.getElementById('tax_due_8').value = taxDueIndividual.toFixed(2);
     document.getElementById('show_tax_due').value = taxDueIndividual.toFixed(2);
 
-    // Get values for the spouse
-    const cumulativeIncomeSpouse = parseFloat(document.getElementById('spouse_cumulative_taxable_income_8').value) || 0;
-    const allowableReductionSpouse = parseFloat(document.getElementById('spouse_allowable_reduction_8').value) || 0;
+  
 
-    // Calculate Taxable Income for Spouse (Item 53)
-    const taxableIncomeSpouse = cumulativeIncomeSpouse - allowableReductionSpouse;
-    document.getElementById('spouse_taxable_income_8').value = taxableIncomeSpouse.toFixed(2);
-
-    // Calculate Tax Due for Spouse (Item 54)
-    const taxDueSpouse = taxableIncomeSpouse * taxRate;
-    document.getElementById('spouse_tax_due_8').value = taxDueSpouse.toFixed(2);
-    document.getElementById('show_spouse_tax_due').value = taxDueSpouse.toFixed(2);
 }
     //53
     function calculateTaxableIncomeToDate() {
@@ -1610,28 +1293,24 @@ function calculateCredits() {
     const taxableIncomeIndividual = cumulativeIncomeIndividual - allowableReductionIndividual;
     document.getElementById('taxable_income_8').value = taxableIncomeIndividual.toFixed(2);
 
-    // Get values for the spouse
-    const cumulativeIncomeSpouse = parseFloat(document.getElementById('spouse_cumulative_taxable_income_8').value) || 0;
-    const allowableReductionSpouse = parseFloat(document.getElementById('spouse_allowable_reduction_8').value) || 0;
+ 
 
-    // Calculate Taxable Income for Spouse
-    const taxableIncomeSpouse = cumulativeIncomeSpouse - allowableReductionSpouse;
-    document.getElementById('spouse_taxable_income_8').value = taxableIncomeSpouse.toFixed(2);
+
 }
 
 
     function calculateCumulativeTaxableIncome() {
     // Fetch values for the current quarter's total income (Item 49)
     const totalIncome = parseFloat(document.querySelector('[name="total_income_8"]')?.value) || 0;
-    const spouseTotalIncome = parseFloat(document.querySelector('[name="spouse_total_income_8"]')?.value) || 0;
+  
 
     // Fetch values for the previous quarter's total income (Item 50)
     const prevQuarterIncome = parseFloat(document.querySelector('[name="total_prev_8"]')?.value) || 0;
-    const spousePrevQuarterIncome = parseFloat(document.querySelector('[name="spouse_total_prev_8"]')?.value) || 0;
+
 
     // Calculate cumulative taxable income (Sum of Items 49 and 50)
     const cumulativeIncome = totalIncome + prevQuarterIncome;
-    const spouseCumulativeIncome = spouseTotalIncome + spousePrevQuarterIncome;
+
 
     // Update cumulative taxable income fields (Item 51)
     const cumulativeIncomeElement = document.querySelector('[name="cumulative_taxable_income_8"]');
@@ -1639,10 +1318,7 @@ function calculateCredits() {
         cumulativeIncomeElement.value = cumulativeIncome.toFixed(2);
     }
 
-    const spouseCumulativeIncomeElement = document.querySelector('[name="spouse_cumulative_taxable_income_8"]');
-    if (spouseCumulativeIncomeElement) {
-        spouseCumulativeIncomeElement.value = spouseCumulativeIncome.toFixed(2);
-    }
+ 
 }
 
     //Calculation for 49
@@ -1651,12 +1327,11 @@ function calculateCredits() {
     const salesRevenues = parseFloat(document.querySelector('[name="sales_revenues_8"]')?.value) || 0; // Item 47
     const nonOperatingIncome = parseFloat(document.querySelector('[name="non_operating_8"]')?.value) || 0; // Item 48
     
-    const spouseSalesRevenues = parseFloat(document.querySelector('[name="spouse_sales_revenues_8"]')?.value) || 0; // Item 47 (Spouse)
-    const spouseNonOperatingIncome = parseFloat(document.querySelector('[name="spouse_non_operating_8"]')?.value) || 0; // Item 48 (Spouse)
+  
 
     // Calculate Total Income for the Quarter (Sum of Item 47 and Item 48)
     const totalIncome = salesRevenues + nonOperatingIncome;
-    const spouseTotalIncome = spouseSalesRevenues + spouseNonOperatingIncome;
+   
 
     // Update Total Income fields (Item 49)
     const totalIncomeElement = document.querySelector('[name="total_income_8"]');
@@ -1664,16 +1339,13 @@ function calculateCredits() {
         totalIncomeElement.value = totalIncome.toFixed(2);
     }
 
-    const spouseTotalIncomeElement = document.querySelector('[name="spouse_total_income_8"]');
-    if (spouseTotalIncomeElement) {
-        spouseTotalIncomeElement.value = spouseTotalIncome.toFixed(2);
-    }
+   
 }
 
 
     function calculateTaxDue() {
         const totalTaxableIncome = parseFloat(document.getElementById('graduated_total_taxable_income')?.value) || 0;
-        const spouseTotalTaxableIncome = parseFloat(document.getElementById('graduated_spouse_total_taxable_income')?.value) || 0;
+     
         
         // Calculate Tax Due for the individual
         let taxDue = 0;
@@ -1701,58 +1373,33 @@ function calculateCredits() {
             showTaxDueElement.value = taxDue.toFixed(2);
         }
 
-        // Calculate Tax Due for the spouse (same logic)
-        let spouseTaxDue = 0;
-        if (spouseTotalTaxableIncome <= 250000) {
-            spouseTaxDue = 0;
-        } else if (spouseTotalTaxableIncome > 250000 && spouseTotalTaxableIncome <= 400000) {
-            spouseTaxDue = (spouseTotalTaxableIncome - 250000) * 0.15;
-        } else if (spouseTotalTaxableIncome > 400000 && spouseTotalTaxableIncome <= 800000) {
-            spouseTaxDue = 22500 + (spouseTotalTaxableIncome - 400000) * 0.20;
-        } else if (spouseTotalTaxableIncome > 800000 && spouseTotalTaxableIncome <= 2000000) {
-            spouseTaxDue = 102500 + (spouseTotalTaxableIncome - 800000) * 0.25;
-        } else if (spouseTotalTaxableIncome > 2000000 && spouseTotalTaxableIncome <= 8000000) {
-            spouseTaxDue = 402500 + (spouseTotalTaxableIncome - 2000000) * 0.30;
-        } else if (spouseTotalTaxableIncome > 8000000) {
-            spouseTaxDue = 2202500 + (spouseTotalTaxableIncome - 8000000) * 0.35;
-        }
+     
 
-        // Update the Tax Due for the spouse
-        const spouseTaxDueElement = document.getElementById('graduated_spouse_tax_due');
-        if (spouseTaxDueElement) {
-            spouseTaxDueElement.value = spouseTaxDue.toFixed(2);
-        }
-        const showSpouseTaxDueElement = document.getElementById('show_spouse_tax_due');
-        if (showSpouseTaxDueElement) {
-            showSpouseTaxDueElement.value = spouseTaxDue.toFixed(2);
-        }
+
+
     }
     // Function to calculate and update Gross Income from operation
 
     function calculateTotalTaxableIncome() {
         const netIncome = parseFloat(document.getElementById('net_income')?.value) || 0; // Item 41 (Net Income)
-        const spouseNetIncome = parseFloat(document.getElementById('spouse_net_income')?.value) || 0; // Item 41 for Spouse
+    
         const taxableIncome = parseFloat(document.getElementById('taxable_income')?.value) || 0; // Item 42 (Taxable Income)
-        const spouseTaxableIncome = parseFloat(document.getElementById('spouse_taxable_income')?.value) || 0; // Item 42 for Spouse
+        
         const nonOperatingIncome = parseFloat(document.getElementById('graduated_non_op')?.value) || 0; // Item 43 (Non-Operating Income)
-        const spouseNonOperatingIncome = parseFloat(document.getElementById('spouse_graduated_non_op')?.value) || 0; // Item 43 for Spouse
+       
         const partnerGPP = parseFloat(document.getElementById('partner_gpp')?.value) || 0; // Item 44 (Partner GPP)
-        const spousePartnerGPP = parseFloat(document.getElementById('spouse_partner_gpp')?.value) || 0; // Item 44 for Spouse
+      
 
         // Calculate Total Taxable Income for individual and spouse
         const totalTaxableIncome = netIncome + taxableIncome + nonOperatingIncome + partnerGPP;
-        const spouseTotalTaxableIncome = spouseNetIncome + spouseTaxableIncome + spouseNonOperatingIncome + spousePartnerGPP;
-
+      
         // Update the Total Taxable Income fields
         const totalTaxableIncomeElement = document.getElementById('graduated_total_taxable_income');
         if (totalTaxableIncomeElement) {
             totalTaxableIncomeElement.value = totalTaxableIncome.toFixed(2);
         }
 
-        const spouseTotalTaxableIncomeElement = document.getElementById('graduated_spouse_total_taxable_income');
-        if (spouseTotalTaxableIncomeElement) {
-            spouseTotalTaxableIncomeElement.value = spouseTotalTaxableIncome.toFixed(2);
-        }
+   
     }
 
     function calculateGrossIncome() {
@@ -1769,30 +1416,17 @@ function calculateCredits() {
         }
     }
 
-    // Function to calculate and update Spouse Gross Income from operation
-    function calculateSpouseGrossIncome() {
-        const spouseSalesRevenues = parseFloat(document.getElementById('spouse_sales_revenues')?.value) || 0; // Item 36 for Spouse
-        const spouseCostOfSales = parseFloat(document.getElementById('spouse_cost_of_sales')?.value) || 0; // Item 37 for Spouse
-
-        // Calculate Spouse Gross Income/(Loss) from Operation
-        const spouseGrossIncome = spouseSalesRevenues - spouseCostOfSales;
-
-        // Update the Spouse Gross Income field
-        const spouseGrossIncomeElement = document.getElementById('spouse_gross_income');
-        if (spouseGrossIncomeElement) {
-            spouseGrossIncomeElement.value = spouseGrossIncome.toFixed(2);
-        }
-    }
+  
 
     // Function to calculate Optional Standard Deduction (OSD) based on Item 36 (Sales Revenues)
     function calculateOSD() {
         const salesRevenues = parseFloat(document.getElementById('sales_revenues')?.value) || 0; // Item 36 (Sales Revenues)
-        const spouseSalesRevenues = parseFloat(document.getElementById('spouse_sales_revenues')?.value) || 0; // Item 36 for Spouse
+       
 
         if (deductionMethod === 'osd') {
             // Calculate OSD (40% of Item 36 for individual and spouse)
             const osd = (salesRevenues * 0.40).toFixed(2); // 40% of Item 36 for individual
-            const spouseOsd = (spouseSalesRevenues * 0.40).toFixed(2); // 40% of Item 36 for spouse
+          
 
             // Update OSD fields if they exist
             const osdElement = document.getElementById('osd');
@@ -1800,31 +1434,28 @@ function calculateCredits() {
                 osdElement.value = osd;
             }
 
-            const spouseOsdElement = document.getElementById('spouse_osd');
-            if (spouseOsdElement) {
-                spouseOsdElement.value = spouseOsd;
-            }
+           
         }
     }
 
     // Function to calculate Net Income/(Loss) This Quarter
     function calculateNetIncome() {
         const grossIncome = parseFloat(document.getElementById('gross_income')?.value) || 0; // Item 38
-        const spouseGrossIncome = parseFloat(document.getElementById('spouse_gross_income')?.value) || 0; // Item 38 for Spouse
+       
 
         let netIncome = 0;
-        let spouseNetIncome = 0;
+  
 
         // If OSD method, subtract Item 40 (OSD); If itemized, subtract Item 39 (deduction)
         if (deductionMethod === 'osd') {
             const osd = parseFloat(document.getElementById('osd')?.value) || 0; // Item 40 (OSD)
-            const spouseOsd = parseFloat(document.getElementById('spouse_osd')?.value) || 0; // Item 40 (OSD)
+            
             netIncome = grossIncome - osd;
-            spouseNetIncome = spouseGrossIncome - spouseOsd; // Subtract same OSD for spouse
+         
         } else {
             const deduction = parseFloat(document.getElementById('deduction')?.value) || 0; // Item 39 (Deduction)
             netIncome = grossIncome - deduction;
-            spouseNetIncome = spouseGrossIncome - deduction; // Subtract same Deduction for spouse
+ 
         }
 
         // Update the Net Income fields
@@ -1833,15 +1464,12 @@ function calculateCredits() {
             netIncomeElement.value = netIncome.toFixed(2);
         }
 
-        const spouseNetIncomeElement = document.getElementById('spouse_net_income');
-        if (spouseNetIncomeElement) {
-            spouseNetIncomeElement.value = spouseNetIncome.toFixed(2);
-        }
+      
     }
 
     function calculateTotals() {
     calculateGrossIncome();              // Calculate individual Gross Income
-    calculateSpouseGrossIncome();        // Calculate spouse Gross Income
+
     calculateOSD();                      // Calculate OSD (Optional Standard Deduction)
     calculateNetIncome();                // Calculate Net Income
     calculateTotalTaxableIncome();       // Calculate Total Taxable Income (Item 45)
@@ -1875,15 +1503,14 @@ function calculateCredits() {
         const fieldsToWatch = [
             'sales_revenues', 
             'cost_of_sales', 
-            'spouse_sales_revenues', 
-            'spouse_cost_of_sales',
+       
             'deduction', // Deduction field for itemized calculation
             'graduated_non_op', 
-            'spouse_graduated_non_op', 
+
             'partner_gpp', 
-            'spouse_partner_gpp', 
+        
             'taxable_income',
-            'spouse_taxable_income',
+         
         ];
 
         fieldsToWatch.forEach(fieldId => {

@@ -4,7 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\TaxRow;
-use App\Models\ATC;
+use App\Models\Atc;
 use App\Models\TaxType;
 use App\Models\Coa;
 use App\Models\Transactions;

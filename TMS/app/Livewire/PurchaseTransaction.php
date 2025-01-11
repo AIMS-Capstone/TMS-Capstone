@@ -2,7 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Models\ATC;
+use App\Models\Atc;
 use App\Models\TaxRow;
 use App\Models\TaxType;
 use App\Models\Transactions;
