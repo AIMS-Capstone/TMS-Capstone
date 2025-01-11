@@ -121,7 +121,6 @@ Route::middleware([
     Route::get('/tax-return/{taxReturn}/2550q-pdf', [TaxReturnController::class, 'showVatReportPDF'])
     ->name('tax_return.2550q.pdf');
     
-    Route::get('/transactions/{id}/edit-sales', [TransactionsController::class, 'edit'])->name('transactions.edit');
     Route::post('/transactions/{id}', [TransactionsController::class, 'update'])->name('transactions.update');
     Route::post('/tax-return/{id}/mark-filed', [TaxReturnController::class, 'markAsFiled'])->name('tax-return.mark-filed');
 
