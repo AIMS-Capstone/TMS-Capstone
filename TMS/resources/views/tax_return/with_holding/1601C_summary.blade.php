@@ -137,7 +137,7 @@
                                 <p class="py-4"><strong>Title</strong><br>{{ $with_holding->title ?? 'N/A' }}</p>
                                 <p class="py-4"><strong>Month</strong><br>{{ \Carbon\Carbon::createFromDate($with_holding->year, $with_holding->month, 1)->format('F Y') ?? 'January 2025' }}</p>
                                 <p class="py-4"><strong>Created By</strong><br>{{ $with_holding->creator->name ?? 'N/A' }}</p>
-                                <p class="py-4"><strong>Tax Identification Number</strong><br>{{ $employee_tin ?? '123-456-789-000'}}</p>
+                                <p class="py-4"><strong>Tax Identification Number</strong><br>{{ $with_holding->organization->tin ?? '123-456-789-000'}}</p>
                             </div>
                         </div>
                     </div>

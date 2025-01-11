@@ -318,35 +318,34 @@
     </div>
     
     <script>
-        // Show or hide "Specify Tax Relief" input based on selection
         document.addEventListener("DOMContentLoaded", () => {
+            // Show or hide "Specify Tax Relief" input based on selection
             const taxReliefYes = document.getElementById("tax_relief_yes");
             const taxReliefNo = document.getElementById("tax_relief_no");
             const taxReliefDetailsContainer = document.getElementById("tax_relief_details_container");
 
-            taxReliefYes.addEventListener("change", () => {
-                if (taxReliefYes.checked) {
-                    taxReliefDetailsContainer.style.display = "block";
-                }
-            });
+            if (taxReliefYes && taxReliefNo && taxReliefDetailsContainer) {
+                taxReliefYes.addEventListener("change", () => {
+                    taxReliefDetailsContainer.style.display = taxReliefYes.checked ? "block" : "none";
+                });
 
-            taxReliefNo.addEventListener("change", () => {
-                if (taxReliefNo.checked) {
-                    taxReliefDetailsContainer.style.display = "none";
-                }
-            });
-        });
+                taxReliefNo.addEventListener("change", () => {
+                    taxReliefDetailsContainer.style.display = taxReliefNo.checked ? "none" : "block";
+                });
+            }
 
-        // Calculate totals dynamically
-        document.addEventListener("DOMContentLoaded", () => {
+            // Helper function to parse input values
+            const parseInput = (id) => parseFloat(document.getElementById(id)?.value) || 0;
+
+            // Calculate totals dynamically
             const calculateTotals = () => {
-                const totalTaxesWithheld = parseFloat(document.getElementById("total_taxes_withheld").value) || 0;
-                const adjustmentTaxes = parseFloat(document.getElementById("adjustment_taxes_withheld").value) || 0;
-                const taxRemitted = parseFloat(document.getElementById("tax_remitted_return").value) || 0;
-                const otherRemittances = parseFloat(document.getElementById("other_remittances").value) || 0;
-                const surcharge = parseFloat(document.getElementById("surcharge").value) || 0;
-                const interest = parseFloat(document.getElementById("interest").value) || 0;
-                const compromise = parseFloat(document.getElementById("compromise").value) || 0;
+                const totalTaxesWithheld = parseInput("total_taxes_withheld");
+                const adjustmentTaxes = parseInput("adjustment_taxes_withheld");
+                const taxRemitted = parseInput("tax_remitted_return");
+                const otherRemittances = parseInput("other_remittances");
+                const surcharge = parseInput("surcharge");
+                const interest = parseInput("interest");
+                const compromise = parseInput("compromise");
 
                 // Remittance calculation
                 const remittance = totalTaxesWithheld + adjustmentTaxes - taxRemitted - otherRemittances;
@@ -354,17 +353,31 @@
                 // Total penalties
                 const totalPenalties = surcharge + interest + compromise;
 
-                // Update totals
-                document.getElementById("total_tax_remittances").value = (taxRemitted + otherRemittances).toFixed(2);
+                // Update calculated fields
+                document.getElementById("total_tax_remittances").value = remittance.toFixed(2);
                 document.getElementById("tax_still_due").value = remittance.toFixed(2);
                 document.getElementById("total_penalties").value = totalPenalties.toFixed(2);
                 document.getElementById("total_amount_still_due").value = (remittance + totalPenalties).toFixed(2);
             };
 
             // Add event listeners to recalculate totals when inputs change
-            document.querySelectorAll("input").forEach((input) => {
-                input.addEventListener("input", calculateTotals);
+            const inputs = [
+                "total_taxes_withheld",
+                "adjustment_taxes_withheld",
+                "tax_remitted_return",
+                "other_remittances",
+                "surcharge",
+                "interest",
+                "compromise",
+            ];
+            
+            inputs.forEach((id) => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener("input", calculateTotals);
+                }
             });
         });
     </script>
+
 </x-app-layout>

@@ -35,43 +35,53 @@ $organizationId = session('organization_id');
                 </div>
                 <hr>
 
-                <div 
-                    x-data="{
-                        showCheckboxes: false, 
-                        checkAll: false, 
-                        selectedRows: [],
-                        showDeleteCancelButtons: false,
-                        showConfirmArchiveModal: false,
-                                        
-                        // Toggle a single row
-                        toggleCheckbox(id) {
-                            if (this.selectedRows.includes(id)) {
-                                this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
-                            } else {
-                                this.selectedRows.push(id);
-                            }
-                            console.log(this.selectedRows); // Debugging line
-                            },
-                                        
-                            // Toggle all rows
-                            toggleAll() {
-                                this.checkAll = !this.checkAll;
-                                if (this.checkAll) {
-                                    this.selectedRows = {{ json_encode($sources->pluck('id')->toArray()) }}; 
-                                } else {
-                                this.selectedRows = []; 
-                                }
-                                console.log(this.selectedRows); // Debugging line
-                                },
-                                        
-                                        // Handle archiving
-                                        deleteRows() { 
+                                <div 
+                                    x-data="{
+                                        showCheckboxes: false, 
+                                        checkAll: false, 
+                                        selectedRows: [],
+                                        showDeleteCancelButtons: false,
+                                        showRestoreCancelButtons: false, 
+                                        isDisabled: false,
+                                        showConfirmUnarchiveModal: false, 
+                                        showConfirmDeleteModal: false,
+
+                                        disableButtons() {
+                                            this.isDisabled = true;
+                                        },
+
+                                        enableButtons() {
+                                            this.isDisabled = false;
+                                            this.showDeleteCancelButtons = false; 
+                                            this.showRestoreCancelButtons = false; 
+                                            this.showConfirmUnarchiveModal = false; 
+                                            this.showConfirmDeleteModal = false;
+                                        },
+
+                                        toggleCheckbox(id) {
+                                            if (this.selectedRows.includes(id)) {
+                                                this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
+                                            } else {
+                                                this.selectedRows.push(id);
+                                            }
+                                            // Update the checkAll state based on all checkboxes' status
+                                            this.checkAll = this.selectedRows.length === {{ json_encode($sources->count()) }};
+                                        },
+                                        toggleAll() {
+                                            this.checkAll = !this.checkAll;
+                                            if (this.checkAll) {
+                                                this.selectedRows = {{ json_encode($sources->pluck('id')->toArray()) }}; 
+                                            } else {
+                                                this.selectedRows = []; // Unselect all
+                                            }
+                                        },
+                                        deleteRows() {
                                             if (this.selectedRows.length === 0) {
                                                 alert('No rows selected for deletion.');
                                                 return;
                                             }
 
-                                            fetch('{{ route("Sources1601C.deactivate", ["id" => $with_holding->id]) }}', {
+                                            fetch('{{ route('Sources1601C.destroy', ['id' => $with_holding->id]) }}', {
                                                 method: 'POST',
                                                 headers: {
                                                     'Content-Type': 'application/json',
@@ -81,35 +91,48 @@ $organizationId = session('organization_id');
                                             })
                                             .then(response => {
                                                 if (response.ok) {
-                                                    location.reload();
+                                                    location.reload();  // Reload page to reflect deletion
                                                 } else {
-                                                    return response.json().then(data => {
-                                                        console.error('Error Response:', data);
-                                                        alert('Error archiving rows: ' + (data.message || 'Unknown error occurred.'));
-                                                    });
+                                                    alert('Error deleting rows.');
                                                 }
-                                            })
-                                            .catch(error => {
-                                                console.error('Fetch Error:', error);
-                                                alert('Failed to connect to the server. Please check your internet connection or try again later.');
                                             });
                                         },
-                                        
-                                        // Cancel selection
+                                        restoreRows() {
+                                            if (this.selectedRows.length === 0) {
+                                                alert('No rows selected for restoration.');
+                                                return;
+                                            }
+
+                                            fetch('{{ route('Sources1601C.restore', ['id' => $with_holding->id]) }}', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                },
+                                                body: JSON.stringify({ ids: this.selectedRows })
+                                            })
+                                            .then(response => {
+                                                if (response.ok) {
+                                                    location.reload();  // Reload page to reflect restoration
+                                                } else {
+                                                    alert('Error restoring rows.');
+                                                }
+                                            });
+                                        },
                                         cancelSelection() {
                                             this.selectedRows = []; 
                                             this.checkAll = false;
                                             this.showCheckboxes = false; 
                                             this.showDeleteCancelButtons = false;
-                                            this.showConfirmArchiveModal = false;
+                                            this.showRestoreCancelButtons = false;
+                                            this.showConfirmUnarchiveModal = false;
+                                            this.showConfirmDeleteModal = false;
                                         },
-                                        
                                         get selectedCount() {
-                                            return this.selectedRows.length;
+                                            return this.selectedRows.length; 
                                         }
                                     }"
-                                    class="mb-12 mx-10 overflow-hidden max-w-full rounded-md border-neutral-300"
-                                    >
+                                    class="mb-12 mx-12 overflow-hidden max-w-full">
 
                     <!-- Actions -->
                     <div class="flex flex-row space-x-2 items-center justify-between">
@@ -151,191 +174,28 @@ $organizationId = session('organization_id');
 
                         <!-- Action Buttons -->
                         <div class="flex space-x-4 items-center pr-10 ml-auto">
-                                <!-- NILAGAY KO TALAGA DITO YUNG FORM, DAMING WAYS NA GINAWA KO LAHAT HINDI NAKAKAPAG TRIGGER NG SHOW KRAZY NIG -->
-                                <div x-data="{ show: false, success: false }">
-                                    <!-- Add Button -->
-                                    <button x-on:click="show = true" class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-green-500 hover:text-green-500 hover:bg-green-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-green-500" viewBox="0 0 256 256"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"><circle cx="128" cy="128" r="112"/><path d="M 79.999992,128 H 176.0001"/><path d="m 128.00004,79.99995 v 96.0001"/></g></svg>
-                                        <span class="text-zinc-600 transition group-hover:text-green-500">Add</span>
-                                    </button>
-
-                                    <!-- Add Modal -->
-                                    <div x-show="show" x-on:close-modal.window="show = false;" x-effect="document.body.classList.toggle('overflow-hidden', show || success)"
-                                        class="fixed z-50 inset-0 flex items-center justify-center m-2 px-6" x-cloak>
-                                        <!-- Modal background -->
-                                        <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
-                                        <!-- Modal container -->
-                                        <div class="bg-white rounded-lg shadow-lg w-full h-auto max-w-6xl mx-auto z-10 overflow-hidden"
-                                            x-show="show" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
-                                            x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
-                                            <!-- Modal header -->
-                                            <div class="relative p-3 bg-blue-900 border-opacity-80 w-full">
-                                                <h1 class="text-lg font-bold text-white text-center">New Compensation</h1>
-                                                <button @click="show = false" class="absolute right-4 top-4 items-center text-sm text-white hover:text-zinc-200">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 8L16 16M8 16L16 8" stroke="#1e3a8a" class="transition duration-200 hover:stroke-gray-600"/>
+                                            <!-- Unarchive Button -->
+                                                <button 
+                                                    type="button" 
+                                                    @click="showCheckboxes = !showCheckboxes; showRestoreCancelButtons = !showRestoreCancelButtons; disableButtons();" 
+                                                    :disabled="selectedRows.length === 1 || isDisabled"
+                                                    class="border px-3 py-2 rounded-lg text-sm text-gray-600 hover:border-gray-800 hover:text-gray-800 hover:bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                                                    >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-zinc-500" viewBox="0 0 24 24">
+                                                        <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
                                                     </svg>
+                                                    <span class="text-zinc-600 transition group-hover:text-zinc-500">Unarchive</span>
                                                 </button>
-                                            </div>      
-                                            <!-- Modal Body -->
-                                            <div class="p-10">
-                                                <form id="add_sources" action="{{ route('with_holding.1601C_sources_store', ['id' => $with_holding->id]) }}" method="POST" enctype="multipart/form-data">
-                                                    @csrf
-                                                    <input type="hidden" name="withholding_id" value="{{ $with_holding->id }}">
-                                                    <input type="hidden" id="taxable_compensation_input" name="taxable_compensation" value="0">
-                                                    <div class="grid grid-cols-3 gap-6">
-                                                        <!-- Left Column: Employee Details -->
-                                                        <div class="col-span-2">
-                                                            <!-- Employee Selection -->
-                                                            <div class="grid grid-cols-2 gap-6 mb-5">
-                                                                <div>
-                                                                    <label for="employee_id" class="block font-bold text-sm text-zinc-700">Employee <span class="text-red-500">*</span></label>
-                                                                    <select id="employee_id" name="employee_id" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
-                                                                        <option value="" disabled selected>Select Employee</option>
-                                                                        @foreach ($employees as $employee)
-                                                                            <option value="{{ $employee->id }}">
-                                                                                {{ $employee->first_name }} {{ $employee->last_name }}
-                                                                            </option>
-                                                                        @endforeach
-                                                                    </select>
-                                                                </div>
-                                                                <!-- Payment Date -->
-                                                                <div>
-                                                                    <label for="payment_date" class="block font-bold text-sm text-zinc-700">
-                                                                        Payment Date <span class="text-red-500">*</span>
-                                                                    </label>
-                                                                    <input type="date" id="payment_date" name="payment_date"
-                                                                        class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"
-                                                                        required>
-                                                                </div>
-                                                            </div>
-                                                            <div class="grid grid-cols-2 gap-6 mb-5">
-                                                                <!-- Display Employee Wage Status -->
-                                                                <div>
-                                                                    <label for="employee_wage_status" class="block font-bold text-sm text-zinc-700">Employee Wage Status</label>
-                                                                    <input type="text" id="employee_wage_status" name="employee_wage_status" class="mt-2 bg-zinc-100 text-zinc-800 text-xs px-4 py-2 border-zinc-100 rounded-full" 
-                                                                        value="{{ $employment->employee_wage_status ?? 'Not Available' }}" readonly>
-                                                                </div>
-                                                                <!-- Gross Compensation -->
-                                                                <div>
-                                                                    <label for="gross_compensation" class="block font-bold text-sm text-zinc-700">Gross Compensation <span class="text-red-500">*</span></label>
-                                                                    <input type="number" id="gross_compensation" name="gross_compensation" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-        
-                                                        <!-- Right Column: Taxable Compensation Summary -->
-                                                        <div class="col-span-1 p-4">
-                                                            <h2 class="text-2xl font-bold text-blue-900">Taxable Compensation</h2>
-                                                            <p id="taxable_compensation" class="text-2xl text-zinc-700 mb-4">0.00</p>
-                                                            <div>
-                                                                <label for="tax_due" class="block font-bold text-sm text-zinc-700">Tax Due</label>
-                                                                <input type="number" id="tax_due" name="tax_due" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" readonly>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <hr class="mt-4">
-                                                    <div class="col-span-3 mt-4">
-                                                        <h1 class="block font-bold text-sm text-zinc-700">Non-Taxable Compensation</h1>
-                                                        <div class="grid grid-cols-3 gap-6 my-5">
-                                                            <!-- Statutory Minimum Wage -->
-                                                            <div>
-                                                                <label for="statutory_minimum_wage" class="block font-bold text-sm text-zinc-700">Statutory Minimum Wage <span class="text-red-500">*</span></label>
-                                                                <input type="number" id="statutory_minimum_wage" name="statutory_minimum_wage" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
-                                                            </div>
-
-                                                            <!-- Hazard Pay -->
-                                                            <div>
-                                                                <label for="hazard_pay" class="block font-bold text-sm text-zinc-700">Hazard Pay</label>
-                                                                <input type="number" id="hazard_pay" name="hazard_pay" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                                            </div>
-
-                                                            <!-- Other Non-Taxable Compensation -->
-                                                            <div>
-                                                                <label for="other_non_taxable_compensation" class="block font-bold text-sm text-zinc-700">Other Non-Taxable Compensation</label>
-                                                                <input type="number" id="other_non_taxable_compensation" name="other_non_taxable_compensation" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="grid grid-cols-3 gap-6 mb-5">
-                                                            <!-- Holiday Pay -->
-                                                            <div>
-                                                                <label for="holiday_pay" class="block font-bold text-sm text-zinc-700">Holiday Pay</label>
-                                                                <input type="number" id="holiday_pay" name="holiday_pay" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                                            </div>
-
-                                                            <!-- 13th Month Pay -->
-                                                            <div>
-                                                                <label for="month_13_pay" class="block font-bold text-sm text-zinc-700">13th Month Pay and Other Benefits</label>
-                                                                <input type="number" id="month_13_pay" name="month_13_pay" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                                            </div>
-
-                                                        </div>
-
-                                                        <div class="grid grid-cols-3 gap-6 mb-5">
-                                                            <!-- Overtime Pay -->
-                                                            <div>
-                                                                <label for="overtime_pay" class="block font-bold text-sm text-zinc-700">Overtime Pay</label>
-                                                                <input type="number" id="overtime_pay" name="overtime_pay" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                                            </div>
-
-                                                            <!-- De Minimis Benefits -->
-                                                            <div>
-                                                                <label for="de_minimis_benefits" class="block font-bold text-sm text-zinc-700">De Minimis Benefits</label>
-                                                                <input type="number" id="de_minimis_benefits" name="de_minimis_benefits" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                                            </div>
-
-                                                        </div>
-                                                        <div class="grid grid-cols-3 gap-6 mb-5">
-                                                            <!-- Night Shift Differential -->   
-                                                            <div>
-                                                                <label for="night_shift_differential" class="block font-bold text-sm text-zinc-700">Night Shift Differential</label>
-                                                                <input type="number" id="night_shift_differential" name="night_shift_differential" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                                            </div>
-
-                                                            <!-- SSS, GSIS, PHIC, HDMF, Union Dues -->
-                                                            <div>
-                                                                <label for="sss_gsis_phic_hdmf_union_dues" class="block font-bold text-sm text-zinc-700">SSS, GSIS, PHIC, HDMF, Union Dues</label>
-                                                                <input type="number" id="sss_gsis_phic_hdmf_union_dues" name="sss_gsis_phic_hdmf_union_dues" step="0.01" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
-                                                            </div>
-
-                                                        </div>
-                                                    </div>
-                                                    <!-- Modal footer -->
-                                                    <div class="flex justify-end px-6">
-                                                        <button type="button" x-on:click="show = false" class="mr-2 hover:text-zinc-900 text-zinc-600 text-sm font-semibold py-2 px-4">
-                                                            Cancel
-                                                        </button>
-                                                        <button type="submit" class="bg-blue-900 hover:bg-blue-950 text-white font-semibold text-sm py-1 px-8 rounded-lg">
-                                                            Save
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                            <!-- Livewire Source Import -->
-                            <livewire:source-import :withholdingId="$with_holding->id" />
-
-                            <button type="button" @click="showCheckboxes = !showCheckboxes;    showDeleteCancelButtons: false, showDeleteCancelButtons = !showDeleteCancelButtons; $el.disabled = true;" 
-                                :disabled="selectedRows.length === 1"
-                                class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-blue-900 hover:text-blue-900 hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
-                                >
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-blue-900" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
-                                <span class="text-zinc-600 transition group-hover:text-blue-900">Archive</span>
-                            </button>
-
-                            <a href="{{ route('Sources1601C.download', ['id' => $with_holding->id]) }}">
-                                <button type="button" class="border px-3 py-2 text-sm text-zinc-600 rounded-lg hover:border-green-500 hover:text-green-500 hover:bg-green-100 transition flex items-center group">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5 transition group-hover:text-green-500" viewBox="0 0 24 24">
-                                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
-                                    </svg> 
-                                    <span class="text-zinc-600 transition group-hover:text-green-500">Download</span>
-                                </button>
-                            </a>
+                                                <!-- Delete Button -->
+                                                <button 
+                                                    type="button" 
+                                                    @click="showCheckboxes = !showCheckboxes; showDeleteCancelButtons = !showDeleteCancelButtons; disableButtons();" 
+                                                    :disabled="selectedRows.length === 1 || isDisabled"
+                                                    class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-red-800 hover:text-red-800 hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                                                    >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
+                                                    <span class="text-zinc-600 transition group-hover:text-red-500">Delete</span>
+                                                </button>
 
                             <div class="relative inline-block space-x-4 text-left">
                                 <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" class="flex items-center text-zinc-500 hover:text-zinc-700" type="button">
@@ -417,8 +277,8 @@ $organizationId = session('organization_id');
                     <!-- Sources Table -->
                     <div class="container mx-auto overflow-hidden">
                         <!-- Transactions Header -->
-                        <div class="mx-auto ps-8">
-                            <div class="flex flex-row space-x-2 items-center justify-between">
+                        <div class="container mx-auto ps-8">
+                            <div class="flex flex-row space-x-2 items-center justify-center">
                                 <div x-data="{
                                         selectedType: new URLSearchParams(window.location.search).get('type') || 'Compensation',
                                         filterTransactions() {
@@ -427,6 +287,8 @@ $organizationId = session('organization_id');
                                             window.location.href = url.toString();
                                         }
                                     }" class="w-full">
+                                    
+                                <a href="{{route('with_holding.1601C_sources', ['id' => $with_holding->id]) }}">
                                     <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-8 border-neutral-300" role="tablist" aria-label="tab options">
                                         <button 
                                             @click="selectedType = 'Compensation'; filterTransactions()" 
@@ -443,7 +305,7 @@ $organizationId = session('organization_id');
                                             </span>
                                         </button>
                                     </div>
-                                    <a href="{{ route('Sources1601C.archive', ['id' => $with_holding->id]) }}">
+                                </a>
                                         <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-8 border-neutral-300" role="tablist" aria-label="tab options">
                                             <button 
                                                 @click="selectedType = 'ArchiveCompensation'; filterTransactions()" 
@@ -464,7 +326,6 @@ $organizationId = session('organization_id');
                                 </div>
                             </div>
                         </div>
-
                         <hr>
 
                         <div class="mb-12 mt-6 mx-12 overflow-hidden max-w-full border-neutral-300">
@@ -516,31 +377,20 @@ $organizationId = session('organization_id');
                                                 <td class="py-3 px-4">{{ $source->employee->first_name ?? 'N/A' }} {{ $source->employee->last_name ?? '' }}</td>
                                                 <td class="py-3 px-4"><span class="bg-zinc-100 text-zinc-700 text-xs font-medium me-2 px-4 py-1.5 rounded-full">{{ $source->employment->employee_wage_status ?? 'N/A' }}</span></td>
                                                 <td class="py-3 px-4">{{ \Carbon\Carbon::parse($source->payment_date ?? 'N/A')->format('F j, Y') }}</td>
-                                                <td class="py-3 px-4">{{ number_format($source->gross_compensation ?? 0, 2) }}</td>
-                                                <td class="py-3 px-4">{{ number_format($source->tax_due ?? 0, 2) }}</td>
-                                                <td class="py-3 px-4">{{ number_format($source->statutory_minimum_wage ?? 0, 2) }}</td>
+                                                <td class="py-3 px-4">{{ number_format($source->gross_compensation, 2) ?? 'N/A' }}</td>
+                                                <td class="py-3 px-4">{{ number_format($source->tax_due, 2) ?? 'N/A' }}</td>
+                                                <td class="py-3 px-4">{{ number_format($source->statutory_minimum_wage, 2) ?? 'N/A' }}</td>
                                                 <td class="py-3 px-4">
-                                                    {{ number_format(($source->holiday_pay ?? 0) + ($source->overtime_pay ?? 0) + ($source->night_shift_differential ?? 0) + ($source->hazard_pay ?? 0), 2) }}
+                                                    {{ number_format($source->holiday_pay + $source->overtime_pay + $source->night_shift_differential + $source->hazard_pay, 2) ?? 'N/A' }}
                                                 </td>
-                                                <td class="py-3 px-4">{{ number_format($source->month_13_pay ?? 0, 2) }}</td>
-                                                <td class="py-3 px-4">{{ number_format($source->de_minimis_benefits ?? 0, 2) }}</td>
-                                                <td class="py-3 px-4">{{ number_format($source->sss_gsis_phic_hdmf_union_dues ?? 0, 2) }}</td>
-                                                <td class="py-3 px-4">{{ number_format($source->other_non_taxable_compensation ?? 0, 2) }}</td>
+                                                <td class="py-3 px-4">{{ number_format($source->month_13_pay, 2) ?? 'N/A' }}</td>
+                                                <td class="py-3 px-4">{{ number_format($source->de_minimis_benefits, 2) ?? 'N/A' }}</td>
+                                                <td class="py-3 px-4">{{ number_format($source->sss_gsis_phic_hdmf_union_dues, 2) ?? 'N/A' }}</td>
+                                                <td class="py-3 px-4">{{ number_format($source->other_non_taxable_compensation, 2) ?? 'N/A' }}</td>
                                                 <td class="py-3 px-4">
-                                                    {{ number_format(
-                                                        ($source->holiday_pay ?? 0) +
-                                                        ($source->overtime_pay ?? 0) +
-                                                        ($source->night_shift_differential ?? 0) +
-                                                        ($source->hazard_pay ?? 0) +
-                                                        ($source->statutory_minimum_wage ?? 0) +
-                                                        ($source->month_13_pay ?? 0) +
-                                                        ($source->de_minimis_benefits ?? 0) +
-                                                        ($source->sss_gsis_phic_hdmf_union_dues ?? 0) +
-                                                        ($source->other_non_taxable_compensation ?? 0),
-                                                        2
-                                                    ) }}
+                                                    {{ number_format($source->holiday_pay + $source->overtime_pay + $source->night_shift_differential + $source->hazard_pay + $source->statutory_minimum_wage + $source->month_13_pay + $source->de_minimis_benefits + $source->sss_gsis_phic_hdmf_union_dues + $source->other_non_taxable_compensation, 2) ?? 'N/A' }}
                                                 </td>
-                                                <td class="py-3 px-4">{{ number_format($source->taxable_compensation ?? 0, 2) }}</td>
+                                                <td class="py-3 px-4">{{ number_format($source->taxable_compensation, 2) ?? 'N/A' }}</td>
                                             </tr>
                                         @empty
                                         <tr>
@@ -555,61 +405,129 @@ $organizationId = session('organization_id');
                                 </table>
                             </div>
 
-                            <!-- Archive Confirmation Modal -->
-                                    <div 
-                                        x-show="showConfirmArchiveModal" 
-                                        x-cloak 
-                                        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                                        x-effect="document.body.classList.toggle('overflow-hidden', showConfirmArchiveModal)"
-                                    >
-                                        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
-                                            <div class="flex flex-col items-center">
-                                                <!-- Icon -->
-                                                <div class="mb-4">
-                                                    <i class="fas fa-exclamation-triangle text-zinc-700 text-8xl"></i>
-                                                </div>
+                            <!-- Unarchive Confirmation Modal -->
+                                        <div 
+                                            x-show="showConfirmUnarchiveModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            @click.away="showConfirmUnarchiveModal = false"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showConfirmUnarchiveModal)"
+                                        >
+                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <!-- Icon -->
+                                                    <div class="mb-4">
+                                                        <i class="fas fa-exclamation-triangle text-zinc-700 text-8xl"></i>
+                                                    </div>
 
-                                                <!-- Title -->
-                                                <h2 class="text-2xl font-extrabold text-zinc-700 mb-2">Archive Item(s)</h2>
+                                                    <!-- Title -->
+                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Unarchive Item(s)</h2>
 
-                                                <!-- Description -->
-                                                <p class="text-sm text-zinc-700 text-center">
-                                                    You're going to Archive the selected item(s) in the Charts of Account table. Are you sure?
-                                                </p>
+                                                    <!-- Description -->
+                                                    <p class="text-sm text-zinc-700 text-center">
+                                                        You're going to unarchive the selected item(s) in the Sources Archive table. Are you sure?
+                                                    </p>
 
-                                                <!-- Actions -->
-                                                <div class="flex justify-center space-x-8 mt-6 w-full">
-                                                    <button 
-                                                        @click="showConfirmArchiveModal = false; showDeleteCancelButtons = true;" 
-                                                        class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
-                                                    > 
-                                                        Cancel
-                                                    </button>
-                                                    <button 
-                                                        @click="deleteRows(); showConfirmArchiveModal = false;" 
-                                                        class="px-5 py-2 bg-zinc-700 hover:bg-zinc-800 text-white rounded-lg text-sm font-medium transition"
-                                                    > 
-                                                        Archive
-                                                    </button>
+                                                    <!-- Actions -->
+                                                    <div class="flex justify-center space-x-8 mt-6 w-full">
+                                                        <button 
+                                                            @click="showConfirmUnarchiveModal = false; enableButtons(); showRestoreCancelButtons = true; disableButtons();" 
+                                                            class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        <button 
+                                                            @click="restoreRows(); showConfirmUnarchiveModal = false;" 
+                                                            class="px-4 py-2 bg-zinc-700 hover:bg-zinc-800 text-white rounded-lg text-sm transition"
+                                                        >
+                                                            Unarchive
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <!-- Action Buttons -->
-                                    <div x-show="showDeleteCancelButtons" class="flex justify-center py-4" x-cloak>
-                                        <button @click="showConfirmArchiveModal = true; showDeleteCancelButtons = true;" :disabled="selectedRows.length === 0"
-                                            class="border px-3 py-2 rounded-lg text-sm text-gray-800 border-gray-800 bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
-                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-zinc-800" viewBox="0 0 24 24">
-                                                <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
-                                            </svg>
-                                            <span class="text-zinc-600 transition group-hover:text-zinc-800">Archive Selected</span><span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
-                                        </button>
-                                        <button @click="cancelSelection" class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
-                                         > Cancel
-                                        </button>
-                                    </div>
+                                        <!-- Delete Confirmation Modal -->
+                                        <div 
+                                            x-show="showConfirmDeleteModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
+                                            @click.away="showConfirmDeleteModal = false"
+                                        >
+                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <!-- Icon -->
+                                                    <div class="mb-4">
+                                                        <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>
+                                                    </div>
+
+                                                    <!-- Title -->
+                                                    <h2 class="text-2xl font-extrabold text-zinc-800 mb-2">Delete Sources</h2>
+
+                                                    <!-- Description -->
+                                                    <p class="text-sm text-zinc-600 text-center">
+                                                        You're going to delete the selected item(s) in the Sources Archive table. Are you sure?
+                                                    </p>
+
+                                                    <!-- Actions -->
+                                                    <div class="flex justify-center space-x-8 mt-6 w-full">
+                                                        <button 
+                                                            @click="showConfirmDeleteModal = false; enableButtons(); enableButtons(); showDeleteCancelButtons = true; disableButtons();" 
+                                                            class="px-4 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-900 font-bold transition"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        <button 
+                                                            @click="deleteRows(); showConfirmDeleteModal = false;" 
+                                                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex justify-center py-4" x-cloak>
+                                            <!-- Delete and Cancel buttons -->
+                                            <div class="flex justify-center py-4" x-show="showDeleteCancelButtons">
+                                                <button 
+                                                    type="button" 
+                                                    @click="showConfirmDeleteModal = true; showDeleteCancelButtons = true;"
+                                                    :disabled="selectedRows.length === 0"
+                                                    class="border px-3 py-2 mx-2 rounded-lg text-sm text-red-600 border-red-600 bg-red-100 hover:bg-red-200 transition disabled:opacity-50 disabled:cursor-not-allowed group flex items-center space-x-2"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24">
+                                                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/>
+                                                    </svg>
+                                                    <span class="text-red-600 transition group-hover:text-red-600">Delete Selected <span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span></span>
+                                                </button>
+                                                <button 
+                                                    @click="cancelSelection(); enableButtons();" 
+                                                    class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                            <!-- Unarchive and Cancel buttons -->
+                                            <div class="flex justify-center py-4" x-show="showRestoreCancelButtons">
+                                                <button 
+                                                    type = "button"
+                                                    @click="showConfirmUnarchiveModal = true; showRestoreCancelButtons = true;"
+                                                    :disabled="selectedRows.length === 0"
+                                                    class="border px-3 py-2 rounded-lg text-sm text-gray-800 border-gray-800 bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-zinc-800" viewBox="0 0 24 24">
+                                                        <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
+                                                    </svg>
+                                                    <span class="text-zinc-600 transition group-hover:text-zinc-800">Unarchive Selected</span><span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
+                                                </button>
+                                                <button @click="cancelSelection(); enableButtons();" class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition">
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </div>
 
                             @if (count($sources) > 0)
                                 <div class="mt-4">
