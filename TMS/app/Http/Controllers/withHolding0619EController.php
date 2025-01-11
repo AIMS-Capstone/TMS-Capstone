@@ -11,7 +11,7 @@ use App\Models\Employment;
 use App\Models\Form1601C;
 use App\Models\Form1601EQ;
 use App\Models\Form0619E;
-use App\Models\atc;
+use App\Models\Atc;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;

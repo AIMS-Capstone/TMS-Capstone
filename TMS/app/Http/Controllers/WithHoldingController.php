@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\atc;
+use App\Models\Atc;
 use App\Models\Employee;
 use App\Models\Employment;
 use App\Models\Form1601C;

@@ -166,80 +166,77 @@ private function numberToOrdinal($number)
     }
     public function calculateTotals()
     {
-    
-        // Initialize totals
-        $this->vatableSales = 0;
-        $this->vatAmount = 0;  // This will store the VAT amount (not including ATC)
-        $this->totalAmount = 0;
-        $this->nonVatableSales = 0;
-        $this->appliedATCs = [];  // To store ATC details
-        $this->appliedATCsTotalAmount = 0;  // Total ATC tax amount
+        // Initialize totals with explicit casting to float
+        $this->vatableSales = 0.00;
+        $this->vatAmount = 0.00;
+        $this->totalAmount = 0.00;
+        $this->nonVatableSales = 0.00;
+        $this->appliedATCs = [];
+        $this->appliedATCsTotalAmount = 0.00;
     
         foreach ($this->taxRows as &$row) {
-            $amount = $row['amount']; // Total Amount Due (Gross Sales)
-            $taxTypeId = $row['tax_type'];
-            $taxCode = $row['tax_code'];
+            // Convert amount to float and handle empty/invalid values
+            $amount = isset($row['amount']) ? floatval($row['amount']) : 0.00;
+            $taxTypeId = $row['tax_type'] ?? null;
+            $taxCode = $row['tax_code'] ?? null;
+    
+            // Skip calculation if amount is 0 or invalid
+            if ($amount <= 0) {
+                $row['atc_amount'] = 0.00;
+                continue;
+            }
     
             // Find the tax type and rate
             $taxType = TaxType::find($taxTypeId);
-            $taxRate = $taxType ? $taxType->VAT : 0; // Get VAT or PT rate
+            $taxRate = $taxType ? floatval($taxType->VAT) : 0.00;
     
             // Find ATC and its rate
             $atc = Atc::find($taxCode);
-            $atcRate = $atc ? $atc->tax_rate : 0;  // ATC rate if applicable
+            $atcRate = $atc ? floatval($atc->tax_rate) : 0.00;
     
             // If it's Percentage Tax (PT)
             if ($taxType && $taxType->short_code == 'PT') {
-                // If there's an ATC, first calculate the net sales (without ATC)
                 if ($atcRate > 0) {
-                    // Step 1: Calculate VATable Sales (Net) before ATC (i.e., remove the ATC portion)
-                    $netSales = $amount / (1 + ($atcRate / 100)); // Net Sales without ATC
-    
-                    // Step 2: Calculate the ATC tax
+                    // Calculate net sales before ATC
+                    $netSales = $amount / (1 + ($atcRate / 100));
                     $atcAmount = $netSales * ($atcRate / 100);
     
-                    // Step 3: Add to VATable Sales and VAT Amount
-                    $this->vatableSales += $netSales; // Only net amount (VATable Sales)
-                    $this->vatAmount += $netSales * ($taxRate / 100); // VAT is calculated only on net sales, excluding ATC
+                    $this->vatableSales += $netSales;
+                    $this->vatAmount += $netSales * ($taxRate / 100);
     
-                    // Store ATC details
                     $this->appliedATCs[$taxCode] = [
                         'code' => $atc->tax_code,
                         'rate' => $atcRate,
                         'amount' => $amount,
                         'tax_amount' => $atcAmount
                     ];
-                    $row['atc_amount'] = $atcAmount; // Store ATC amount for this row
+                    $row['atc_amount'] = $atcAmount;
                 } else {
-                    // No ATC, full amount is VATable
                     $this->vatableSales += $amount;
-                    $this->vatAmount += $amount * ($taxRate / 100); // Apply VAT on the full amount
-                    $row['atc_amount'] = 0; // No ATC applied
+                    $this->vatAmount += $amount * ($taxRate / 100);
+                    $row['atc_amount'] = 0.00;
                 }
             } else {
-                // Non-Percentage Tax sales (e.g., VAT or Non-VATable)
                 if ($taxRate > 0) {
-                    // For VAT, calculate net amount and VAT
                     $netAmount = $amount / (1 + ($taxRate / 100));
                     $this->vatableSales += $netAmount;
-                    $this->vatAmount += $amount - $netAmount; // Add VAT amount
+                    $this->vatAmount += $amount - $netAmount;
                 } else {
-                    // Non-VATable sales
                     $this->nonVatableSales += $amount;
-                    $row['atc_amount'] = 0; // No ATC for non-vatable sales
+                    $row['atc_amount'] = 0.00;
                 }
             }
     
-            // Add the gross amount (Total Amount Due) to total
+            // Add the gross amount to total
             $this->totalAmount += $amount;
         }
     
-        // Sum up all applied ATC tax amounts
+        // Calculate total ATC amount
         $this->appliedATCsTotalAmount = collect($this->appliedATCs)->sum('tax_amount');
     
-        // Final adjustment to the total amount: VATable Sales + Non-VATable Sales + ATC tax
-        $this->totalAmount = $this->vatableSales + $this->vatAmount + $this->nonVatableSales + $this->appliedATCsTotalAmount; // Total includes ATC tax
-
+        // Final total calculation
+        $this->totalAmount = $this->vatableSales + $this->vatAmount + $this->nonVatableSales + $this->appliedATCsTotalAmount;
+    
         $this->rendered();
     }
     
