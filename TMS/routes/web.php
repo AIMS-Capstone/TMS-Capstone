@@ -345,9 +345,24 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
                 Route::get('/{id}/1601C_summary', [WithHoldingController::class, 'showSummary1601C'])->name('with_holding.1601C_summary');
                 Route::get('/{id}/1601C_sources', [WithHoldingController::class, 'showSources1601C'])->name('with_holding.1601C_sources');
                 Route::post('/{id}/1601C_sources_store', [WithHoldingController::class, 'store1601C'])->name('with_holding.1601C_sources_store');
+                Route::post('/{id}/1601C/deactivate', [WithholdingController::class, 'deactivateSources1601C'])->name('Sources1601C.deactivate');
+                Route::get('/{id}/1601C_sources/archive', [WithholdingController::class, 'archiveSources1601C'])->name('Sources1601C.archive');
+                Route::post('/{id}/1601C/restore', [WithholdingController::class, 'restoreSources1601C'])->name('Sources1601C.restore');
+                Route::post('/{id}/1601C/destory', [WithholdingController::class, 'destroySources1601C'])->name('Sources1601C.destroy');
+                Route::get('/{id}/1601C/export', [WithholdingController::class, 'downloadSources1601C'])->name('Sources1601C.download');
+
+                //import's template
+                Route::get('/1601C/sources', [withholdingController::class, 'sources_template']);
+
                 // Route for creating the 1601C form
                 Route::get('/{id}/1601C_form', [WithHoldingController::class, 'createForm1601C'])->name('form1601C.create');
                 Route::post('/{id}/1601C/store', [WithHoldingController::class, 'storeForm1601C'])->name('form1601C.store');
+                Route::get('/{id}/1601C/preview', [WithholdingController::class, 'previewForm1601C'])->name('form1601C.preview');
+                // Route for editing slight krazy 1601C form
+                Route::get('/{id}/1601C/edit', [withHoldingController::class, 'editForm1601C'])->name('form1601C.edit');
+                Route::put('/{id}/1601C/update', [withHoldingController::class, 'updateForm1601C'])->name('form1601C.update');
+                Route::get('/{id}/1601C/download', [withHoldingController::class, 'downloadForm1601C'])->name('form1601C.download');
+
                 //Route for import
                 Route::post('/withholding/1601C/{id}/import', [WithHoldingController::class, 'importSources1601C'])->name('with_holding.1601C_import');
 
