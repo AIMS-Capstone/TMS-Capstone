@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\atc;
+use App\Models\Atc;
 use Illuminate\Auth\Access\Response;
 
 class AtcPolicy

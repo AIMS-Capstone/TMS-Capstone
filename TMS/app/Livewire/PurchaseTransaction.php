@@ -135,34 +135,34 @@ class PurchaseTransaction extends Component
         $this->totalAmount = 0;
         $this->appliedATCs = [];
         $this->appliedATCsTotalAmount = 0;
-
+    
         Log::info('Calculating totals', [
             'tax_rows_count' => count($this->taxRows),
         ]);
-
+    
         foreach ($this->taxRows as &$row) { // Use reference (&) to modify array elements
-            $amount = $row['amount'];
+            $amount = isset($row['amount']) && is_numeric($row['amount']) ? (float)$row['amount'] : 0.0;
             $taxTypeId = $row['tax_type'];
-
+    
             $taxType = TaxType::find($taxTypeId);
             $vatRate = $taxType ? $taxType->VAT : 0;
-
+    
             $atc = ATC::find($row['tax_code']);
             $atcRate = $atc ? $atc->tax_rate : 0;
-
+    
             // Log each row's details
             Log::info('Processing tax row', [
                 'row_details' => $row,
                 'tax_type' => $row['tax_type'],
                 'amount' => $row['amount'],
             ]);
-
+    
             if ($vatRate > 0) {
                 // Handle vatable purchase
                 $netAmount = $amount / (1 + ($vatRate / 100));
                 $this->vatablePurchase += $netAmount;
                 $this->vatAmount += $amount - $netAmount;
-
+    
                 // Calculate ATC if applicable
                 if ($atcRate > 0) {
                     $atcAmount = $netAmount * ($atcRate / 100);
@@ -182,15 +182,16 @@ class PurchaseTransaction extends Component
                 $row['atc_amount'] = 0; // No ATC for non-vatable purchases
             }
         }
-
+    
         // Calculate the total amount
         $this->appliedATCsTotalAmount = collect($this->appliedATCs)->sum('tax_amount');
         $vatInclusiveAmount = $this->vatablePurchase + $this->vatAmount;
-
+    
         // Add both vatable and non-vatable purchases to the total amount
         $this->totalAmount = $vatInclusiveAmount + $this->nonVatablePurchase - $this->appliedATCsTotalAmount;
         $this->rendered();
     }
+    
 
     public function saveTransaction()
     {

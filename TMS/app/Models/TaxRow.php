@@ -16,7 +16,7 @@ class TaxRow extends Model
     }
     public function atc()
     {
-        return $this->belongsTo(ATC::class, 'tax_code', 'id');
+        return $this->belongsTo(Atc::class, 'tax_code', 'id');
     }
     public function taxType()
     {

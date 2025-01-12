@@ -30,89 +30,47 @@ class CreateTax1701qTable extends Migration
             $table->boolean('claiming_foreign_credits')->nullable();
             $table->string('individual_rate_type')->nullable();
 
-            // Spouse Information
-            $table->string('spouse_tin')->nullable();
-            $table->string('spouse_rdo')->nullable();
-            $table->string('spouse_filer_type')->nullable();
-            $table->string('spouse_alphanumeric_tax_code')->nullable();
-            $table->string('spouse_name')->nullable();
-            $table->string('spouse_citizenship')->nullable();
-            $table->string('spouse_foreign_tax_number')->nullable();
-            $table->boolean('spouse_claiming_foreign_credits')->nullable();
+      
 
             // Tax Calculations
             $table->decimal('show_tax_due', 15, 2)->nullable();
-            $table->decimal('show_spouse_tax_due', 15, 2)->nullable();
             $table->decimal('show_tax_credits_payments', 15, 2)->nullable();
-            $table->decimal('show_spouse_tax_credits_payments', 15, 2)->nullable();
             $table->decimal('show_tax_payable', 15, 2)->nullable();
-            $table->decimal('show_spouse_tax_payable', 15, 2)->nullable();
             $table->decimal('show_total_penalties', 15, 2)->nullable();
-            $table->decimal('show_spouse_total_penalties', 15, 2)->nullable();
             $table->decimal('show_total_amount_payable', 15, 2)->nullable();
-            $table->decimal('show_spouse_total_amount_payable', 15, 2)->nullable();
             $table->decimal('aggregate_amount_payable', 15, 2)->nullable();
 
             // Sales and Revenues
             $table->decimal('sales_revenues', 15, 2)->nullable();
-            $table->decimal('spouse_sales_revenues', 15, 2)->nullable();
             $table->decimal('cost_of_sales', 15, 2)->nullable();
-            $table->decimal('spouse_cost_of_sales', 15, 2)->nullable();
             $table->decimal('gross_income', 15, 2)->nullable();
-            $table->decimal('spouse_gross_income', 15, 2)->nullable();
             $table->decimal('total_itemized_deductions', 15, 2)->nullable();
-            $table->decimal('spouse_total_itemized_deductions', 15, 2)->nullable();
             $table->decimal('osd', 15, 2)->nullable();
-            $table->decimal('spouse_osd', 15, 2)->nullable();
             $table->decimal('net_income', 15, 2)->nullable();
-            $table->decimal('spouse_net_income', 15, 2)->nullable();
             $table->decimal('taxable_income', 15, 2)->nullable();
-            $table->decimal('spouse_taxable_income', 15, 2)->nullable();
-
             // Fields ending with _8
             $table->decimal('sales_revenues_8', 15, 2)->nullable();
-            $table->decimal('spouse_sales_revenues_8', 15, 2)->nullable();
             $table->decimal('non_op_specify_8', 15, 2)->nullable();
             $table->decimal('non_operating_8', 15, 2)->nullable();
-            $table->decimal('spouse_non_operating_8', 15, 2)->nullable();
             $table->decimal('total_income_8', 15, 2)->nullable();
-            $table->decimal('spouse_total_income_8', 15, 2)->nullable();
             $table->decimal('total_prev_8', 15, 2)->nullable();
-            $table->decimal('spouse_total_prev_8', 15, 2)->nullable();
             $table->decimal('cumulative_taxable_income_8', 15, 2)->nullable();
-            $table->decimal('spouse_cumulative_taxable_income_8', 15, 2)->nullable();
             $table->decimal('allowable_reduction_8', 15, 2)->nullable();
-            $table->decimal('spouse_allowable_reduction_8', 15, 2)->nullable();
             $table->decimal('taxable_income_8', 15, 2)->nullable();
-            $table->decimal('spouse_taxable_income_8', 15, 2)->nullable();
             $table->decimal('tax_due_8', 15, 2)->nullable();
-            $table->decimal('spouse_tax_due_8', 15, 2)->nullable();
             $table->decimal('prior_year_credits', 15, 2)->nullable();
-            $table->decimal('spouse_prior_year_credits', 15, 2)->nullable();
             $table->decimal('tax_payments_prev_quarters', 15, 2)->nullable();
-            $table->decimal('spouse_tax_payments_prev_quarters', 15, 2)->nullable();
             $table->decimal('creditable_tax_withheld_prev_quarters', 15, 2)->nullable();
-            $table->decimal('spouse_creditable_tax_withheld_prev_quarters', 15, 2)->nullable();
             $table->decimal('creditable_tax_withheld_bir', 15, 2)->nullable();
-            $table->decimal('spouse_creditable_tax_withheld_bir', 15, 2)->nullable();
             $table->decimal('tax_paid_prev_return', 15, 2)->nullable();
-            $table->decimal('spouse_tax_paid_prev_return', 15, 2)->nullable();
             $table->decimal('foreign_tax_credits', 15, 2)->nullable();
-            $table->decimal('spouse_foreign_tax_credits', 15, 2)->nullable();
             $table->decimal('other_tax_credits', 15, 2)->nullable();
-            $table->decimal('spouse_other_tax_credits', 15, 2)->nullable();
             $table->decimal('total_tax_credits', 15, 2)->nullable();
-            $table->decimal('spouse_total_tax_credits', 15, 2)->nullable();
             $table->decimal('tax_payable', 15, 2)->nullable();
-            $table->decimal('spouse_tax_payable', 15, 2)->nullable();
             $table->decimal('surcharge', 15, 2)->nullable();
-            $table->decimal('spouse_surcharge', 15, 2)->nullable();
             $table->decimal('interest', 15, 2)->nullable();
-            $table->decimal('spouse_interest', 15, 2)->nullable();
             $table->decimal('compromise', 15, 2)->nullable();
-            $table->decimal('spouse_compromise', 15, 2)->nullable();
             $table->decimal('total_penalties', 15, 2)->nullable();
-            $table->decimal('spouse_total_penalties', 15, 2)->nullable();
 
             $table->timestamps(); // Timestamps for created_at and updated_at
         });
