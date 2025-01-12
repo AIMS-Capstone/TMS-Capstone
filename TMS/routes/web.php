@@ -237,6 +237,15 @@ Route::post('/tax-return/store1701Q/{taxReturn}', [Tax1701QController::class, 's
     ->name('tax_return.report');
     Route::get('/income_return/{id}/report', [TaxReturnController::class, 'showIncomeReport'])
     ->name('income_return.report');
+    Route::get('/tax-return/{taxReturn}/1701q/report', [Tax1701QController::class, 'reportPDF'])
+    ->name('income_return.reportPDF');
+
+
+Route::get('/tax-return/{taxReturn}/1701q/download', [Tax1701QController::class, 'downloadPdf'])
+    ->name('income_return.download');
+
+Route::get('/tax-return/{taxReturn}/1701q/stream', [Tax1701QController::class, 'streamPdf'])
+    ->name('income_return.stream');
 
 
         Route::get('tax_return/{id}/income-input-summary', [TaxReturnController::class, 'showIncomeInputSummary'])->name('tax_return.income_input_summary');
