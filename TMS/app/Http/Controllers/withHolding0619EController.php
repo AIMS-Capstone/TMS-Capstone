@@ -309,13 +309,13 @@ class withHolding0619EController extends Controller
         return $pdf->download($filename);
     }
 
-    private function getWithHoldings($organizationId, $type)
+    private function getWithHoldings($organizationId, $type, $perPage = 5)
     {
 
         return WithHolding::with(['employee', 'employment', 'creator'])
             ->where('type', $type)
             ->where('organization_id', $organizationId)
-            ->paginate(5);
+            ->paginate($perPage);
             
     }
 }

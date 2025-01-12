@@ -375,7 +375,7 @@
                                                     <th scope="col" class="text-left py-4 px-4">Date Archived</th>
                                                 </tr>
                                             </thead>
-                                            <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
+                                            <tbody class="divide-y divide-neutral-300">
                                                 @foreach ($inactiveCoas as $coa)
                                                     <tr class="hover:bg-blue-50 cursor-pointer ease-in-out">
                                                         <td class="p-4">

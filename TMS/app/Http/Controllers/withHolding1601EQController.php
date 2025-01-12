@@ -148,7 +148,7 @@ class withHolding1601EQController extends Controller
     }
 
     // Qap page to
-    public function showQap1601EQ($withholdingId)
+    public function showQap1601EQ(Request $request, $withholdingId)
     {
         // Check if the form already exists
         $existingForm = Form1601EQ::where('withholding_id', $withholdingId)->first();
@@ -187,6 +187,9 @@ class withHolding1601EQController extends Controller
                 $endDate = null;
         }
 
+        // Get perPage value from the request, default to 5
+        $perPage = $request->input('perPage', 5);
+
         $taxRows = TaxRow::whereHas('transaction', function ($query) use ($withholdingId) {
             $query->where('withholding_id', $withholdingId)
                 ->where('transaction_type', 'Purchase')
@@ -197,7 +200,7 @@ class withHolding1601EQController extends Controller
                 'taxType',
                 'atc', 
             ])
-            ->paginate(5);
+            ->paginate($perPage);
 
         $unassignedTransactions = Transactions::whereNull('withholding_id')
             ->where('transaction_type', 'Purchase')
@@ -311,7 +314,7 @@ class withHolding1601EQController extends Controller
     }
 
     // Archive QAP Transactions
-    public function archiveQAP($withholdingId)
+    public function archiveQAP(Request $request, $withholdingId)
     {
 
         // Check if the form already exists
@@ -325,13 +328,16 @@ class withHolding1601EQController extends Controller
 
         $withHolding = WithHolding::findOrFail($withholdingId);
 
+        // Get perPage value from the request, default to 5
+        $perPage = $request->input('perPage', 5);
+
         $taxRows = TaxRow::whereHas('transaction', function ($query) use ($withholdingId) {
             $query->where('withholding_id', $withholdingId)
                 ->where('transaction_type', 'Purchase')
                 ->where('QAP', 'inactive');
         })
             ->with(['transaction.contactDetails', 'taxType', 'atc']) 
-            ->paginate(5);
+            ->paginate($perPage);
 
         $unassignedTransactions = Transactions::whereNull('withholding_id')
             ->where('transaction_type', 'Purchase')

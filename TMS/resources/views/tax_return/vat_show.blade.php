@@ -64,7 +64,7 @@
 
                 // Handle deletion
              
-deleteRows() {
+                    deleteRows() {
           
 
                         fetch('/tax-return-transaction/deactivate', {
@@ -119,28 +119,24 @@ deleteRows() {
                                 updateSearch() {
                                     this.$refs.searchForm.submit();
                                 }
-                            }"
-                            x-ref="searchForm"
-                            action="{{ route('tax_return.slsp_data', $taxReturn->id) }}" 
-                            method="GET" 
-                            role="search" 
-                            aria-label="Table" 
-                            autocomplete="off"
-                            >
-                            <input 
-                                type="search" 
-                                name="search" 
-                                x-model="search"
-                                x-on:input.debounce.500ms="updateSearch"
-                                class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
-                                aria-label="Search Term" 
-                                placeholder="Search..." 
-                            >
-                            
-                            <input type="hidden" name="type" x-model="type">
-                            <input type="hidden" name="perPage" x-model="perPage">
-                        </form>
-                            
+                             }"
+                                x-ref="searchForm"
+                                action="{{ route('tax_return.slsp_data', $taxReturn->id) }}" 
+                                method="GET" 
+                                role="search" 
+                                aria-label="Table" 
+                                autocomplete="off"
+                                >
+                                <input type="search" name="search" x-model="search" x-on:input.debounce.500ms="updateSearch"
+                                    class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
+                                    aria-label="Search Term" 
+                                    placeholder="Search..." 
+                                >
+                                
+                                <input type="hidden" name="type" x-model="type">
+                                <input type="hidden" name="perPage" x-model="perPage">
+                            </form>
+                                
                             <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                         </div>
                         <!-- Sort by dropdown -->
@@ -615,9 +611,6 @@ document.addEventListener('search', event => {
     document.body.appendChild(form);
     form.submit();
 }
-
-
-    
 
 </script>
 
