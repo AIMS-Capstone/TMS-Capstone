@@ -39,6 +39,13 @@ class JournalRow extends Component
     // Watch for updates on debit or credit fields
     public function updated($field)
     {
+        if ($field === 'debit' || $field === 'credit') {
+            // Ensure that if the field is empty, it gets set to 0
+            $this->debit = is_numeric($this->debit) ? (float) $this->debit : 0;
+            $this->credit = is_numeric($this->credit) ? (float) $this->credit : 0;
+        }
+    
+        // Other logic
         if (in_array($field, ['debit', 'credit', 'coa'])) {
             // Make sure to adjust totals and dispatch updates when debit/credit change
             $this->dispatch('journalRowUpdated', [
@@ -50,6 +57,7 @@ class JournalRow extends Component
             ])->to($this->getParentComponentClass());
         }
     }
+    
 
     protected function getParentComponentClass()
     {

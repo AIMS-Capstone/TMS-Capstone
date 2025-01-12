@@ -141,11 +141,11 @@
     <div class="flex items-center space-x-4 w-2/3">
         <label class="flex items-center">
             <input type="radio" name="amended_return" value="yes" class="mr-2"
-                   {{ old('amended_return') == 'yes' ? 'checked' : '' }}> Yes
+            {{ old('amended_return', $tax1701q->amended_return) == 'yes' ? 'checked' : '' }}> Yes
         </label>
         <label class="flex items-center">
             <input type="radio" name="amended_return" value="no" class="mr-2"
-                   {{ old('amended_return') == 'no' ? 'checked' : '' }}> No
+            {{ old('amended_return', $tax1701q->amended_return) == 'no' ? 'checked' : '' }}> No
         </label>
     </div>
 </div>
@@ -178,7 +178,8 @@
     
     <input type="number" name="sheets" placeholder="No. of Sheets" 
            class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-           value="{{ old('sheets') }}">
+           value="{{ old('sheets', $tax1701q->sheets) }}">
+           
 </div>
 
 
@@ -214,7 +215,7 @@
     
     <input type="text" name="tin" placeholder="000-000-000-000" 
            class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-           value="{{ old('tin', $organization->tin) }}">
+           value="{{ old('tin', $tax1701q->tin) }}">
 </div>
 
 
@@ -243,7 +244,7 @@
         </span>
     </label>
     
-    <input type="text" name="rdo_code" value="{{ old('rdo_code', $rdoCode) }}" readonly 
+    <input type="text" name="rdo_code" value="{{ old('rdo_code', $tax1701q->rdo_code) }}" readonly 
            class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
 </div>
 
@@ -347,7 +348,7 @@
         </span>
     </label>
 
-    <input type="text" name="taxpayer_name" value="{{ old('taxpayer_name', $organization->registration_name) }}" 
+    <input type="text" name="taxpayer_name" value="{{ old('taxpayer_name', $tax1701q->taxpayer_name) }}" 
            placeholder="e.g. Dela Cruz, Juan, Protacio" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300" readonly>
 </div>
 
@@ -377,7 +378,7 @@
         </span>
     </label>
 
-    <input type="text" name="registered_address" value="{{ old('registered_address', $organization->address_line . ', ' . $organization->city . ', ' . $organization->province . ', ' . $organization->region) }}" 
+    <input type="text" name="registered_address" value="{{ old('registered_address', $tax1701q->registered_address) }}" 
            placeholder="e.g. 145 Yakal St. ESL Bldg., San Antonio Village Makati NCR" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
 </div>
 
@@ -406,7 +407,7 @@
         </span>
     </label>
 
-    <input type="text" name="zip_code" value="{{ old('zip_code', $organization->zip_code) }}" 
+    <input type="text" name="zip_code" value="{{ old('zip_code', $tax1701q->zip_code) }}" 
            placeholder="e.g. 1203" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
 </div>
 
@@ -472,7 +473,7 @@
 
     <div class="w-2/3">
         <!-- Email Address input -->
-        <input type="text" name="email_address" value="{{ old('email_address', $organization->email) }}" 
+        <input type="text" name="email_address" value="{{ old('email_address', $tax1701q->email_address) }}" 
                placeholder="pedro@gmail.com" class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
     </div>
 </div>
@@ -619,7 +620,7 @@
         <!-- Graduated Rates Option -->
         <label class="inline-flex items-center">
             <input type="radio" name="individual_rate_type" value="graduated_rates"
-                   {{  $individualTaxOptionRate && $individualTaxOptionRate->rate_type === 'graduated_rates' ? 'checked' : 'disabled' }}
+                   {{  $tax1701q->individual_rate_type &&  $tax1701q->individual_rate_type === 'graduated_rates' ? 'checked' : 'disabled' }}
                    class="form-radio text-blue-600">
             <span class="ml-2">Graduated Rates</span>
         </label>
@@ -627,7 +628,7 @@
         <!-- 8% Gross Sales/Receipts Option -->
         <label class="inline-flex items-center">
             <input type="radio" name="individual_rate_type" value="8_percent"
-                   {{  $individualTaxOptionRate && $individualTaxOptionRate->rate_type === '8_percent' ? 'checked' : 'disabled' }}
+                   {{   $tax1701q->individual_rate_type &&  $tax1701q->individual_rate_type === '8_percent' ? 'checked' : 'disabled' }}
                    class="form-radio text-blue-600">
             <span class="ml-2">8% Gross Sales/Receipts</span>
         </label>
@@ -640,7 +641,7 @@
 
 
     <!-- Individual Deduction Method Section -->
-    @if($individualTaxOptionRate && $individualTaxOptionRate->rate_type === 'graduated_rates')
+    @if($tax1701q->individual_rate_type &&  $tax1701q->individual_rate_type === 'graduated_rates')
     <div x-data="{ showTooltip: false }" class="mb-4">
         <label class="block text-sm font-medium text-gray-700 flex items-center">
             Choose Deduction Method
@@ -669,7 +670,7 @@
             <!-- Itemized Deductions Option -->
             <label class="inline-flex items-center">
                 <input type="radio" name="individual_deduction_method" value="itemized"
-                       {{ old('individual_deduction_method', $individualTaxOptionRate->deduction_method === 'itemized' ? 'checked' : 'disabled') }}
+                       {{ old('individual_deduction_method', $tax1701q->individual_deduction_method === 'itemized' ? 'checked' : 'disabled') }}
                        class="form-radio text-blue-600">
                 <span class="ml-2">Itemized Deductions</span>
             </label>
@@ -677,7 +678,7 @@
             <!-- Optional Standard Deduction (OSD) Option -->
             <label class="inline-flex items-center">
                 <input type="radio" name="individual_deduction_method" value="osd"
-                       {{ old('individual_deduction_method', $individualTaxOptionRate->deduction_method === 'osd' ? 'checked' : 'disabled') }}
+                       {{ old('individual_deduction_method', $tax1701q->individual_deduction_method === 'osd' ? 'checked' : 'disabled') }}
                        class="form-radio text-blue-600">
                 <span class="ml-2">Optional Standard Deduction (OSD)</span>
             </label>
@@ -936,7 +937,7 @@
 
 
 
-    @if($individualTaxOptionRate->rate_type === 'graduated_rates')
+    @if($tax1701q->individual_rate_type === 'graduated_rates')
             <div class="border-b border-t">
                 <div class="grid grid-cols-3 gap-4 pt-2">
                     <!-- Header Row -->
@@ -979,7 +980,7 @@
             id="sales_revenues"
             step="any"
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            value="{{ number_format($individualNetAmount, 2) }}" 
+            value="{{ number_format($tax1701q->sales_revenues, 2) }}" 
             onchange="calculateTotals()">
     </div>
 </div>
@@ -1021,7 +1022,7 @@
             id="cost_of_sales" 
             step="any"
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            value="{{ number_format($individualCOGS, 2) }}" 
+            value="{{ number_format($tax1701q->cost_of_sales, 2) }}" 
             onchange="calculateTotals()">
     </div>
 </div>
@@ -1098,7 +1099,7 @@
             name="total_itemized_deductions" 
             step="any"
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            value="{{ number_format($individualItemizedDeduction, 2) }}" 
+            value="{{ number_format($tax1701q->total_itemized_deductions, 2) }}" 
             onchange="calculateTotals()">
     </div>
 </div>
@@ -1212,7 +1213,7 @@
             type="number" 
             name="taxable_income"
             step="any" 
-            value="0.00"
+            value="{{ number_format($tax1701q->taxable_income, 2) }}" 
             id="taxable_income"
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
             onchange="calculateTotals()">
@@ -1248,6 +1249,7 @@
         <input 
             type="text" 
             name="graduated_non_op_specify" 
+            value="{{ $tax1701q->graduated_non_op_specify}}" 
             id="graduated_non_op_specify"
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
             onchange="calculateTotals()">
@@ -1256,7 +1258,7 @@
         <input 
             type="number" 
             step="any"
-            value="0.00"
+            value="{{ number_format($tax1701q->graduated_non_op, 2) }}" 
             name="graduated_non_op" 
             id="graduated_non_op"
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
@@ -1298,7 +1300,7 @@
             type="number" 
             step="any"
             name="partner_gpp" 
-            value="0.00"
+            value="{{ number_format($tax1701q->partner_gpp, 2) }}" 
             id="partner_gpp"
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
             onchange="calculateTotals()">
@@ -1386,7 +1388,7 @@
 
     
         <!-- Schedule II - 8% IT Rate (if selected) -->
-        @elseif($individualTaxOptionRate->rate_type === '8_percent')
+        @elseif($tax1701q->individual_rate_type === '8_percent')
             <div class="border-b border-t">
                 <div class="grid grid-cols-3 gap-4 pt-2">
                     <!-- Header Row -->
@@ -1427,7 +1429,7 @@
                             type="number" 
                             step="any"
                             name="sales_revenues_8" 
-                            value="{{ number_format($individualNetAmount, 2) }}"
+                            value="{{ number_format($tax1701q->sales_revenues_8, 2) }}"
                             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                             onchange="calculateTotals()"
                         >
@@ -1464,6 +1466,7 @@
                         <input 
                             type="text" 
                             name="non_op_specify_8" 
+                            value="{{ $tax1701q->non_op_specify_8 }}" 
                             
                             id="non_op_specify_8"
                             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
@@ -1475,7 +1478,7 @@
                             type="number" 
                                 step="any"
                             name="non_operating_8" 
-                                value="0.00"
+                            value="{{ number_format($tax1701q->non_operating_8, 2) }}" 
                             id="non_operating_8" 
                             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                             onchange="calculateTotals()"
@@ -1552,7 +1555,7 @@
                             type="number" 
                             step="any"
                             name="total_prev_8" 
-                                value="0.00"
+                            value="{{ number_format($tax1701q->total_prev_8, 2) }}" 
                             id="total_prev_8" 
                             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                             onchange="calculateTotals()"
@@ -1633,7 +1636,7 @@
                             type="number" 
                             step="any"
                             name="allowable_reduction_8" 
-                                value="0.00"
+                            value="{{ number_format($tax1701q->allowable_reduction_8, 2) }}" 
                             id="allowable_reduction_8" 
                             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                             onchange="calculateTotals()"
@@ -1758,7 +1761,7 @@
             type="number" 
             step="any"
             name="prior_year_credits" 
-            value="0.00"
+            value="{{ number_format($tax1701q->prior_year_credits, 2) }}" 
             id="prior_year_credits" 
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
             onchange="calculateTotals()"
@@ -1793,7 +1796,7 @@
         <input 
             type="number" 
             step="any"
-            value="0.00"
+            value="{{ number_format($tax1701q->tax_payments_prev_quarters, 2) }}" 
             name="tax_payments_prev_quarters" 
             id="tax_payments_prev_quarters" 
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
@@ -1830,7 +1833,7 @@
         <input 
             type="number" 
             step="any"
-            value="0.00"
+            value="{{ number_format($tax1701q->creditable_tax_withheld_prev_quarters, 2) }}" 
             name="creditable_tax_withheld_prev_quarters" 
             id="creditable_tax_withheld_prev_quarters" 
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
@@ -1867,7 +1870,7 @@
         <input 
             type="number" 
             step="any"
-            value="0.00"
+            value="{{ number_format($tax1701q->creditable_tax_withheld_bir, 2) }}" 
             name="creditable_tax_withheld_bir" 
             id="creditable_tax_withheld_bir" 
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
@@ -1905,7 +1908,7 @@
             type="number" 
             step="any"
             name="tax_paid_prev_return" 
-            value="0.00"
+            value="{{ number_format($tax1701q->tax_paid_prev_return, 2) }}" 
             id="tax_paid_prev_return" 
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
             onchange="calculateTotals()"
@@ -1943,7 +1946,7 @@
             step="any"
             name="foreign_tax_credits" 
             id="foreign_tax_credits" 
-            value="0.00"
+            value="{{ number_format($tax1701q->foreign_tax_credits, 2) }}" 
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
             onchange="calculateTotals()"
         >
@@ -1976,7 +1979,7 @@
     <div>
         <input 
         type="text" 
-     
+        value="{{$tax1701q->other_tax_credits_specify}}" 
         name="other_tax_credits_specify" 
         id="other_tax_credits_specify" 
         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
@@ -1987,7 +1990,7 @@
         <input 
             type="number" 
             step="any"
-            value="0.00"
+            value="{{ number_format($tax1701q->other_tax_credits, 2) }}" 
             name="other_tax_credits" 
             id="other_tax_credits" 
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
@@ -2096,7 +2099,8 @@
             type="number" 
             step="any"
             name="surcharge" 
-            value="0.00"
+           
+            value="{{ number_format($tax1701q->surcharge, 2) }}" 
             id="surcharge" 
             onchange="calculateTotals()"
             class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
@@ -2130,7 +2134,7 @@
     <input 
         type="number" 
         step="any"
-          value="0.00"
+        value="{{ number_format($tax1701q->interest, 2) }}" 
         name="interest" 
         id="interest" 
         onchange="calculateTotals()"
@@ -2165,7 +2169,7 @@
     <input 
         type="number" 
         step="any"
-          value="0.00"
+        value="{{ number_format($tax1701q->compromise, 2) }}" 
         name="compromise" 
         id="compromise" 
         onchange="calculateTotals()"

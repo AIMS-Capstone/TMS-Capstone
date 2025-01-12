@@ -767,13 +767,16 @@ private function extractTextFromReceipt($filePath)
     
         // Fetch all transactions for the specific organization, with related contact details and tax rows
         $transactions = Transactions::with(['contactDetails', 'taxRows'])
-                                    ->where('organization_id', $organizationId)
-                                    ->get();
+                                ->where('organization_id', $organizationId)
+                                ->whereIn('transaction_type', ['Sales', 'Purchase']) 
+                                ->get();
+
     
         // Check if transactions exist, if not, handle the case
         if ($transactions->isEmpty()) {
-            return response()->json(['message' => 'No transactions found for this organization.'], 404);
+            return back()->with('alert', 'No transactions found for this organization.');
         }
+        
     
         // Generate the PDF
         $pdf = PDF::loadView('transactions.pdf', compact('transactions'));

@@ -36,7 +36,7 @@
                     <div class="flex justify-between items-center px-8 ps-10 my-4">
                         <!-- Navigation Tabs -->
                         <nav class="flex space-x-4">
-                            <a href="{{ route('tax_return.income_input_summary', $taxReturn->id) }}" 
+                            <a href="{{ route('income_return.show', ['id' => $taxReturn->id, 'type' => '1701Q']) }}" 
                                class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap {{ request()->routeIs('tax-returns.income-summary') ? 'font-bold bg-slate-100 text-blue-900 rounded-lg' : 'text-zinc-600 font-medium hover:text-blue-900' }}">
                                 Summary
                             </a>
@@ -48,14 +48,16 @@
 
                         <!-- Buttons -->
                         <div class="flex space-x-4">
-                            <a href="" 
+                            <a href="{{route('tax_return.1701q.edit', $taxReturn->id)}}" 
                                class="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600">
                                 Edit Report
                             </a>
-                            <a href="" 
-                               class="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-lg hover:bg-green-600">
-                                Download PDF
-                            </a>
+                            <form action="{{ route('tax-return.mark-filed', $taxReturn->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-lg hover:bg-green-600">
+                                    File Report
+                                </button>
+                            </form>
                         </div>
                     </div>
 

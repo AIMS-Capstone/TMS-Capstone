@@ -33,6 +33,7 @@
         <tr>
             <th>Name</th>
             <th>Date</th>
+            <th>Transaction Type</th>
             <th>Tax Code</th>
             <th>Tax Type</th>
             <th>COA</th>
@@ -46,6 +47,7 @@
                 <tr>
                     <td>{{ $transaction->contactDetails->bus_name ?? 'N/A' }}</td>
                     <td>{{ $transaction->created_at->format('d/m/Y') }}</td>
+                    <td>{{ $transaction->transaction_type }}</td>
                     <td>{{ $taxRow->atc->tax_code }}</td>
                     <td>{{ $taxRow->taxType->short_code }}</td>
                     <td>{{ $taxRow->coaAccount->name }}</td>

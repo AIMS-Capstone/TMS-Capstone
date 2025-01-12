@@ -139,40 +139,41 @@
     </div>
     <div class="row">
         <div class="cell label">16 Tax Rate</div>
-        <div class="cell">{{ $tax1701q->individual_rate_type == '8_percent'? '8% on gross sales/receipts & other non-operating income in lieu of Graduated Rates under Sec. 24(A)(2)(a) & Percentage Tax' : 'Graduated Rates' }}</div>
+        <div class="cell">{{ $tax1701q->individual_rate_type == '8_percent'? '8% on gross sales/receipts & other non-operating income' : 'Graduated Rates' }}</div>
         <div class="cell label">16A Method of Deduction</div>
         <div class="cell">{{ $tax1701q->individual_deduction_method }}</div>
     </div>
     
 </div>
 
-
+<div class="section-title">Part III Total Tax Payable</div>
         <!-- Income Computation -->
-        <div class="section-title">Part III Total Tax Payable</div>
+ 
         <div class="grid">
+            
             <div class="row">
                 <div class="cell label">Particulars</div>
                 <div class="cell label">A.)Taxpayer/Filer</div>
             </div>
             <div class="row">
                 <div class="cell label">26 Tax Due (From Part V, Schedule I-Item 46 OR Schedule II-Item 54)</div>
-                <div class="cell value">{{ number_format($tax1701q->tax_due, 2) }}</div>
+                <div class="cell value">{{ number_format($tax1701q->show_tax_due, 2) }}</div>
             </div>
             <div class="row">
                 <div class="cell label">27 Less: Tax Credits/Payments (From Part V, Schedule III-Item 62)</div>
-                <div class="cell value">{{ number_format($tax1701q->tax_credits_payments, 2) }}</div>
+                <div class="cell value">{{ number_format($tax1701q->show_tax_credits_payments, 2) }}</div>
             </div>
             <div class="row">
                 <div class="cell label">28 Tax Payable/(Overpayment) (Item 26 Less Item 27) (From Part V, Item 63)</div>
-                <div class="cell value">{{ number_format($tax1701q->tax_payable_overpayment, 2) }}</div>
+                <div class="cell value">{{ number_format($tax1701q->show_tax_payable, 2) }}</div>
             </div>
             <div class="row">
                 <div class="cell label">29 Add: Total Penalties (From Part V, Schedule IV-Item 67)</div>
-                <div class="cell value">{{ number_format($tax1701q->total_penalties, 2) }}</div>
+                <div class="cell value">{{ number_format($tax1701q->show_total_penalties, 2) }}</div>
             </div>
             <div class="row">
                 <div class="cell label">30 Total Amount Payable/(Overpayment) (Sum of Items 28 and 29) (From Part V, Item 68)</div>
-                <div class="cell value">{{ number_format($tax1701q->total_amount_payable, 2) }}</div>
+                <div class="cell value">{{ number_format($tax1701q->show_total_amount_payable, 2) }}</div>
             </div>
             <div class="row">
                 <div class="cell label">31 Aggregate Amount Payable/(Overpayment) (Sum of Items 30A and 30B)</div>
@@ -183,42 +184,43 @@
         <!-- Tax Due Computation -->
       <!-- Part V – Computation of Tax Due -->
 <div class="section-title">Part V – Computation of Tax Due</div>
-
+<div class="section-title">Schedule II – For 8% IT Rate</div>
 <div class="grid">
     @if($tax1701q->individual_rate_type == '8_percent')
         <!-- Schedule II – For 8% IT Rate -->
-        <div class="section-title">Schedule II – For 8% IT Rate</div>
         <div class="row">
             <div class="cell label">47 Sales/Revenues/Receipts/Fees (net of sales returns, allowances and discounts)</div>
-            <div class="cell value">{{ number_format($tax1701q->sales_revenues, 2) }}</div>
+            <div class="cell value">{{ number_format($tax1701q->sales_revenues_8, 2) }}</div>
         </div>
         <div class="row">
-            <div class="cell label">48 Add: Non-Operating Income (specify)</div>
-            <div class="cell value">{{ number_format($tax1701q->non_operating_income, 2) }}</div>
+            <div class="cell label">48 Add: Non-Operating Income (specify) <u>{{$tax1701q->non_op_specify_8;}}</u></div>
+
+            
+            <div class="cell value">{{ number_format($tax1701q->non_operationg_8, 2) }}</div>
         </div>
         <div class="row">
             <div class="cell label">49 Total Income for the quarter (Sum of Items 47 and 48)</div>
-            <div class="cell value">{{ number_format($tax1701q->total_income_quarter, 2) }}</div>
+            <div class="cell value">{{ number_format($tax1701q->total_income_8, 2) }}</div>
         </div>
         <div class="row">
             <div class="cell label">50 Add: Total Taxable Income/(Loss) Previous Quarter (Item 51 of previous quarter)</div>
-            <div class="cell value">{{ number_format($tax1701q->total_income_previous_quarter, 2) }}</div>
+            <div class="cell value">{{ number_format($tax1701q->total_prev_8, 2) }}</div>
         </div>
         <div class="row">
             <div class="cell label">51 Cumulative Taxable Income/(Loss) as of This Quarter (Sum of Items 49 and 50)</div>
-            <div class="cell value">{{ number_format($tax1701q->cumulative_income, 2) }}</div>
+            <div class="cell value">{{ number_format($tax1701q->cumulative_taxable_income_8, 2) }}</div>
         </div>
         <div class="row">
             <div class="cell label">52 Less: Allowable reduction from gross sales/receipts and other non-operating income of purely self-employed individuals and/or professionals in the amount of P 250,000</div>
-            <div class="cell value">{{ number_format($tax1701q->allowable_reduction, 2) }}</div>
+            <div class="cell value">{{ number_format($tax1701q->allowable_reduction_8, 2) }}</div>
         </div>
         <div class="row">
             <div class="cell label">53 Taxable Income/(Loss) To Date (Item 51 Less Item 52)</div>
-            <div class="cell value">{{ number_format($tax1701q->taxable_income_to_date, 2) }}</div>
+            <div class="cell value">{{ number_format($tax1701q->taxable_income_8, 2) }}</div>
         </div>
         <div class="row">
             <div class="cell label">54 TAX DUE (Item 53 x 8% Tax Rate) (To Part III, Item 26)</div>
-            <div class="cell value">{{ number_format($tax1701q->tax_due_8_percent, 2) }}</div>
+            <div class="cell value">{{ number_format($tax1701q->tax_due_8, 2) }}</div>
         </div>
     @else
         <!-- Schedule I – For Graduated IT Rate -->
@@ -237,7 +239,7 @@
         </div>
         <div class="row">
             <div class="cell label">39 Total Allowable Itemized Deductions</div>
-            <div class="cell value">{{ number_format($tax1701q->itemized_deductions, 2) }}</div>
+            <div class="cell value">{{ number_format($tax1701q->total_itemized_deductions, 2) }}</div>
         </div>
         <div class="row">
             <div class="cell label">40 Optional Standard Deduction (OSD) (40% of Item 36)</div>
@@ -249,57 +251,113 @@
         </div>
         <div class="row">
             <div class="cell label">42 Taxable Income/(Loss) Previous Quarter/s</div>
-            <div class="cell value">{{ number_format($tax1701q->taxable_income_previous, 2) }}</div>
+            <div class="cell value">{{ number_format($tax1701q->taxable_income, 2) }}</div>
         </div>
         <div class="row">
-            <div class="cell label">43 Non-Operating Income (specify)</div>
-            <div class="cell value">{{ number_format($tax1701q->non_operating_income_specified, 2) }}</div>
+            <div class="cell label">43 Non-Operating Income (specify) <u> {{ $tax1701q->graduated_non_op_specify }} </u></div>
+            <div class="cell value">{{ number_format($tax1701q->graduated_non_op, 2) }}</div>
         </div>
         <div class="row">
             <div class="cell label">44 Amount Received/Share in Income by a Partner from General Professional Partnership (GPP)</div>
-            <div class="cell value">{{ number_format($tax1701q->income_from_gpp, 2) }}</div>
+            <div class="cell value">{{ number_format($tax1701q->partner_gpp, 2) }}</div>
         </div>
         <div class="row">
             <div class="cell label">45 Total Taxable Income/(Loss) To Date (Sum of Items 41 to 44)</div>
-            <div class="cell value">{{ number_format($tax1701q->total_taxable_income, 2) }}</div>
+            <div class="cell value">{{ number_format($tax1701q->graduated_total_taxable_income, 2) }}</div>
         </div>
         <div class="row">
             <div class="cell label">46 TAX DUE (Item 45 x Applicable Tax Rate based on Tax Table below) (To Part III, Item 26)</div>
-            <div class="cell value">{{ number_format($tax1701q->tax_due_graduated, 2) }}</div>
+            <div class="cell value">{{ number_format($tax1701q->graduated_tax_due, 2) }}</div>
         </div>
     @endif
 </div>
 
-
-        <!-- Penalties -->
-        <div class="section-title">Part IV - Penalties</div>
-        <div class="grid">
-            <div class="row">
-                <div class="cell label">21 Surcharge</div>
-                <div class="cell value">{{ number_format($tax1701q->surcharge, 2) }}</div>
-            </div>
-            <div class="row">
-                <div class="cell label">22 Interest</div>
-                <div class="cell value">{{ number_format($tax1701q->interest, 2) }}</div>
-            </div>
-            <div class="row">
-                <div class="cell label">23 Compromise</div>
-                <div class="cell value">{{ number_format($tax1701q->compromise, 2) }}</div>
-            </div>
-            <div class="row">
-                <div class="cell label">24 Total Penalties (Sum of Items 21 to 23)</div>
-                <div class="cell value">{{ number_format($tax1701q->total_penalties, 2) }}</div>
-            </div>
+<div class="section-title">Schedule III - Tax Credits/Payments</div>
+       <!-- Schedule III - Tax Credits/Payments -->
+       <div class="grid">
+  
+       <div class="row">
+           <div class="cell label">55 Prior Year’s Excess Credits</div>
+           <div class="cell value">{{ number_format($tax1701q->prior_year_excess_credits, 2) }}</div>
+       </div>
+       <div class="row">
+           <div class="cell label">56 Tax Payment/s for the Previous Quarter/s</div>
+           <div class="cell value">{{ number_format($tax1701q->tax_payments_previous_quarter, 2) }}</div>
+       </div>
+       <div class="row">
+           <div class="cell label">57 Creditable Tax Withheld for the Previous Quarter/s</div>
+           <div class="cell value">{{ number_format($tax1701q->creditable_tax_withheld_previous_quarter, 2) }}</div>
+       </div>
+       <div class="row">
+           <div class="cell label">58 Creditable Tax Withheld per BIR Form No. 2307 for this Quarter</div>
+           <div class="cell value">{{ number_format($tax1701q->creditable_tax_withheld_2307, 2) }}</div>
+       </div>
+       <div class="row">
+           <div class="cell label">59 Tax Paid in Return Previously Filed, if this is an Amended Return</div>
+           <div class="cell value">{{ number_format($tax1701q->tax_paid_previous_return, 2) }}</div>
+       </div>
+       <div class="row">
+           <div class="cell label">60 Foreign Tax Credits, if applicable</div>
+           <div class="cell value">{{ number_format($tax1701q->foreign_tax_credits, 2) }}</div>
+       </div>
+       <div class="row">
+           <div class="cell label">61 Other Tax Credits/Payments (specify)</div>
+           <div class="cell value">{{ number_format($tax1701q->other_tax_credits, 2) }}</div>
+       </div>
+       <div class="row">
+           <div class="cell label">62 Total Tax Credits/Payments (Sum of Items 55 to 61) (To Part III, Item 27)</div>
+           <div class="cell value">{{ number_format($tax1701q->total_tax_credits, 2) }}</div>
+       </div>
+       <div class="row">
+        <div class="cell label">63 Tax Payable/(Overpayment) (Item 46 or 54, Less Item 62) (To Part III, Item 28)
         </div>
+        <div class="cell value">{{ number_format($tax1701q->total_tax_credits, 2) }}</div>
+    </div>
+   </div>
 
-        <!-- Total Amount Payable -->
-        <div class="section-title">Total Amount Payable</div>
-        <div class="grid">
-            <div class="row">
-                <div class="cell label">25 Total Amount Payable (Sum of Items 20 and 24)</div>
-                <div class="cell value">{{ number_format($tax1701q->show_total_amount_payable, 2) }}</div>
-            </div>
+<!-- Schedule IV - Penalties -->
+<div class="section-title">Schedule IV - Penalties</div>
+
+<div class="grid">
+    <!-- Surcharge -->
+    <div class="row">
+        <div class="cell label">64 Surcharge</div>
+        <div class="cell value">{{ number_format($tax1701q->surcharge, 2) }}</div>
+    </div>
+    
+    <!-- Interest -->
+    <div class="row">
+        <div class="cell label">65 Interest</div>
+        <div class="cell value">{{ number_format($tax1701q->interest, 2) }}</div>
+    </div>
+    
+    <!-- Compromise -->
+    <div class="row">
+        <div class="cell label">66 Compromise</div>
+        <div class="cell value">{{ number_format($tax1701q->compromise, 2) }}</div>
+    </div>
+    
+    <!-- Total Penalties -->
+    <div class="row">
+        <div class="cell label">67 Total Penalties (Sum of Items 64 to 66) (To Part III, Item 29)</div>
+        <div class="cell value">
+            {{ number_format($tax1701q->total_penalties, 2) }}
         </div>
+    </div>
+    
+    <!-- Total Amount Payable/(Overpayment) -->
+    <div class="row">
+        <div class="cell label">68 Total Amount Payable/(Overpayment) (Sum of Items 63 and 67) (To Part III, Item 30)</div>
+        <div class="cell value">
+            {{ number_format(
+                ($tax1701q->taxable_income_graduated_rate - $tax1701q->total_tax_credits) + 
+                ($tax1701q->surcharge + $tax1701q->interest + $tax1701q->compromise),
+                2
+            ) }}
+        </div>
+    </div>
+</div>
+
 
    
 

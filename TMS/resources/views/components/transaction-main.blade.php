@@ -505,6 +505,9 @@
 </div>
 
 <script>
+       @if (session('alert'))
+        alert('{{ session('alert') }}');
+    @endif
     document.addEventListener('search', event => {
          window.location.href = `?search=${event.detail.search}`;
      });

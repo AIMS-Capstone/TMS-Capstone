@@ -228,6 +228,8 @@ Route::post('/tax-return/store1701Q/{taxReturn}', [Tax1701QController::class, 's
         // Tax Return Routes
         Route::resource('tax_return', TaxReturnController::class);
         Route::get('/vat_return', [TaxReturnController::class, 'vatReturn'])->name('vat_return');
+        Route::get('/tax-return/{taxReturn}/2550q/edit', [TaxReturnController::class, 'edit2550q'])
+        ->name('tax_return.2550Q.edit');
         Route::get('/income_return', [TaxReturnController::class, 'incomeReturn'])->name('income_return');
         Route::get('/percentage_return/{id}/report', [TaxReturnController::class, 'showPercentageReport'])
     ->name('percentage_return.report');
@@ -239,6 +241,8 @@ Route::post('/tax-return/store1701Q/{taxReturn}', [Tax1701QController::class, 's
     ->name('income_return.report');
     Route::get('/tax-return/{taxReturn}/1701q/report', [Tax1701QController::class, 'reportPDF'])
     ->name('income_return.reportPDF');
+    Route::get('/tax-return/{taxReturn}/1701q/edit', [Tax1701QController::class, 'edit'])
+    ->name('tax_return.1701q.edit');
 
 
 Route::get('/tax-return/{taxReturn}/1701q/download', [Tax1701QController::class, 'downloadPdf'])
