@@ -70,6 +70,64 @@
                 <!-- Step 1: File Upload -->
                 @if($step === 1)
                     <div class="px-20">
+                        <div class="flex flex-col space-y-4 justify-center items-center h-full">
+                            <div class="p-6 h-full max-h-screen-md w-full max-w-screen-lg border rounded-sm flex flex-col">
+                                <div class="flex flex-col text-center justify-center items-center text-blue-900 font-bold">
+                                    <p class="text-lg">Importing</p>
+                                    <p class="text-xl">Employee Compensation from a CSV File</p>
+                                    <p class="text-xs font-light text-zinc-600">
+                                        By default, any CSV file can be imported by mapping the required fields<br>
+                                        against the columns in your file. Ensure all necessary information is accurate.
+                                    </p>
+                                </div>
+
+                                <div class="text-xs text-zinc-700 mt-6">
+                                    <p class="flex items-center pl-24 font-semibold">Preparing your CSV Files</p>
+                                    <p class="flex items-center pl-24 text-xs mb-4">You will need:</p>
+                                    <div class="flex justify-center mb-4 pl-10">
+                                        <ul class="list-disc text-[11px]">
+                                            <li>
+                                                <span class="inline-block align-top">
+                                                    A CSV file containing employee financial information. You can 
+                                                    <a class="text-blue-600" href="{{ url('/tax_return/with_holding/1601C/sources') }}">download</a> this template for importing compensations.
+                                                </span>
+                                            </li>
+                                            <li>
+                                                <span class="inline-block align-top">
+                                                    Ensure that <b>First Name</b> and <b>Last Name</b> of the employees match the records already existing on the 
+                                                    <a class="text-blue-600" href="{{ url('employees') }}">Employee Page</a>.
+                                                </span>
+                                            </li>
+                                            <li>
+                                                <span class="inline-block align-top">
+                                                    The column for <b>Employee Wage Status</b> (e.g., "Above Minimum Wage" or "Minimum Wage") must be included and accurate.
+                                                </span>
+                                            </li>
+                                            <li>
+                                                <span class="inline-block align-top">
+                                                    For <b>Payment Date</b>, ensure the format is <b>YYYY-MM-DD</b>.
+                                                </span>
+                                            </li>
+                                            <li>
+                                                <span class="inline-block align-top">
+                                                    <b>Gross Compensation</b> is required and should be a numeric value.
+                                                </span>
+                                            </li>
+                                            <li>
+                                                <span class="inline-block align-top">
+                                                    Non-taxable benefits fields (e.g., <b>Statutory Minimum Wage, Holiday Pay, Overtime Pay</b>, etc.) should be provided if applicable.
+                                                </span>
+                                            </li>
+                                            <li>
+                                                <span class="inline-block align-top">
+                                                    Avoid duplicate entries for the same <b>Employee (First Name + Last Name)</b> and <b>Payment Date</b>.
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <label class="block font-bold mt-4 text-sm text-zinc-700 mb-2">Choose a file to import.</label>
                         <div class="flex items-center space-x-4">
                             <label class="cursor-pointer">
