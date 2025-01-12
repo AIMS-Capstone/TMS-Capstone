@@ -10,16 +10,10 @@
         <p class="font-extrabold text-3xl text-center auth-color mt-2">Create New Password</p>
         <p class="font-normal mt-2 text-base text-center taxuri-text mb-6">Your new password must be different<br>from previous used passwords</p>
 
-        <form method="POST" action="{{ route('password.update') }}">
-            {{-- idk how this would interact --}}
+        <form id="reset-password-form" method="POST" action="{{ route('password.update') }}">
             {{-- @csrf --}}
 
             {{-- <input type="hidden" name="token" value="{{ $request->route('token') }}"> --}}
-
-            {{-- <div class="block">
-                <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
-            </div> --}}
 
             <div class="flex flex-col items-center">
                 <div class="mt-4">
@@ -58,8 +52,36 @@
                     {{ __('Reset Password') }}
                 </x-create-pass-button>
             </div>
+            <div x-show="showModal" x-data="{show: false}" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30" x-cloak>
+                <div class="bg-white rounded-lg shadow-lg p-6 text-center max-w-lg w-full">
+                    <!-- Centered Image -->
+                    <div class="flex justify-center mb-4">
+                        <img src="{{ asset('images/Ok-amico.png') }}" alt="Password Updated" class="w-40 h-40 mr-6">
+                    </div>
+                    <h2 class="text-emerald-500 font-bold text-3xl whitespace-normal mb-4">Password Updated</h2>
+                    <p class="font-normal text-sm mb-4">Your password has been successfully<br>changed. You can now log in again.</p>
+                    <div class="flex items-center justify-center mt-4 mb-4">
+                        <button type="button" onclick="window.location.href='{{ route('login') }}'" @click="showModal = false" class="inline-flex items-center w-48 justify-center py-2 bg-emerald-500 border border-transparent rounded-xl 
+                        font-bold text-sm text-white tracking-widest hover:bg-emerald-600 focus:bg-emerald-700 active:bg-emerald-700 focus:outline-none disabled:opacity-50 transition ease-in-out duration-150">
+                            {{ __('Log In') }} 
+                            <div class="ms-2 w-5 h-5 flex items-center justify-center border-2 border-white rounded-full">
+                                <svg class="rtl:rotate-180 w-3.5 h-3.5 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                                </svg>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </form>
         <script>
+        document.getElementById('reset-password-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            document.querySelector('[x-show="showModal"]').style.display = 'flex';
+
+            // di ko sure kung paano siya mag ssubmit pero oks na modal niya
+        });
+        
         function togglePassword(id) {
             const passwordField = document.getElementById(id);
             const toggleButton = passwordField.nextElementSibling;

@@ -5,8 +5,8 @@
         </x-slot>
 
         
-        <p class="font-extrabold text-4xl text-center auth-color mt-20">Log In</p>
-        <p class="font-normal mt-2 text-base text-center taxuri-text mb-6">Enter your details to sign in to your account</p>
+        <p class="font-extrabold text-2xl sm:text-4xl text-center auth-color mt-10 sm:mt-20">Log In</p>
+        <p class="font-normal mt-2 text-sm sm:text-base text-center taxuri-text mb-4 sm:mb-6">Enter your details to sign in to your account</p>
         <x-validation-errors class="mb-2" />
 
         @session('status')
@@ -16,8 +16,7 @@
         @endsession
 
         <form method="POST" action="{{ route('login') }}">
-            @csrf
-
+    @csrf
             <div>
                 <x-auth-label for="email" value="{{ __('Email') }}" />
                 <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" placeholder="Enter your Email Address" oninput="checkForm()"/>
@@ -55,9 +54,9 @@
                 </x-auth-button>
             </div>
 
-            <p class="font-normal text-sm text-center mt-5 taxuri-text">Don't have an account yet? <a class="font-bold text-sm hover:text-gray-900 focus:outline-none" href="{{ route('register') }}">
+            {{-- <p class="font-normal text-sm text-center mt-5 taxuri-text">Don't have an account yet? <a class="font-bold text-sm hover:text-gray-900 focus:outline-none" href="{{ route('register') }}">
                 {{ __('Register Now') }}
-            </a>
+            </a> --}}
             
         </div>
         </form>

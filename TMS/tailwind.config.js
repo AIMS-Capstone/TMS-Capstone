@@ -19,5 +19,15 @@ export default {
         },
     },
 
+    theme: {
+        extend: {},
+      },
+      plugins: [],
+      variants: {
+        extend: {
+          textColor: ['peer-checked'],
+        },
+      },
+
     plugins: [forms, typography],
 };

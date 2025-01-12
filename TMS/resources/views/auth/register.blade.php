@@ -89,9 +89,9 @@
             </div>
             {{-- add a redirection/route to register-success-page.blade.php --}}
 
-            <p class="font-normal text-sm text-center mt-3 taxuri-text">Already have an account? <a class="font-bold text-sm hover:text-gray-900 focus:outline-none" href="{{ route('login') }}">
+            {{-- <p class="font-normal text-sm text-center mt-3 taxuri-text">Already have an account? <a class="font-bold text-sm hover:text-gray-900 focus:outline-none" href="{{ route('login') }}">
                 {{ __('Login') }}
-            </a>
+            </a> --}}
         </form>
         <script>
             function togglePassword(id) {

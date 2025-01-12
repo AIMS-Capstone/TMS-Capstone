@@ -9,7 +9,7 @@
             <div class="flex transition-transform duration-500 ease-out w-full h-full" id="carousel">
                 <!-- Slide 1 -->
                 <div class="min-w-full flex-shrink-0 p-12 flex flex-col items-center justify-center">
-                    <img src="images/Visual data-pana.png" alt="Slide 1" class="object-contain h-80 lg:w-1/2" />
+                    <img src="{{ asset('images/Visual data-pana.png') }}" alt="Slide 1" class="object-contain h-80 lg:w-1/2" />
                     <div class="text-center mt-2">
                         <h2 class="text-2xl font-extrabold taxuri-color">Unlock Insightful Reports</h2>
                         <p class="text-sm mt-2">
@@ -20,10 +20,10 @@
                 </div>
                 <!-- Slide 2 -->
                 <div class="min-w-full flex-shrink-0 p-12 flex flex-col items-center justify-center">
-                    <img src="images/Audit-pana.png" alt="Slide 2" class="object-contain h-80 lg:w-1/2" />
+                    <img src="{{ asset('images/Audit-pana.png') }}" alt="Slide 2" class="object-contain h-80 lg:w-1/2" />
                     <div class="text-center mt-2">
                         <h2 class="text-2xl font-extrabold text-center taxuri-color">Manage Taxes with Ease</h2>
-                        <p class="text-center mt-2">
+                        <p class="text-sm text-center mt-2">
                             Taxuri ensures that managing taxes is straightforward and <br>
                             stress-free, so you can focus on what matters most
                         </p>
@@ -31,10 +31,10 @@
                 </div>
                 <!-- Slide 3 -->
                 <div class="min-w-full flex-shrink-0 p-12 flex flex-col items-center justify-center">
-                    <img src="images/Data extraction-amico.png" alt="Slide 3" class="object-contain h-80 lg:w-1/2" />
+                    <img src="{{ asset('images/Data extraction-amico.png') }}" alt="Slide 3" class="object-contain h-80 lg:w-1/2" />
                     <div class="text-center mt-2">
                         <h2 class="text-2xl font-extrabold text-center mt-4 taxuri-color">Smart Tax Solutions</h2>
-                        <p class="text-center mt-2">
+                        <p class="text-sm text-center mt-2">
                             With built-in predictive analytics, Taxuri delivers smart <br>
                             solutions that adapt to your needs <br>
                             saving your time and effort

@@ -1,13 +1,6 @@
-<x-form-section submit="updateProfileInformation">
-    <x-slot name="title">
-        {{ __('Profile Information') }}
-    </x-slot>
+<div submit="updateProfileInformation">
 
-    <x-slot name="description">
-        {{ __('Update your account\'s profile information and email address.') }}
-    </x-slot>
-
-    <x-slot name="form">
+    <div name="form">
         <!-- Profile Photo -->
         @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
             <div x-data="{photoName: null, photoPreview: null}" class="col-span-6 sm:col-span-4">
@@ -52,36 +45,54 @@
             </div>
         @endif
 
-        <!-- Name -->
-        <div class="col-span-6 sm:col-span-4">
-            <x-label for="name" value="{{ __('Name') }}" />
-            <x-input id="name" type="text" class="mt-1 block w-full" wire:model="state.name" required autocomplete="name" />
-            <x-input-error for="name" class="mt-2" />
+        <div class="ml-4 flex flex-row justify-between">
+            <div>
+                <h2 class="text-xl font-bold text-blue-900">Profile Information</h2>
+                <p class="text-zinc-500 text-sm mt-1">Update your account’s profile information and email address.</p>
+            </div>
+            <div class="max-w-3xl mx-auto rounded-lg shadow-sm bg-white ml-14 p-4">
+                <div class="gap-6 p-6 text-zinc-700">
+                    <div class="mb-5 flex justify-between space-x-4 items-start">
+                        <div class="w-full">
+                            <label class="block font-bold text-zinc-700">First Name</label>
+                            <input type="text" class="mt-1 text-sm truncate w-full border border-gray-300 rounded-xl shadow-sm px-3 py-2 bg-white" 
+                                value="{{ $this->user->first_name ?? 'PUP' }}" disabled>
+                        </div>
+                        <div class="w-full">
+                            <label class="block font-bold text-zinc-700">Middle Name</label>
+                            <input type="text" class="mt-1 text-sm w-full border border-gray-300 rounded-xl shadow-sm px-3 py-2 bg-white" 
+                                value="{{ $this->user->middle_name ?? ' ' }}" disabled>
+                        </div>
+                    </div>
+
+                    <!-- Classification Field -->
+                    <div class="mb-5 flex justify-between space-x-4 items-start">
+                        <div class="w-2/3">
+                            <label class="block font-bold text-zinc-700">Last Name</label>
+                            <input type="text" class="mt-1 text-sm w-full border border-gray-300 rounded-xl shadow-sm px-3 py-2 bg-white" 
+                                value="{{ $this->user->last_name ?? ' ' }}" disabled>
+                        </div>
+                        <div class="w-2/3">
+                            <label class="block font-bold text-zinc-700">Suffix</label>
+                            <input type="text" class="mt-1 text-sm w-full border border-gray-300 rounded-xl shadow-sm px-3 py-2 bg-white" 
+                                value="{{ $this->user->suffix ?? ' ' }}" disabled>
+                        </div>
+                    </div>
+
+                    <!-- Email Address Field -->
+                    <div class="mb-8">
+                        <label class="block font-bold text-zinc-700">Email</label>
+                        <input type="text" class="mt-1 text-sm w-full border border-gray-300 rounded-xl shadow-sm px-3 py-2 bg-white" 
+                            value="{{ $this->user->email ?? ' ' }}" disabled>
+                    </div>
+
+                    <div>
+                        <button class="w-full px-3 py-2 bg-blue-900 text-white hover:bg-blue-950 font-semibold rounded-xl">Edit Information</button>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <!-- Email -->
-        <div class="col-span-6 sm:col-span-4">
-            <x-label for="email" value="{{ __('Email') }}" />
-            <x-input id="email" type="email" class="mt-1 block w-full" wire:model="state.email" required autocomplete="username" />
-            <x-input-error for="email" class="mt-2" />
-
-            @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::emailVerification()) && ! $this->user->hasVerifiedEmail())
-                <p class="text-sm mt-2">
-                    {{ __('Your email address is unverified.') }}
-
-                    <button type="button" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" wire:click.prevent="sendEmailVerification">
-                        {{ __('Click here to re-send the verification email.') }}
-                    </button>
-                </p>
-
-                @if ($this->verificationLinkSent)
-                    <p class="mt-2 font-medium text-sm text-green-600">
-                        {{ __('A new verification link has been sent to your email address.') }}
-                    </p>
-                @endif
-            @endif
-        </div>
-    </x-slot>
+    </div>
 
     <x-slot name="actions">
         <x-action-message class="me-3" on="saved">
@@ -92,4 +103,4 @@
             {{ __('Save') }}
         </x-button>
     </x-slot>
-</x-form-section>
+</div>
