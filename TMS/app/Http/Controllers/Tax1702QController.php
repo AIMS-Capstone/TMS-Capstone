@@ -109,9 +109,11 @@ class Tax1702QController extends Controller
             $tax1702q->fill($validated);
             $tax1702q->save();
 
-            return redirect()
-                ->route('tax_return.corporate_quarterly_pdf', ['taxReturn' => $taxReturn->id])
-                ->with('success', 'Form 1702Q has been submitted successfully.');
+            // return redirect()
+            //     ->route('tax_return.corporate_quarterly_pdf', ['taxReturn' => $taxReturn->id])
+            //     ->with('success', 'Form 1702Q has been submitted successfully.');
+            return back()->with('success', 'Form 1702Q has been submitted successfully.');
+
         } catch (\Exception $e) {
             return redirect()
                 ->back()

@@ -53,7 +53,7 @@ use App\Http\Controllers\ClientAuthController;
 use App\Http\Controllers\ClientFinancialController;
 use App\Http\Controllers\ClientProfileController;
 use App\Http\Controllers\ClientAnalyticsController;
-
+use App\Http\Controllers\Tax1702QController;
 //Models
 use App\Models\rdo;
 use App\Models\TaxReturn;
@@ -220,6 +220,8 @@ Route::post('/tax-return/store1701Q/{taxReturn}', [Tax1701QController::class, 's
           ->name('tax_return.store2551Q');
         Route::post('tax-return/{taxReturn}/2550q', [TaxReturnController::class, 'store2550Q'])
         ->name('tax_return.store2550Q');
+        Route::post('tax-return/{taxReturn}/1702Q', [Tax1702QController::class, 'store'])
+        ->name('tax_return.store1702Q');
         Route::post('/tax-return-transaction/deactivate', [TransactionsController::class, 'deactivate'])
     ->name('tax-return-transaction.deactivate');
     // This is for deactivating transactions on Spouse or Individual
