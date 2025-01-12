@@ -44,7 +44,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
         <div class="w-full flex">
             {{-- Sidebar --}}
             <nav id="sidebar" class="bg-white h-screen 
-            sticky top-0 z-40 sidebar-open py-6 pr-4 border-r-2 shadow-sm overfow-hidden transition-all duration-500">
+            sticky top-0 z-50 sidebar-open py-6 pr-4 border-r-2 shadow-sm overfow-hidden transition-all duration-500">
                 <div class="relative flex justify-center items-center">
                     <a href="{{ route('dashboard') }}" class="text-center content">
                         <img src="{{ asset('images/Taxuri Logo-name.png') }}" alt="logo" class='w-[160px]' />

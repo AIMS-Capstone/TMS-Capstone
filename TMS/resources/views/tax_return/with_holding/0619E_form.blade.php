@@ -35,8 +35,7 @@
                 <form action="{{ route('form0619E.store', ['id' => $withHolding->id]) }}" method="POST">
                     @csrf
                     <input type="hidden" name="withholding_id" value="{{ $withHolding->id }}">
-
-                    <div class="p-8">
+                    <div class="px-8 py-10">
                         <!-- Filing Period -->
                         <h3 class="font-bold text-zinc-700 text-lg mb-4">Filing Period</h3>
 
