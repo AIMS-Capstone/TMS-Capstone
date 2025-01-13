@@ -240,7 +240,10 @@ class withHolding1604EController extends Controller
 
         $orgSetup = OrgSetup::findOrFail(session('organization_id'));
 
-        return view('tax_return.with_holding.1604E_form', compact('withHolding', 'orgSetup'));
+        // Pass form1604E as null (or other logic if needed)
+        $form1604E = null;
+
+        return view('tax_return.with_holding.1604E_form', compact('withHolding', 'orgSetup', 'form1604E'));
     }
 
     /**
