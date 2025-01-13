@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('1601c_forms', function (Blueprint $table) {
+        Schema::table('1601C_forms', function (Blueprint $table) {
             $table->string('agent_category')->nullable()->after('compromise');
             $table->boolean('tax_relief')->default(0)->after('agent_category');
             $table->decimal('adjustment_taxes_withheld', 15, 2)->nullable()->after('tax_relief');
