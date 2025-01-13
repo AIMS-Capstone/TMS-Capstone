@@ -7,6 +7,7 @@ use App\Models\TaxReturn;
 use App\Http\Requests\StoreTaxReturnRequest;
 use App\Http\Requests\UpdateTaxReturnRequest;
 use App\Models\OrgSetup;
+use App\Models\Tax1701Q;
 use App\Models\Tax2550Q;
 use App\Models\Tax2551Q;
 use App\Models\TaxReturnTransaction;
@@ -263,7 +264,8 @@ class TaxReturnController extends Controller
         $taxReturn->status = 'Filed';
         $taxReturn->save();
         
-        return redirect()->route('tax_return.2551q.pdf', $taxReturn->id)->with('success', 'Tax return has been marked as Filed.');
+        return redirect()->back()->with('success', 'Tax return has been marked as Filed.');
+
     }
   // Function for showing Value Added Tax Report Preview
 public function showVatReport($id)
@@ -277,19 +279,31 @@ public function showVatReport($id)
         ->where('id', $organization_id)
         ->first();
 
+        $existing2550q = Tax2550Q::where('tax_return_id', $taxReturn->id)->first();
+        if ($existing2550q) {
+            // If a Tax2550q is already available, redirect to the PDF report
+            return redirect()->route('tax_return.2550q.pdf', ['taxReturn' => $taxReturn->id]);
+        }
     // Extract the RDO code from the organization data
     $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
 
     // Parse the organization's start date to determine the fiscal year
     $startDate = Carbon::parse($organization->start_date);
-    $yearEnded = $startDate->month == 1 && $startDate->day == 1
-        ? $startDate->addYear()->endOfYear()  // Calendar year end
-        : $startDate->addYear()->lastOfMonth(); // Fiscal year end
-
+    $taxYear = Carbon::parse($taxReturn->year);
+    
+    // Use the month from the organization's start date and the year from the tax return
+    $yearEnded = Carbon::createFromDate($taxYear->year, $startDate->month, $startDate->day);
+    
+    // Determine the correct end of the period
+    $yearEnded = $yearEnded->month == 1 && $yearEnded->day == 1
+        ? $yearEnded->addYear()->endOfYear()  // Calendar year end
+        : $yearEnded->addYear()->lastOfMonth(); // Fiscal year end
+    
     // Determine whether it's a calendar or fiscal year
     $period = $yearEnded->month == 12 && $yearEnded->day == 31 ? 'calendar' : 'fiscal';
     $yearEndedFormatted = $yearEnded->format('Y-m');
     $yearEndedFormattedForDisplay = $yearEnded->format('m/Y');
+    
 
     // Retrieve current quarter and year
     $currentQuarter = (int)filter_var($taxReturn->month, FILTER_SANITIZE_NUMBER_INT); // Extract quarter number
@@ -452,7 +466,12 @@ public function showVatReport($id)
       // Fetch the tax return and organization setup data
       $taxReturn = TaxReturn::findOrFail($id);
       $organization_id = session("organization_id");
-  
+      $tax1701Q = Tax1701Q::where('tax_return_id', $id)->first();
+
+      // If a Tax1701Q exists, redirect to the reportPDF page
+      if ($tax1701Q) {
+          return redirect()->route('income_return.reportPDF', ['taxReturn' => $taxReturn->id]);
+      }
       // Load the organization and its RDO relationship
       $organization = OrgSetup::with("rdo")
           ->where('id', $organization_id)
@@ -591,7 +610,15 @@ public function showVatReport($id)
   }
   
   
-
+  public function edit2550Q(TaxReturn $taxReturn)
+  {
+      $tax2550q = Tax2550Q::where('tax_return_id', $taxReturn->id)->firstOrFail();
+      
+      return view('tax_return.vat_report_edit', [
+          'taxReturn' => $taxReturn,
+          'tax2550q' => $tax2550q
+      ]);
+  }
   
 
 
