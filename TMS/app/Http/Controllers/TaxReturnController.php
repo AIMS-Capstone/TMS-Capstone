@@ -491,6 +491,13 @@ public function showVatReport($id)
   
       // Retrieve the individual and spouse background information
       $individualBackground = $taxReturn->individualBackgroundInformation;
+      if (!$individualBackground) {
+        return back()->with('error', 'Please set up Background Information first.');
+    }
+    $individualTaxOptionRate = $individualBackground->taxOptionRate()->first();
+    if (!$individualTaxOptionRate) {
+        return back()->with('error', 'Please set up Tax Rate for the individual first.');
+    }
       $spouseBackground = $individualBackground->spouseInformation ?? null;
   
       // Fetch tax option rate for individual background information
