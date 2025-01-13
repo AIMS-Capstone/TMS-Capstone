@@ -25,7 +25,7 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 
-
+        {{-- gawa bago select.css --}}
         @vite(['resources/css/app.css', 'resources/css/custom.css', 'resources/css/select.css', 'resources/js/app.js'])
         <!-- Styles -->
         @livewireStyles

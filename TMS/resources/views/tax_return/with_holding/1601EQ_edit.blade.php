@@ -21,8 +21,7 @@
                 <div class="flex justify-between items-center mt-2 mb-4">
                     <div class="flex items-center">
                         <p class="taxuri-text font-normal text-sm">
-                            Verify the tax information below, with some fields pre-filled from your organization's setup. Select options as needed, then click 'Proceed to Report' to generate the BIR form. Hover over
-                            icons for additional guidance on specific fields.
+                            Verify the tax information below, with some fields pre-filled from your organization's setup. Select options as needed to generate the BIR form.
                         </p>
                     </div>
                 </div>  
@@ -129,6 +128,10 @@
                         <button type="submit" class="w-56 bg-blue-900 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-950">
                             Update Report
                         </button>
+                        <a href="{{ route('form1601EQ.preview', ['id' => $form->id]) }}"
+                            class="ml-4 text-zinc-600 hover:text-zinc-900 hover:font-bold font-medium py-2 px-4">
+                            Cancel
+                        </a>
                     </div>
                 </div>
             </form>

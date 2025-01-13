@@ -39,8 +39,7 @@
                 <div class="flex justify-between items-center mt-2 mb-4">
                     <div class="flex items-center">
                         <p class="taxuri-text font-normal text-sm">
-                            Verify the tax information below, with some fields pre-filled from your organization's setup. Select options as needed, then click 'Proceed to Report' to generate the BIR form. Hover over
-                            icons for additional guidance on specific fields.
+                            Verify the tax information below, with some fields pre-filled from your organization's setup. Select options as needed to generate the BIR form.
                         </p>
                     </div>
                 </div>  

@@ -15,7 +15,7 @@
 
     <!-- Notes and Activities Button -->
 
-    @if (Route::currentRouteName() == 'transactions.show')
+    {{-- @if (Route::currentRouteName() == 'transactions.show')
         <div class="ml-auto float-end justify-end items-center">
             <button type="button" class="group text-zinc-700 border border-gray-300 hover:bg-blue-900 hover:text-white font-medium rounded-lg text-sm px-2 py-2 flex items-center focus:outline-none focus:ring-1 focus:ring-gray-300 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition mr-2 group-hover:fill-white" viewBox="0 0 24 24" fill="none">
@@ -25,7 +25,7 @@
                 Notes and Activities
             </button>
         </div>
-    @endif
+    @endif --}}
 
     <div class="px-4 sm:px-0 ">
         {{ $aside ?? '' }}
