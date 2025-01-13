@@ -10,6 +10,7 @@ class ActivityLogController extends Controller
 {
     public function audit_log(Request $request)
     {
+        $perPage = $request->input('perPage', 5);
         // Fetch activities with filters
         $activities = Activity::query()
             ->with('causer') // Load related user data
@@ -44,7 +45,7 @@ class ActivityLogController extends Controller
                 $query->where('properties->organization_id', $request->organization_id);
             })
             ->latest()
-            ->paginate(10);
+            ->paginate($perPage);
 
         // Fetch all organizations for the dropdown filter
         $organizations = OrgSetup::all();

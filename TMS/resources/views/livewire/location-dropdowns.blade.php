@@ -9,7 +9,7 @@
                 name="region"
                 id="region"
                 x-model="formData.region"
-                class="select2 cursor-pointer border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm"
+                class="select2 cursor-pointer w-full border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 rounded-xl shadow-sm"
             >
                 <option value="" disabled selected>Select Region</option>
                 @foreach($regions as $region)
@@ -27,7 +27,7 @@
                 name="province"
                 id="province"
                 x-model="formData.province"
-                class="select2 cursor-pointer border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm"
+                class="select2 cursor-pointer w-full border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 rounded-xl shadow-sm"
                 @if(!$selectedRegion) disabled @endif
             >
                 <option value="" disabled selected>Select Province</option>
@@ -46,7 +46,7 @@
                 name="city"
                 id="city"
                 x-model="formData.city"
-                class="select2 cursor-pointer border rounded-xl px-4 py-2 w-full text-sm border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 shadow-sm"
+                class="select2 cursor-pointer w-full border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 rounded-xl shadow-sm"
                 @if(!$selectedProvince) disabled @endif
             >
                 <option value="" disabled selected>Select City</option>

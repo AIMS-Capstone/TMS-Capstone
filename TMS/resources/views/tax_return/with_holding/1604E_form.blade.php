@@ -18,14 +18,8 @@
                     <!-- Year -->
                     <div class="mb-6">
                         <label for="year" class="block text-sm font-medium text-gray-700">1. For the Year</label>
-                        <input 
-                            type="text" 
-                            id="year" 
-                            name="year" 
-                            class="mt-1 p-2 block w-full border border-gray-300 rounded-md bg-gray-100" 
-                            value="{{ $withHolding->year }}" 
-                            readonly
-                        >
+                        <input type="text" id="year" name="year" class="mt-1 p-2 block w-full border border-gray-300 rounded-md bg-gray-100" 
+                            value="{{ $withHolding->year }}" readonly>
                     </div>
 
                     <!-- Amended Return -->
