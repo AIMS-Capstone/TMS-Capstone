@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Foreign keys
-            $table->foreign('form_1601eq_id')->references('id')->on('1601EQ_forms')->onDelete('cascade');
+            $table->foreign('form_1601eq_id')->references('id')->on('1601eq_forms')->onDelete('cascade');
             $table->foreign('atc_id')->references('id')->on('atcs')->onDelete('cascade');
         }); 
     }
