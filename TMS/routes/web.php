@@ -254,6 +254,22 @@ Route::get('/tax-return/{taxReturn}/1701q/stream', [Tax1701QController::class, '
     ->name('income_return.stream');
 
 
+// Edit existing 1702Q form
+Route::get('/tax-return/{taxReturn}/1702q/edit', [Tax1702QController::class, 'edit'])
+    ->name('tax_return.corporate_quarterly.edit');
+
+// View PDF report in browser
+Route::get('/tax-return/{taxReturn}/1702q/pdf', [Tax1702QController::class, 'reportPDF'])
+    ->name('tax_return.corporate_quarterly_pdf');
+
+// Download PDF
+Route::get('/tax-return/{tax_return_id}/1702q/download', [Tax1702QController::class, 'downloadPdf'])
+    ->name('tax_return.corporate_quarterly.download');
+
+// Stream PDF
+Route::get('/tax-return/{tax_return_id}/1702q/stream', [Tax1702QController::class, 'streamPdf'])
+    ->name('tax_return.corporate_quarterly.stream');
+
         Route::get('tax_return/{id}/income-input-summary', [TaxReturnController::class, 'showIncomeInputSummary'])->name('tax_return.income_input_summary');
         
         // Individual sections

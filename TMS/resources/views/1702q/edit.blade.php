@@ -125,11 +125,11 @@ $taxCodes = [
                     <div class="flex items-center space-x-4 w-2/3">
                         <label class="flex items-center">
                             <input type="radio" name="period" value="calendar" class="mr-2" 
-                                @if($period == 'calendar') checked @endif> Calendar
+                                @if($tax1702q->period == 'calendar') checked @endif> Calendar
                         </label>
                         <label class="flex items-center">
                             <input type="radio" name="period" value="fiscal" class="mr-2"    
-                                @if($period == 'fiscal') checked @endif> Fiscal
+                                @if($tax1702q->period == 'fiscal') checked @endif> Fiscal
                         </label>
                     </div>
                 </div>
@@ -137,7 +137,7 @@ $taxCodes = [
                 <!-- Year Ended -->
                 <div class="mb-4 flex items-start">
                     <label class="block text-gray-700 text-sm font-medium w-1/3">2 Year Ended</label>
-                    <input type="month" name="year_ended" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300" value="{{ old('year_ended', $yearEndedFormatted) }}">
+                    <input type="month" name="year_ended" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300" value="{{ old('year_ended', $tax1702q->year_ended) }}">
 
 
                 </div>
@@ -164,34 +164,41 @@ $taxCodes = [
 
 
 
-            <!-- Amended Return? -->
-            <div class="mb-4 flex items-start">
-                <label class="block text-gray-700 text-sm font-medium w-1/3">4 Amended Return?</label>
-                <div class="flex items-center space-x-4 w-2/3">
-                    <label class="flex items-center">
-                        <input type="radio" name="amended_return" value="yes" class="mr-2"> Yes
-                    </label>
-                    <label class="flex items-center">
-                        <input type="radio" name="amended_return" value="no" class="mr-2"> No
-                    </label>
-                </div>
-            </div>
+         <!-- Amended Return? -->
+<div class="mb-4 flex items-start">
+    <label class="block text-gray-700 text-sm font-medium w-1/3">4 Amended Return?</label>
+    <div class="flex items-center space-x-4 w-2/3">
+        <label class="flex items-center">
+            <input type="radio" name="amended_return" value="yes" 
+                {{ $tax1702q->amended_return == 'yes' ? 'checked' : '' }} class="mr-2"> Yes
+        </label>
+        <label class="flex items-center">
+            <input type="radio" name="amended_return" value="no" 
+                {{ $tax1702q->amended_return == 'no' ? 'checked' : '' }} class="mr-2"> No
+        </label>
+    </div>
+</div>
+
 
             <!-- Alphanumeric Tax Code -->
      
             <div class="mb-4 flex items-start">
                 <label class="block text-gray-700 text-sm font-medium w-1/3">5 Alphanumeric Tax Code</label>
-                <select name="alphanumeric_tax_code" id="alphanumeric_tax_code" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300" >
+                <select name="alphanumeric_tax_code" id="alphanumeric_tax_code" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                     <option value="">Select a Tax Code</option>
                     @foreach($taxCodes as $category => $codes)
                         <optgroup label="{{ $category }}">
                             @foreach($codes as $code => $details)
-                            <option value="{{ $code }}" data-rate="{{ $details['rate'] }}">{{ $code }} - {{ $details['title'] }} - {{ $details['rate'] }}</option>
+                            <option value="{{ $code }}" data-rate="{{ $details['rate'] }}"
+                                {{ $tax1702q->alphanumeric_tax_code == $code ? 'selected' : '' }}>
+                                {{ $code }} - {{ $details['title'] }} - {{ $details['rate'] }}
+                            </option>
                             @endforeach
                         </optgroup>
                     @endforeach
                 </select>
             </div>
+            
             
 
 
@@ -202,69 +209,78 @@ $taxCodes = [
             <!-- TIN -->
             <div class="mb-4 flex items-start">
                 <label class="block text-gray-700 text-sm font-medium w-1/3">6 Taxpayer Identification Number (TIN)</label>
-                <input type="text" name="tin" placeholder="000-000-000-000" value = "{{$organization->tin;}} "class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                <input type="text" name="tin" placeholder="000-000-000-000" value = "{{$tax1702q->tin;}} "class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
 
             <!-- RDO Code -->
             <div class="mb-4 flex items-start">
                 <label class="block text-gray-700 text-sm font-medium w-1/3">7 Revenue District Office (RDO) Code</label>
-                <input type="text" name="rdo_code" placeholder="000-000-000-000" value="{{ $rdoCode; }}" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                <input type="text" name="rdo_code" placeholder="000-000-000-000" value="{{ $tax1702q->rdo_code; }}" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
 
             </div>
 
             <!-- Taxpayer's Name -->
             <div class="mb-4 flex items-start">
                 <label class="block text-gray-700 text-sm font-medium w-1/3">8 Registered Name</label>
-                <input type="text" name="taxpayer_name" value="{{$organization->registration_name;}}" placeholder="e.g. Dela Cruz, Juan, Protacio" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                <input type="text" name="taxpayer_name" value="{{$tax1702q->taxpayer_name;}}" placeholder="e.g. Dela Cruz, Juan, Protacio" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
 
             <!-- Registered Address -->
             <div class="mb-4 flex items-start">
                 <label class="block text-gray-700 text-sm font-medium w-1/3">9 Registered Address</label>
-                <input type="text" name="registered_address" value="{{ $organization->address_line . ', ' . $organization->city . ', ' . $organization->province . ', ' . $organization->region; }}" placeholder="e.g. 145 Yakal St. ESL Bldg., San Antonio Village Makati NCR" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                <input type="text" name="registered_address" value="{{ $tax1702q->registered_address; }}" placeholder="e.g. 145 Yakal St. ESL Bldg., San Antonio Village Makati NCR" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
 
             <!-- Zip Code -->
             <div class="mb-4 flex items-start">
                 <label class="block text-gray-700 text-sm font-medium w-1/3">9A Zip Code</label>
-                <input type="text" name="zip_code" value="{{$organization->zip_code;}}" placeholder="e.g. 1203" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                <input type="text" name="zip_code" value="{{$tax1702q->zip_code;}}" placeholder="e.g. 1203" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
      
         <div class="mb-4 flex items-start">
             <label class="block text-gray-700 text-sm font-medium w-1/3">10 Contact Number</label>
-            <input type="text" name="contact_number" value="{{$organization->contact_number;}}" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            <input type="text" name="contact_number" value="{{$tax1702q->contact_number;}}" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
         <div class="mb-4 flex items-start">
             <label class="block text-gray-700 text-sm font-medium w-1/3">11 Email Address</label>
-            <input type="text" name="email_address"  value="{{$organization->email;}}" placeholder="pedro@gmail.com" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            <input type="text" name="email_address"  value="{{$tax1702q->email_address;}}" placeholder="pedro@gmail.com" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
         <div class="mb-4 flex items-start">
             <label class="block text-gray-700 text-sm font-medium w-1/3">12 Method of Deduction</label>
             <div class="flex items-center space-x-4 w-2/3">
                 <label class="flex items-center">
-                    <input type="radio" name="taxpayer_classification" value="itemized" class="mr-2"> Itemized Deductions [Section 34 (A-J), NIRC]
+                    <input type="radio" name="taxpayer_classification" value="itemized" class="mr-2"
+                        {{ $tax1702q->taxpayer_classification == 'itemized' ? 'checked' : '' }}>
+                    Itemized Deductions [Section 34 (A-J), NIRC]
                 </label>
                 <label class="flex items-center">
-                    <input type="radio" name="taxpayer_classification" value="osd" class="mr-2"> Optional Standard Deduction (OSD) – 40% of Gross Income
+                    <input type="radio" name="taxpayer_classification" value="osd" class="mr-2"
+                        {{ $tax1702q->taxpayer_classification == 'osd' ? 'checked' : '' }}>
+                    Optional Standard Deduction (OSD) – 40% of Gross Income
                 </label>
-         
             </div>
         </div>
+        
         <div class="mb-4 flex items-start">
             <label class="block text-gray-700 text-sm font-medium w-1/3">13 Are you availing of tax relief under
                 Special Law or International Tax Treaty?</label>
             <div class="flex items-center space-x-4 w-2/3">
                 <label class="flex items-center">
-                    <input type="radio" name="tax_relief" value="yes" class="mr-2"> Yes
+                    <input type="radio" name="tax_relief" value="yes" class="mr-2"
+                        {{ $tax1702q->tax_relief == 'yes' ? 'checked' : '' }}>
+                    Yes
                 </label>
                 <label class="flex items-center">
-                    <input type="radio" name="tax_relief" value="no" class="mr-2"> No
+                    <input type="radio" name="tax_relief" value="no" class="mr-2"
+                        {{ $tax1702q->tax_relief == 'no' ? 'checked' : '' }}>
+                    No
                 </label>
             </div>
         </div>
+        
         <div class="mb-4 flex items-start">
             <label class="block text-gray-700 text-sm font-medium w-1/3">13A If yes, specify            </label>
-            <input type="text" name="yes_specify" placeholder="Specified Tax Treaty" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            <input type="text" name="yes_specify" value="{{$tax1702q->yes_specify}}" placeholder="Specified Tax Treaty" class="w-2/3 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
         <div class="border-b ">
             <h3 class="font-semibold text-gray-700 text-lg mb-4">Part II - Total Tax Payables</h3>
@@ -278,13 +294,14 @@ $taxCodes = [
                 </div>
                 <div>
                     <input 
-                        type="text"
-                        id="show_income_tax_due_regular" 
-                        name="show_income_tax_due_regular"
-                        readonly
-                        value="{{ old('income_tax_due_regular') }}"
-                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                    >
+                    type="text"
+                    id="show_income_tax_due_regular" 
+                    name="show_income_tax_due_regular"
+                    readonly
+                    value="{{ old('show_income_tax_due_regular', number_format($tax1702q->show_income_tax_due_regular, 2)) }}"
+                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                />
+                
                 </div>
             
                 <div class="flex items-center">
@@ -299,7 +316,7 @@ $taxCodes = [
                         type="text" 
                         name="unexpired_excess_mcit" 
                         id="unexpired_excess_mcit" 
-                        value="{{ old('unexpired_excess_mcit') }}"
+                           value="{{ old('unexpired_excess_mcit', number_format($tax1702q->unexpired_excess_mcit, 2)) }}"
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     >
                 </div>
@@ -316,7 +333,7 @@ $taxCodes = [
                         type="text" 
                         name="balance_tax_due_regular" 
                         id="balance_tax_due_regular" 
-                        value="{{ old('balance_tax_due_regular') }}"
+                           value="{{ old('balance_tax_due_regular', number_format($tax1702q->balance_tax_due_regular, 2)) }}"
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     >
                 </div>
@@ -333,7 +350,7 @@ $taxCodes = [
                         type="text" 
                         name="show_income_tax_due_special" 
                         id="show_income_tax_due_special" 
-                        value="{{ old('income_tax_due_special') }}"
+                           value="{{ old('show_income_tax_due_special', number_format($tax1702q->show_income_tax_due_special, 2)) }}"
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     >
                 </div>
@@ -350,7 +367,7 @@ $taxCodes = [
                         type="text" 
                         name="aggregate_tax_due" 
                         id="aggregate_tax_due" 
-                        value="{{ old('aggregate_tax_due') }}"
+                                      value="{{ old('aggregate_tax_due', number_format($tax1702q->aggregate_tax_due, 2)) }}"
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     >
                 </div>
@@ -367,7 +384,7 @@ $taxCodes = [
                         type="text" 
                         name="show_total_tax_credits" 
                         id="show_total_tax_credits" 
-                        value="{{ old('total_tax_credits') }}"
+                          value="{{ old('show_total_tax_credits', number_format($tax1702q->show_total_tax_credits, 2)) }}"
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     >
                 </div>
@@ -384,7 +401,7 @@ $taxCodes = [
                         type="text" 
                         name="net_tax_payable" 
                         id="net_tax_payable" 
-                        value="{{ old('net_tax_payable') }}"
+                                                  value="{{ old('net_tax_payable', number_format($tax1702q->net_tax_payable, 2)) }}"
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     >
                 </div>
@@ -401,7 +418,7 @@ $taxCodes = [
                         type="text" 
                         name="surcharge" 
                         id="surcharge" 
-                        value="{{ old('surcharge') }}"
+                                       value="{{ old('surcharge', number_format($tax1702q->surcharge, 2)) }}"
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     >
                 </div>
@@ -418,7 +435,7 @@ $taxCodes = [
                         type="text" 
                         name="interest" 
                         id="interest" 
-                        value="{{ old('interest') }}"
+                             value="{{ old('interest', number_format($tax1702q->interest, 2)) }}"
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     >
                 </div>
@@ -435,7 +452,7 @@ $taxCodes = [
                         type="text" 
                         name="compromise" 
                         id="compromise" 
-                        value="{{ old('compromise') }}"
+                                   value="{{ old('compromise', number_format($tax1702q->compromise, 2)) }}"
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     >
                 </div>
@@ -452,7 +469,7 @@ $taxCodes = [
                         type="text" 
                         name="total_penalties" 
                         id="total_penalties" 
-                        value="{{ old('total_penalties') }}"
+                                  value="{{ old('total_penalties', number_format($tax1702q->total_penalties, 2)) }}"
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     >
                 </div>
@@ -469,7 +486,7 @@ $taxCodes = [
                         type="text" 
                         name="total_amount_payable" 
                         id="total_amount_payable" 
-                        value="{{ old('total_amount_payable') }}"
+                            value="{{ old('total_amount_payable', number_format($tax1702q->total_amount_payable, 2)) }}"
                         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     >
                 </div>
@@ -497,7 +514,7 @@ $taxCodes = [
                 type="text" 
                 name="sales_receipts_special" 
                 id="sales_receipts_special"
-                value="{{ old('sales_receipts_special','0.00') }}"
+                   value="{{ old('sales_receipts_special', number_format($tax1702q->sales_receipts_special, 2)) }}"
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
     
@@ -513,7 +530,7 @@ $taxCodes = [
                 type="text" 
                 name="cost_of_sales_special" 
                 id="cost_of_sales_special" 
-                value="{{ old('cost_of_sales_special','0.00') }}"
+                    value="{{ old('cost_of_sales_special', number_format($tax1702q->cost_of_sales_special, 2)) }}"
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
     
@@ -529,7 +546,7 @@ $taxCodes = [
                 type="text" 
                 name="gross_income_special" 
                 id="gross_income_special" 
-                value="{{ old('gross_income_special','0.00') }}"
+                value="{{ old('gross_income_special', number_format($tax1702q->gross_income_special, 2)) }}"
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
     
@@ -545,7 +562,7 @@ $taxCodes = [
                 type="text" 
                 name="other_taxable_income_special" 
                 id="other_taxable_income_special" 
-                value="{{ old('other_taxable_income_special','0.00') }}"
+                value="{{ old('other_taxable_income_special', number_format($tax1702q->other_taxable_income_special, 2)) }}"
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
     
@@ -567,7 +584,7 @@ $taxCodes = [
                 name="total_gross_income_special" 
                 id="total_gross_income_special" 
                 readonly 
-                value="{{ old('total_gross_income_special') }}"
+                value="{{ old('total_gross_income_special', number_format($tax1702q->total_gross_income_special, 2)) }}"
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
     
@@ -584,7 +601,7 @@ $taxCodes = [
                 type="text" 
                 name="deductions_special" 
                 id="deductions_special" 
-                value="{{ old('deductions_special') }}"
+                value="{{ old('deductions_special', number_format($tax1702q->deductions_special, 2)) }}"
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
     
@@ -601,7 +618,7 @@ $taxCodes = [
                 name="taxable_income_quarter_special" 
                 id="taxable_income_quarter_special" 
                readonly
-    value="{{ old('taxable_income_quarter_special', '0.00') }}"
+    value="{{ old('taxable_income_quarter_special', number_format($tax1702q->taxable_income_quarter_special, 2)) }}"
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                 >
         </div>
@@ -618,7 +635,7 @@ $taxCodes = [
                 type="text" 
                 name="prev_quarter_income_special" 
                 id="prev_quarter_income_special" 
-                value="{{ old('prev_quarter_income_special', '0.00') }}"
+                value="{{ old('prev_quarter_income_special', number_format($tax1702q->prev_quarter_income_special, 2)) }}"
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
     
@@ -635,7 +652,7 @@ $taxCodes = [
                 name="total_taxable_income_special" 
                 id="total_taxable_income_special" 
                 readonly
-                 value="{{ old('total_taxable_income_special', '0.00') }}"
+                 value="{{ old('total_taxable_income_special', number_format($tax1702q->total_taxable_income_special, 2)) }}"
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
     
@@ -652,7 +669,7 @@ $taxCodes = [
                 name="tax_rate_special" 
                 id="tax_rate_special" 
                  readonly
-                  value="{{ old('tax_rate_special', '0.00') }}"
+                 value="{{ old('tax_rate_special', number_format($tax1702q->tax_rate_special, 2)) }}"
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
     
@@ -668,7 +685,7 @@ $taxCodes = [
                 type="text" 
                 name="income_tax_due_special" 
                 id="income_tax_due_special" 
-                value="{{ old('income_tax_due_special') }}"
+                value="{{ old('income_tax_due_special', number_format($tax1702q->income_tax_due_special, 2)) }}"
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
     
@@ -684,7 +701,7 @@ $taxCodes = [
                 type="text" 
                 name="other_agencies_share_special" 
                 id="other_agencies_share_special" 
-                value="{{ old('other_agencies_share_special') }}"
+                value="{{ old('other_agencies_share_special', number_format($tax1702q->other_agencies_share_special, 2)) }}"
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
     
@@ -700,7 +717,7 @@ $taxCodes = [
                 type="text" 
                 name="net_tax_due_special" 
                 id="net_tax_due_special" 
-                value="{{ old('net_tax_due_special') }}"
+                value="{{ old('net_tax_due_special', number_format($tax1702q->net_tax_due_special, 2)) }}"
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
 
@@ -724,7 +741,7 @@ $taxCodes = [
                     type="text" 
                     name="sales_receipts_regular" 
                     id="sales_receipts_regular" 
-                    value="{{ old('sales_receipts_regular') }}"
+                    value="{{ old('sales_receipts_regular', number_format($tax1702q->sales_receipts_regular, 2)) }}"
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     onchange="calculateTotals()">
             </div>
@@ -740,7 +757,7 @@ $taxCodes = [
                     type="text" 
                     name="cost_of_sales_regular" 
                     id="cost_of_sales_regular"
-                    value="{{ old('cost_of_sales_regular') }}"
+                    value="{{ old('cost_of_sales_regular', number_format($tax1702q->cost_of_sales_regular, 2)) }}"
                  
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
@@ -758,7 +775,7 @@ $taxCodes = [
                     type="text" 
                     name="gross_income_operation_regular" 
                     id="gross_income_operation_regular"
-                    value="{{ old('gross_income_operation_regular') }}"
+                    value="{{ old('gross_income_operation_regular', number_format($tax1702q->gross_income_operation_regular, 2)) }}"
                     readonly 
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
@@ -776,7 +793,7 @@ $taxCodes = [
                     type="text" 
                     name="non_operating_income_regular" 
                     id="non_operating_income_regular"
-                    value="{{ old('non_operating_income_regular') }}"
+                   value="{{ old('non_operating_income_regular', number_format($tax1702q->non_operating_income_regular, 2)) }}"
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
             
@@ -793,7 +810,7 @@ $taxCodes = [
                     type="text" 
                     name="total_gross_income_regular" 
                     id="total_gross_income_regular"
-                    value="{{ old('total_gross_income_regular') }}"
+                    value="{{ old('total_gross_income_regular', number_format($tax1702q->total_gross_income_regular, 2)) }}"
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
             
@@ -810,7 +827,7 @@ $taxCodes = [
                     type="text" 
                     name="deductions_regular" 
                     id="deductions_regular"
-                    value="{{ old('deductions_regular') }}"
+                    value="{{ old('deductions_regular', number_format($tax1702q->deductions_regular, 2)) }}"
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
             
@@ -827,7 +844,7 @@ $taxCodes = [
                     type="text" 
                     name="taxable_income_quarter_regular" 
                     id="taxable_income_quarter_regular"
-                    value="{{ old('taxable_income_quarter_regular') }}"
+                    value="{{ old('taxable_income_quarter_regular', number_format($tax1702q->taxable_income_quarter_regular, 2)) }}"
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
             
@@ -844,7 +861,7 @@ $taxCodes = [
                     type="text" 
                     name="taxable_income_previous_regular" 
                     id="taxable_income_previous_regular"
-                    value="{{ old('taxable_income_previous_regular') }}"
+                   value="{{ old('taxable_income_previous_regular', number_format($tax1702q->taxable_income_previous_regular, 2)) }}"
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
             
@@ -861,7 +878,7 @@ $taxCodes = [
                     type="text" 
                     name="total_taxable_income_regular" 
                     id="total_taxable_income_regular"
-                    value="{{ old('total_taxable_income_regular') }}"
+                    value="{{ old('total_taxable_income_regular', number_format($tax1702q->total_taxable_income_regular, 2)) }}"
                     readonly 
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
@@ -880,7 +897,7 @@ $taxCodes = [
                     name="income_tax_rate_regular" 
                              readonly
                     id="income_tax_rate_regular"
-                    value="{{ old('income_tax_rate_regular') }}"
+                    value="{{ old('income_tax_rate_regular', number_format($tax1702q->income_tax_rate_regular, 2)) }}"
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
             
@@ -897,7 +914,7 @@ $taxCodes = [
                     type="text" 
                     name="income_tax_due_regular" 
                     id="income_tax_due_regular"
-                    value="{{ old('income_tax_due_regular') }}"
+                    value="{{ old('income_tax_due_regular', number_format($tax1702q->income_tax_due_regular, 2)) }}"
                     readonly 
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
@@ -915,7 +932,7 @@ $taxCodes = [
                     type="text" 
                     name="mcit_regular" 
                     id="mcit_regular"
-                    value="{{ old('mcit_regular') }}"
+                    value="{{ old('mcit_regular', number_format($tax1702q->mcit_regular, 2)) }}"
                 
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
@@ -934,7 +951,7 @@ $taxCodes = [
                     type="text" 
                     name="final_income_tax_due_regular" 
                     id="final_income_tax_due_regular"
-                    value="{{ old('final_income_tax_due_regular') }}"
+                    value="{{ old('final_income_tax_due_regular', number_format($tax1702q->final_income_tax_due_regular, 2)) }}"
                     readonly 
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
@@ -962,7 +979,7 @@ $taxCodes = [
                 type="text" 
                 name="gross_income_first_quarter_mcit" 
                 id="gross_income_first_quarter_mcit" 
-                value="{{ old('gross_income_first_quarter_mcit') }}"
+                 value="{{ old('gross_income_first_quarter_mcit', number_format($tax1702q->gross_income_first_quarter_mcit, 2)) }}"
   
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
@@ -980,7 +997,7 @@ $taxCodes = [
                 type="text" 
                 name="gross_income_second_quarter_mcit" 
                 id="gross_income_second_quarter_mcit" 
-                value="{{ old('gross_income_second_quarter_mcit') }}"
+                 value="{{ old('gross_income_second_quarter_mcit', number_format($tax1702q->gross_income_second_quarter_mcit, 2)) }}"
               
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
@@ -998,7 +1015,7 @@ $taxCodes = [
                 type="text" 
                 name="gross_income_third_quarter_mcit" 
                 id="gross_income_third_quarter_mcit" 
-                value="{{ old('gross_income_third_quarter_mcit') }}"
+                value="{{ old('gross_income_third_quarter_mcit', number_format($tax1702q->gross_income_third_quarter_mcit, 2)) }}"
        
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
@@ -1016,7 +1033,7 @@ $taxCodes = [
                 type="text" 
                 name="total_gross_income_mcit" 
                 id="total_gross_income_mcit" 
-                value="{{ old('total_gross_income_mcit') }}"
+                value="{{ old('total_gross_income_mcit', number_format($tax1702q->total_gross_income_mcit, 2)) }}"
                 readonly 
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
@@ -1052,7 +1069,7 @@ $taxCodes = [
                 type="text" 
                 name="minimum_corporate_income_tax_mcit" 
                 id="minimum_corporate_income_tax_mcit" 
-                value="{{ old('minimum_corporate_income_tax_mcit','0.00') }}"
+                value="{{ old('minimum_corporate_income_tax_mcit', number_format($tax1702q->minimum_corporate_income_tax_mcit, 2)) }}"
                 readonly 
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
         </div>
@@ -1076,7 +1093,7 @@ $taxCodes = [
                     type="text" 
                     name="prior_year_excess_credits" 
                     id="prior_year_excess_credits" 
-                    value="{{ old('prior_year_excess_credits') }}"
+                    value="{{ old('prior_year_excess_credits', number_format($tax1702q->prior_year_excess_credits, 2)) }}"
                
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
@@ -1094,7 +1111,7 @@ $taxCodes = [
                     type="text" 
                     name="previous_quarters_tax_payments" 
                     id="previous_quarters_tax_payments" 
-                    value="{{ old('previous_quarters_tax_payments') }}"
+                    value="{{ old('previous_quarters_tax_payments', number_format($tax1702q->previous_quarters_tax_payments, 2)) }}"
              
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
@@ -1112,7 +1129,7 @@ $taxCodes = [
                     type="text" 
                     name="previous_quarters_mcit_payments" 
                     id="previous_quarters_mcit_payments" 
-                    value="{{ old('previous_quarters_mcit_payments') }}"
+                    value="{{ old('previous_quarters_mcit_payments', number_format($tax1702q->previous_quarters_mcit_payments, 2)) }}"
              
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
@@ -1130,7 +1147,7 @@ $taxCodes = [
                     type="text" 
                     name="previous_quarters_creditable_tax" 
                     id="previous_quarters_creditable_tax" 
-                    value="{{ old('previous_quarters_creditable_tax') }}"
+                    value="{{ old('previous_quarters_creditable_tax', number_format($tax1702q->previous_quarters_creditable_tax, 2)) }}"
                
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
@@ -1148,7 +1165,7 @@ $taxCodes = [
                     type="text" 
                     name="current_quarter_creditable_tax" 
                     id="current_quarter_creditable_tax" 
-                    value="{{ old('current_quarter_creditable_tax') }}"
+                    value="{{ old('current_quarter_creditable_tax', number_format($tax1702q->current_quarter_creditable_tax, 2)) }}"
               
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
@@ -1166,7 +1183,7 @@ $taxCodes = [
                     type="text" 
                     name="previously_filed_tax_payment" 
                     id="previously_filed_tax_payment" 
-                    value="{{ old('previously_filed_tax_payment') }}"
+                    value="{{ old('previously_filed_tax_payment', number_format($tax1702q->previously_filed_tax_payment, 2)) }}"
               
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
@@ -1186,12 +1203,12 @@ $taxCodes = [
             
             <div>
                 <input 
-                    type="text" 
-                    name="other_tax_specify" 
-                    id="other_tax_specify" 
-                    value="{{ old('other_tax_specify') }}"
-              
-                    class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                type="text" 
+                name="other_tax_specify" 
+                id="other_tax_specify" 
+                value="{{ old('other_tax_specify', $tax1702q->other_tax_specify) }}"
+                class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            
             </div>
             
             <div class="flex items-center font-semibold">
@@ -1207,7 +1224,7 @@ $taxCodes = [
                     type="text" 
                     name="other_tax_amount" 
                     id="other_tax_amount" 
-                    value="{{ old('other_tax_amount') }}"
+                     value="{{ old('other_tax_amount', number_format($tax1702q->other_tax_amount, 2)) }}"
               
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
@@ -1225,7 +1242,7 @@ $taxCodes = [
                 type="text" 
                 name="other_tax_specify2" 
                 id="other_tax_specify2" 
-                value="{{ old('other_tax_specify2') }}"
+                value="{{ old('other_tax_specify2', $tax1702q->other_tax_specify2) }}"
        
                 class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
@@ -1243,7 +1260,7 @@ $taxCodes = [
                     type="text" 
                     name="other_tax_amount2" 
                     id="other_tax_amount2" 
-                    value="{{ old('other_tax_amount2') }}"
+                    value="{{ old('other_tax_amount2', number_format($tax1702q->other_tax_amount2, 2)) }}"
               
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
@@ -1260,7 +1277,7 @@ $taxCodes = [
                     type="text" 
                     name="total_tax_credits" 
                     id="total_tax_credits" 
-                    value="{{ old('total_tax_credits') }}"
+                    value="{{ old('total_tax_credits', number_format($tax1702q->total_tax_credits, 2)) }}"
                     readonly 
                     class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
             </div>
