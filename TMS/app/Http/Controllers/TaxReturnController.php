@@ -8,6 +8,7 @@ use App\Http\Requests\StoreTaxReturnRequest;
 use App\Http\Requests\UpdateTaxReturnRequest;
 use App\Models\OrgSetup;
 use App\Models\Tax1701Q;
+use App\Models\Tax1702Q;
 use App\Models\Tax2550Q;
 use App\Models\Tax2551Q;
 use App\Models\TaxReturnTransaction;
@@ -93,28 +94,37 @@ class TaxReturnController extends Controller
     }
     
 // Function for showing detailed view of Income Returns
-    public function showIncome($id, $type)
-    {
-        // Retrieve the tax return by its ID
-        $taxReturn = TaxReturn::findOrFail($id);
-        $organization_id = session("organization_id");
+public function showIncome($id, $type)
+{
+    // Retrieve the tax return by its ID
+    $taxReturn = TaxReturn::findOrFail($id);
+    $organization_id = session("organization_id");
 
-        // Check if the 'type' (or title) matches '1701Q'
-        if ($taxReturn->title === '1701Q') {
-            // If title is 1701Q, show the specific view for 1701Q
-            return view('tax_return.income_input_summary', compact('taxReturn'));
+    // Check if the 'type' (or title) matches '1701Q'
+    if ($taxReturn->title === '1701Q') {
+        // If title is 1701Q, show the specific view for 1701Q
+        return view('tax_return.income_input_summary', compact('taxReturn'));
+    }
+
+    if ($taxReturn->title === '1702Q') {
+        // Check if an existing 1702Q entry exists for this tax return
+        $existing1702q = Tax1702Q::where('tax_return_id', $taxReturn->id)->first();
+
+        if ($existing1702q) {
+            // Redirect to the PDF route if the 1702Q entry exists
+            return redirect()->route('tax_return.corporate_quarterly_pdf', ['taxReturn' => $taxReturn]);
         }
-        if ($taxReturn->title === '1702Q') {
-            // If title is 1701Q, show the specific view for 1701Q
-            $organization = OrgSetup::with("rdo")
+
+        // If no existing 1702Q entry, proceed with the view preparation
+        $organization = OrgSetup::with("rdo")
             ->where('id', $organization_id)
             ->first();
-    
+
         $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
-    
+
         // Parse the start_date using Carbon
         $startDate = Carbon::parse($organization->start_date);
-    
+
         // Determine the year ended based on the start_date
         $yearEnded = null;
         if ($startDate->month == 1 && $startDate->day == 1) {
@@ -124,13 +134,14 @@ class TaxReturnController extends Controller
             // Fiscal year - Ends on the last day of the same month next year
             $yearEnded = $startDate->addYear()->lastOfMonth();
         }
+
         // Check whether the organization follows a calendar or fiscal period
         $period = ($yearEnded->month == 12 && $yearEnded->day == 31) ? 'calendar' : 'fiscal';
-    
+
         // Format the year ended date as 'YYYY-MM'
         $yearEndedFormatted = $yearEnded->format('Y-m');
         $yearEndedFormattedForDisplay = $yearEnded->format('m/Y'); // e.g., "12/2024"
-    
+
         // Get the transaction IDs related to this tax return
         $transactionIds = $taxReturn->transactions->pluck('id');
         $taxRows = TaxRow::whereHas('transaction', function ($query) use ($transactionIds) {
@@ -141,22 +152,20 @@ class TaxReturnController extends Controller
         })->with(['transaction.contactDetails', 'atc', 'taxType'])
           ->get();
 
-          return view('1702q.preview', compact(
+        return view('1702q.preview', compact(
             'taxReturn',
             'organization',
             'yearEndedFormatted',
             'yearEndedFormattedForDisplay',
             'period',
             'rdoCode',
-    
         ));
-            
-        }
-
-        // If title is not 1701Q, you can handle other cases or show a different view
-        // For example, you can use a default view or handle other titles like '1702Q', etc.
-        return view('tax_return.show', compact('taxReturn'));
     }
+
+    // If title is not 1701Q or 1702Q, show a default view
+    return view('tax_return.show', compact('taxReturn'));
+}
+
 
     
     // Function for showing Percentage Report Preview

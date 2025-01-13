@@ -109,10 +109,10 @@ class Tax1702QController extends Controller
             $tax1702q->fill($validated);
             $tax1702q->save();
 
-            // return redirect()
-            //     ->route('tax_return.corporate_quarterly_pdf', ['taxReturn' => $taxReturn->id])
-            //     ->with('success', 'Form 1702Q has been submitted successfully.');
-            return back()->with('success', 'Form 1702Q has been submitted successfully.');
+            return redirect()
+                ->route('tax_return.corporate_quarterly_pdf', ['taxReturn' => $taxReturn->id])
+                ->with('success', 'Form 1702Q has been submitted successfully.');
+        
 
         } catch (\Exception $e) {
             return redirect()
@@ -126,7 +126,7 @@ class Tax1702QController extends Controller
     {
         $tax1702q = Tax1702Q::where('tax_return_id', $taxReturn->id)->firstOrFail();
         
-        return view('tax_return.corporate_quarterly_edit', [
+        return view('1702q.edit', [
             'taxReturn' => $taxReturn,
             'tax1702q' => $tax1702q
         ]);
@@ -137,7 +137,7 @@ class Tax1702QController extends Controller
         $tax1702q = Tax1702Q::where('tax_return_id', $taxReturn->id)->firstOrFail();
 
         // Return the view that contains the iframe
-        return view('tax_return.corporate_quarterly_pdf', [
+        return view('tax_return.non_individual_income_report', [
             'taxReturn' => $taxReturn,
             'tax1702q' => $tax1702q
         ]);
@@ -148,7 +148,7 @@ class Tax1702QController extends Controller
         $tax1702q = Tax1702Q::where('tax_return_id', $tax_return_id)->firstOrFail();
         $taxReturn = TaxReturn::findOrFail($tax_return_id);
 
-        $pdf = PDF::loadView('tax_return.corporate_quarterly_pdf_template', [
+        $pdf = PDF::loadView('tax_return.non_individual_income_pdf', [
             'tax1702q' => $tax1702q,
             'taxReturn' => $taxReturn
         ]);
@@ -163,7 +163,7 @@ class Tax1702QController extends Controller
         $tax1702q = Tax1702Q::where('tax_return_id', $tax_return_id)->firstOrFail();
         $taxReturn = TaxReturn::findOrFail($tax_return_id);
 
-        $pdf = PDF::loadView('tax_return.corporate_quarterly_pdf_template', [
+        $pdf = PDF::loadView('tax_return.non_individual_income_pdf', [
             'tax1702q' => $tax1702q,
             'taxReturn' => $taxReturn
         ]);
