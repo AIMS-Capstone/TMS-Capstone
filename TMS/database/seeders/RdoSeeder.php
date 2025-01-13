@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\rdo;
+use App\Models\Rdo;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -139,7 +139,7 @@ class RdoSeeder extends Seeder
         ];
 
         foreach ($rdo as $rdo) {
-            rdo::create($rdo);
+            Rdo::create($rdo);
         }
     }
 }
