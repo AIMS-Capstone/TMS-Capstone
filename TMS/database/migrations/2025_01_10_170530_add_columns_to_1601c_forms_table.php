@@ -24,7 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('1601c_forms', function (Blueprint $table) {
+        Schema::table('1601C_forms', function (Blueprint $table) {
             $table->dropColumn('agent_category');
             $table->dropColumn('tax_relief');
             $table->dropColumn('adjustment_taxes_withheld');
