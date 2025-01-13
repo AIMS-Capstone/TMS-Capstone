@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\rdo;
+use App\Models\Rdo;
 use App\Http\Requests\StorerdoRequest;
 use App\Http\Requests\UpdaterdoRequest;
 

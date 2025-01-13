@@ -55,7 +55,7 @@ use App\Http\Controllers\ClientProfileController;
 use App\Http\Controllers\ClientAnalyticsController;
 use App\Http\Controllers\Tax1702QController;
 //Models
-use App\Models\rdo;
+use App\Models\Rdo;
 use App\Models\TaxReturn;
 
 // Public Routes
