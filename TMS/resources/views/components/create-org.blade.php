@@ -364,20 +364,15 @@
                                     <x-input type="text" name="address_line" id="address_line" x-model="formData.address_line" placeholder="e.g. ESI Bldg 124 Yakal Street" />
                                 </div>
                             </div>
-                    
-                            <div 
-                            x-data 
-                            @region-selected.window="formData.region = $event.detail"
-                            @province-selected.window="formData.province = $event.detail"
-                            @city-selected.window="formData.city = $event.detail"
-                            @zip-selected.window="formData.zip_code = $event.detail">
-                            <livewire:location-dropdowns/>
-                        </div>
+                            <div x-data 
+                                @region-selected.window="formData.region = $event.detail"
+                                @province-selected.window="formData.province = $event.detail"
+                                @city-selected.window="formData.city = $event.detail"
+                                @zip-selected.window="formData.zip_code = $event.detail">
+                                <livewire:location-dropdowns />
+                            </div>
                         </div>
                     </div>
-
-               
-           
                 </div>
                 <div x-show="currentTab === 3" class="space-y-6">
                     <div class="tab-content-item">

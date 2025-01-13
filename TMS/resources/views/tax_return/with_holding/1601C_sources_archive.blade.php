@@ -35,105 +35,103 @@ $organizationId = session('organization_id');
                 </div>
                 <hr>
 
-                                <div 
-                                    x-data="{
-                                        showCheckboxes: false, 
-                                        checkAll: false, 
-                                        selectedRows: [],
-                                        showDeleteCancelButtons: false,
-                                        showRestoreCancelButtons: false, 
-                                        isDisabled: false,
-                                        showConfirmUnarchiveModal: false, 
-                                        showConfirmDeleteModal: false,
+                <div 
+                    x-data="{
+                        showCheckboxes: false, 
+                        checkAll: false, 
+                        selectedRows: [],
+                        showDeleteCancelButtons: false,
+                        showRestoreCancelButtons: false, 
+                        isDisabled: false,
+                        showConfirmUnarchiveModal: false, 
+                        showConfirmDeleteModal: false,
 
-                                        disableButtons() {
-                                            this.isDisabled = true;
-                                        },
+                        disableButtons() {
+                            this.isDisabled = true;
+                        },
 
-                                        enableButtons() {
-                                            this.isDisabled = false;
-                                            this.showDeleteCancelButtons = false; 
-                                            this.showRestoreCancelButtons = false; 
-                                            this.showConfirmUnarchiveModal = false; 
-                                            this.showConfirmDeleteModal = false;
-                                        },
+                        enableButtons() {
+                            this.isDisabled = false;
+                            this.showDeleteCancelButtons = false; 
+                            this.showRestoreCancelButtons = false; 
+                            this.showConfirmUnarchiveModal = false; 
+                            this.showConfirmDeleteModal = false;
+                        },
 
-                                        toggleCheckbox(id) {
-                                            if (this.selectedRows.includes(id)) {
-                                                this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
-                                            } else {
-                                                this.selectedRows.push(id);
-                                            }
-                                            // Update the checkAll state based on all checkboxes' status
-                                            this.checkAll = this.selectedRows.length === {{ json_encode($sources->count()) }};
-                                        },
-                                        toggleAll() {
-                                            this.checkAll = !this.checkAll;
-                                            if (this.checkAll) {
-                                                this.selectedRows = {{ json_encode($sources->pluck('id')->toArray()) }}; 
-                                            } else {
-                                                this.selectedRows = []; // Unselect all
-                                            }
-                                        },
-                                        deleteRows() {
-                                            if (this.selectedRows.length === 0) {
-                                                alert('No rows selected for deletion.');
-                                                return;
-                                            }
+                        toggleCheckbox(id) {
+                            if (this.selectedRows.includes(id)) {
+                                this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
+                            } else {
+                                this.selectedRows.push(id);
+                            }
+                            // Update the checkAll state based on all checkboxes' status
+                            this.checkAll = this.selectedRows.length === {{ json_encode($sources->count()) }};
+                        },
+                        toggleAll() {
+                            this.checkAll = !this.checkAll;
+                            if (this.checkAll) {
+                                this.selectedRows = {{ json_encode($sources->pluck('id')->toArray()) }}; 
+                            } else {
+                                this.selectedRows = []; // Unselect all
+                            }
+                        },
+                        deleteRows() {
+                            if (this.selectedRows.length === 0) {
+                                alert('No rows selected for deletion.');
+                                return;
+                            }
 
-                                            fetch('{{ route('Sources1601C.destroy', ['id' => $with_holding->id]) }}', {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                                },
-                                                body: JSON.stringify({ ids: this.selectedRows })
-                                            })
-                                            .then(response => {
-                                                if (response.ok) {
-                                                    location.reload();  // Reload page to reflect deletion
-                                                } else {
-                                                    alert('Error deleting rows.');
-                                                }
-                                            });
-                                        },
-                                        restoreRows() {
-                                            if (this.selectedRows.length === 0) {
-                                                alert('No rows selected for restoration.');
-                                                return;
-                                            }
+                            fetch('{{ route('Sources1601C.destroy', ['id' => $with_holding->id]) }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({ ids: this.selectedRows })
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    location.reload();  // Reload page to reflect deletion
+                                } else {
+                                    alert('Error deleting rows.');
+                                }
+                            });
+                        },
+                        restoreRows() {
+                            if (this.selectedRows.length === 0) {
+                                alert('No rows selected for restoration.');
+                                return;
+                            }
 
-                                            fetch('{{ route('Sources1601C.restore', ['id' => $with_holding->id]) }}', {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                                },
-                                                body: JSON.stringify({ ids: this.selectedRows })
-                                            })
-                                            .then(response => {
-                                                if (response.ok) {
-                                                    location.reload();  // Reload page to reflect restoration
-                                                } else {
-                                                    alert('Error restoring rows.');
-                                                }
-                                            });
-                                        },
-                                        cancelSelection() {
-                                            this.selectedRows = []; 
-                                            this.checkAll = false;
-                                            this.showCheckboxes = false; 
-                                            this.showDeleteCancelButtons = false;
-                                            this.showRestoreCancelButtons = false;
-                                            this.showConfirmUnarchiveModal = false;
-                                            this.showConfirmDeleteModal = false;
-                                        },
-                                        get selectedCount() {
-                                            return this.selectedRows.length; 
-                                        }
-                                    }"
-                                    class="mb-12 mx-12 overflow-hidden max-w-full">
-
+                            fetch('{{ route('Sources1601C.restore', ['id' => $with_holding->id]) }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({ ids: this.selectedRows })
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    location.reload();  // Reload page to reflect restoration
+                                } else {
+                                    alert('Error restoring rows.');
+                                }
+                            });
+                        },
+                        cancelSelection() {
+                            this.selectedRows = []; 
+                            this.checkAll = false;
+                            this.showCheckboxes = false; 
+                            this.showDeleteCancelButtons = false;
+                            this.showRestoreCancelButtons = false;
+                            this.showConfirmUnarchiveModal = false;
+                            this.showConfirmDeleteModal = false;
+                        },
+                        get selectedCount() {
+                            return this.selectedRows.length; 
+                        }
+                    }" class="container mx-auto">
                     <!-- Actions -->
                     <div class="flex flex-row space-x-2 items-center justify-between">
                         <!-- Search Bar -->
@@ -174,28 +172,24 @@ $organizationId = session('organization_id');
 
                         <!-- Action Buttons -->
                         <div class="flex space-x-4 items-center pr-10 ml-auto">
-                                            <!-- Unarchive Button -->
-                                                <button 
-                                                    type="button" 
-                                                    @click="showCheckboxes = !showCheckboxes; showRestoreCancelButtons = !showRestoreCancelButtons; disableButtons();" 
-                                                    :disabled="selectedRows.length === 1 || isDisabled"
-                                                    class="border px-3 py-2 rounded-lg text-sm text-gray-600 hover:border-gray-800 hover:text-gray-800 hover:bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
-                                                    >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-zinc-500" viewBox="0 0 24 24">
-                                                        <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
-                                                    </svg>
-                                                    <span class="text-zinc-600 transition group-hover:text-zinc-500">Unarchive</span>
-                                                </button>
-                                                <!-- Delete Button -->
-                                                <button 
-                                                    type="button" 
-                                                    @click="showCheckboxes = !showCheckboxes; showDeleteCancelButtons = !showDeleteCancelButtons; disableButtons();" 
-                                                    :disabled="selectedRows.length === 1 || isDisabled"
-                                                    class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-red-800 hover:text-red-800 hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
-                                                    >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
-                                                    <span class="text-zinc-600 transition group-hover:text-red-500">Delete</span>
-                                                </button>
+                            <!-- Unarchive Button -->
+                            <button type="button" @click="showCheckboxes = !showCheckboxes; showRestoreCancelButtons = !showRestoreCancelButtons; disableButtons();" 
+                                :disabled="selectedRows.length === 1 || isDisabled"
+                                class="border px-3 py-2 rounded-lg text-sm text-gray-600 hover:border-gray-800 hover:text-gray-800 hover:bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                                >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-zinc-500" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
+                                </svg>
+                                <span class="text-zinc-600 transition group-hover:text-zinc-500">Unarchive</span>
+                            </button>
+                            <!-- Delete Button -->
+                            <button type="button" @click="showCheckboxes = !showCheckboxes; showDeleteCancelButtons = !showDeleteCancelButtons; disableButtons();" 
+                                :disabled="selectedRows.length === 1 || isDisabled"
+                                class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-red-800 hover:text-red-800 hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                                >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
+                                <span class="text-zinc-600 transition group-hover:text-red-500">Delete</span>
+                            </button>
 
                             <div class="relative inline-block space-x-4 text-left">
                                 <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" class="flex items-center text-zinc-500 hover:text-zinc-700" type="button">
@@ -279,53 +273,41 @@ $organizationId = session('organization_id');
                         <!-- Transactions Header -->
                         <div class="container mx-auto ps-8">
                             <div class="flex flex-row space-x-2 items-center justify-center">
-                                <div x-data="{
-                                        selectedType: new URLSearchParams(window.location.search).get('type') || 'Compensation',
-                                        filterTransactions() {
-                                            const url = new URL(window.location.href);
-                                            url.searchParams.set('type', this.selectedType);
-                                            window.location.href = url.toString();
-                                        }
-                                    }" class="w-full">
-                                    
-                                <a href="{{route('with_holding.1601C_sources', ['id' => $with_holding->id]) }}">
-                                    <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-8 border-neutral-300" role="tablist" aria-label="tab options">
-                                        <button 
-                                            @click="selectedType = 'Compensation'; filterTransactions()" 
-                                            :aria-selected="selectedType === 'Compensation'"
-                                            :tabindex="selectedType === 'Compensation' ? '0' : '-1'" 
-                                            :class="selectedType === 'Compensation' ? 'font-bold text-blue-900 ' : 'text-neutral-600 font-normal hover:border-b-blue-900 hover:text-blue-900 hover:font-bold'" 
-                                            class="h-min py-2 text-base relative" 
-                                            type="button" 
-                                            role="tab" 
-                                            aria-controls="tabpanelsales">
-                                            <span class="block">Compensation</span>
-                                            <span 
-                                                :class="selectedType === 'Compensation' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
-                                            </span>
-                                        </button>
-                                    </div>
-                                </a>
-                                        <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-8 border-neutral-300" role="tablist" aria-label="tab options">
+                                <div x-data="{ selectedTab: 'Archive Compensation' }" class="w-full">
+                                    <div @keydown.right.prevent="$focus.wrap().next()" @keydown.left.prevent="$focus.wrap().previous()" class="flex justify-center gap-24 border-neutral-300" role="tablist" aria-label="tab options">
+                                        <a href="{{route('with_holding.1601C_sources', ['id' => $with_holding->id]) }}">
                                             <button 
-                                                @click="selectedType = 'ArchiveCompensation'; filterTransactions()" 
-                                                :aria-selected="selectedType === 'Archive Compensation'"
-                                                :tabindex="selectedType === 'Archive Compensation' ? '0' : '-1'" 
-                                                :class="selectedType === 'Archive Compensation' ? 'font-bold text-blue-900 ' : 'text-neutral-600 font-normal hover:border-b-blue-900 hover:text-blue-900 hover:font-bold'" 
+                                                @click="selectedTab = 'Compensation'" 
+                                                :aria-selected="selectedTab === 'Compensation'" 
+                                                :tabindex="selectedTab === 'Compensation' ? '0' : '-1'" 
+                                                :class="selectedTab === 'Compensation' ? 'font-bold text-blue-900 ' : 'text-neutral-600 font-medium hover:border-b-blue-900 hover:text-blue-900 hover:font-bold'" 
                                                 class="h-min py-2 text-base relative" 
                                                 type="button" 
                                                 role="tab" 
-                                                aria-controls="tabpanelsales">
-                                                <span class="block">Archive Compensation</span>
+                                                aria-controls="tabpanelCompensation">
+                                                <span class="block">Compensation</span>
                                                 <span 
-                                                    :class="selectedType === 'Archive Compensation' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
+                                                    :class="selectedTab === 'Compensation' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
                                                 </span>
                                             </button>
-                                        </div>
-                                    </a>
-                                </div>
+                                        </a>
+                                        <button @click="selectedTab = 'ArchiveCompensation'" :aria-selected="selectedTab === 'Archive Compensation'" 
+                                            :tabindex="selectedTab === 'Archive Compensation' ? '0' : '-1'" 
+                                            :class="selectedTab === 'Archive Compensation' ? 'font-bold text-blue-900' : 'text-neutral-600 font-medium hover:border-b-blue-900 hover:text-blue-900 hover:font-bold'"
+                                            class="h-min py-2 text-base relative" 
+                                            type="button" 
+                                            role="tab" 
+                                            aria-controls="tabpanelArchiveCompensation" >
+                                            <span class="block">Archive Compensation</span>
+                                            <span
+                                                :class="selectedTab === 'Archive Compensation' ? 'block bg-blue-900 border-blue-900 border-b-4 w-[120%] rounded-b-md transform rotate-180 absolute bottom-0 left-[-10%]' : 'hidden'">
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>  
                             </div>
                         </div>
+
                         <hr>
 
                         <div class="mb-12 mt-6 mx-12 overflow-hidden max-w-full border-neutral-300">
@@ -406,128 +388,128 @@ $organizationId = session('organization_id');
                             </div>
 
                             <!-- Unarchive Confirmation Modal -->
-                                        <div 
-                                            x-show="showConfirmUnarchiveModal" 
-                                            x-cloak 
-                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                                            @click.away="showConfirmUnarchiveModal = false"
-                                            x-effect="document.body.classList.toggle('overflow-hidden', showConfirmUnarchiveModal)"
-                                        >
-                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-                                                <div class="flex flex-col items-center">
-                                                    <!-- Icon -->
-                                                    <div class="mb-4">
-                                                        <i class="fas fa-exclamation-triangle text-zinc-700 text-8xl"></i>
-                                                    </div>
-
-                                                    <!-- Title -->
-                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Unarchive Item(s)</h2>
-
-                                                    <!-- Description -->
-                                                    <p class="text-sm text-zinc-700 text-center">
-                                                        You're going to unarchive the selected item(s) in the Sources Archive table. Are you sure?
-                                                    </p>
-
-                                                    <!-- Actions -->
-                                                    <div class="flex justify-center space-x-8 mt-6 w-full">
-                                                        <button 
-                                                            @click="showConfirmUnarchiveModal = false; enableButtons(); showRestoreCancelButtons = true; disableButtons();" 
-                                                            class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
-                                                        >
-                                                            Cancel
-                                                        </button>
-                                                        <button 
-                                                            @click="restoreRows(); showConfirmUnarchiveModal = false;" 
-                                                            class="px-4 py-2 bg-zinc-700 hover:bg-zinc-800 text-white rounded-lg text-sm transition"
-                                                        >
-                                                            Unarchive
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                            <div 
+                                x-show="showConfirmUnarchiveModal" 
+                                x-cloak 
+                                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                @click.away="showConfirmUnarchiveModal = false"
+                                x-effect="document.body.classList.toggle('overflow-hidden', showConfirmUnarchiveModal)"
+                            >
+                                <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                    <div class="flex flex-col items-center">
+                                        <!-- Icon -->
+                                        <div class="mb-4">
+                                            <i class="fas fa-exclamation-triangle text-zinc-700 text-8xl"></i>
                                         </div>
 
-                                        <!-- Delete Confirmation Modal -->
-                                        <div 
-                                            x-show="showConfirmDeleteModal" 
-                                            x-cloak 
-                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                                            x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
-                                            @click.away="showConfirmDeleteModal = false"
-                                        >
-                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-                                                <div class="flex flex-col items-center">
-                                                    <!-- Icon -->
-                                                    <div class="mb-4">
-                                                        <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>
-                                                    </div>
+                                        <!-- Title -->
+                                        <h2 class="text-2xl font-bold text-zinc-700 mb-2">Unarchive Item(s)</h2>
 
-                                                    <!-- Title -->
-                                                    <h2 class="text-2xl font-extrabold text-zinc-800 mb-2">Delete Sources</h2>
+                                        <!-- Description -->
+                                        <p class="text-sm text-zinc-700 text-center">
+                                            You're going to unarchive the selected item(s) in the Sources Archive table. Are you sure?
+                                        </p>
 
-                                                    <!-- Description -->
-                                                    <p class="text-sm text-zinc-600 text-center">
-                                                        You're going to delete the selected item(s) in the Sources Archive table. Are you sure?
-                                                    </p>
+                                        <!-- Actions -->
+                                        <div class="flex justify-center space-x-8 mt-6 w-full">
+                                            <button 
+                                                @click="showConfirmUnarchiveModal = false; enableButtons(); showRestoreCancelButtons = true; disableButtons();" 
+                                                class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button 
+                                                @click="restoreRows(); showConfirmUnarchiveModal = false;" 
+                                                class="px-4 py-2 bg-zinc-700 hover:bg-zinc-800 text-white rounded-lg text-sm transition"
+                                            >
+                                                Unarchive
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                                                    <!-- Actions -->
-                                                    <div class="flex justify-center space-x-8 mt-6 w-full">
-                                                        <button 
-                                                            @click="showConfirmDeleteModal = false; enableButtons(); enableButtons(); showDeleteCancelButtons = true; disableButtons();" 
-                                                            class="px-4 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-900 font-bold transition"
-                                                        >
-                                                            Cancel
-                                                        </button>
-                                                        <button 
-                                                            @click="deleteRows(); showConfirmDeleteModal = false;" 
-                                                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition"
-                                                        >
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                            <!-- Delete Confirmation Modal -->
+                            <div 
+                                x-show="showConfirmDeleteModal" 
+                                x-cloak 
+                                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
+                                @click.away="showConfirmDeleteModal = false"
+                                >
+                                <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                    <div class="flex flex-col items-center">
+                                        <!-- Icon -->
+                                        <div class="mb-4">
+                                            <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>
                                         </div>
 
-                                        <div class="flex justify-center py-4" x-cloak>
-                                            <!-- Delete and Cancel buttons -->
-                                            <div class="flex justify-center py-4" x-show="showDeleteCancelButtons">
-                                                <button 
-                                                    type="button" 
-                                                    @click="showConfirmDeleteModal = true; showDeleteCancelButtons = true;"
-                                                    :disabled="selectedRows.length === 0"
-                                                    class="border px-3 py-2 mx-2 rounded-lg text-sm text-red-600 border-red-600 bg-red-100 hover:bg-red-200 transition disabled:opacity-50 disabled:cursor-not-allowed group flex items-center space-x-2"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24">
-                                                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/>
-                                                    </svg>
-                                                    <span class="text-red-600 transition group-hover:text-red-600">Delete Selected <span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span></span>
-                                                </button>
-                                                <button 
-                                                    @click="cancelSelection(); enableButtons();" 
-                                                    class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
-                                                >
-                                                    Cancel
-                                                </button>
-                                            </div>
-                                            <!-- Unarchive and Cancel buttons -->
-                                            <div class="flex justify-center py-4" x-show="showRestoreCancelButtons">
-                                                <button 
-                                                    type = "button"
-                                                    @click="showConfirmUnarchiveModal = true; showRestoreCancelButtons = true;"
-                                                    :disabled="selectedRows.length === 0"
-                                                    class="border px-3 py-2 rounded-lg text-sm text-gray-800 border-gray-800 bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-zinc-800" viewBox="0 0 24 24">
-                                                        <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
-                                                    </svg>
-                                                    <span class="text-zinc-600 transition group-hover:text-zinc-800">Unarchive Selected</span><span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
-                                                </button>
-                                                <button @click="cancelSelection(); enableButtons();" class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition">
-                                                    Cancel
-                                                </button>
-                                            </div>
+                                        <!-- Title -->
+                                        <h2 class="text-2xl font-extrabold text-zinc-800 mb-2">Delete Sources</h2>
+
+                                        <!-- Description -->
+                                        <p class="text-sm text-zinc-600 text-center">
+                                            You're going to delete the selected item(s) in the Sources Archive table. Are you sure?
+                                        </p>
+
+                                        <!-- Actions -->
+                                        <div class="flex justify-center space-x-8 mt-6 w-full">
+                                            <button 
+                                                @click="showConfirmDeleteModal = false; enableButtons(); enableButtons(); showDeleteCancelButtons = true; disableButtons();" 
+                                                class="px-4 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-900 font-bold transition"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button 
+                                                @click="deleteRows(); showConfirmDeleteModal = false;" 
+                                                class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition"
+                                            >
+                                                Delete
+                                            </button>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-center py-4" x-cloak>
+                                <!-- Delete and Cancel buttons -->
+                                <div class="flex justify-center py-4" x-show="showDeleteCancelButtons">
+                                    <button 
+                                        type="button" 
+                                        @click="showConfirmDeleteModal = true; showDeleteCancelButtons = true;"
+                                        :disabled="selectedRows.length === 0"
+                                        class="border px-3 py-2 mx-2 rounded-lg text-sm text-red-600 border-red-600 bg-red-100 hover:bg-red-200 transition disabled:opacity-50 disabled:cursor-not-allowed group flex items-center space-x-2"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24">
+                                            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/>
+                                        </svg>
+                                        <span class="text-red-600 transition group-hover:text-red-600">Delete Selected <span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span></span>
+                                    </button>
+                                    <button 
+                                        @click="cancelSelection(); enableButtons();" 
+                                        class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                                <!-- Unarchive and Cancel buttons -->
+                                <div class="flex justify-center py-4" x-show="showRestoreCancelButtons">
+                                    <button 
+                                        type = "button"
+                                        @click="showConfirmUnarchiveModal = true; showRestoreCancelButtons = true;"
+                                        :disabled="selectedRows.length === 0"
+                                        class="border px-3 py-2 rounded-lg text-sm text-gray-800 border-gray-800 bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-zinc-800" viewBox="0 0 24 24">
+                                            <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
+                                        </svg>
+                                        <span class="text-zinc-600 transition group-hover:text-zinc-800">Unarchive Selected</span><span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
+                                    </button>
+                                    <button @click="cancelSelection(); enableButtons();" class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
 
                             @if (count($sources) > 0)
                                 <div class="mt-4">
@@ -537,7 +519,6 @@ $organizationId = session('organization_id');
                         </div>
                     </div>
                 </div>
-                
             </div>
         </div>
     </div>

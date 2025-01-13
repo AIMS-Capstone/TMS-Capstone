@@ -87,11 +87,11 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                             'tax_return.spouse_information', 'tax_return.sales_revenue', 'tax_return.background_information', 'tax_return.tax_option_rate.update',
                             'vat_return', 'tax_return.slsp_data', 'tax_return.summary', 'tax_return.report', 'tax_return.2550q.pdf', 
                             'percentage_return', 'percentage_return.slsp_data', 'tax-returns.percentage-summary', 'percentage_return.report', 'tax_return.2551q.pdf', 
-                            'with_holding.1601C', 'with_holding.1601C.generate', 'with_holding.1601C_summary', 'with_holding.1601C_sources', 'with_holding.1601C_sources_store', 'form1601C.create', 'form1601C.store', 'with_holding.1601C_import',
+                            'with_holding.1601C', 'with_holding.1601C.generate', 'with_holding.1601C_summary', 'with_holding.1601C_sources', 'with_holding.1601C_sources_store', 'form1601C.create', 'form1601C.store', 'with_holding.1601C_import', 'Sources1601C.archive', 'form1601C.preview', 'form1601C.edit', 'form1601C.update',
                             'with_holding.0619E', 'with_holding.0619E.generate', 'form0619E.create', 'form0619E.store', 'form0619E.preview', 'form0619E.edit', 'form0619E.update', 
                             'with_holding.1601EQ', 'with_holding.1601EQ.generate', 'with_holding.1601EQ_Qap', 'with_holding.1601EQ_Qap.set', 'with_holding.1601EQ_Qap.archive', 'with_holding.1601EQ_Qap.activate', 'with_holding.1601EQ_Qap.deactivate', 'form1601EQ.create', 'form1601EQ.store', 'form1601EQ.preview', 'form1601EQ.edit', 'form1601EQ.update',
                             'with_holding.1604C', 'with_holding.1604C.generate', 'with_holding.1604C_remittances', 'with_holding.1604C_schedule1', 'with_holding.1604C_schedule2', 'form1604C.create', 'form1604C.store',
-                            'with_holding.1604E', 'with_holding.1604E.generate', 'with_holding.1604E_summary', 'with_holding.1604E_remittances', 'with_holding.1604E_sources', 'with_holding.1604E_schedule4', 'with_holding.1604E_store', 'form1604E.create', 'form1604E.store') ? 'true' : 'false' }} }">
+                            'with_holding.1604E', 'with_holding.1604E.generate', 'with_holding.1604E_summary', 'with_holding.1604E_remittances', 'with_holding.1604E_sources', 'with_holding.1604E_schedule4', 'with_holding.1604E_store', 'form1604E.create', 'form1604E.store', 'form1604E.preview', 'form1604E.edit') ? 'true' : 'false' }} }">
                             <button @click="open = !open" type="button"
                                 :class="{
                                     'flex items-center w-full p-2 text-[14px] ease-in transition-all duration-500 rounded-r-full hover:font-bold px-6 py-2 group': true,
@@ -134,14 +134,14 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                     <a href="{{ route('with_holding.0619E') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
                                     {{ request()->routeIs('with_holding.0619E') || request()->routeIs('with_holding.0619E.generate', 'form0619E.create', 'form0619E.store', 'form0619E.preview', 'form0619E.edit', 'form0619E.update',
                                     'with_holding.1601EQ', 'with_holding.1601EQ.generate', 'with_holding.1601EQ_Qap', 'with_holding.1601EQ_Qap.set', 'with_holding.1601EQ_Qap.archive', 'with_holding.1601EQ_Qap.activate', 'with_holding.1601EQ_Qap.deactivate', 'form1601EQ.create', 'form1601EQ.store', 'form1601EQ.preview', 'form1601EQ.edit', 'form1601EQ.update',
-                                    'with_holding.1604E', 'with_holding.1604E.generate', 'with_holding.1604E_summary', 'with_holding.1604E_remittances', 'with_holding.1604E_sources', 'with_holding.1604E_schedule4', 'with_holding.1604E_store', 'form1604E.create', 'form1604E.store') 
+                                    'with_holding.1604E', 'with_holding.1604E.generate', 'with_holding.1604E_summary', 'with_holding.1604E_remittances', 'with_holding.1604E_sources', 'with_holding.1604E_schedule4', 'with_holding.1604E_store', 'form1604E.create', 'form1604E.store', 'form1604E.preview', 'form1604E.edit') 
                                     ? 'sidebar-submenu-active' : '' }}">
                                         Withholding - Expanded
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{ route('with_holding.1601C') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
-                                    {{ request()->routeIs('with_holding.1601C') || request()->routeIs('with_holding.1601C.generate', 'with_holding.1601C_summary', 'with_holding.1601C_sources', 'with_holding.1601C_sources_store', 'form1601C.create', 'form1601C.store', 'with_holding.1601C_import') 
+                                    {{ request()->routeIs('with_holding.1601C') || request()->routeIs('with_holding.1601C.generate', 'with_holding.1601C_summary', 'with_holding.1601C_sources', 'with_holding.1601C_sources_store', 'form1601C.create', 'form1601C.store', 'with_holding.1601C_import', 'Sources1601C.archive', 'form1601C.preview', 'form1601C.edit', 'form1601C.update') 
                                     ? 'sidebar-submenu-active' : '' }}">
                                         Withholding - Compensation
                                     </a>
