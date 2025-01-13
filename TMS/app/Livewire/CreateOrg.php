@@ -4,7 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\OrgSetup;
-use App\Models\rdo;
+use App\Models\Rdo;
 
 class CreateOrg extends Component
 {

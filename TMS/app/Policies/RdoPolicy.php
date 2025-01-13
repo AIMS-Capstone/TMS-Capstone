@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\rdo;
+use App\Models\Rdo;
 use Illuminate\Auth\Access\Response;
 
 class RdoPolicy
