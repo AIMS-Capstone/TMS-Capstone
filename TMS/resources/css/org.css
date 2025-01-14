@@ -14,8 +14,9 @@
 
 .select2-container .select2-selection--single .select2-selection__rendered{
     padding: 0 !important;
-    border-bottom: 1px solid!important;
-    border-bottom-color: rgb(229 231 235 / var(--tw-border-opacity, 1)) !important;
+    border: 1px solid!important;
+    border-radius: 2px !important;
+    border-color: rgb(229 231 235 / var(--tw-border-opacity, 1)) !important;
     white-space: normal !important; /* Allows text to wrap */
     word-wrap: break-word  !important; /* Break words if necessary */
     overflow: visible  !important; /* Ensures text overflow is not hidden */
@@ -39,8 +40,7 @@
 }
 
 .select2-container {
-    width: 12rem!important; /* or set a specific width, e.g., 500px */
-    max-width: 20rem !important;
+ 
 }
 /* If disabled, apply these styles */
 .select2-container--default .select2-selection--single.disabled,
