@@ -9,7 +9,7 @@
                 name="region"
                 id="region"
                 x-model="formData.region"
-                class="select2 cursor-pointer w-full border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 rounded-xl shadow-sm"
+                class="select2 cursor-pointer border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 rounded-xl shadow-sm"
             >
                 <option value="" disabled selected>Select Region</option>
                 @foreach($regions as $region)
@@ -39,16 +39,17 @@
     </div>
 
     {{-- City Dropdown and Zip Code --}}
-    <div class="flex flex-row space-x-4 w-full max-w-md">
+    <div class="city-zip-container flex flex-row space-x-4 w-full max-w-md">
+        <!-- City Dropdown -->
         <div class="flex flex-col w-full">
             <x-field-label for="city" value="{{ __('City') }}" class="mb-2 text-left" />
             <select
                 name="city"
                 id="city"
                 x-model="formData.city"
-                class="select2 cursor-pointer w-full border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 rounded-xl shadow-sm"
+                class="select2 cursor-pointer border-gray-300 placeholder:text-gray-400 placeholder:font-light placeholder:text-sm focus:border-slate-500 focus:ring-slate-500 rounded-xl shadow-sm w-full"
                 @if(!$selectedProvince) disabled @endif
-            >
+                >
                 <option value="" disabled selected>Select City</option>
                 @foreach($cities as $city)
                     <option value="{{ $city['name'] }}">{{ $city['name'] }}</option>

@@ -364,7 +364,7 @@
                                     <x-input type="text" name="address_line" id="address_line" x-model="formData.address_line" placeholder="e.g. ESI Bldg 124 Yakal Street" />
                                 </div>
                             </div>
-                            <div x-data 
+                            <div x-data
                                 @region-selected.window="formData.region = $event.detail"
                                 @province-selected.window="formData.province = $event.detail"
                                 @city-selected.window="formData.city = $event.detail"
