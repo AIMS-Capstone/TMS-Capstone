@@ -9,6 +9,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/css/custom.css',
                 'resources/css/select.css',
+                'resources/css/org.css'
             ],
             refresh: true,
         }),
