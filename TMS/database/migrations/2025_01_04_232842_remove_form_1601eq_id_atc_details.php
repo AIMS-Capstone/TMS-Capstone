@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('1601eq_atc_details', function (Blueprint $table) {
+        Schema::table('1601EQ_atc_details', function (Blueprint $table) {
             // Add withholding_id column
             $table->unsignedBigInteger('withholding_id')->nullable()->after('id');
 
