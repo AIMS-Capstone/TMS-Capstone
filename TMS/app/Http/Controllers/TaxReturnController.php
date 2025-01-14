@@ -1359,8 +1359,11 @@ public function showIncomeCoaData(TaxReturn $taxReturn, Request $request)
         
             // Get the tax rows and eager load taxType to access tax_rate and transaction_type
             $taxRows = TaxRow::whereIn('transaction_id', $transactionIds)
-                ->with('taxType') // Eager load taxType to get transaction_type and tax_rate
-                ->get();
+            ->whereNull('credit') // Skip rows with a value in the credit column
+            ->whereNull('debit')  // Skip rows with a value in the debit column
+            ->with('taxType')     // Eager load taxType to get transaction_type and tax_rate
+            ->get();
+
         
             // Initialize an array to store the summary data, grouped by tax type
             $summaryData = [];
