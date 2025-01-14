@@ -113,10 +113,10 @@
                                     <div class="flex justify-center pl-4">
                                         <ul class="list-disc text-[11px]">
                                             <li>
-                                                <span class="inline-block align-top">a CSV file containing transaction information (You can <a class="text-blue-600" href="{{ url('') }}">download</a> this template for importing transactions).</span>
+                                                <span class="inline-block align-top">a CSV file containing transaction information (You can <a href="{{ asset('csv/purchase_template.csv') }}" download="purchase_template.csv" class="text-blue-600 hover:font-bold hover:underline">download</a> this template for importing transactions).</span>
                                             </li>
                                             <li>
-                                                <span   class="inline-block align-top">a COA/Chart of Accounts column added to your Purchase transactions (<a class="text-blue-600" href="{{ url('/export-coa') }}">download list</a>). This is a required field.</span>
+                                                <span class="inline-block align-top">a COA/Chart of Accounts column added to your Purchase transactions <a class="text-blue-600 hover:underline hover:font-bold" href="{{ url('/export-coa') }}">(download list)</a>. This is a required field.</span>
                                             </li>
                                             <li>
                                                 <span class="inline-block align-top">an ATC column added to your VAT on Purchases transactions. You can use the available Creditable Income<br/>Taxes Withheld and Final Income Taxes Withheld Tax Codes. This is optional but can speed up the importing. </span>

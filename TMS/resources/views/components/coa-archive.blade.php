@@ -438,7 +438,7 @@
                                             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
                                             @click.away="showConfirmUnarchiveModal = false"
                                             x-effect="document.body.classList.toggle('overflow-hidden', showConfirmUnarchiveModal)"
-                                        >
+                                            >
                                             <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
                                                 <div class="flex flex-col items-center">
                                                     <!-- Icon -->
@@ -480,7 +480,7 @@
                                             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
                                             x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
                                             @click.away="showConfirmDeleteModal = false"
-                                        >
+                                            >
                                             <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
                                                 <div class="flex flex-col items-center">
                                                     <!-- Icon -->

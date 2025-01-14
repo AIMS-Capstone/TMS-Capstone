@@ -85,11 +85,12 @@
                                     <div class="flex justify-center mb-4 pl-10">
                                         <ul class="list-disc text-[11px]">
                                             <li class="pl-2">
-                                                <span class="inline-block align-top">a CSV file containing transaction information (You can download this template for importing transactions).</span>
+                                                <span class="inline-block align-top">a CSV file containing transaction information (You can <a href="{{ asset('csv/transaction_template.csv') }}" download="transaction_template.csv" class="text-blue-600 hover:font-bold hover:underline">
+                                                    download</a> this template for importing transactions).</span>
                                             </li>
                                             <li class="pl-2">
                                                 <span class="inline-block align-top">
-                                                    a <a href="{{ route('export.taxType', 'sales') }}"> <b>Tax Type</b> </a>column to specify the tax rate for each transaction:
+                                                    a <a href="{{ route('export.taxType', 'sales') }}"> <strong class="text-blue-600 hover:underline">Tax Type</strong> </a>column to specify the tax rate for each transaction:
                                                     <p>V or VOS = Vat on Sales</p>
                                                     <p>S or STG = Sales to Government</p>
                                                     <p>Z or ZRS = Zero Rated Sales</p>
@@ -100,10 +101,10 @@
                                                 <span class="inline-block align-top">a <b>Category</b> column which specifies whether it is for <b>Goods</b> or <b>Services</b>.</span>
                                             </li>
                                             <li class="pl-2">
-                                                <span class="inline-block align-top">an ATC Column added to your VAT on Sales transactions <a href="{{ route('export.atcs', 'sales') }}">(download list).</a> This is optional but can speed up the importing.</span>
+                                                <span class="inline-block align-top">an ATC Column added to your VAT on Sales transactions <a href="{{ route('export.atcs', 'sales') }}" class="text-blue-600 hover:font-bold hover:underline">(download list).</a> This is optional but can speed up the importing.</span>
                                             </li>
                                             <li class="pl-2">
-                                                <span class="inline-block align-top">a COA/Chart of Accounts column added to your Sales transactions (download list). This is a required field.</span>
+                                                <span class="inline-block align-top">a COA/Chart of Accounts column added to your Sales transactions <a href="{{ route('export.coa') }}" class="text-blue-600 hover:font-bold hover:underline">(download list)</a>. This is a required field.</span>
                                             </li>
                                             <li class="pl-2">
                                                 <span class="inline-block align-top"><b>Contact TIN</b> for sales transactions is optional. You can leave this field empty.</span>

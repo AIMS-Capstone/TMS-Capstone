@@ -1,0 +1,5 @@
+﻿Date,Amount,Tax Type,Category,ATC,COA Code,Reference No.,Description,Contact TIN,Contact Name,First Name,Last Name,Middle Name,Address Line,City,Zip Code
+11/12/2024,20000,VOP,Goods,WI010,1000,51742,Vat on Purchase,123-123-20005,John Doe Inc.,,,,123 Yakal Street,Santa Rosa,4026
+11/10/2024,45000,CG,Goods,WI011,2000,51666,Capital Goods,123-123-20012,,John,Doe,Alfred,345 Mahogany Village,San Pedro,4026
+11/8/2024,25000,GNQIT,Goods,WI090,3000,51666,Goods not Qualified ,123-123-20012,,John,Doe,Alfred,346 Mahogany Village,San Pedro,4026
+11/8/2024,35000,IOG,Goods,WI091,4000,51666,Tax Exempt Sales,123-123-20012,,John,Doe,Alfred,347 Mahogany Village,San Pedro,4026
