@@ -344,7 +344,7 @@ class withHolding1601EQController extends Controller
             ->with('contactDetails')
             ->get();
 
-        return view('tax_return.with_holding.1601EQ_qap_archive', [
+        return view('tax_return.with_holding.1601EQ_Qap_archive', [
             'withHolding' => $withHolding,
             'taxRows' => $taxRows,
             'unassignedTransactions' => $unassignedTransactions,
