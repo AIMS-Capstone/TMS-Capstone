@@ -26,7 +26,7 @@ class Tax1701QController extends Controller
             'date_of_birth' => 'required|date',
             'email_address' => 'required|email|max:255',
             'citizenship' => 'required|string|max:50',
-            'foreign_tax' => 'required|string|max:50',
+            'foreign_tax' => 'nullable|string|max:50',
             'claiming_foreign_credits' => 'required|boolean',
             'individual_rate_type' => 'required|string|max:50',
             'show_tax_due' => 'nullable|numeric',
