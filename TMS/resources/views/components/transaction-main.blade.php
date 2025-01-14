@@ -32,7 +32,7 @@
                         <livewire:multi-step-import-modal/>
                     </li>
                     <li x-show="selectedTab === 'Sales'">
-                        <a href="{{ url('/transactions/upload') }}" class="block px-4 py-2 hover-dropdown">Upload Image</a>
+                        {{-- <a href="{{ url('/transactions/upload') }}" class="block px-4 py-2 hover-dropdown">Upload Image</a> --}}
                     </li>
                     
                     <!-- Options for Purchase tab -->
@@ -43,7 +43,7 @@
                         <livewire:purchase-multi-step-import/>
                     </li>
                     <li x-show="selectedTab === 'Purchase'">
-                        <a href="#" class="block px-4 py-2 hover-dropdown">Upload Image</a>
+                        <a href="{{ url('/transactions/upload') }}" class="block px-4 py-2 hover-dropdown">Upload Image</a>
                     </li>
 
                     <!-- Options for Journal tab -->
