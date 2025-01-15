@@ -22,8 +22,10 @@ class EmployeesController extends Controller
 
         $organizationId = session('organization_id');
 
-        // Query employees with their address and employments
-        $query = Employee::with(['address', 'employments.address']);
+        $query = Employee::where(function ($query) use ($organizationId) {
+            $query->where('organization_id', $organizationId)
+                ->orWhereNull('organization_id');
+        })->with(['address', 'employments.address']);
 
         if ($organizationId) {
             $query->where('organization_id', $organizationId);

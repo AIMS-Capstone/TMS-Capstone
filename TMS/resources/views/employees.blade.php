@@ -106,14 +106,13 @@ $organization = \App\Models\OrgSetup::find($organizationId);
 
                         // Toggle all rows
                         toggleAll() {
-                            this.checkAll = !this.checkAll;
-                            if (this.checkAll) {
-                                this.selectedRows = [...document.querySelectorAll('[id^=contact]')].map(el => el.id.replace('contact', ''));
-                            } else {
-                                this.selectedRows = [];
-                            }
-                            console.log('All rows:', this.selectedRows); // Debugging
-                        },
+                                            this.checkAll = !this.checkAll;
+                                            if (this.checkAll) {
+                                                this.selectedRows = {{ json_encode($employees->pluck('id')->toArray()) }}; 
+                                            } else {
+                                                this.selectedRows = []; // Unselect all
+                                            }
+                                        },
 
                         // Handle delete (soft delete)
                         deleteRows() {
@@ -122,9 +121,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                 return;
                             }
 
-
                             // Send the request to the backend
-                            fetch('{{ route("employees.destroy") }}', {
+                            fetch('{{ route('employees.destroy') }}', {
                                 method: 'DELETE',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -298,9 +296,9 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                     <thead class="bg-neutral-100 text-sm text-neutral-700">
                                         <tr>
                                             <th scope="col" class="p-4">
-                                                <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
+                                                <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600" x-cloak>
                                                     <div class="relative flex items-center">
-                                                        <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition" />
+                                                        <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition" />
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                                         </svg>
@@ -322,9 +320,9 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                             @foreach ($employees as $employee)
                                                 <tr class="hover:bg-blue-50 cursor-pointer ease-in-out">
                                                     <td class="p-4">
-                                                        <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
+                                                        <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600" x-cloak>
                                                             <div class="relative flex items-center">
-                                                                <input type="checkbox" @click="toggleCheckbox('{{ $employee->id }}')" :checked="selectedRows.includes('{{ $employee->id }}')" id="contact{{ $employee->id }}" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition" />
+                                                                <input type="checkbox" @click="toggleCheckbox('{{ $employee->id }}')" :checked="selectedRows.includes('{{ $employee->id }}')" id="contact{{ $employee->id }}" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition" />
                                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                                                 </svg>

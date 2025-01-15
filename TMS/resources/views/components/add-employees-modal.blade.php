@@ -183,8 +183,21 @@
 
                                 <div class="mb-6 flex justify-between items-start">
                                     <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                        <label for="tin" class="text-zinc-700 font-semibold whitespace-nowrap">Tax Identification Number (TIN) <span class="text-red-500">*</span></label>
-                                        <input type="text" id="tin" name="tin" placeholder="000-000-000-000" maxlength="17" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
+                                        <label for="tin" class="text-zinc-700 font-semibold whitespace-nowrap">
+                                            Tax Identification Number (TIN) <span class="text-red-500">*</span>
+                                        </label>
+                                        <input 
+                                            type="text" 
+                                            id="tin" 
+                                            name="tin" 
+                                            placeholder="000-000-000-000" 
+                                            maxlength="15" 
+                                            pattern="^\d{3}-\d{3}-\d{3}-\d{3}$" 
+                                            title="TIN must follow the format ###-###-###-###." 
+                                            oninput="validateTIN(this)" 
+                                            class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
+                                            required>
+                                        <p id="tinError" class="text-red-500 text-xs hidden">TIN must follow the format ###-###-###-###.</p>
                                     </div>
                                     <div class="w-2/3 pr-4 flex items-center space-x-4">
                                         <label for="zip_code" class="text-zinc-700 font-semibold whitespace-nowrap">Zip Code <span class="text-red-500">*</span></label>
@@ -352,7 +365,7 @@
                                         <label class="flex items-center">
                                             <input type="radio" name="employee_wage_status" value="Above Minimum Wage Earner" class="mr-2"> Above Minimum Wage Earner
                                         </label>
-                                    </div>
+                                    </div>  
                                 </div>
                             </div>
 
@@ -479,6 +492,7 @@
                                 <button 
                                     x-show="currentStep > 1" 
                                     @click="currentStep--" 
+                                    @click.prevent="prevStep()"
                                     type="button" 
                                     id="prevBtn"
                                     class="px-6 py-2 bg-white text-blue-900 font-semibold border border-blue-900 rounded-lg">
@@ -488,6 +502,7 @@
                                 <button 
                                     x-show="currentStep < 4" 
                                     @click="currentStep++" 
+                                    @click.prevent="nextStep()"
                                     type="button" 
                                     id="nextBtn"
                                     class="px-6 py-2 bg-blue-900 text-white font-semibold rounded-lg">
@@ -581,4 +596,40 @@
             rateInput.placeholder = "0.00";
         }
     });
+
+    //tin
+    function validateTIN(input) {
+        let value = input.value.replace(/\D/g, ''); // Remove all non-numeric characters
+        let formattedValue = '';
+
+        if (value.length > 3) {
+            formattedValue += value.slice(0, 3) + '-';
+        }
+        if (value.length > 6) {
+            formattedValue += value.slice(3, 6) + '-';
+        }
+        if (value.length > 9) {
+            formattedValue += value.slice(6, 9) + '-';
+        }
+        if (value.length > 12) {
+            formattedValue += value.slice(9, 12);
+        }
+
+        input.value = formattedValue;
+
+        // Check if the format is valid
+        const isValid = /^\d{3}-\d{3}-\d{3}-\d{3}$/.test(input.value);
+        const errorMessage = document.getElementById('tinError');
+
+        if (isValid) {
+            errorMessage.classList.add('hidden');
+            input.classList.remove('border-red-500');
+            input.classList.add('border-gray-200');
+        } else {
+            errorMessage.classList.remove('hidden');
+            input.classList.add('border-red-500');
+            input.classList.remove('border-gray-200');
+        }
+    }
+
 </script>
