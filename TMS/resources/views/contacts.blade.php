@@ -156,7 +156,7 @@
                                         <input 
                                             type="search" 
                                             name="search" 
-                                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
+                                            class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
                                             aria-label="Search Term" 
                                             placeholder="Search..." 
                                             @input.debounce="$el.form.requestSubmit()"
@@ -323,8 +323,13 @@
                         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
                         x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)">
                         
-                        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
+                        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto relative">
                             <div class="flex flex-col items-center">
+                                <button @click="showConfirmDeleteModal = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
                                 <!-- Icon -->
                                 <div class="mb-4">
                                     <i class="fas fa-exclamation-triangle text-red-700 text-8xl"></i>

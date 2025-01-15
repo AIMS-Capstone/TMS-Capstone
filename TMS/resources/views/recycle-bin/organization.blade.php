@@ -68,7 +68,7 @@
                     <hr class="mx-1 mt-auto">
 
                     <div class="flex flex-col md:flex-row justify-between">
-                        <div class="w-full mt-8 ml-0 h-auto border border-zinc-300 rounded-lg p-4 bg-white">
+                        <div class="w-full mt-8 ml-0 h-auto border border-zinc-300 rounded-lg p-4">
                             <div x-data="recycleBinHandler">
                                 <div class="flex flex-row items-center">
                                     <!-- Search and Sort Options -->
@@ -164,17 +164,20 @@
                                                 </tr>
                                             @else
                                             @foreach($trashedOrganizations as $organization)
-                                                <tr>
+                                                <tr class="hover:bg-slate-100 cursor-pointer ease-in-out">
                                                     <td class="py-3 px-4">
-                                                        <input 
-                                                            type="checkbox" 
-                                                            x-bind:checked="selectedRows.includes({{ $organization->id }})" 
+                                                        <input type="checkbox" x-bind:checked="selectedRows.includes({{ $organization->id }})" 
                                                             @click="toggleCheckbox({{ $organization->id }})" 
                                                             aria-label="Select item {{ $organization->registration_name }}" 
                                                             data-organization-id="{{ $organization->id }}"
                                                         >
                                                     </td>
-                                                    <td class="py-3 px-4">{{ $organization->registration_name }}</td>
+                                                    <td class="text-left py-4 px-4">
+                                                        <button class="font-bold hover:text-blue-600 underline"
+                                                        @click="$dispatch('open-view-org-modal', { organization: { registration_name: '{{ $organization->registration_name }}', tax_type: '{{ $organization->tax_type }}', type: '{{ $organization->type }}', tin: '{{ $organization->tin }}', account: '{{ $organization->account ? 'Account Active' : 'No Account Yet' }}' } })">
+                                                        {{ $organization->registration_name }}
+                                                        </button>
+                                                    </td>
                                                     <td class="py-3 px-4">{{ $organization->tax_type }}</td>
                                                     <td class="py-3 px-4">{{ $organization->type }}</td>
                                                     <td class="text-left py-3 px-4">
@@ -196,30 +199,125 @@
                                     @endif
                                 </div>
 
+                                {{-- View Details --}}
+                                <div x-data="{ showOrg: false, organization: {}, formatDate(date) {const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                                        return new Date(date).toLocaleDateString(undefined, options); } }" x-show="showOrg"
+                                    @open-view-org-modal.window="showOrg = true; organization = $event.detail.organization" x-on:close-modal.window="showOrg = false"
+                                    x-effect="document.body.classList.toggle('overflow-hidden', showOrg)" class="fixed z-50 inset-0 flex items-center justify-center m-2 px-6" x-cloak>
+                                    <!-- Modal background -->
+                                    <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
+                                    <!-- Modal container -->
+                                    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden"
+                                    x-show="showOrg" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
+                                        <!-- Modal header -->
+                                        <div class="relative p-3 bg-blue-900 border-opacity-80 w-full">
+                                            <h1 class="text-lg font-bold text-white text-center">Organization Details</h1>
+                                            <button @click="showOrg = false" class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 8L16 16M8 16L16 8" stroke="#1e3a8a" class="transition duration-200 hover:stroke-gray-600"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <!-- Modal body -->
+                                        <div class="p-10">
+                                            <div class="grid grid-cols-2 gap-6 mb-5">
+                                                <div class="w-full">
+                                                    <label class="block text-sm font-bold text-zinc-700">Name</label>
+                                                    <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                                                        x-bind:value="organization.registration_name" disabled readonly>
+                                                </div>
+                                                <div class="w-full">
+                                                    <label class="block text-sm font-bold text-zinc-700">TIN</label>
+                                                    <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                                                        x-bind:value="organization.tin" disabled readonly>
+                                                </div>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-6 mb-5">
+                                                <div class="w-full">
+                                                    <label class="block text-sm font-bold text-zinc-700">Tax Type</label>
+                                                    <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                                                        x-bind:value="organization.tax_type" disabled readonly>
+                                                </div>
+                                                <div class="w-full">
+                                                    <label class="block text-sm font-bold text-zinc-700">Classification</label>
+                                                    <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                                                        x-bind:value="organization.type" disabled readonly>
+                                                </div>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-6 mb-5">
+                                                <div class="w-full">
+                                                    <label class="block text-sm mb-2 font-bold text-zinc-700">Account Status</label>
+                                                    <span class="py-2 px-4 mt-2 text-xs font-medium rounded-full"
+                                                        :class="organization.account === 'Account Active' ? 'bg-green-100 text-green-800' : 'bg-zinc-100 text-zinc-800'">
+                                                        <span x-text="organization.account"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Delete Confirmation Modal -->
-                                <div x-show="showConfirmDeleteModal" class="fixed inset-0 bg-gray-200 z-50 bg-opacity-50 flex justify-center items-center" x-cloak>
-                                    <div class="bg-white p-5 rounded-lg max-w-md w-full text-center">
-                                        <p class="text-lg font-semibold mb-4">Are you sure you want to delete the selected items?</p>
-                                        <div class="flex justify-center space-x-4">
-                                            <button @click="bulkDelete(); closeModal();" class="bg-red-500 text-white py-2 px-4 rounded-lg">Yes, Delete</button>
-                                            <button @click="closeModal()" class="bg-gray-300 py-2 px-4 rounded-lg">Cancel</button>
+                                <div x-show="showConfirmDeleteModal" class="fixed inset-0 bg-gray-200 z-50 bg-opacity-50 flex justify-center items-center" @click.away="showConfirmDeleteModal = false"
+                                    x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)" x-cloak>
+                                    <div class="bg-white p-10 rounded-lg shadow-lg max-w-lg w-full relative">
+                                        <button @click="closeModal()" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                        <div class="flex justify-start mb-4">
+                                            <i class="fas fa-exclamation-triangle text-red-500 text-8xl"></i>
+                                        </div>
+                                        <h2 class="text-xl text-zinc-700 font-bold text-start mb-4">Permanently Delete Organization(s)</h2>
+                                        <p class="text-start mb-6 text-sm text-zinc-700">Are you sure you want to permanently delete the selected organization(s) to the recycle bin?</p>
+                                        <div class="bg-red-100 border-l-8 border-red-500 text-red-500 p-6 rounded-lg mb-6">
+                                            <ul class="list-disc pl-5 text-[13px]">
+                                                <li class="pl-2">
+                                                    <span class="inline-block align-top">This action cannot be undone, and the organization(s) will be completely removed from the system.</span>
+                                                </li>
+                                                <li class="pl-2">
+                                                    <span class="inline-block align-top">Any process or reports tied to this organization(s) will be affected.</span>
+                                                </li>
+                                                <li class="pl-2">
+                                                    <span class="inline-block align-top">Proceed only if you’re sure this organization(s) should<br />be removed from access.</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="flex justify-end gap-4">
+                                            <button @click="closeModal()" class="mr-2 font-semibold text-zinc-600 px-3 py-1 rounded-md hover:text-zinc-900 transition">Cancel</button>
+                                            <button @click="bulkDelete(); closeModal();" class="bg-red-500 hover:bg-red-700 text-white font-semibold py-1.5 px-5 rounded-lg">Permanently Delete</button>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Restore Confirmation Modal -->
-                                <div x-show="showConfirmRestoreModal" class="fixed inset-0 z-50 bg-gray-200 bg-opacity-50 flex justify-center items-center" x-cloak>
-                                    <div class="bg-white p-5 rounded-lg max-w-md w-full text-center">
-                                        <p class="text-lg font-semibold mb-4">Are you sure you want to restore the selected items?</p>
-                                        <div class="flex justify-center space-x-4">
-                                            <button @click="bulkRestore(); closeModal();" class="bg-green-500 text-white py-2 px-4 rounded-lg">Yes, Restore</button>
-                                            <button @click="closeModal()" class="bg-gray-300 py-2 px-4 rounded-lg">Cancel</button>
+                                <div x-show="showConfirmRestoreModal" class="fixed inset-0 z-50 bg-gray-200 bg-opacity-50 flex justify-center items-center" @click.away="showConfirmRestoreModal = false"
+                                    x-effect="document.body.classList.toggle('overflow-hidden', showConfirmRestoreModal)" x-cloak>
+                                    <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative">
+                                        <div class="flex flex-col items-center">
+                                            <button @click="closeModal()" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                            <div class="mb-4">
+                                                <i class="fas fa-exclamation-triangle text-blue-600 text-8xl"></i>
+                                            </div>
+                                            <h2 class="text-2xl font-extrabold text-blue-600 mb-2">Restore Organization(s)</h2>
+                                            <p class="text-sm text-zinc-700 text-center">You're going to restore the selected organization(s) in the Recycle Bin table. Are you sure?</p>
+                                            <div class="flex justify-center space-x-8 mt-6 w-full">
+                                                <button @click="closeModal()" class="px-4 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-900 font-bold transition">Cancel</button>
+                                                <button @click="bulkRestore(); closeModal();" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition">Restore</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                {{-- Action buttons --}}
-                                <div class="flex justify-center py-4" x-cloak>
+                                {{-- Action buttons Inalis ko muna yung iba, ayaw kasi gumana; should be the same with other tables--}}
+                                {{-- <div class="flex justify-center py-4" x-cloak>
                                     <!-- Delete and Cancel buttons -->
                                     <div class="flex justify-center py-4" x-show="showDeleteCancelButtons">
                                         <button 
@@ -257,7 +355,7 @@
                                             Cancel
                                         </button>
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
                     </div>

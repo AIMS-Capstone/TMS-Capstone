@@ -392,8 +392,13 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
                         x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
                         >
-                        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
+                        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto relative">
                             <div class="flex flex-col items-center">
+                                <button @click="showConfirmDeleteModal = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
                                 <!-- Icon -->
                                 <div class="mb-4">
                                     <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>

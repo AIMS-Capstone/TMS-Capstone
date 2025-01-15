@@ -439,15 +439,20 @@
                                             @click.away="showConfirmUnarchiveModal = false"
                                             x-effect="document.body.classList.toggle('overflow-hidden', showConfirmUnarchiveModal)"
                                             >
-                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative">
                                                 <div class="flex flex-col items-center">
+                                                    <button @click="showConfirmUnarchiveModal = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
                                                     <!-- Icon -->
                                                     <div class="mb-4">
                                                         <i class="fas fa-exclamation-triangle text-zinc-700 text-8xl"></i>
                                                     </div>
 
                                                     <!-- Title -->
-                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Unarchive Item(s)</h2>
+                                                    <h2 class="text-2xl font-extrabold text-zinc-700 mb-2">Unarchive Item(s)</h2>
 
                                                     <!-- Description -->
                                                     <p class="text-sm text-zinc-700 text-center">
@@ -481,8 +486,13 @@
                                             x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
                                             @click.away="showConfirmDeleteModal = false"
                                             >
-                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative">
                                                 <div class="flex flex-col items-center">
+                                                    <button @click="showConfirmDeleteModal = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
                                                     <!-- Icon -->
                                                     <div class="mb-4">
                                                         <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>

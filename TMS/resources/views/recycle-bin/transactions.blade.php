@@ -158,7 +158,7 @@
                                         <tbody class="divide-y divide-zinc-200 text-sm text-zinc-700">
                                             @if($trashedTransactions->isEmpty())
                                                 <tr>
-                                                    <td colspan="7" class="text-center p-4">
+                                                    <td colspan="8" class="text-center p-4">
                                                         <img src="{{ asset('images/Box.png') }}" alt="No data available" class="mx-auto w-48 h-48" />
                                                         <h1 class="font-extrabold text-zinc-700">No Deleted Transactions Users yet</h1>
                                                         <p class="text-sm text-neutral-500 mt-2">Deleted items will show up here when you need to restore or permanently delete them.</p>
@@ -166,7 +166,7 @@
                                                 </tr>
                                             @else
                                                 @foreach($trashedTransactions as $transaction)
-                                                    <tr>
+                                                    <tr class="hover:bg-slate-100 cursor-pointer ease-in-out">
                                                         <td class="py-3 px-4">
                                                             <input 
                                                                 type="checkbox" 
@@ -176,10 +176,16 @@
                                                             >
                                                         </td>
                                                         <td class="py-3 px-4">{{ $transaction->Organization->registration_name ?? 'N/A' }}</td>
-                                                        <td class="py-3 px-4">
-                                                            <div class="font-semibold">{{ $transaction->contactDetails->bus_name ?? 'N/A' }}</div>
-                                                            <div class="text-sm text-gray-500">{{ $transaction->contactDetails->contact_address ?? 'N/A' }}</div>
-                                                            <div class="text-sm text-gray-500">{{ $transaction->contactDetails->contact_tin ?? 'N/A' }}</div>
+                                                        <td>
+                                                            <button x-data 
+                                                                x-on:click="$dispatch('open-view-transac-modal', { id: '{{ $transaction->id }}', bus_name: '{{ $transaction->contactDetails->bus_name ?? 'N/A' }}', 
+                                                                tin: '{{ $transaction->contactDetails->contact_tin ?? 'N/A' }}', inv_number: '{{ $transaction->inv_number }}', reference: '{{ $transaction->reference }}', 
+                                                                total_amount: '{{ $transaction->total_amount }}', transaction_type: '{{ $transaction->transaction_type == 'Sales' ? 'Sales' : ($transaction->transaction_type == 'Purchases' ? 'Purchases' : 'Manual Journal') }}'})"
+                                                                class="text-left py-4 px-4 hover:text-blue-600">
+                                                                <div class="font-bold underline">{{ $transaction->contactDetails->bus_name ?? 'N/A' }}</div>
+                                                                <div class="text-sm text-gray-500">{{ $transaction->contactDetails->contact_address ?? 'N/A' }}</div>
+                                                                <div class="text-sm text-gray-500">{{ $transaction->contactDetails->contact_tin ?? 'N/A' }}</div>
+                                                            </button>
                                                         </td>
                                                         <td class="py-3 px-4">{{ $transaction->inv_number }}</td>
                                                         <td class="py-3 px-4">{{ $transaction->reference }}</td>
@@ -205,25 +211,166 @@
                                 </div>
 
                                 <!-- Modals -->
-                                <div x-show="showConfirmDeleteModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center" x-cloak>
-                                    <div class="bg-white p-5 rounded-lg max-w-md w-full text-center">
-                                        <p class="text-lg font-semibold mb-4">Are you sure you want to delete the selected items?</p>
-                                        <div class="flex justify-center space-x-4">
-                                            <button @click="bulkDelete(); closeModal();" class="bg-red-500 text-white py-2 px-4 rounded-lg">Yes, Delete</button>
-                                            <button @click="closeModal()" class="bg-gray-300 py-2 px-4 rounded-lg">Cancel</button>
+                                {{-- View Details --}}
+                                <div x-data="{ showTransac: false, transac: {} }" x-show="showTransac"
+                                    @open-view-transac-modal.window="showTransac = true; transac = $event.detail" x-on:close-modal.window="showTransac = false"
+                                    x-effect="document.body.classList.toggle('overflow-hidden', showTransac)" class="fixed z-50 inset-0 flex items-center justify-center m-2 px-6" x-cloak>
+                                    <!-- Modal background -->
+                                    <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
+                                    <!-- Modal container -->
+                                    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden"
+                                    x-show="showTransac" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
+                                        <!-- Modal header -->
+                                        <div class="relative p-3 bg-blue-900 border-opacity-80 w-full">
+                                            <h1 class="text-lg font-bold text-white text-center">Transaction Details</h1>
+                                            <button @click="showTransac = false" class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 8L16 16M8 16L16 8" stroke="#1e3a8a" class="transition duration-200 hover:stroke-gray-600"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <!-- Modal body -->
+                                        <div class="p-10">
+                                            <div class="mb-5 flex justify-between items-start">
+                                                <div class="w-2/3 pr-4">
+                                                    <label class="block text-sm font-bold text-zinc-700">Contact</label>
+                                                    <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                                                        x-bind:value="transac.bus_name" disabled readonly>
+                                                </div>
+                                                <div class="w-2/3 text-left">
+                                                    <label class="block text-sm font-bold text-zinc-700">TIN</label>
+                                                    <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                                                        x-bind:value="transac.tin" disabled readonly>
+                                                </div>
+                                            </div>
+                                            <div class="mb-5 flex justify-between items-start">
+                                                <div class="w-2/3 pr-4">
+                                                    <label class="block text-sm font-bold text-zinc-700">Invoice Number</label>
+                                                    <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                                                        x-bind:value="transac.inv_number" disabled readonly>
+                                                </div>
+                                                <div class="w-2/3 pr-4">
+                                                    <label class="block text-sm font-bold text-zinc-700">Reference Number</label>
+                                                    <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                                                        x-bind:value="transac.reference" disabled readonly>
+                                                </div>
+                                            </div>
+                                            <div class="mb-5 flex justify-between items-start">
+                                                <div class="w-2/3 pr-4">
+                                                    <label class="block text-sm font-bold text-zinc-700">Gross Amount</label>
+                                                    <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                                                        x-bind:value="transac.total_amount" disabled readonly>
+                                                </div>
+                                                <div class="w-2/3 text-left">
+                                                    <label class="block text-sm font-bold text-zinc-700">Transaction Type</label>
+                                                    <div class="inline-block bg-gray-100 text-gray-700 text-xs font-medium mt-2 px-4 py-2 rounded-full">
+                                                        <span x-text="transac.transaction_type"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div x-show="showConfirmRestoreModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center" x-cloak>
-                                    <div class="bg-white p-5 rounded-lg max-w-md w-full text-center">
-                                        <p class="text-lg font-semibold mb-4">Are you sure you want to restore the selected items?</p>
-                                        <div class="flex justify-center space-x-4">
-                                            <button @click="bulkRestore(); closeModal();" class="bg-green-500 text-white py-2 px-4 rounded-lg">Yes, Restore</button>
-                                            <button @click="closeModal()" class="bg-gray-300 py-2 px-4 rounded-lg">Cancel</button>
+                                {{-- Delete --}}
+                                <div x-show="showConfirmDeleteModal" class="fixed inset-0 bg-gray-200 z-50 bg-opacity-50 flex justify-center items-center" @click.away="showConfirmDeleteModal = false"
+                                    x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)" x-cloak>
+                                    <div class="bg-white p-10 rounded-lg shadow-lg max-w-lg w-full relative">
+                                        <button @click="closeModal()" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                        <div class="flex justify-start mb-4">
+                                            <i class="fas fa-exclamation-triangle text-red-500 text-8xl"></i>
+                                        </div>
+                                        <h2 class="text-xl text-zinc-700 font-bold text-start mb-4">Permanently Delete Transaction(s)</h2>
+                                        <p class="text-start mb-6 text-sm text-zinc-700">Are you sure you want to permanently delete the selected transaction(s) to the recycle bin?</p>
+                                        <div class="bg-red-100 border-l-8 border-red-500 text-red-500 p-6 rounded-lg mb-6">
+                                            <ul class="list-disc pl-5 text-[13px]">
+                                                <li class="pl-2">
+                                                    <span class="inline-block align-top">This action cannot be undone, and the transaction(s) will be completely removed from the system.</span>
+                                                </li>
+                                                <li class="pl-2">
+                                                    <span class="inline-block align-top">Any process or reports tied to this transaction(s) will be affected.</span>
+                                                </li>
+                                                <li class="pl-2">
+                                                    <span class="inline-block align-top">Proceed only if you’re sure this transaction(s) should<br />be removed from access.</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="flex justify-end gap-4">
+                                            <button @click="closeModal()" class="mr-2 font-semibold text-zinc-600 px-3 py-1 rounded-md hover:text-zinc-900 transition">Cancel</button>
+                                            <button @click="bulkDelete(); closeModal();" class="bg-red-500 hover:bg-red-700 text-white font-semibold py-1.5 px-5 rounded-lg">Permanently Delete</button>
                                         </div>
                                     </div>
                                 </div>
+
+                                {{-- Restore --}}
+                                <div x-show="showConfirmRestoreModal" class="fixed inset-0 z-50 bg-gray-200 bg-opacity-50 flex justify-center items-center" @click.away="showConfirmRestoreModal = false"
+                                    x-effect="document.body.classList.toggle('overflow-hidden', showConfirmRestoreModal)" x-cloak>
+                                    <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative">
+                                        <div class="flex flex-col items-center">
+                                            <button @click="closeModal()" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                            <div class="mb-4">
+                                                <i class="fas fa-exclamation-triangle text-blue-600 text-8xl"></i>
+                                            </div>
+                                            <h2 class="text-2xl font-extrabold text-blue-600 mb-2">Restore Transaction(s)</h2>
+                                            <p class="text-sm text-zinc-700 text-center">You're going to restore the selected transaction(s) in the Recycle Bin table. Are you sure?</p>
+                                            <div class="flex justify-center space-x-8 mt-6 w-full">
+                                                <button @click="closeModal()" class="px-4 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-900 font-bold transition">Cancel</button>
+                                                <button @click="bulkRestore(); closeModal();" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition">Restore</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Action buttons Inalis ko muna yung iba, ayaw kasi gumana; should be the same with other tables--}}
+                                {{-- <div class="flex justify-center py-4" x-cloak>
+                                    <!-- Delete and Cancel buttons -->
+                                    <div class="flex justify-center py-4" x-show="showDeleteCancelButtons">
+                                        <button 
+                                            type="button" 
+                                            @click="showConfirmDeleteModal = true; showDeleteCancelButtons = true;"
+                                            :disabled="selectedRows.length === 0"
+                                            class="border px-3 py-2 mx-2 rounded-lg text-sm text-red-600 border-red-600 bg-red-100 hover:bg-red-200 transition disabled:opacity-50 disabled:cursor-not-allowed group flex items-center space-x-2"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24">
+                                                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/>
+                                            </svg>
+                                            <span class="text-red-600 transition group-hover:text-red-600">Delete Selected <span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span></span>
+                                        </button>
+                                        <button 
+                                            @click="cancelSelection(); enableButtons();" 
+                                            class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                    <!-- Restore and cancel buttons -->
+                                    <div class="flex justify-center py-4" x-show="showRestoreCancelButtons">
+                                        <button 
+                                            type = "button"
+                                            @click="showConfirmUnarchiveModal = true; showRestoreCancelButtons = true;"
+                                            :disabled="selectedRows.length === 0"
+                                            class="border px-3 py-2 rounded-lg text-sm text-gray-800 border-gray-800 bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-zinc-800" viewBox="0 0 24 24">
+                                                <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
+                                            </svg>
+                                            <span class="text-zinc-600 transition group-hover:text-zinc-800">Restore Selected</span><span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
+                                        </button>
+                                        <button @click="cancelSelection(); enableButtons();" class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div> --}}
                             </div>
                         </div>
                     </div>
