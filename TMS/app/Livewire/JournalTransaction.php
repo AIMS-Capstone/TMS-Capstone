@@ -29,11 +29,34 @@ class JournalTransaction extends Component
 
     // Listen for child component updates
     protected $listeners = ['journalRowUpdated' => 'updateJournalRow', 'journalRowRemoved' => 'removeJournalRow'];
+    protected $rules = [
+        'date' => 'required|date',
+        'reference' => 'required|string',
+        'journalRows.*.description' => 'required|string',
+        'journalRows.*.coa' => 'required|exists:coas,id',
+        'journalRows.*.debit' => 'required|numeric|min:0',
+        'journalRows.*.credit' => 'required|numeric|min:0',
+    ];
+
+    protected $messages = [
+        'date.required' => 'The date field is required.',
+        'reference.required' => 'The reference number is required.',
+        'journalRows.*.description.required' => 'Description is required for all entries.',
+        'journalRows.*.coa.required' => 'Account must be selected for all entries.',
+        'journalRows.*.debit.required' => 'Debit amount is required.',
+        'journalRows.*.credit.required' => 'Credit amount is required.',
+        'journalRows.*.debit.numeric' => 'Debit must be a valid number.',
+        'journalRows.*.credit.numeric' => 'Credit must be a valid number.',
+    ];
 
     public function mount()
     {
         $this->addJournalRow(); // Add an initial journal row on mount
         $this->addJournalRow(); 
+    }
+    public function updated($propertyName)
+    {
+        $this->validateOnly($propertyName);
     }
 
     // Adds a new journal row to the entry
@@ -77,11 +100,13 @@ class JournalTransaction extends Component
     // Handles saving the transaction
     public function saveTransaction()
     {
+        $this->validate();
         // Ensure debits and credits are balanced
         if ($this->totalAmountDebit !== $this->totalAmountCredit) {
-            session()->flash('error', 'Debits and credits must be balanced.');
+            $this->addError('balance', 'Debits and credits must be equal.');
             return;
         }
+        try {
         $organizationId = Session::get('organization_id');
         // Create a new transaction
         $transaction = Transactions::create([
@@ -112,6 +137,10 @@ class JournalTransaction extends Component
         // Optionally provide feedback and redirect
         session()->flash('message', 'Transaction saved successfully!');
         return redirect()->route('transactions.show', ['transaction' => $transaction->id]);
+    } catch (\Exception $e) {
+        $this->addError('general', 'Failed to save transaction. ' . $e->getMessage());
+        return;
+    }
     }
 
     public function render()

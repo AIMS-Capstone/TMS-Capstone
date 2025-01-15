@@ -203,7 +203,12 @@
                                 <tr>
                                     <td class="border px-4 py-2">{{ $row->description }}</td>
                                     <td class="border px-4 py-2">{{ $row->taxType->tax_type }} ({{ $row->taxType->VAT }}%)</td>
-                                    <td class="border px-4 py-2">{{ $row->atc->tax_code }} ({{ $row->atc->tax_rate }}%)</td>
+                                    <td class="border px-4 py-2">@if($row->atc)
+                                        {{ $row->atc->tax_code }} ({{ $row->atc->tax_rate }}%)
+                                    @else
+                                        N/A (N/A%)
+                                    @endif
+                                    </td>
                                     <td class="border px-4 py-2">{{ $row->coa }}</td>
                                     <td class="border px-4 py-2">{{ number_format($row->amount, 2) }}</td>
                                     <td class="border px-4 py-2">{{ number_format($row->tax_amount, 2) }}</td>
@@ -463,7 +468,12 @@
                                 <tr>
                                     <td class="border px-4 py-2">{{ $row['description'] }}</td>
                                     <td class="border px-4 py-2">{{ $row->taxType->tax_type }} ({{ $row->taxType->VAT }}%)</td>
-                                    <td class="border px-4 py-2">{{ $row->atc->tax_code }} ({{ $row->atc->tax_rate }}%)</td>
+                                    <td class="border px-4 py-2">@if($row->atc)
+                                        {{ $row->atc->tax_code }} ({{ $row->atc->tax_rate }}%)
+                                    @else
+                                        N/A (N/A%)
+                                    @endif
+                                    </td>
                                     <td class="border px-4 py-2">{{ $row['coa'] }}</td>
                                     <td class="border px-4 py-2">{{ number_format($row['amount'], 2) }}</td>
                                     <td class="border px-4 py-2">{{ number_format($row['tax_amount'], 2) }}</td>

@@ -1,6 +1,7 @@
 <?php
 namespace Database\Factories;
 
+use App\Models\OrgSetup;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -15,7 +16,9 @@ class ContactsFactory extends Factory
      */
     public function definition(): array
     {
+        $orgSetupId = OrgSetup::inRandomOrder()->first()->id ?? OrgSetup::first()->id;
         return [
+            'organization_id' => $orgSetupId,
             'bus_name' => fake()->company(),
             'contact_type' => 'Non-Individual',
             'contact_tin' => $this->generateTIN(),

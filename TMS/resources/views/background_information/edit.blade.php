@@ -15,11 +15,11 @@
                             Input Summary
                         </a>
                         <a 
-                            href="{{ route('tax_return.report', ['id' => $taxReturn->id]) }}" 
-                            class="text-zinc-600 font-medium hover:text-blue-900 px-4 py-2 text-sm"
-                        >
-                            Report
-                        </a>
+                        href="{{ route('income_return.report', ['id' => $taxReturn->id]) }}" 
+                        class="text-zinc-600 font-medium hover:text-blue-900 px-4 py-2 text-sm"
+                    >
+                        Report
+                    </a>
                  
                     </div>
                     <div x-data="{
@@ -291,3 +291,8 @@
         </div>
     </div>
 </x-app-layout>
+@if(session('error'))
+    <script>
+        alert("{{ session('error') }}");
+    </script>
+@endif
