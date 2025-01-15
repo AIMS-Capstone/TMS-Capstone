@@ -345,12 +345,12 @@ $organizationId = session('organization_id');
                                                     <select id="year" name="year" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
                                                         <option value="">Select Year</option>
                                                         @php
-                                                            $currentYear = date('Y');
-                                                            $startYear = $currentYear - 100;
-                                                        @endphp
-                                                        @for ($year = $startYear; $year <= $currentYear; $year++)
-                                                            <option value="{{ $year }}">{{ $year }}</option>
-                                                        @endfor
+                                                        $currentYear = date('Y');
+                                                        $startYear = $currentYear - 100;
+                                                    @endphp
+                                                    @for ($year = $currentYear; $year >= $startYear; $year--)
+                                                        <option value="{{ $year }}">{{ $year }}</option>
+                                                    @endfor
                                                     </select>
                                                 </div>
                             

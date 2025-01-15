@@ -201,80 +201,72 @@ class SalesImport implements ToCollection, WithHeadingRow
     }
     
     public function processAndSaveData(array $importedData)
-{
-    Log::info('Starting processAndSaveData');
-    Log::info('Imported data count at start of processing: ' . count($importedData));
-
-    $processedData = [];
-    $organizationId = Session::get('organization_id');
+    {
+        Log::info('Starting processAndSaveData');
+        Log::info('Imported data count at start of processing: ' . count($importedData));
     
-    if (!$organizationId) {
-        Log::error('Organization ID missing from session');
-        throw new Exception('Organization ID not found in session.');
-    }
-    
-    Log::info('Organization ID found: ' . $organizationId);
-
-    foreach ($importedData as $index => $row) {
-        Log::info('Processing row ' . $index);
+        $processedData = [];
+        $organizationId = Session::get('organization_id');
         
-        try {
-            // Process contact information
-            $contactData = $this->processContactData($row);
-            Log::info('Contact data processed for row ' . $index);
-            
-            // Fetch and validate related models
-            $taxType = $this->getTaxType($row);
-            $atcModel = $this->getAtc($row);
-            $coaModel = $this->getCoa($row);
-            
-            if (!$taxType || !$atcModel || !$coaModel) {
-                Log::warning("Row {$index} missing required related models");
-                $this->errors[] = "Row {$index}: Missing required related models";
+        foreach ($importedData as $index => $row) {
+            try {
+                // Process contact information
+                $contactData = $this->processContactData($row);
+                
+                // Fetch and validate related models
+                $taxType = $this->getTaxType($row);
+                $atcModel = $this->getAtc($row);
+                $coaModel = $this->getCoa($row);
+                
+                // Log tax type information
+                Log::info('Tax type details for row ' . $index, [
+                    'tax_type_id' => $taxType->id,
+                    'short_code' => $taxType->short_code,
+                    'category' => $taxType->category,
+                    'VAT' => $taxType->VAT
+                ]);
+                
+                // Calculate amounts
+                $amount = floatval($row['amount']);
+                $taxAmount = $this->calculateTaxAmount($amount, $taxType, $atcModel);
+                $netAmount = $this->calculateNetAmount($amount, $taxType, $atcModel);
+    
+                Log::info('Calculated amounts for row ' . $index, [
+                    'gross_amount' => $amount,
+                    'tax_amount' => $taxAmount,
+                    'net_amount' => $netAmount,
+                    'is_vat' => ($taxType->VAT === '12' ? 'Yes' : 'No')
+                ]);
+    
+                // Generate unique key for grouping transactions
+                $key = $this->generateKey($row);
+                
+                // Prepare and store processed data
+                $processedData[$key][] = [
+                    'organization_id' => $organizationId,
+                    'contact_id' => $contactData->id,
+                    'date' => $row['date'],
+                    'invoice_no' => $row['invoice_no'] ?? null,
+                    'reference_no' => $row['reference_no'] ?? null,
+                    'description' => $row['description'] ?? null,
+                    'tax_type_id' => $taxType->id,
+                    'atc_id' => $atcModel ? $atcModel->id : null,
+                    'coa_id' => $coaModel ? $coaModel->id : null,
+                    'amount' => $amount,
+                    'tax_amount' => $taxAmount,
+                    'net_amount' => $netAmount,
+                    'is_vat' => ($taxType->VAT === '12')
+                ];
+    
+            } catch (Exception $e) {
+                Log::error("Error processing row {$index}: " . $e->getMessage());
+                $this->errors[] = "Row {$index}: " . $e->getMessage();
                 continue;
             }
-            
-            // Calculate amounts
-            $amount = floatval($row['amount'] ?? 0);
-            $taxAmount = $this->calculateTaxAmount($amount, $taxType, $atcModel);
-            $netAmount = $this->calculateNetAmount($amount, $taxType, $atcModel);
-
-            // Generate unique key for grouping transactions
-            $key = $this->generateKey($row);
-            Log::info("Generated key for row {$index}: {$key}");
-            
-            // Prepare and store processed data
-            $processedData[$key][] = $this->prepareProcessedData(
-                $row,
-                $contactData,
-                $taxType,
-                $atcModel,
-                $coaModel,
-                $amount,
-                $taxAmount,
-                $netAmount,
-                $organizationId
-            );
-            
-            Log::info("Successfully processed row {$index}");
-
-        } catch (Exception $e) {
-            $this->errors[] = "Row {$index}: " . $e->getMessage();
-            Log::error("Error processing row {$index}: " . $e->getMessage());
-            continue;
         }
-    }
-
-    if (!empty($this->errors)) {
-        Log::warning('Import completed with errors: ' . json_encode($this->errors));
-    }
-
-    Log::info('Processed data count: ' . count($processedData));
-    Log::info('Processed data structure: ' . json_encode(array_keys($processedData)));
     
-    // Save the processed data and return the result
-    return $this->saveProcessedData($processedData);
-}
+        return $this->saveProcessedData($processedData);
+    }
 
 protected function getTaxType(array $row)
 {
@@ -724,31 +716,21 @@ protected function validateContactState(Contacts $contact): void
 
 protected function saveProcessedData(array $processedData)
 {
-    Log::info('Starting saveProcessedData');
-    Log::info('Number of groups to process: ' . count($processedData));
-
     try {
         $savedTransactions = [];
-
         DB::beginTransaction();
 
         foreach ($processedData as $groupKey => $group) {
-            Log::info("Processing group: {$groupKey}");
+            Log::info("Processing transaction group: {$groupKey}");
             
-            if (empty($group)) {
-                Log::warning("Empty group found for key: {$groupKey}");
-                continue;
-            }
-
-            // Calculate totals for the entire group
             $totalAmount = 0;
             $totalVatAmount = 0;
             $totalVatableSales = 0;
-
-            // Use the first row of the group for common transaction data
+            
+            // Use first row for transaction details
             $firstRow = $group[0];
             
-            // Create the main transaction first
+            // Create transaction
             $transaction = new Transactions([
                 'organization_id' => $firstRow['organization_id'],
                 'contact' => $firstRow['contact_id'],
@@ -759,60 +741,86 @@ protected function saveProcessedData(array $processedData)
                 'status' => 'Draft'
             ]);
 
-            // Create tax rows and calculate totals
-            $taxRows = [];
+            // Process each row in the group
             foreach ($group as $row) {
-                // Get required models for tax calculation
-                $taxType = TaxType::findOrFail($row['tax_type_id']);
-                $atc = $row['atc_id'] ? Atc::findOrFail($row['atc_id']) : null;
+                $totalAmount += $row['amount'];
                 
-                // Calculate tax amounts
-                $amount = floatval($row['amount']);
-                $taxAmount = $this->calculateTaxAmount($amount, $taxType, $atc);
-                $netAmount = $amount - $taxAmount;
-
-                // Add to totals
-                $totalAmount += $amount;
-                if ($taxType->short_code === 'VAT') {
-                    $totalVatAmount += $taxAmount;
-                    $totalVatableSales += $netAmount;
+                // Get tax type details for proper VAT checking
+                $taxType = TaxType::find($row['tax_type_id']);
+                $isVat = $taxType && $taxType->VAT == 12; // Specifically check for VAT value of 12
+                
+                if ($isVat) {
+                    $totalVatAmount += $row['tax_amount'];
+                    $totalVatableSales += $row['net_amount'];
+                    
+                    Log::info('Adding VAT amounts', [
+                        'row_amount' => $row['amount'],
+                        'row_tax_amount' => $row['tax_amount'],
+                        'row_net_amount' => $row['net_amount'],
+                        'vat_rate' => $taxType->VAT,
+                        'running_total_vat' => $totalVatAmount,
+                        'running_total_vatable' => $totalVatableSales
+                    ]);
                 }
-
-                // Prepare tax row
-                $taxRows[] = new TaxRow([
-                    'tax_type' => $row['tax_type_id'],
-                    'tax_code' => $row['atc_id'],
-                    'coa' => $row['coa_id'],
-                    'amount' => $amount,
-                    'description' => $row['description'],
-                    'tax_amount' => $taxAmount,
-                    'net_amount' => $netAmount,
-                    'status' => 'active'
-                ]);
             }
 
-            // Update transaction with calculated totals
+            Log::info('Final transaction totals before save', [
+                'transaction_id' => null,
+                'total_amount' => $totalAmount,
+                'total_vat_amount' => $totalVatAmount,
+                'total_vatable_sales' => $totalVatableSales
+            ]);
+
+            // Set transaction totals
             $transaction->total_amount = $totalAmount;
             $transaction->vat_amount = $totalVatAmount;
             $transaction->vatable_sales = $totalVatableSales;
             
             // Save transaction
             $transaction->save();
-            Log::info("Created transaction ID: {$transaction->id}");
 
-            // Save tax rows
-            foreach ($taxRows as $taxRow) {
-                $taxRow->transaction_id = $transaction->id;
+            // Create tax rows
+            foreach ($group as $row) {
+                // Get tax type details again for tax row
+                $taxType = TaxType::find($row['tax_type_id']);
+                $taxRow = new TaxRow([
+                    'transaction_id' => $transaction->id,
+                    'tax_type' => $row['tax_type_id'],
+                    'tax_code' => $row['atc_id'],
+                    'coa' => $row['coa_id'],
+                    'amount' => $row['amount'],
+                    'description' => $row['description'],
+                    'tax_amount' => $row['tax_amount'],
+                    'net_amount' => $row['net_amount'],
+                    'status' => 'active'
+                ]);
+                
                 $taxRow->save();
-                Log::info("Created tax row ID: {$taxRow->id} for transaction ID: {$transaction->id}");
+                
+                Log::info('Saved tax row', [
+                    'transaction_id' => $transaction->id,
+                    'tax_row_id' => $taxRow->id,
+                    'amount' => $row['amount'],
+                    'tax_amount' => $row['tax_amount'],
+                    'net_amount' => $row['net_amount'],
+                    'vat_rate' => $taxType->VAT,
+                    'is_vat' => ($taxType->VAT == 12)
+                ]);
             }
+
+            // Double-check final amounts
+            $transaction = $transaction->fresh();
+            Log::info('Final saved transaction amounts', [
+                'transaction_id' => $transaction->id,
+                'total_amount' => $transaction->total_amount,
+                'vat_amount' => $transaction->vat_amount,
+                'vatable_sales' => $transaction->vatable_sales
+            ]);
 
             $savedTransactions[] = $transaction;
         }
 
         DB::commit();
-        Log::info('Successfully committed all transactions');
-
         return [
             'success' => true,
             'message' => 'Successfully imported ' . count($savedTransactions) . ' transactions',
@@ -822,9 +830,7 @@ protected function saveProcessedData(array $processedData)
     } catch (\Exception $e) {
         DB::rollBack();
         Log::error('Error in saveProcessedData: ' . $e->getMessage());
-        Log::error($e->getTraceAsString());
-
-        throw new \Exception('Failed to save import data: ' . $e->getMessage());
+        throw $e;
     }
 }
 

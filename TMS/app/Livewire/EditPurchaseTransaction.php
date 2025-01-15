@@ -63,9 +63,9 @@ class EditPurchaseTransaction extends Component
     {
         $this->taxRows[] = [
             'description' => '',
-            'tax_type' => '',
-            'tax_code' => '',
-            'coa' => '',
+            'tax_type' => null, 
+            'tax_code' => null,  
+            'coa' => null,      
             'amount' => 0,
             'tax_amount' => 0,
             'net_amount' => 0,
@@ -87,8 +87,10 @@ class EditPurchaseTransaction extends Component
 
     public function updateTaxRow($data)
     {
-        $this->taxRows[$data['index']] = $data;
-        $this->calculateTotals(); // Recalculate after updating a row
+        if (isset($data['index']) && isset($data['taxRow'])) {
+            $this->taxRows[$data['index']] = $data['taxRow'];
+            $this->calculateTotals();
+        }
     }
 
     public function calculateTotals()
@@ -99,23 +101,28 @@ class EditPurchaseTransaction extends Component
         $this->totalAmount = 0;
         $this->appliedATCs = [];
         $this->appliedATCsTotalAmount = 0;
-
+    
         foreach ($this->taxRows as &$row) {
+            // Add safety checks
+            if (!isset($row['tax_type']) || !isset($row['amount']) || !isset($row['tax_code'])) {
+                continue;
+            }
+    
             $amount = $row['amount'];
             $taxTypeId = $row['tax_type'];
-
-            $taxType = TaxType::find($taxTypeId);
+    
+            $taxType = !empty($taxTypeId) ? TaxType::find($taxTypeId) : null;
             $vatRate = $taxType ? $taxType->VAT : 0;
-
-            $atc = ATC::find($row['tax_code']);
+    
+            $atc = !empty($row['tax_code']) ? Atc::find($row['tax_code']) : null;
             $atcRate = $atc ? $atc->tax_rate : 0;
-
+    
             if ($vatRate > 0) {
                 $netAmount = $amount / (1 + ($vatRate / 100));
                 $this->vatablePurchase += $netAmount;
                 $this->vatAmount += $amount - $netAmount;
-
-                if ($atcRate > 0) {
+    
+                if ($atcRate > 0 && $atc) {
                     $atcAmount = $netAmount * ($atcRate / 100);
                     $row['atc_amount'] = $atcAmount;
                     $this->appliedATCs[$row['tax_code']] = [
@@ -132,7 +139,7 @@ class EditPurchaseTransaction extends Component
                 $row['atc_amount'] = 0;
             }
         }
-
+    
         $this->appliedATCsTotalAmount = collect($this->appliedATCs)->sum('tax_amount');
         $vatInclusiveAmount = $this->vatablePurchase + $this->vatAmount;
         $this->totalAmount = $vatInclusiveAmount + $this->nonVatablePurchase - $this->appliedATCsTotalAmount;

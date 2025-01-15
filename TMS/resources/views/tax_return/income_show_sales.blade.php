@@ -22,11 +22,11 @@
                                 Input Summary
                             </a>
                             <a 
-                                href="{{ route('tax_return.report', ['id' => $taxReturn->id]) }}" 
-                                class="text-zinc-600 font-medium hover:text-blue-900 px-4 py-2 text-sm"
-                            >
-                                Report
-                            </a>
+                            href="{{ route('income_return.report', ['id' => $taxReturn->id]) }}" 
+                            class="text-zinc-600 font-medium hover:text-blue-900 px-4 py-2 text-sm"
+                        >
+                            Report
+                        </a>
                         </div>
                     </div>
                     <!-- Tab Content for Input Summary -->
@@ -360,6 +360,11 @@ class="mb-12 mx-12 overflow-hidden max-w-full rounded-md border-neutral-300 dark
 
 <!-- Script -->
 <script>
+    @if(session('error'))
+  
+  alert("{{ session('error') }}");
+
+@endif
 document.addEventListener('search', event => {
     window.location.href = `?search=${event.detail.search}`;
 });
