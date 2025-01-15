@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Contacts;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule; //recommend ni chatgpt for adding rule sa duplicated contact type
 use Spatie\Activitylog\Models\Activity;
 
 class ContactsController extends Controller
@@ -17,7 +18,11 @@ class ContactsController extends Controller
         $perPage = $request->input('perPage', 5);
         $organizationId = session('organization_id');
 
-        $query = Contacts::query()->where('organization_id', $organizationId);
+        
+        $query = Contacts::where(function ($query) use ($organizationId) {
+            $query->where('organization_id', $organizationId)
+                ->orWhereNull('organization_id');
+                });
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -49,7 +54,13 @@ class ContactsController extends Controller
         }
 
         $validated = $request->validate([
-            'contact_type' => 'required|string',
+            'contact_type' => [
+            'required',
+            Rule::unique('contacts')->where(function ($query) use ($request) {
+                return $query->where('bus_name', $request->bus_name)
+                             ->where('contact_type', $request->contact_type);
+            }),
+        ],
             'classification' => 'required|string',
             'bus_name' => 'required|string|max:50',
             'contact_tin' => 'nullable|string|max:17',
