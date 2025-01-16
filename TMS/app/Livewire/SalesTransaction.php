@@ -302,8 +302,8 @@ private function numberToOrdinal($number)
             }
     
             // Provide feedback to the user
-            session()->flash('message', 'Transaction saved successfully!');
-            return redirect()->route('transactions.show', ['transaction' => $transaction->id]);
+            return redirect()->route('transactions.show', ['transaction' => $transaction->id])
+            ->with('successTransaction', 'Transaction completed successfully!');
     
         } catch (\Exception $e) {
             // Log the error for further investigation

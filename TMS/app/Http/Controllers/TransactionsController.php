@@ -32,6 +32,7 @@ use Illuminate\Validation\ValidationException;
 
 class TransactionsController extends Controller
 {
+    private const VAT_RATE = 0.12; 
     /**
      * Display a listing of the resource.
      */
@@ -248,13 +249,21 @@ public function getAllTransactions(Request $request)
     public function showUploadForm()
     {
         // Retrieve the necessary data from the database
-        $coas = Coa::all(); 
-        $tax_types = TaxType::all();
-        $tax_codes = Atc::all();
-    
+        $organization_id = session('organization_id');  // Assuming organization_id is stored in the session
+        
+        // Fetch COA records based on the organization_id (if available) or null
+        $coas = Coa::where('organization_id', $organization_id)->orWhereNull('organization_id')->get();
+        
+        // Fetch tax types with transaction_type as 'purchase'
+        $tax_types = TaxType::where('transaction_type', 'purchase')->get();
+        
+        // Fetch tax codes with transaction_type as 'purchase'
+        $tax_codes = Atc::where('transaction_type', 'purchase')->get();
+        
         // Pass the data to the view
         return view('transactions.upload', compact('coas', 'tax_types', 'tax_codes'));
     }
+    
     public function store(StoreTransactionsRequest $request)
     {
         //
@@ -343,7 +352,7 @@ public function storeUpload(Request $request)
         'net_amount' => 'required|numeric|min:0',
         'description' => 'required|string|max:255',
         'tax_type' => 'required|exists:tax_types,id',
-        'tax_code' => 'required|exists:atcs,id',
+        'tax_code' => 'nullable|exists:atcs,id',
         'coa' => 'required|exists:coas,id'
     ]);
 
@@ -461,66 +470,76 @@ public function upload(Request $request)
         return redirect()->back()->withErrors(['error' => $e->getMessage()]);
     }
 }
-    private function cleanExtractedText($extractedText)
+
+private function cleanExtractedText($extractedText)
 {
     // Basic cleanup: Remove unnecessary newlines and extra spaces
     $cleanedText = preg_replace('/\s+/', ' ', $extractedText);
 
-    // Apply OCR error corrections (basic example)
+    // Apply OCR error corrections
     $cleanedText = $this->cleanOcrText($cleanedText);
 
-    // DEBUG: Output cleaned text to inspect what's happening
-    // echo $cleanedText;
-
-    // Extract Vendor Name: We capture the first valid part of the text, stopping when we reach a section indicating address or receipt labels
+    // Extract vendor name
     preg_match("/([A-Za-z0-9\s\.\-]+(?:\s+[A-Za-z0-9\s\.\-]+)*)\s*[:,\n]/", $cleanedText, $vendor);
-
     $vendor = $vendor ? trim($vendor[1]) : 'Unknown Vendor';
-    
 
-  
-
-    // Extract Address: This regex captures the next meaningful block of text after the vendor name, but stops before other structured information like TIN, Date, etc.
+    // Extract address
     preg_match("/([A-Za-z0-9\s\.\-\d]+)(?=\s*(?:TIN|Date|TOTAL|Cashier|Ref|Time|OfficialReceipt|Amount))/i", $cleanedText, $address);
     $address = $address ? trim($address[1]) : 'Unknown Address';
 
-    // Extract TIN (look for TIN patterns)
+    // Extract TIN
     preg_match("/(?:MIN|TIN)[\s:\-]*([\d\-]+)/i", $cleanedText, $tin);
     $tin = $tin ? $tin[1] : 'N/A';
-    // Extract Date (support both slash and hyphen date formats)
+
+    // Extract date
     preg_match("/(?:Date[:\-\s]*|)(\d{1,4}[-\/]\d{1,2}[-\/]\d{1,4})/", $cleanedText, $date);
     $date = $date ? $date[1] : 'Unknown Date';
 
-
-    // Extract Invoice Number (commonly starts with Invoice, Ref, or other labels)
+    // Extract invoice number
     preg_match("/(?:Invoice|Ref|SlF|OfficialReceipt)\s*[:\-]?\s*(\d{4,})/", $cleanedText, $invoiceNumber);
     $invoiceNumber = $invoiceNumber ? $invoiceNumber[1] : 'Unknown Invoice Number';
 
-    // Extract Total Amount (look for 'TOTAL', 'TOTALAMOUNT')
-    preg_match("/TOTAL[\s\w]*\s*(PHP[\d,\.]+)/", $cleanedText, $totalAmount);
-    $totalAmount = $totalAmount ? $totalAmount[1] : '0.00';
+    // Extract amounts and clean them
+    // Total Amount (VAT inclusive)
+    preg_match("/TOTAL[\s\w]*\s*(?:PHP)?[\s]*([\d,\.]+)/", $cleanedText, $totalAmount);
+    $totalAmount = $totalAmount ? $this->cleanAmount($totalAmount[1]) : null;
 
-    // Extract Tax Amount (for VAT-related terms)
-    preg_match("/(\d{1,2}%\s*VAT)\s*([\w]*[\d,\.]+)/i", $cleanedText, $taxAmount);
-    $taxAmount = $taxAmount ? $taxAmount[2] : '0.00';
+    // Tax Amount (VAT)
+    preg_match("/(\d{1,2}%\s*VAT)\s*(?:PHP)?[\s]*([\d,\.]+)/i", $cleanedText, $taxAmount);
+    $taxAmount = $taxAmount ? $this->cleanAmount($taxAmount[2]) : null;
 
+    // Net Amount (VAT exclusive)
+    preg_match("/(?:Change|Net)\s*[\s\-]*(?:PHP)?[\s]*([\d,\.]+)/", $cleanedText, $netAmount);
+    $netAmount = $netAmount ? $this->cleanAmount($netAmount[1]) : null;
 
-    // Extract Net Amount (from 'Change' or 'Net' terms)
-    preg_match("/(?:Change|Net)\s*[\s\-]*([\d,\.]+)/", $cleanedText, $netAmount);
-    $netAmount = $netAmount ? 'PHP' . $netAmount[1] : 'PHP0.00';
+    // Calculate missing values based on what we have
+    $calculatedAmounts = $this->calculateMissingAmounts($totalAmount, $taxAmount, $netAmount);
 
-    // Return the extracted and cleaned information as an array
     return [
         'vendor' => $vendor,
         'tin' => $tin,
         'date' => $date,
         'invoice_number' => $invoiceNumber,
-        'total_amount' => $totalAmount,
-        'tax_amount' => $taxAmount,
-        'net_amount' => $netAmount,
+        'total_amount' => $calculatedAmounts['total_amount'],
+        'tax_amount' => $calculatedAmounts['tax_amount'],
+        'net_amount' => $calculatedAmounts['net_amount'],
         'address' => $address,
     ];
 }
+
+// Helper method to clean amount values
+private function cleanAmount($amount)
+{
+    // Remove any currency symbols, spaces, and normalize decimal separator
+    $cleaned = preg_replace('/[^0-9,\.]/', '', $amount);
+    
+    // Convert to standard decimal format
+    $cleaned = str_replace(',', '', $cleaned);
+    
+    // Ensure proper decimal format
+    return number_format((float)$cleaned, 2, '.', '');
+}
+
 
     
     
@@ -847,5 +866,53 @@ private function extractTextFromReceipt($filePath)
         return $pdf->download('transactions_list.pdf');
     }
    
-
+    private function calculateMissingAmounts($totalAmount, $taxAmount, $netAmount) {
+        $vatRate = 0.12;
+        
+        // Convert string values to floats for calculation
+        $totalAmount = $totalAmount ? (float)$totalAmount : null;
+        $taxAmount = $taxAmount ? (float)$taxAmount : null;
+        $netAmount = $netAmount ? (float)$netAmount : null;
+    
+        // If we have total amount only
+        if ($totalAmount && !$taxAmount && !$netAmount) {
+            $taxAmount = round($totalAmount - ($totalAmount / (1 + $vatRate)), 2);
+            $netAmount = $totalAmount - $taxAmount;
+        }
+        // If we have net amount only
+        elseif (!$totalAmount && !$taxAmount && $netAmount) {
+            $taxAmount = round($netAmount * $vatRate, 2);
+            $totalAmount = $netAmount + $taxAmount;
+        }
+        // If we have tax amount only
+        elseif (!$totalAmount && $taxAmount && !$netAmount) {
+            $netAmount = round($taxAmount / $vatRate, 2);
+            $totalAmount = $netAmount + $taxAmount;
+        }
+        // If we have total and tax amount
+        elseif ($totalAmount && $taxAmount && !$netAmount) {
+            $netAmount = $totalAmount - $taxAmount;
+        }
+        // If we have total and net amount
+        elseif ($totalAmount && !$taxAmount && $netAmount) {
+            $taxAmount = $totalAmount - $netAmount;
+        }
+        // If we have tax and net amount
+        elseif (!$totalAmount && $taxAmount && $netAmount) {
+            $totalAmount = $netAmount + $taxAmount;
+        }
+        // If we don't have any amounts, set defaults
+        elseif (!$totalAmount && !$taxAmount && !$netAmount) {
+            $totalAmount = '0.00';
+            $taxAmount = '0.00';
+            $netAmount = '0.00';
+        }
+    
+        // Format all amounts to 2 decimal places
+        return [
+            'total_amount' => number_format($totalAmount, 2, '.', ''),
+            'tax_amount' => number_format($taxAmount, 2, '.', ''),
+            'net_amount' => number_format($netAmount, 2, '.', '')
+        ];
+    }
 }

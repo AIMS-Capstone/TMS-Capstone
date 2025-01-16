@@ -229,7 +229,8 @@ class PurchaseTransaction extends Component
             }
 
             session()->flash('message', 'Purchase transaction saved successfully!');
-            return redirect()->route('transactions.show', ['transaction' => $transaction->id]);
+            return redirect()->route('transactions.show', ['transaction' => $transaction->id])
+    ->with('successTransaction', 'Transaction completed successfully!');
 
         } catch (\Exception $e) {
             Log::error('Error saving purchase transaction: ' . $e->getMessage());
