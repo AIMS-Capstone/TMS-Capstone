@@ -4,7 +4,7 @@
     x-on:open-edit-employee-modal.window="show = true; console.log($event.detail); employee = $event.detail"
     x-on:close-modal.window="show = false"
     x-effect="document.body.classList.toggle('overflow-hidden', show)"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-50 px-4 overflow-y-auto"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-20 px-4 overflow-y-auto"
     x-cloak
 >
 

@@ -192,16 +192,13 @@
                                             name="tin" 
                                             placeholder="000-000-000-000" 
                                             maxlength="15" 
-                                            pattern="^\d{3}-\d{3}-\d{3}-\d{3}$" 
-                                            title="TIN must follow the format ###-###-###-###." 
-                                            oninput="validateTIN(this)" 
+                                            minlength="15"
                                             class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
                                             required>
-                                        <p id="tinError" class="text-red-500 text-xs hidden">TIN must follow the format ###-###-###-###.</p>
                                     </div>
                                     <div class="w-2/3 pr-4 flex items-center space-x-4">
                                         <label for="zip_code" class="text-zinc-700 font-semibold whitespace-nowrap">Zip Code <span class="text-red-500">*</span></label>
-                                        <input type="text" id="zip_code" name="zip_code" placeholder="e.g., 1203" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        <input type="text" id="zip_code" name="zip_code" maxlength="4" minlength="4" placeholder="e.g., 1203" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                                     </div>
                                 </div>
                             </div>
@@ -461,7 +458,7 @@
                                         <input type="text" name="prev_address" placeholder="e.g., 145 Yakal St." class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"">
                                     </div>
                                     <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                        <label class="font-semibold text-zinc-700 whitespace-nowrap">Reason for Separation <span class="text-red-500">*</span></label>
+                                        <label class="font-semibold text-zinc-700 whitespace-nowrap">Reason for Separation</label>
                                         <input type="text" name="prev_reason_for_separation" placeholder="Optional" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"">
                                     </div>
                                 </div>
@@ -596,40 +593,5 @@
             rateInput.placeholder = "0.00";
         }
     });
-
-    //tin
-    function validateTIN(input) {
-        let value = input.value.replace(/\D/g, ''); // Remove all non-numeric characters
-        let formattedValue = '';
-
-        if (value.length > 3) {
-            formattedValue += value.slice(0, 3) + '-';
-        }
-        if (value.length > 6) {
-            formattedValue += value.slice(3, 6) + '-';
-        }
-        if (value.length > 9) {
-            formattedValue += value.slice(6, 9) + '-';
-        }
-        if (value.length > 12) {
-            formattedValue += value.slice(9, 12);
-        }
-
-        input.value = formattedValue;
-
-        // Check if the format is valid
-        const isValid = /^\d{3}-\d{3}-\d{3}-\d{3}$/.test(input.value);
-        const errorMessage = document.getElementById('tinError');
-
-        if (isValid) {
-            errorMessage.classList.add('hidden');
-            input.classList.remove('border-red-500');
-            input.classList.add('border-gray-200');
-        } else {
-            errorMessage.classList.remove('hidden');
-            input.classList.add('border-red-500');
-            input.classList.remove('border-gray-200');
-        }
-    }
 
 </script>
