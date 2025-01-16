@@ -314,6 +314,7 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
         Route::get('/download_coa', [CoaController::class, 'download_coa']);
         Route::get('/coa/import_template', [CoaController::class, 'import_template']);
         Route::get('/coa/account_type_template', [CoaController::class, 'account_type_template']);
+        Route::get('/coa/sub_type_template', [CoaController::class, 'sub_type_template']);
         Route::put('/coa/{coa}', [CoaController::class, 'update'])->name('coa.update');
 
 
@@ -392,6 +393,7 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
                 Route::get('/{id}/1601C/edit', [withHoldingController::class, 'editForm1601C'])->name('form1601C.edit');
                 Route::put('/{id}/1601C/update', [withHoldingController::class, 'updateForm1601C'])->name('form1601C.update');
                 Route::get('/{id}/1601C/download', [withHoldingController::class, 'downloadForm1601C'])->name('form1601C.download');
+                Route::post('/{id}/1601C/mark-filed', [withHoldingController::class, 'markForm1601CFiled'])->name('form1601C.markFiled');
 
                 //Route for import
                 Route::post('/withholding/1601C/{id}/import', [WithHoldingController::class, 'importSources1601C'])->name('with_holding.1601C_import');
@@ -410,6 +412,8 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
                 Route::get('/{id}/0619E/edit', [withHolding0619EController::class, 'editForm0619E'])->name('form0619E.edit');
                 Route::put('/{id}/0619E/update', [withHolding0619EController::class, 'updateForm0619E'])->name('form0619E.update');
                 Route::get('/{id}/0619E/download', [withHolding0619EController::class, 'downloadForm0619E'])->name('form0619E.download');
+                Route::post('/{id}/0619E/mark-filed', [withHolding0619EController::class, 'markForm0619EFiled'])->name('form0619E.markFiled');
+
             
             // Routes for generating withholding tax return for 1601EQ
                 Route::get('/1601EQ', [withHolding1601EQController::class, 'index1601EQ'])->name('with_holding.1601EQ');
@@ -429,6 +433,7 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
                 Route::get('/{id}/1601EQ/edit', [withHolding1601EQController::class, 'editForm1601EQ'])->name('form1601EQ.edit');
                 Route::put('/{id}/1601EQ/update', [withHolding1601EQController::class, 'updateForm1601EQ'])->name('form1601EQ.update');
                 Route::get('/{id}/1601EQ/download', [WithHolding1601EQController::class, 'downloadForm1601EQ'])->name('form1601EQ.download');
+                Route::post('/{id}/1601EQ/mark-filed', [withHolding1601EQController::class, 'markForm1601EQFiled'])->name('form1601EQ.markFiled');
                 
             // Route for generating witholding tax return for 1604C
                 Route::get('/1604C', [withHolding1604CController::class, 'index1604C'])->name('with_holding.1604C');
@@ -458,6 +463,7 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
                 Route::get('/{id}/1604E/edit', [withHolding1604EController::class, 'editForm1604E'])->name('form1604E.edit');
                 Route::put('/{id}/1604E/update', [withHolding1604EController::class, 'updateForm1604E'])->name('form1604E.update');
                 Route::get('/{id}/1604E/download', [WithHolding1604EController::class, 'downloadForm1604E'])->name('form1604E.download');
+                Route::post('/{id}/1604E/mark-filed', [withHolding1604EController::class, 'markForm1604EFiled'])->name('form1604E.markFiled');
 
 
         });//ending of tax_return/with_holding prefix
