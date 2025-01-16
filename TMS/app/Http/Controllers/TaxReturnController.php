@@ -44,16 +44,40 @@ class TaxReturnController extends Controller
         //
     }
 // Function for showing 2550Q Returns Table
-    public function vatReturn()
-    {
-        $organizationId = session('organization_id');
-        $taxReturns = TaxReturn::with('user')
-            ->where('organization_id', $organizationId)
-            ->whereIn('title', ['2550Q', '2550M'])
-            ->get();
+public function vatReturn(Request $request)
+{
+    $organizationId = session('organization_id');
+    $perPage = $request->input('perPage', 5);
+    $search = $request->input('search');
+    $sortBy = $request->input('sortBy', 'created_at');  // Default sort column
+    $sortDirection = $request->input('sortDirection', 'desc');  // Default sort direction
 
-        return view('tax_return.vat_return', compact('taxReturns'));
+    $query = TaxReturn::with('user')
+        ->where('organization_id', $organizationId)
+        ->whereIn('title', ['2550Q', '2550M']);
+
+    // Apply search filter
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+              ->orWhere('status', 'like', "%{$search}%")
+              ->orWhereHas('user', function ($q) use ($search) {
+                  $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%");
+              });
+        });
     }
+
+    // Apply sorting
+    $query->orderBy($sortBy, $sortDirection);
+
+    // Paginate results
+    $taxReturns = $query->paginate($perPage);
+
+    return view('tax_return.vat_return', compact('taxReturns'));
+}
+
+
     // Function for showing Income Returns Table
     public function incomeReturn()
     {

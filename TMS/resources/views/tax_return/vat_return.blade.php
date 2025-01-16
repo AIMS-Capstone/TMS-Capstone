@@ -172,7 +172,7 @@ $organizationId = session('organization_id');
                                     </div>
                                 </div>
                             </div>
-
+       
                             <!-- End row -->
                             <div class="flex space-x-4 items-center pr-10 ml-auto">
                                 <button 
@@ -329,6 +329,9 @@ $organizationId = session('organization_id');
                                         @endif
                                     </tbody>
                                 </table>
+                                <div class="mx-12 mb-4">
+                                    {{ $taxReturns->appends(request()->input())->links('vendor.pagination.custom') }}
+                                 </div>
                             </div>
                         </div>
                     </div>

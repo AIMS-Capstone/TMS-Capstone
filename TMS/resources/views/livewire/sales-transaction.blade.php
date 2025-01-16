@@ -226,6 +226,11 @@
 
 @script
     <script>
+        @if(session('alert'))
+
+        alert("{{ session('alert') }}");
+  
+@endif
             document.addEventListener('livewire:load', () => {
         @this.on('contactError', data => {
             const errorContainer = document.getElementById('contact-error-message');
@@ -308,8 +313,8 @@ $('#select_contact').on('change', function() {
                 <form wire:submit.prevent="save" class="p-6">
                     <div class="grid grid-cols-2 gap-4">
                         <div class="mb-4">
-                            <label for="contact_type" class="block text-gray-700 font-semibold">Contact Type<span class="text-red-500">*</span></label>
-                            <select id="contact_type" wire:model.defer="newContact.contact_type" name="contact_type" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
+                            <label for="contact_type" class="block text-gray-700 font-semibold">Classification<span class="text-red-500">*</span></label>
+                            <select id="contact_type" wire:model.defer="newContact.classification" name="classification" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
                                 <option value="" class="text-gray-500"disabled selected>Contact Type</option>
                                 <option class="hover:bg-blue-100 hover:text-blue-950 hover:font-bold hover:rounded-full">Individual</option>
                                 <option class="hover:bg-blue-100 hover:text-blue-950 hover:font-bold hover:rounded-full">Non-Individual</option>
