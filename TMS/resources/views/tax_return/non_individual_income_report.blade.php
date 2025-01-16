@@ -64,4 +64,132 @@
             </div>
         </div>
     </div>
+    <div 
+    x-data="{ 
+        showSuccessModal: {{ session()->has('success') ? 'true' : 'false' }} 
+    }"
+    x-show="showSuccessModal" 
+    x-cloak 
+    class="fixed inset-0 z-50 flex items-center justify-center"
+    x-effect="document.body.classList.toggle('overflow-hidden', showSuccessModal)"
+>
+    <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
+
+    <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative" 
+        x-show="showSuccessModal" 
+        x-transition:enter="transition ease-out duration-300 transform" 
+        x-transition:enter-start="opacity-0 scale-90" 
+        x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-200 transform" 
+        x-transition:leave-start="opacity-100 scale-100" 
+        x-transition:leave-end="opacity-0 scale-90"
+    >
+        <button @click="showSuccessModal = false" 
+            class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <div class="flex flex-col items-center">
+            <!-- Icon -->
+            <div class="flex justify-center align-middle mb-4">
+                <img src="{{ asset('images/Success.png') }}" alt="Item(s) Posted" class="w-28 h-28">
+            </div>
+
+            <!-- Title -->
+            <h2 class="text-2xl font-bold text-emerald-500 mb-4">Tax Return  Generated</h2>
+
+            <!-- Description -->
+            <p class="text-sm text-zinc-600 text-center mb-6">
+                The 1702Q Quarterly Income Tax Return has been successfully generated.
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<div 
+x-data="{ 
+    showSuccessModal2: {{ session()->has('success2') ? 'true' : 'false' }} 
+}"
+x-show="showSuccessModal2" 
+x-cloak 
+class="fixed inset-0 z-50 flex items-center justify-center"
+x-effect="document.body.classList.toggle('overflow-hidden', showSuccessModal)"
+>
+<div class="fixed inset-0 bg-gray-200 opacity-50"></div>
+
+<div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative" 
+    x-show="showSuccessModal2" 
+    x-transition:enter="transition ease-out duration-300 transform" 
+    x-transition:enter-start="opacity-0 scale-90" 
+    x-transition:enter-end="opacity-100 scale-100"
+    x-transition:leave="transition ease-in duration-200 transform" 
+    x-transition:leave-start="opacity-100 scale-100" 
+    x-transition:leave-end="opacity-0 scale-90"
+>
+    <button @click="showSuccessModal2 = false" 
+        class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </button>
+    <div class="flex flex-col items-center">
+        <!-- Icon -->
+        <div class="flex justify-center align-middle mb-4">
+            <img src="{{ asset('images/Success.png') }}" alt="Item(s) Posted" class="w-28 h-28">
+        </div>
+
+        <!-- Title -->
+        <h2 class="text-2xl font-bold text-emerald-500 mb-4">Tax Return Modified</h2>
+
+        <!-- Description -->
+        <p class="text-sm text-zinc-600 text-center mb-6">
+            The 1702Q Quarterly Income Tax Return has been successfully edited.
+        </p>
+    </div>
+</div>
+</div>
+<div 
+x-data="{ 
+    showSuccessModalMark: {{ session()->has('successMark') ? 'true' : 'false' }} 
+}"
+x-show="showSuccessModalMark" 
+x-cloak 
+class="fixed inset-0 z-50 flex items-center justify-center"
+x-effect="document.body.classList.toggle('overflow-hidden', showSuccessModal)"
+>
+<div class="fixed inset-0 bg-gray-200 opacity-50"></div>
+
+<div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative" 
+    x-show="showSuccessModalMark" 
+    x-transition:enter="transition ease-out duration-300 transform" 
+    x-transition:enter-start="opacity-0 scale-90" 
+    x-transition:enter-end="opacity-100 scale-100"
+    x-transition:leave="transition ease-in duration-200 transform" 
+    x-transition:leave-start="opacity-100 scale-100" 
+    x-transition:leave-end="opacity-0 scale-90"
+>
+    <button @click="showSuccessModalMark = false" 
+        class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </button>
+    <div class="flex flex-col items-center">
+        <!-- Icon -->
+        <div class="flex justify-center align-middle mb-4">
+            <img src="{{ asset('images/Success.png') }}" alt="Item(s) Posted" class="w-28 h-28">
+        </div>
+
+        <!-- Title -->
+        <h2 class="text-2xl font-bold text-emerald-500 mb-4">Marked as Filed</h2>
+
+        <!-- Description -->
+        <p class="text-sm text-zinc-600 text-center mb-6">
+            The Tax Return has been successfully marked as filed.
+        </p>
+    </div>
+</div>
+</div>
 </x-app-layout>

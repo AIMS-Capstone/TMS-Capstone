@@ -119,7 +119,7 @@
         <button 
             type="button" 
             wire:click.prevent="removeRow" 
-            class="text-red-600 group"
+            class="text-red-600 group px-5"
         >
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 group-hover:fill-red-600 transition-colors" viewBox="0 0 24 24">
                 <g fill="#9ca3af" class="group-hover:fill-red-600">

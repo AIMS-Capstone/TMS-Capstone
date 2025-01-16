@@ -139,6 +139,10 @@ private function numberToOrdinal($number)
 
     public function removeTaxRow($index)
     {
+        if (count($this->taxRows) <= 1) {
+            session()->flash('alert', 'Cannot delete the last row.');
+            return;
+        }
         // Find the key of the row with the matching index
         $key = array_search($index, array_column($this->taxRows, 'id'));
         

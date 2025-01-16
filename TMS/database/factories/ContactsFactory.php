@@ -12,19 +12,27 @@ class ContactsFactory extends Factory
     /**
      * Define the model's default state.
      *
-     * @return array<string, mixed>
+     * @return array
      */
     public function definition(): array
     {
         $orgSetupId = OrgSetup::inRandomOrder()->first()->id ?? OrgSetup::first()->id;
+        
+        // Alternate between 'Vendor' and 'Customer'
+        $contactType = fake()->randomElement(['Vendor', 'Customer']);
+
+        // Alternate between 'Individual' and 'Non-Individual'
+        $classification = fake()->randomElement(['Individual', 'Non-Individual']);
+
         return [
             'organization_id' => $orgSetupId,
             'bus_name' => fake()->company(),
-            'contact_type' => 'Non-Individual',
+            'contact_type' => $contactType,
+            'classification' => $classification,
             'contact_tin' => $this->generateTIN(),
             'contact_address' => fake()->address(),
             'contact_city' => fake()->city(),
-            'contact_zip'=>fake()->postcode()
+            'contact_zip'=> fake()->postcode()
         ];
     }
 

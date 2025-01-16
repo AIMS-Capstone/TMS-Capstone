@@ -73,16 +73,29 @@ class SelectInput extends Component
 }
 
 
-    protected function fetchOptions($organizationId)
-    {
-        return Contacts::where('organization_id', $organizationId)->get()->map(function ($contact) {
+protected function fetchOptions($organizationId)
+{
+    $query = Contacts::where('organization_id', $organizationId);
+
+    // Filter based on transaction type
+    if ($this->type === 'sales') {
+        $query->where('contact_type', 'Customer');
+    } elseif ($this->type === 'purchase') {
+        $query->where('contact_type', 'Vendor');
+    }
+
+    return $query->select('id', 'bus_name', 'contact_tin')
+        ->orderBy('bus_name')
+        ->get()
+        ->map(function ($contact) {
             return [
                 'value' => $contact->id,
                 'name' => $contact->bus_name,
-                'tax_identification_number' => $contact->contact_tin,
+                'tax_identification_number' => $contact->contact_tin ?? 'N/A'
             ];
-        })->toArray();
-    }
+        })
+        ->toArray();
+}
     
 
     public function render()

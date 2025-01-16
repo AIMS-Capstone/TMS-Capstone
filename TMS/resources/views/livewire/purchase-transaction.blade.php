@@ -237,8 +237,8 @@ $('#select_contact').on('change', function() {
                             <p class="text-sm mb-4">Basic Information</p>
                             <!-- Type (Corporation/Individual) -->
                             <div>
-                                <label for="contact_type" class="block text-gray-700 text-sm font-bold">Type</label>
-                                <select id="contact_type" wire:model.defer="newContactPurchase.contact_type" name="contact_type" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
+                                <label for="classification" class="block text-gray-700 text-sm font-bold">Classification</label>
+                                <select id="classification" wire:model.defer="newContactPurchase.classification" name="classification" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
                                     <option value="" disabled selected>Select Business Type</option>
                                     <option value="Individual">Individual</option>
                                     <option value="Non-Individual">Non-Individual</option>
@@ -257,19 +257,7 @@ $('#select_contact').on('change', function() {
                                 <input type="text" id="contact_tin" wire:model.defer="newContactPurchase.contact_tin" name="contact_tin" placeholder="000-000-000-000" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
                             </div>
 
-                            <p class="text-sm my-4">Basic Information</p>
-
-                            <!-- Email -->
-                            <div>
-                                <label for="email" class="block text-gray-700 text-sm font-bold">Email</label>
-                                <input type="email" id="email" wire:model.defer="newContactPurchase.email" name="email" placeholder="Enter Email Address" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
-                            </div>
-
-                            <!-- Phone -->
-                            <div>
-                                <label for="phone" class="block text-gray-700 text-sm font-bold">Phone</label>
-                                <input type="text" id="phone" wire:model.defer="newContactPurchase.phone" name="phone" placeholder="e.g 09123456789" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
-                            </div>
+                           
                         </div>
 
                         <!-- Right Section -->
@@ -289,62 +277,16 @@ $('#select_contact').on('change', function() {
 
                             <!-- Postal/Zip Code -->
                             <div>
-                                <label for="contact_zip" class="block text-gray-700 text-sm font-bold">Postal</label>
+                                <label for="contact_zip" class="block text-gray-700 text-sm font-bold">Zip Code</label>
                                 <input type="text" id="contact_zip" wire:model.defer="newContactPurchase.contact_zip" name="contact_zip" placeholder="e.g 1203" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Default Tax Information -->
-                    <h2 class="text-xl taxuri-color font-bold my-4">Default Tax Information</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                    <!-- Revenue Section -->
-                    <div>
-                        <p class="text-sm mb-4">Revenue</p>
+                    
 
-                        <label for="revenue_tax_type" class="block text-gray-700 text-sm font-bold">Tax Type</label>
-                        <select id="revenue_tax_type" wire:model.defer="newContactPurchase.revenue_tax_type" name="revenue_tax_type" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
-                            <option value="">Nothing Selected</option>
-                            <!-- Add options for Tax Type here -->
-                        </select>
-
-                        <label for="revenue_atc" class="block text-gray-700 text-sm font-bold mt-4">ATC</label>
-                        <select id="revenue_atc" wire:model.defer="newContactPurchase.revenue_atc" name="revenue_atc" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
-                            <option value="">Nothing Selected</option>
-                            <!-- Add options for ATC here -->
-                        </select>
-
-                        <label for="revenue_chart_accounts" class="block text-gray-700 text-sm font-bold mt-4">Chart of Accounts</label>
-                        <select id="revenue_chart_accounts" wire:model.defer="newContactPurchase.revenue_chart_accounts" name="revenue_chart_accounts" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
-                            <option value="">Nothing Selected</option>
-                            <!-- Add options for Chart of Accounts here -->
-                        </select>
-                    </div>
-
-                    <!-- Expense Section -->
-                    <div>
-                        <p class="text-sm mb-4">Expense</p>
-
-                        <label for="expense_tax_type" class="block text-gray-700 text-sm font-bold">Tax Type</label>
-                        <select id="expense_tax_type" wire:model.defer="newContactPurchase.expense_tax_type" name="expense_tax_type" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
-                            <option value="">Nothing Selected</option>
-                            <!-- Add options for Tax Type here -->
-                        </select>
-
-                        <label for="expense_atc" class="block text-gray-700 text-sm font-bold mt-4">ATC</label>
-                        <select id="expense_atc" wire:model.defer="newContactPurchase.expense_atc" name="expense_atc" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peer">
-                            <option value="">Nothing Selected</option>
-                            <!-- Add options for ATC here -->
-                        </select>
-
-                        <label for="expense_chart_accounts" class="block text-gray-700 text-sm font-bold mt-4">Chart of Accounts</label>
-                        <select id="expense_chart_accounts" wire:model.defer="newContactPurchase.expense_chart_accounts" name="expense_chart_accounts" class="block w-full px-0 py-2 text-sm text-neutral-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 appearance-none peerm">
-                            <option value="">Nothing Selected</option>
-                            <!-- Add options for Chart of Accounts here -->
-                        </select>
-                    </div>
-                </div>
-
+             
+          
                 <!-- Save Button -->
                 <div class="flex justify-end items-center mt-6 gap-4">
                     <button type="button" class="text-gray-600 font-semibold" wire:click="closeModal">Cancel</button>

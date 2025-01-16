@@ -27,6 +27,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use thiagoalessio\TesseractOCR\TesseractOCR;
 use Imagick;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class TransactionsController extends Controller
 {
@@ -324,68 +326,105 @@ public function getAllTransactions(Request $request)
     return redirect()->back()->with('success', 'Transaction added successfully!');
 }
 
-    public function storeUpload(Request $request)
+public function storeUpload(Request $request)
 {
- 
-    // Step 1: Create or find a Contact
-    $contact = Contacts::firstOrCreate(
-        [
-            'bus_name' => $request->vendor, 
-            'contact_tin' => $request->customer_tin
-        ],
-        [
-            'contact_address' => $request->address,
-            'contact_type' => $request->organization_type,  // Use the submitted 'organization_type' value
-            'contact_city' => $request->city,
-            'contact_zip' => $request->zip_code  // Add 'city' field to the contact
-        ]
-    );
+    // Validate the request using Laravel's built-in validation
+    $validated = $request->validate([
+        'vendor' => 'required|string|max:255',
+        'customer_tin' => 'required|string|max:20',
+        'address' => 'required|string|max:255',
+        'organization_type' => 'required|string|in:Individual,Non-Individual',
+        'city' => 'required|string|max:100',
+        'zip_code' => 'required|string|max:10',
+        'date' => 'required|date',
+        'reference_number' => 'required|string|unique:transactions,reference',
+        'amount' => 'required|numeric|min:0',
+        'tax_amount' => 'required|numeric|min:0',
+        'net_amount' => 'required|numeric|min:0',
+        'description' => 'required|string|max:255',
+        'tax_type' => 'required|exists:tax_types,id',
+        'tax_code' => 'required|exists:atcs,id',
+        'coa' => 'required|exists:coas,id'
+    ]);
 
-    // Step 2: Create the Transaction
-    $transaction = Transactions::create([
-        'date' => $request->date,
-        'reference' => $request->reference_number,
-        'total_amount' => $request->amount,
-        'vat_amount' => $request->tax_amount,  // tax_amount goes to vat_amount
-        'vatable_purchase' => $request->net_amount, // net_amount goes to vatable_purchase
-        'transaction_type'=> 'Purchase',
-        'organization_id' => session('organization_id') ,
-        'contact' => $contact->id,
+    try {
+        DB::beginTransaction();
         
-    ]);
+        // Create or find contact
+        $contact = Contacts::firstOrCreate(
+            [
+                'bus_name' => $validated['vendor'],
+                'contact_tin' => $validated['customer_tin']
+            ],
+            [
+                'contact_address' => $validated['address'],
+                'contact_type' => $validated['organization_type'],
+                'contact_city' => $validated['city'],
+                'contact_zip' => $validated['zip_code']
+            ]
+        );
 
-    activity('transactions')
-        ->performedOn($transaction)
-        ->causedBy(Auth::user())
-        ->withProperties([
+        // Create transaction
+        $transaction = Transactions::create([
+            'date' => $validated['date'],
+            'reference' => $validated['reference_number'],
+            'total_amount' => $validated['amount'],
+            'vat_amount' => $validated['tax_amount'],
+            'vatable_purchase' => $validated['net_amount'],
+            'transaction_type' => 'Purchase',
             'organization_id' => session('organization_id'),
-            'attributes' => $transaction->toArray(),
-        ])
-        ->log('Transaction using upload was created');
+            'contact' => $contact->id,
+        ]);
 
+        // Create tax row
+        $transaction->taxRows()->create([
+            'description' => $validated['description'],
+            'tax_type' => $validated['tax_type'],
+            'tax_code' => $validated['tax_code'],
+            'coa' => $validated['coa'],
+            'amount' => $validated['amount'],
+            'tax_amount' => $validated['tax_amount'],
+            'net_amount' => $validated['net_amount']
+        ]);
 
-    // Step 3: Add a TaxRow for each item in the transaction
-    $taxRow = new ModelsTaxRow([
-        'description' => $request->description,
-        'tax_type' => $request->tax_type,
-        'tax_code' => $request->tax_code,
-        'coa' => $request->coa,
-        'amount' => $request->amount,
-        'tax_amount' => $request->tax_amount,
-        'net_amount' => $request->net_amount
-    ]);
+        // Log activity
+        activity('transactions')
+            ->performedOn($transaction)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'organization_id' => session('organization_id'),
+                'attributes' => $transaction->toArray(),
+            ])
+            ->log('Transaction using upload was created');
 
-    // Associate the TaxRow with the Transaction
-    $transaction->taxRows()->save($taxRow);
+        DB::commit();
+        return redirect()->route('transactions')->with('success', 'Transaction saved successfully!');
 
-    // Redirect back with a success message
-    return redirect()->route('transactions')->with('success', 'Transaction and tax rows saved successfully!');
+    } catch (ValidationException $e) {
+        return back()
+            ->withErrors($e->errors())
+            ->withInput()
+            ->with('uploaded_image', session('uploaded_image')); // Re-flash the image
+    }
+    catch (\Exception $e) {
+        DB::rollBack();
+        return back()
+            ->withErrors(['error' => 'Failed to save transaction: ' . $e->getMessage()])
+            ->withInput()
+            ->with('uploaded_image', session('uploaded_image')); // Re-flash the image
+    }
 }
 
 
-    public function upload(Request $request)
-    {
-        // Validate and process the file
+public function upload(Request $request)
+{
+    try {
+        // Validate the request
+        $request->validate([
+            'receipt' => 'required|file|mimes:jpeg,png|max:5120' // 5MB max
+        ]);
+
+        // Process the file
         $path = $request->file('receipt')->store('transactions');
         $processedPath = $this->preprocessImage(storage_path("app/$path"));
         $extractedText = $this->extractTextFromReceipt($processedPath);
@@ -393,12 +432,35 @@ public function getAllTransactions(Request $request)
         // Clean and parse the extracted text
         $cleanedData = $this->cleanExtractedText($extractedText);
         
-        return back()->with([
-            'success' => 'Receipt uploaded and processed successfully!',
-            'cleanedData' => $cleanedData,  // Pass the cleaned data to the view
-            'uncleanData' => $extractedText,
+        // Store the cleaned data in the session
+        session()->flash('cleanedData', $cleanedData);
+        
+        // Store the uploaded image in the session for display
+        $imageData = base64_encode(file_get_contents($request->file('receipt')));
+        $imageSrc = 'data:' . $request->file('receipt')->getMimeType() . ';base64,' . $imageData;
+        session()->flash('uploaded_image', $imageSrc);
+        
+        // If it's an AJAX request, return JSON
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'cleanedData' => $cleanedData
+            ]);
+        }
+        
+        // If it's a regular form submit, redirect back with the data
+        return redirect()->back()->with([
+            'success' => 'Receipt processed successfully',
+            'cleanedData' => $cleanedData
         ]);
+
+    } catch (\Exception $e) {
+        if ($request->ajax()) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+        return redirect()->back()->withErrors(['error' => $e->getMessage()]);
     }
+}
     private function cleanExtractedText($extractedText)
 {
     // Basic cleanup: Remove unnecessary newlines and extra spaces

@@ -34,7 +34,7 @@
                     <li x-show="selectedTab === 'Sales'">
                         {{-- <a href="{{ url('/transactions/upload') }}" class="block px-4 py-2 hover-dropdown">Upload Image</a> --}}
                     </li>
-                    
+               
                     <!-- Options for Purchase tab -->
                     <li x-show="selectedTab === 'Purchase'">
                         <a href="{{ url('/transactions/create?type=purchase') }}" class="block px-4 py-2 hover-dropdown">Add Manual</a>

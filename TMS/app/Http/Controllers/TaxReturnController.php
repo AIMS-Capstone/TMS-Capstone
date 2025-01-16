@@ -44,16 +44,40 @@ class TaxReturnController extends Controller
         //
     }
 // Function for showing 2550Q Returns Table
-    public function vatReturn()
-    {
-        $organizationId = session('organization_id');
-        $taxReturns = TaxReturn::with('user')
-            ->where('organization_id', $organizationId)
-            ->whereIn('title', ['2550Q', '2550M'])
-            ->get();
+public function vatReturn(Request $request)
+{
+    $organizationId = session('organization_id');
+    $perPage = $request->input('perPage', 5);
+    $search = $request->input('search');
+    $sortBy = $request->input('sortBy', 'created_at');  // Default sort column
+    $sortDirection = $request->input('sortDirection', 'desc');  // Default sort direction
 
-        return view('tax_return.vat_return', compact('taxReturns'));
+    $query = TaxReturn::with('user')
+        ->where('organization_id', $organizationId)
+        ->whereIn('title', ['2550Q', '2550M']);
+
+    // Apply search filter
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+              ->orWhere('status', 'like', "%{$search}%")
+              ->orWhereHas('user', function ($q) use ($search) {
+                  $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%");
+              });
+        });
     }
+
+    // Apply sorting
+    $query->orderBy($sortBy, $sortDirection);
+
+    // Paginate results
+    $taxReturns = $query->paginate($perPage);
+
+    return view('tax_return.vat_return', compact('taxReturns'));
+}
+
+
     // Function for showing Income Returns Table
     public function incomeReturn()
     {
@@ -273,7 +297,7 @@ public function showIncome($id, $type)
         $taxReturn->status = 'Filed';
         $taxReturn->save();
         
-        return redirect()->back()->with('success', 'Tax return has been marked as Filed.');
+        return redirect()->back()->with('successMark', 'Tax return has been marked as Filed.');
 
     }
   // Function for showing Value Added Tax Report Preview
@@ -955,17 +979,21 @@ public function showVatReport($id)
         $validatedData['tax_return_id'] = $taxReturn;
   
     
-        // Step 3: Create or update the Tax2550Q record
         $tax2550Q = Tax2550Q::updateOrCreate(
             ['tax_return_id' => $taxReturn], // Find existing record by tax_return_id
             $validatedData // Use validated data for creation or update
         );
-    
-        // Step 4: Return a response
+        
+        // Step 4: Determine the message type based on whether it's an update or new creation
+        $messageType = $tax2550Q->wasRecentlyCreated ? 'success' : 'success2';
+        $messageText = $tax2550Q->wasRecentlyCreated 
+            ? 'Tax return successfully submitted and PDF generated.' 
+            : 'Tax return successfully updated and PDF generated.';
+        
+        // Step 5: Return a response
         return redirect()
             ->route('tax_return.2550q.pdf', ['taxReturn' => $taxReturn])
-            ->with('success', 'Tax return successfully submitted and PDF generated.');
-            
+            ->with($messageType, $messageText);
         
     }
     
@@ -1051,6 +1079,7 @@ public function showVatReport($id)
       
               try {
                   // Create or update Tax2551Q
+                  $exists = Tax2551Q::where('tax_return_id', $taxReturn)->exists();
                   $tax2551Q = Tax2551Q::updateOrCreate(
                       ['tax_return_id' => $taxReturn],
                       $validatedData
@@ -1083,10 +1112,11 @@ public function showVatReport($id)
                   }
       
                   DB::commit();
+                  $successType = $exists ? 'success2' : 'success';
       
                   return redirect()
                       ->route('tax_return.2551q.pdf', ['taxReturn' => $taxReturn])
-                      ->with('success', 'Tax return successfully submitted and PDF generated.');
+                      ->with($successType, 'Tax return successfully ' . ($exists ? 'updated' : 'submitted') . ' and PDF generated.');
       
               } catch (\Exception $e) {
                   DB::rollBack();
@@ -1976,7 +2006,8 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
         // Serve the filled PDF in a view
         return view('tax_return.percentage_report', [
             'taxReturn' => $taxReturn,
-            'pdfPath' => asset('storage/filled_report.pdf'), // Serve the PDF from public storage
+            'pdfPath' => asset('storage/filled_report.pdf'),
+            'success' => session('success') // Serve the PDF from public storage
         ]);
     }
     public function percentageEdit($id)
@@ -2228,6 +2259,7 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
         return view('tax_return.vat_report', [
             'taxReturn' => $taxReturn,
             'pdfPath' => asset('storage/2550Q.pdf'), // Serve the PDF from public storage
+            'success' => session('success')
         ]);
     }
     

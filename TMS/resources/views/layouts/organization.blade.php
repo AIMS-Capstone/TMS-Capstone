@@ -47,8 +47,11 @@
                             <div class="flex justify-between h-[70px]">
                                 <div class="flex">
                                     <!-- Taxuri Logo -->
+                             
                                     <div class="shrink-0 flex items-center">
+                                        <a href="{{ route('dashboard') }}" >
                                         <img src="{{ asset('images/Taxuri Logo-name.png') }}" alt="logo" class='w-[160px]' />
+                                        </a>
                                     </div>
                                     
                                 </div>

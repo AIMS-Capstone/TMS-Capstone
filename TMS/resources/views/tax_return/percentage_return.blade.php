@@ -32,7 +32,9 @@ $organizationId = session('organization_id');
                     showCheckboxes: false, 
                     checkAll: false, 
                     selectedRows: [],
+                        showConfirmDeleteModal: false,
                     showDeleteCancelButtons: false,
+                
 
                     // Toggle a single row
                     toggleCheckbox(id) {
@@ -50,23 +52,21 @@ $organizationId = session('organization_id');
                             return;
                         }
 
-                        if (confirm('Are you sure you want to archive the selected row/s?')) {
-                            fetch('/coa/deactivate', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                },
-                                body: JSON.stringify({ ids: this.selectedRows })
-                            })
-                            .then(response => {
-                                if (response.ok) {
-                                    location.reload();  
-                                } else {
-                                    alert('Error deleting rows.');
-                                }
-                            });
-                        }
+                        fetch('/tax_return/destroy', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ ids: this.selectedRows })
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                location.reload();  
+                            } else {
+                                alert('Error deleting rows.');
+                            }
+                        });
                     },
 
                     // Cancel selection
@@ -334,50 +334,58 @@ $organizationId = session('organization_id');
                     </div>
 
                    <!-- Delete Confirmation Modal -->
-                   <div x-show="showConfirmDeleteModal" x-cloak 
-                        class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
-                        x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)">
-                        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
-                            <div class="flex flex-col items-center">
-                                <!-- Icon -->
-                                <div class="mb-4">
-                                    <i class="fas fa-exclamation-triangle text-red-700 text-8xl"></i>
-                                </div>
+                   <div 
+                   x-show="showConfirmDeleteModal" 
+                   x-cloak 
+                   class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
+                   x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)">
+                   
+                   <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
+                       <div class="flex flex-col items-center">
+                           <!-- Icon -->
+                           <div class="mb-4">
+                               <i class="fas fa-exclamation-triangle text-red-700 text-8xl"></i>
+                           </div>
 
-                                <!-- Title -->
-                                <h2 class="text-2xl font-extrabold text-zinc-700 mb-2">Delete Item(s)</h2>
+                           <!-- Title -->
+                           <h2 class="text-2xl font-extrabold text-zinc-700 mb-2">Delete Item(s)</h2>
 
-                                <!-- Description -->
-                                <p class="text-sm text-zinc-700 text-center">
-                                    You're going to Delete the selected item(s) in the Value Added Tax Return table. Are you sure?
-                                </p>
+                           <!-- Description -->
+                           <p class="text-sm text-zinc-700 text-center">
+                               You're going to Delete the selected item(s) in the Value Added Tax Return table. Are you sure?
+                           </p>
 
-                                <!-- Actions -->
-                                <div class="flex justify-center space-x-8 mt-6 w-full">
-                                    <button 
-                                        @click="showConfirmDeleteModal = false; showDeleteCancelButtons = true;" 
-                                        class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
-                                        > 
-                                        Cancel
-                                    </button>
-                                    <button 
-                                        @click="deleteRows(); showConfirmDeleteModal = false;" 
-                                        class="px-5 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg text-sm font-medium transition"
-                                        > 
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                           <!-- Actions -->
+                           <div class="flex justify-center space-x-8 mt-6 w-full">
+                               <button 
+                                   @click="showConfirmDeleteModal = false; showDeleteCancelButtons = true;" 
+                                   class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
+                                   > 
+                                   Cancel
+                               </button>
+                               <button 
+                                   @click="deleteRows(); showConfirmDeleteModal = false;" 
+                                   class="px-5 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg text-sm font-medium transition"
+                                   > 
+                                   Delete
+                               </button>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+
 
                     <!-- Action Buttons -->
                     <div x-show="showDeleteCancelButtons" class="flex justify-center py-4" x-cloak>
-                        <button @click="showConfirmDeleteModal" = true; showDeleteCancelButtons = true;" :disabled="selectedRows.length === 0"
-                            class="border px-3 py-2 rounded-lg text-sm text-red-600 border-red-600 bg-red-100 hover:bg-red-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                        <button 
+                            @click="showConfirmDeleteModal = true; showDeleteCancelButtons = true;" 
+                            :disabled="selectedRows.length === 0"
+                            class="border px-3 py-2 mx-2 rounded-lg text-sm text-red-600 border-red-600 bg-red-100 hover:bg-red-200 transition disabled:opacity-50 disabled:cursor-not-allowed group flex items-center space-x-2"
                             >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
-                            <span class="text-red-600 transition group-hover:text-red-600">Delete Selected</span><span class="transition group-hover:text-red-500" x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24">
+                                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/>
+                            </svg>
+                            <span class="text-red-600 transition group-hover:text-red-600">Delete Selected <span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span></span>
                         </button>
                         <button @click="cancelSelection" class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"> 
                             Cancel

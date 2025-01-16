@@ -77,8 +77,14 @@ class Tax1701QController extends Controller
         // Store or update the Tax1701Q data
         $tax1701Q = Tax1701Q::where('tax_return_id', $taxReturn->id)->first();
 
-        if (!$tax1701Q) {
-            // If no existing Tax1701Q is found, create a new one
+        $messageType = 'success'; // Default message type for new record
+        $messageText = 'Tax1701Q data has been saved successfully!'; // Default message for new record
+    
+        if ($tax1701Q) {
+            $messageType = 'success2'; // Set this to 'success2' for edited records
+            $messageText = 'Tax1701Q data has been updated successfully!'; // Message for updated record
+        } else {
+            // Create a new Tax1701Q if it doesn't exist
             $tax1701Q = new Tax1701Q();
             $tax1701Q->tax_return_id = $taxReturn->id;
         }
@@ -90,7 +96,7 @@ class Tax1701QController extends Controller
  
         // Redirect to the report view page
         return redirect()->route('income_return.reportPDF', ['taxReturn' => $taxReturn->id])
-                        ->with('success', 'Tax1701Q data has been saved successfully!');
+        ->with($messageType, $messageText);
     }
     public function edit(TaxReturn $taxReturn)
 {
