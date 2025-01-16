@@ -9,7 +9,7 @@ class ContactsSeeder extends Seeder
 {
     public function run(): void
     {
-        // Use the factory to generate 100 contacts for organization_id 1
-        Contacts::factory()->count(50)->create();
+        // Generate 10 contacts for organization_id 1
+        Contacts::factory()->count(10)->create();
     }
 }
