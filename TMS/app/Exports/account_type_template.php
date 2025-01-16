@@ -20,13 +20,7 @@ class account_type_template implements FromCollection, WithHeadings
             ['Equity'],
             ['Revenue'],
             ['Expenses'],
-            ['Gains'],
-            ['Losses'],
-            ['Other Taxable Income from Operations not Subject to Final Tax'],
-            ['Non Operating Income'],
-            ['Gross Sales Revenues Receipts Fees not subject to Withholding Tax'],
-            ['Sales Revenues Receipts Fees'],
-            ['Sales Returns  Allowances and Discounts']
+            ['Cost of Sales']
         ]);
     }
 

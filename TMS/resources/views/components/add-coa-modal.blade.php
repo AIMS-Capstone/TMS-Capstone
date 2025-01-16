@@ -44,16 +44,23 @@
                         <label for="type" class="block font-semibold text-sm text-gray-700">
                             Account Type <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" name="type" id="type" required
-                            placeholder="Expense"
+                        <select name="type" id="type" required
                             class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                            <option value="" disabled selected>Select Account Type</option>
+                            <option value="Assets">Assets</option>
+                            <option value="Liabilities">Liabilities</option>
+                            <option value="Equity">Equity</option>
+                            <option value="Revenue">Revenue</option>
+                            <option value="Cost of Sales">Cost of Sales</option>
+                            <option value="Expenses">Expenses</option>
+                        </select>
                     </div>
                     <div class="w-1/3 text-left">
                         <label for="sub_type" class="block font-semibold text-sm text-gray-700">
                             Sub Type <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="sub_type" id="sub_type" required
-                            maxlength="10" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                            maxlength="50" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                     </div>
                 </div>
 

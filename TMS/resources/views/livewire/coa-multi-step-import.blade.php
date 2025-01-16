@@ -101,13 +101,13 @@
                                     <div class="flex justify-center mb-4 pl-10">
                                         <ul class="list-disc text-[11px]">
                                             <li>
-                                                <span class="inline-block align-top">a CSV file containing transaction information (You can <a class="text-blue-600" href="{{ url('') }}">download</a> this template for importing transactions), or</span>
+                                                <span class="inline-block align-top">a CSV file containing charts of account information (You can <a class="text-blue-600" href="{{ url('/coa/import_template') }}">download</a> this template for importing transactions), or</span>
                                             </li>
                                             <li>
-                                                <span class="inline-block align-top">Make sure to enter a valid <b>Account Type, </b> (<a class="text-blue-600" href="{{ url('') }}">download</a> list).</span>
+                                                <span class="inline-block align-top">Make sure to enter a valid <b>Account Type, </b> (<a class="text-blue-600" href="{{ url('/coa/account_type_template') }}">download</a> list).</span>
                                             </li>
                                             <li>
-                                                <span class="inline-block align-top">Fill Sub Category if the Account Type is <b>Ordinary Allowance Itemized Deductions, Assets,</b> or <b>Liabilities</b> (<a class="text-blue-600" href="{{ url('') }}">download</a> list).</span>
+                                                <span class="inline-block align-top">Fill Sub Category if the Account Type is <b>Expense, Assets,</b> or <b>Liabilities</b> (<a class="text-blue-600" href="{{ url('/coa/sub_type_template') }}">download</a> list).</span>
                                             </li>
                                             <li>
                                                 <span class="inline-block align-top">For <b>Code</b>, it must be <b>unique.</b></span>
