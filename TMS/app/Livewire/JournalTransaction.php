@@ -7,6 +7,7 @@ use App\Models\Coa;
 use App\Models\Transactions;
 use App\Models\TaxRow; // Assuming this model exists for individual journal rows
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
 
 class JournalTransaction extends Component
 {
@@ -107,24 +108,39 @@ class JournalTransaction extends Component
             return;
         }
         try {
+
         $organizationId = Session::get('organization_id');
+
         // Create a new transaction
         $transaction = Transactions::create([
             'transaction_type' => 'Journal',
             'date' => $this->date,
             'reference' => $this->reference,
-            'total_amount' => $this -> totalAmount,
+            'total_amount' => $this->totalAmount,
             'total_amount_debit' => $this->totalAmountDebit,
             'total_amount_credit' => $this->totalAmountCredit,
-            'status'=> 'Draft',
+            'status' => 'Draft',
             'contact' => $this->selectedContact, // Optionally link a contact
-            'organization_id'=> $organizationId
+            'organization_id' => $organizationId,
         ]);
+
+        // Log the transaction creation activity
+        activity('Transaction Management')
+            ->performedOn($transaction)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'transaction_id' => $transaction->id,
+                'transaction_type' => 'Journal',
+                'organization_id' => $organizationId,
+                'ip' => request()->ip(),
+                'browser' => request()->header('User-Agent'),
+            ])
+            ->log("Journal transaction {$transaction->id} was created.");
 
         // Save each journal row linked to the transaction
         foreach ($this->journalRows as $row) {
             $amount = $row['debit'] > 0 ? $row['debit'] : ($row['credit'] > 0 ? $row['credit'] : 0);
-            TaxRow::create([
+            $journalRow = TaxRow::create([
                 'transaction_id' => $transaction->id,
                 'debit' => $row['debit'],
                 'amount' => $amount,
@@ -132,9 +148,24 @@ class JournalTransaction extends Component
                 'description' => $row['description'],
                 'coa' => $row['coa'], // Assuming 'coa' is the ID of the account
             ]);
+
+            // Log each journal row creation
+            activity('Transaction Management')
+                ->performedOn($journalRow)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'transaction_id' => $transaction->id,
+                    'journal_row_id' => $journalRow->id,
+                    'description' => $row['description'],
+                    'debit' => $row['debit'],
+                    'credit' => $row['credit'],
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log("Journal row {$journalRow->id} was added to Transaction {$transaction->id}.");
         }
 
-        // Optionally provide feedback and redirect
+        // Provide feedback and redirect
         session()->flash('message', 'Transaction saved successfully!');
         return redirect()->route('transactions.show', ['transaction' => $transaction->id])
     ->with('successTransaction', 'Transaction completed successfully!');

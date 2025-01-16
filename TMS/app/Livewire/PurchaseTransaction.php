@@ -8,6 +8,7 @@ use App\Models\TaxType;
 use App\Models\Transactions;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class PurchaseTransaction extends Component
@@ -228,14 +229,37 @@ class PurchaseTransaction extends Component
                 ]);
             }
 
+            // Log activity
+            activity('Transaction Management')
+                ->performedOn($transaction)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'transaction_id' => $transaction->id,
+                    'transaction_type' => $transaction->transaction_type,
+                    'organization_id' => $organizationId,
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                    'tax_rows_count' => count($this->taxRows),
+                ])
+                ->log("Purchase transaction {$transaction->inv_number} was created.");
+
             session()->flash('message', 'Purchase transaction saved successfully!');
             return redirect()->route('transactions.show', ['transaction' => $transaction->id])
     ->with('successTransaction', 'Transaction completed successfully!');
 
         } catch (\Exception $e) {
-            Log::error('Error saving purchase transaction: ' . $e->getMessage());
+            // Log error details
+            Log::error('Error saving purchase transaction: ' . $e->getMessage(), [
+                'organization_id' => $organizationId,
+                'user_id' => Auth::id(),
+                'ip' => request()->ip(),
+            ]);
+
+            // Flash error message
             session()->flash('error', 'There was an error saving the purchase transaction.');
+            return redirect()->back();
         }
+
     }
     public function rendered(): void
     {

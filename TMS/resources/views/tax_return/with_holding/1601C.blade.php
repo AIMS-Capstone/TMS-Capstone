@@ -101,20 +101,20 @@ $organizationId = session('organization_id');
                         <div class="flex flex-row space-x-2 items-center justify-between">
                             <div class="flex flex-row space-x-2 items-center ps-6">
                                 <!-- Search row -->
-                                <div class="relative w-80 p-4">
-                                    <form x-target="table1601C" action="/1601C" role="search" aria-label="Table" autocomplete="off">
-                                        <input 
+                                <div class="relative w-80 p-5">
+                                        <form x-target="table1601C" action="/tax_return/with_holding/1601C" role="search" aria-label="Table" autocomplete="off">
+                                            <input 
                                             type="search" 
-                                            name="search" 
-                                            class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900" 
+                                            name="search"
+                                            class="w-full pl-10 pr-4 py-[7px] text-sm border border-zinc-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-900 focus:border-blue-900" 
                                             aria-label="Search Term" 
                                             placeholder="Search..." 
                                             @input.debounce="$el.form.requestSubmit()" 
                                             @search="$el.form.requestSubmit()"
-                                        >
-                                    </form>
-                                    <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                </div>
+                                            >
+                                            </form>
+                                        <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-zinc-400"></i>
+                                    </div>
                                 <div class="flex flex-row items-center space-x-4">
                                     <div class="relative inline-block text-left sm:w-auto w-full z-30">
                                         <button id="filterButton" class="flex items-center text-zinc-600 hover:text-zinc-800 w-full hover:shadow-sm">
@@ -342,9 +342,9 @@ $organizationId = session('organization_id');
                                     <thead class="bg-neutral-100 text-sm text-neutral-700">
                                         <tr>
                                             <th scope="col" class="p-4">
-                                                <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
+                                                <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600" x-cloak>
                                                     <div class="relative flex items-center">
-                                                        <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"
+                                                        <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition"
                                                         />
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -363,10 +363,10 @@ $organizationId = session('organization_id');
                                         @forelse ($with_holdings as $with_holding)
                                             <tr class="hover:bg-blue-50 cursor-pointer ease-in-out">
                                                 <td class="p-4">
-                                                    <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
+                                                    <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600" x-cloak>
                                                         <div class="relative flex items-center">
                                                             <input type="checkbox" @click="toggleCheckbox('{{ $with_holding->id }}')" :checked="selectedRows.includes('{{ $with_holding->id }}')" id="with_holding{{ $with_holding->id }}" 
-                                                                class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"
+                                                                class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition"
                                                             />
                                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />

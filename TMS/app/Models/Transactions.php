@@ -7,34 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 
 class Transactions extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, SoftDeletes;
     protected $fillable = ['transaction_type', 'date', 'inv_number', 'reference', 'total_amount', 'contact', 'itr_include', 'total_amount_credit', 'total_amount_debit', 'vatable_sales','vatable_purchase', 'vat_amount', 'non_vatable_sales','non_vatable_purchase','status', 'QAP', 'organization_id', 'deleted_by', 'withholding_id', ];
-
-    public static $disableLogging = false;
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly([
-                'transaction_type', 'date', 'inv_number', 'reference', 
-                'total_amount', 'status', 'QAP', 'organization_id', 'ip', 'browser',
-            ])
-            ->logOnlyDirty()
-            ->useLogName('transactions')
-            ->setDescriptionForEvent(fn(string $eventName) => 
-                "Transaction of type '{$this->transaction_type}' was {$eventName}"
-        );
-    }
-
-    public function shouldLogEvent(string $eventName): bool
-    {
-        return !self::$disableLogging;
-    }
 
     public function taxRows()
     {

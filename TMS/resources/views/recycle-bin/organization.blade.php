@@ -67,17 +67,128 @@
                     </nav>
                     <hr class="mx-1 mt-auto">
 
+                    <div 
+                                    x-data="{
+                                        showCheckboxes: false, 
+                                        checkAll: false, 
+                                        selectedRows: [],
+                                        showDeleteCancelButtons: false,
+                                        showRestoreCancelButtons: false, 
+                                        isDisabled: false,
+                                        showConfirmRestoreModal: false, 
+                                        showConfirmDeleteModal: false,
+                                        showSuccessRestoreModal: false,
+                                        showSuccessDeleteModal: false,
+
+                                        disableButtons() {
+                                            this.isDisabled = true;
+                                        },
+
+                                        enableButtons() {
+                                            this.isDisabled = false;
+                                            this.showDeleteCancelButtons = false; 
+                                            this.showRestoreCancelButtons = false; 
+                                            this.showConfirmRestoreModal = false; 
+                                            this.showConfirmDeleteModal = false;
+                                        },
+
+                                        toggleCheckbox(id) {
+                                            if (this.selectedRows.includes(id)) {
+                                                this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
+                                            } else {
+                                                this.selectedRows.push(id);
+                                            }
+                                            // Update the checkAll state based on all checkboxes' status
+                                            this.checkAll = this.selectedRows.length === {{ json_encode($trashedOrganizations->count()) }};
+                                        },
+                                        toggleAll() {
+                                            this.checkAll = !this.checkAll;
+                                            if (this.checkAll) {
+                                                this.selectedRows = {{ json_encode($trashedOrganizations->pluck('id')->toArray()) }}; 
+                                            } else {
+                                                this.selectedRows = []; // Unselect all
+                                            }
+                                        },
+                                        deleteRows() {
+                                            if (this.selectedRows.length === 0) {
+                                                alert('No rows selected for deletion.');
+                                                return;
+                                            }
+
+                                            fetch('{{ route('recycle-bin.organization.bulkDelete' ) }}', {
+                                                method: 'DELETE',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                },
+                                                body: JSON.stringify({ ids: this.selectedRows })
+                                            })
+                                            .then(response => {
+                                            console.log('Selected IDs:', this.selectedRows);
+                                                if (response.ok) {
+                                                    this.showSuccessDeleteModal = true; // Show success modal
+                                                    this.selectedRows = []; // Clear selection
+                                                    this.checkAll = false;
+                                                    setTimeout(() => {
+                                                        location.reload();
+                                                    }, 700);
+                                                } else {
+                                                    alert('Error deleting rows.');
+                                                }
+                                            });
+                                        },
+                                        restoreRows() {
+                                            if (this.selectedRows.length === 0) {
+                                                alert('No rows selected for restoration.');
+                                                return;
+                                            }
+
+                                            fetch('{{ route('recycle-bin.organization.bulkRestore' ) }}', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                },
+                                                body: JSON.stringify({ ids: this.selectedRows })
+                                            })
+                                            .then(response => {
+                                                if (response.ok) {
+                                                    this.showSuccessRestoreModal = true; // Show success modal
+                                                    this.selectedRows = []; // Clear selection
+                                                    this.checkAll = false;
+                                                    setTimeout(() => {
+                                                        location.reload();
+                                                    }, 700);  
+                                                } else {
+                                                    alert('Error restoring rows.');
+                                                }
+                                            });
+                                        },
+                                        cancelSelection() {
+                                            this.selectedRows = []; 
+                                            this.checkAll = false;
+                                            this.showCheckboxes = false; 
+                                            this.showDeleteCancelButtons = false;
+                                            this.showRestoreCancelButtons = false;
+                                            this.showConfirmRestoreModal = false;
+                                            this.showConfirmDeleteModal = false;
+                                        },
+                                        get selectedCount() {
+                                            return this.selectedRows.length; 
+                                        }
+                                    }"
+                                    class="mb-12 mx-12 overflow-hidden max-w-full">
+
                     <div class="flex flex-col md:flex-row justify-between">
                         <div class="w-full mt-8 ml-0 h-auto border border-zinc-300 rounded-lg p-4">
                             <div x-data="recycleBinHandler">
                                 <div class="flex flex-row items-center">
                                     <!-- Search and Sort Options -->
                                     <div class="relative w-80 p-5">
-                                        <form x-target="org-table" action="{{ route('recycle-bin.organization.index') }}" method="GET" role="search" aria-label="Table" autocomplete="off">
+                                        <form x-target="org-table" action="/recycle-bin/organization" role="search" aria-label="Table" autocomplete="off">
                                             <input 
                                             type="search" 
-                                            name="search" 
-                                            value="{{ request('search') }}"
+                                            name="search"
                                             class="w-full pl-10 pr-4 py-[7px] text-sm border border-zinc-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-900 focus:border-blue-900" 
                                             aria-label="Search Term" 
                                             placeholder="Search..." 
@@ -108,14 +219,27 @@
 
                                     <!-- Bulk Action Buttons -->
                                     <div class="ml-auto flex flex-row items-center space-x-4">
-                                        <button @click="confirmBulkRestore()" class="border border-zinc-300 rounded-lg p-2 text-zinc-600 text-sm flex items-center hover:border-blue-500 hover:text-blue-500 hover:bg-blue-100 transition space-x-1 group">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-blue-500" viewBox="0 0 24 24"><path fill="currentColor" d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89l.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7s-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.95 8.95 0 0 0 13 21a9 9 0 0 0 0-18m-1 5v5l4.28 2.54l.72-1.21l-3.5-2.08V8z"/></svg>
-                                            <span class="text-zinc-600 transition group-hover:text-blue-500">Restore</span>
-                                        </button>
-                                        <button @click="confirmBulkDelete()" class="border border-zinc-300 rounded-lg p-2 text-zinc-600 text-sm flex items-center hover:border-red-500 hover:text-red-500 hover:bg-red-100 transition space-x-1 group">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
-                                            <span class="text-zinc-600 transition group-hover:text-red-500">Delete</span>
-                                        </button>
+                                        <button 
+                                                    type="button" 
+                                                    @click="showCheckboxes = !showCheckboxes; showRestoreCancelButtons = !showRestoreCancelButtons; disableButtons();" 
+                                                    :disabled="selectedRows.length === 1 || isDisabled"
+                                                    class="border px-3 py-2 rounded-lg text-sm text-gray-600 hover:border-green-500 hover:text-green-500 hover:bg--green-500 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                                                    >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-green-500" viewBox="0 0 24 24">
+                                                        <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
+                                                    </svg>
+                                                    <span class="text-zinc-600 transition group-hover:text-green-500">Restore</span>
+                                                </button>
+                                                <!-- Delete Button -->
+                                                <button 
+                                                    type="button" 
+                                                    @click="showCheckboxes = !showCheckboxes; showDeleteCancelButtons = !showDeleteCancelButtons; disableButtons();" 
+                                                    :disabled="selectedRows.length === 1 || isDisabled"
+                                                    class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-red-800 hover:text-red-800 hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                                                    >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
+                                                    <span class="text-zinc-600 transition group-hover:text-red-500">Delete</span>
+                                                </button>
                                         <div class="relative inline-block space-x-4 text-left sm:w-auto">
                                             <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" class="flex items-center text-zinc-500 hover:text-zinc-700" type="button">
                                                 <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
@@ -142,9 +266,18 @@
                                     <table class="min-w-full bg-white" id="org-table">
                                         <thead class="bg-zinc-100 text-zinc-700 font-extrabold sticky top-0">
                                             <tr>
-                                                <th class="text-left py-3 px-4">
-                                                    <input type="checkbox" @click="toggleAll()" :checked="checkAll" aria-label="Select all items" />
-                                                </th>
+                                                <th scope="col" class="text-left py-3 px-4">
+                                                    <!-- Header Checkbox for Select All -->
+                                                        <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600" x-cloak>
+                                                            <div class="relative flex items-center">
+                                                                <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition"
+                                                                />
+                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                                                </svg>
+                                                            </div>
+                                                        </label>
+                                                    </th>
                                                 <th class="text-left py-3 px-4 font-semibold text-sm">Name</th>
                                                 <th class="text-left py-3 px-4 font-semibold text-sm">Tax Type</th>
                                                 <th class="text-left py-3 px-4 font-semibold text-sm">Classification</th>
@@ -166,12 +299,18 @@
                                             @foreach($trashedOrganizations as $organization)
                                                 <tr class="hover:bg-slate-100 cursor-pointer ease-in-out">
                                                     <td class="py-3 px-4">
-                                                        <input type="checkbox" x-bind:checked="selectedRows.includes({{ $organization->id }})" 
-                                                            @click="toggleCheckbox({{ $organization->id }})" 
-                                                            aria-label="Select item {{ $organization->registration_name }}" 
-                                                            data-organization-id="{{ $organization->id }}"
-                                                        >
-                                                    </td>
+                                                        <!-- Body Checkbox for Individual Selection -->
+                                                            <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600" x-cloak>
+                                                                <div class="relative flex items-center">
+                                                                    <input type="checkbox" @click="toggleCheckbox('{{ $organization->id }}')" :checked="selectedRows.includes('{{ $organization->id }}')" id="organization{{ $organization->id }}" 
+                                                                        class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition"
+                                                                    />
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                                                    </svg>
+                                                                </div>
+                                                            </label>
+                                                        </td>
                                                     <td class="text-left py-4 px-4">
                                                         <button class="font-bold hover:text-blue-600 underline"
                                                         @click="$dispatch('open-view-org-modal', { organization: { registration_name: '{{ $organization->registration_name }}', tax_type: '{{ $organization->tax_type }}', type: '{{ $organization->type }}', tin: '{{ $organization->tin }}', account: '{{ $organization->account ? 'Account Active' : 'No Account Yet' }}' } })">
@@ -259,61 +398,188 @@
                                     </div>
                                 </div>
 
-                                <!-- Delete Confirmation Modal -->
-                                <div x-show="showConfirmDeleteModal" class="fixed inset-0 bg-gray-200 z-50 bg-opacity-50 flex justify-center items-center" @click.away="showConfirmDeleteModal = false"
-                                    x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)" x-cloak>
-                                    <div class="bg-white p-10 rounded-lg shadow-lg max-w-lg w-full relative">
-                                        <button @click="closeModal()" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                        <div class="flex justify-start mb-4">
-                                            <i class="fas fa-exclamation-triangle text-red-500 text-8xl"></i>
+                                <!-- Restore Confirmation Modal -->
+                                        <div 
+                                            x-show="showConfirmRestoreModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            @click.away="showConfirmRestoreModal = false"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showConfirmRestoreModal)"
+                                        >
+                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <!-- Icon -->
+                                                    <div class="mb-4">
+                                                        <i class="fas fa-exclamation-triangle text-green-500 text-8xl"></i>
+                                                    </div>
+
+                                                    <!-- Title -->
+                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Restore Item(s)</h2>
+
+                                                    <!-- Description -->    
+                                                    <p class="text-sm text-zinc-700 text-center">
+                                                        You're going to restore the selected item(s) in the Organization Recycle Bin. Are you sure?
+                                                    </p>
+
+                                                    <!-- Actions -->
+                                                    <div class="flex justify-center space-x-8 mt-6 w-full">
+                                                        <button 
+                                                            @click="showConfirmRestoreModal = false; enableButtons(); showRestoreCancelButtons = true; disableButtons();" 
+                                                            class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        <button 
+                                                            @click="restoreRows(); showConfirmRestoreModal = false;" 
+                                                            class="px-4 py-2 bg-zinc-700 hover:bg-green-500 text-white rounded-lg text-sm transition"
+                                                        >
+                                                            Restore
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <h2 class="text-xl text-zinc-700 font-bold text-start mb-4">Permanently Delete Organization(s)</h2>
-                                        <p class="text-start mb-6 text-sm text-zinc-700">Are you sure you want to permanently delete the selected organization(s) to the recycle bin?</p>
-                                        <div class="bg-red-100 border-l-8 border-red-500 text-red-500 p-6 rounded-lg mb-6">
-                                            <ul class="list-disc pl-5 text-[13px]">
-                                                <li class="pl-2">
-                                                    <span class="inline-block align-top">This action cannot be undone, and the organization(s) will be completely removed from the system.</span>
-                                                </li>
-                                                <li class="pl-2">
-                                                    <span class="inline-block align-top">Any process or reports tied to this organization(s) will be affected.</span>
-                                                </li>
-                                                <li class="pl-2">
-                                                    <span class="inline-block align-top">Proceed only if you’re sure this organization(s) should<br />be removed from access.</span>
-                                                </li>
-                                            </ul>
+
+                                {{-- View Details --}}
+                                <div x-data="{ showOrg: false, organization: {}, formatDate(date) {const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                                        return new Date(date).toLocaleDateString(undefined, options); } }" x-show="showOrg"
+                                    @open-view-org-modal.window="showOrg = true; organization = $event.detail.organization" x-on:close-modal.window="showOrg = false"
+                                    x-effect="document.body.classList.toggle('overflow-hidden', showOrg)" class="fixed z-50 inset-0 flex items-center justify-center m-2 px-6" x-cloak>
+                                    <!-- Modal background -->
+                                    <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
+                                    <!-- Modal container -->
+                                    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto h-auto z-10 overflow-hidden"
+                                    x-show="showOrg" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
+                                        <!-- Modal header -->
+                                        <div class="relative p-3 bg-blue-900 border-opacity-80 w-full">
+                                            <h1 class="text-lg font-bold text-white text-center">Organization Details</h1>
+                                            <button @click="showOrg = false" class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 8L16 16M8 16L16 8" stroke="#1e3a8a" class="transition duration-200 hover:stroke-gray-600"/>
+                                                </svg>
+                                            </button>
                                         </div>
-                                        <div class="flex justify-end gap-4">
-                                            <button @click="closeModal()" class="mr-2 font-semibold text-zinc-600 px-3 py-1 rounded-md hover:text-zinc-900 transition">Cancel</button>
-                                            <button @click="bulkDelete(); closeModal();" class="bg-red-500 hover:bg-red-700 text-white font-semibold py-1.5 px-5 rounded-lg">Permanently Delete</button>
+                                        <!-- Modal body -->
+                                        <div class="p-10">
+                                            <div class="grid grid-cols-2 gap-6 mb-5">
+                                                <div class="w-full">
+                                                    <label class="block text-sm font-bold text-zinc-700">Name</label>
+                                                    <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                                                        x-bind:value="organization.registration_name" disabled readonly>
+                                                </div>
+                                                <div class="w-full">
+                                                    <label class="block text-sm font-bold text-zinc-700">TIN</label>
+                                                    <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                                                        x-bind:value="organization.tin" disabled readonly>
+                                                </div>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-6 mb-5">
+                                                <div class="w-full">
+                                                    <label class="block text-sm font-bold text-zinc-700">Tax Type</label>
+                                                    <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 truncate border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                                                        x-bind:value="organization.tax_type" disabled readonly>
+                                                </div>
+                                                <div class="w-full">
+                                                    <label class="block text-sm font-bold text-zinc-700">Classification</label>
+                                                    <input class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200"
+                                                        x-bind:value="organization.type" disabled readonly>
+                                                </div>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-6 mb-5">
+                                                <div class="w-full">
+                                                    <label class="block text-sm mb-2 font-bold text-zinc-700">Account Status</label>
+                                                    <span class="py-2 px-4 mt-2 text-xs font-medium rounded-full"
+                                                        :class="organization.account === 'Account Active' ? 'bg-green-100 text-green-800' : 'bg-zinc-100 text-zinc-800'">
+                                                        <span x-text="organization.account"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Restore Confirmation Modal -->
-                                <div x-show="showConfirmRestoreModal" class="fixed inset-0 z-50 bg-gray-200 bg-opacity-50 flex justify-center items-center" @click.away="showConfirmRestoreModal = false"
-                                    x-effect="document.body.classList.toggle('overflow-hidden', showConfirmRestoreModal)" x-cloak>
-                                    <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative">
-                                        <div class="flex flex-col items-center">
-                                            <button @click="closeModal()" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                            <div class="mb-4">
-                                                <i class="fas fa-exclamation-triangle text-blue-600 text-8xl"></i>
-                                            </div>
-                                            <h2 class="text-2xl font-extrabold text-blue-600 mb-2">Restore Organization(s)</h2>
-                                            <p class="text-sm text-zinc-700 text-center">You're going to restore the selected organization(s) in the Recycle Bin table. Are you sure?</p>
-                                            <div class="flex justify-center space-x-8 mt-6 w-full">
-                                                <button @click="closeModal()" class="px-4 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-900 font-bold transition">Cancel</button>
-                                                <button @click="bulkRestore(); closeModal();" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition">Restore</button>
+                                        <!-- Delete Confirmation Modal -->
+                                        <div 
+                                            x-show="showConfirmDeleteModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
+                                            @click.away="showConfirmDeleteModal = false"
+                                        >
+                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <!-- Icon -->
+                                                    <div class="mb-4">
+                                                        <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>
+                                                    </div>
+
+                                                    <!-- Title -->
+                                                    <h2 class="text-2xl font-extrabold text-zinc-800 mb-2">Delete Organization</h2>
+
+                                                    <!-- Description -->
+                                                    <p class="text-sm text-zinc-600 text-center">
+                                                        You're going to delete permanently the selected item(s) in the Organization Recycle. Are you sure?
+                                                    </p>
+
+                                                    <!-- Actions -->
+                                                    <div class="flex justify-center space-x-8 mt-6 w-full">
+                                                        <button 
+                                                            @click="showConfirmDeleteModal = false; enableButtons(); enableButtons(); showDeleteCancelButtons = true; disableButtons();" 
+                                                            class="px-4 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-900 font-bold transition"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        <button 
+                                                            @click="deleteRows(); showConfirmDeleteModal = false;" 
+                                                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+
+                                        <!-- Success Restore Modal -->
+                                        <div 
+                                            x-show="showSuccessRestoreModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showSuccessRestoreModal)"
+                                            @click.away="showSuccessRestoreModal = false"
+                                        >
+                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <i class="fas fa-check-circle text-green-500 text-6xl mb-4"></i>
+                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Restoration Successful!</h2>
+                                                    <p class="text-sm text-zinc-700 text-center">
+                                                        The selected items have been successfully restored.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Success Delete Modal -->
+                                        <div 
+                                            x-show="showSuccessDeleteModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showSuccessDeleteModal)"
+                                            @click.away="showSuccessDeleteModal = false"
+                                        >
+                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <i class="fas fa-check-circle text-red-500 text-6xl mb-4"></i>
+                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Deletion Successful!</h2>
+                                                    <p class="text-sm text-zinc-700 text-center">
+                                                        The selected items have been permanently deleted.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                 </div>
 
                                 {{-- Action buttons Inalis ko muna yung iba, ayaw kasi gumana; should be the same with other tables--}}
@@ -342,14 +608,14 @@
                                     <div class="flex justify-center py-4" x-show="showRestoreCancelButtons">
                                         <button 
                                             type = "button"
-                                            @click="showConfirmUnarchiveModal = true; showRestoreCancelButtons = true;"
+                                            @click="showConfirmRestoreModal = true; showRestoreCancelButtons = true;"
                                             :disabled="selectedRows.length === 0"
-                                            class="border px-3 py-2 rounded-lg text-sm text-gray-800 border-gray-800 bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                                            class="border px-3 py-2 rounded-lg text-sm text-gray-800 border-gray-800 hover:text-green-500 hover:border-green-500 bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-zinc-800" viewBox="0 0 24 24">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-green-500" viewBox="0 0 24 24">
                                                 <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
                                             </svg>
-                                            <span class="text-zinc-600 transition group-hover:text-zinc-800">Restore Selected</span><span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
+                                            <span class="text-zinc-600 transition group-hover:text-green-500">Restore Selected</span><span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
                                         </button>
                                         <button @click="cancelSelection(); enableButtons();" class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition">
                                             Cancel
@@ -359,59 +625,13 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('recycleBinHandler', () => ({
-                checkAll: false,
-                selectedRows: [],
-                showConfirmDeleteModal: false,
-                showConfirmRestoreModal: false,
-
-                toggleCheckbox(id) {
-                    if (this.selectedRows.includes(id)) {
-                        this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
-                    } else {
-                        this.selectedRows.push(id);
-                    }
-                },
-
-                toggleAll() {
-                    this.checkAll = !this.checkAll;
-                    this.selectedRows = this.checkAll ? @json($trashedOrganizations->pluck('id')) : [];
-                },
-
-                bulkRestore() {
-                    axios.post('{{ route("recycle-bin.organization.bulkRestore") }}', { ids: this.selectedRows })
-                        .then(response => location.reload())
-                        .catch(error => console.error(error));
-                },
-
-                bulkDelete() {
-                    axios.post('{{ route("recycle-bin.organization.bulkDelete") }}', { ids: this.selectedRows, _method: "DELETE" })
-                        .then(response => location.reload())
-                        .catch(error => console.error(error));
-                },
-
-                confirmBulkRestore() {
-                    this.showConfirmRestoreModal = true;
-                },
-
-                confirmBulkDelete() {
-                    this.showConfirmDeleteModal = true;
-                },
-
-                closeModal() {
-                    this.showConfirmDeleteModal = false;
-                    this.showConfirmRestoreModal = false;
-                }
-            }));
-        });
-
     // FOR SORT BUTTON
     document.getElementById('sortButton').addEventListener('click', function() {
         const dropdown = document.getElementById('dropdownMenu');

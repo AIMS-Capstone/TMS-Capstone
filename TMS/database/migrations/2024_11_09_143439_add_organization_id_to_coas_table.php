@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('coas', function (Blueprint $table) {
             $table->foreignId('organization_id')
+                ->nullable()
                 ->after('description') // Place it after the 'description' column
                 ->constrained('org_setups') // Referencing the 'id' column in 'org_setups' table
                 ->onDelete('cascade'); // Set cascade on delete

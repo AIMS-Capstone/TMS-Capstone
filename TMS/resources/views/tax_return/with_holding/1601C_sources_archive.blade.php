@@ -136,17 +136,18 @@ $organizationId = session('organization_id');
                     <div class="flex flex-row space-x-2 items-center justify-between">
                         <!-- Search Bar -->
                         <div class="flex flex-row space-x-2 items-center ps-6">
-                            <div class="relative w-80 p-4">
-                                <form action="/1601C_sources" method="GET">
-                                    <div class="relative">
-                                        <input 
-                                            type="search" 
-                                            name="search" 
-                                            class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900"
-                                            placeholder="Search sources..."
-                                        >
-                                        <i class="fa fa-search absolute left-3 top-3 text-gray-400"></i>
-                                    </div>
+                            <div class="w-80 p-5">
+                                <form x-target="tableid" action="/tax_return/with_holding/{{ $with_holding->id }}/1601C_sources" role="search" aria-label="Table" autocomplete="off">
+                                    <input 
+                                        type="search" 
+                                        name="search"
+                                        class="w-full pl-10 pr-4 py-[7px] text-sm border border-zinc-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-900 focus:border-blue-900" 
+                                        aria-label="Search Term" 
+                                        placeholder="Search..." 
+                                        @input.debounce="$el.form.requestSubmit()" 
+                                        @search="$el.form.requestSubmit()"
+                                    >
+                                    <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-zinc-400"></i>
                                 </form>
                             </div>
 
@@ -318,7 +319,7 @@ $organizationId = session('organization_id');
                                             <th scope="col" class="py-2 px-4">
                                                 <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600" x-cloak >
                                                     <div class="relative flex items-center">
-                                                        <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"
+                                                        <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition"
                                                         />
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -348,7 +349,7 @@ $organizationId = session('organization_id');
                                                     <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600" x-cloak>
                                                         <div class="relative flex items-center">
                                                             <input type="checkbox" @click="toggleCheckbox('{{ $source->id }}')" :checked="selectedRows.includes('{{ $source->id }}')" id="source{{ $source->id }}"
-                                                                class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"
+                                                                class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition"
                                                                 />
                                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
