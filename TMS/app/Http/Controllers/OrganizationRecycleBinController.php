@@ -13,8 +13,8 @@ class OrganizationRecycleBinController extends Controller
         $perPage = $request->input('perPage', 5);
 
         // Search functionality
-        if ($request->has('user_search') && $request->user_search != '') {
-            $search = $request->user_search;
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('registration_name', 'LIKE', '%' . $search . '%')
                     ->orWhere('tax_type', 'LIKE', '%' . $search . '%')
