@@ -7,7 +7,7 @@
     class="fixed z-50 inset-0 flex items-center justify-center m-2 px-6"
     x-cloak>
     <!-- Modal background -->
-    <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
+    <div class="fixed inset-0 bg-gray-200 opacity-10"></div>
     <!-- Modal container -->
     <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl mx-auto h-auto z-10 overflow-hidden"
         x-show="showEmp" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"

@@ -166,21 +166,61 @@
                                     <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                 </div>
                     
-                                <!-- Sort by dropdown -->
-                                <div class="relative inline-block text-left">
-                                    <button id="sortButton" class="flex items-center text-zinc-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
-                                            <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
-                                        </svg>
-                                        <span id="selectedOption" class="font-normal text-md text-zinc-700 truncate">Sort by</span>
-                                    </button>
+                                <div class="flex flex-row items-center space-x-4">
+                                    <div class="relative inline-block text-left sm:w-auto w-full z-30">
+                                        <button id="filterButton" class="flex items-center text-zinc-600 hover:text-zinc-800 w-full hover:shadow-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
+                                                <path fill="none" stroke="#696969" stroke-width="2" d="M18 4H6c-1.105 0-2.026.91-1.753 1.98a8.02 8.02 0 0 0 4.298 5.238c.823.394 1.455 1.168 1.455 2.08v6.084a1 1 0 0 0 1.447.894l2-1a1 1 0 0 0 .553-.894v-5.084c0-.912.632-1.686 1.454-2.08a8.02 8.02 0 0 0 4.3-5.238C20.025 4.91 19.103 4 18 4z"/>
+                                            </svg>
+                                            <span id="selectedFilter" class="font-normal text-sm text-zinc-600 truncate">Filter</span>
+                                            <svg id="dropdownArrow" class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
+                                        </button>
+                                    
+                                        <div id="dropdownFilter" class="absolute mt-2 w-[340px] rounded-lg shadow-lg bg-white hidden z-40">
+                                            <div class="py-2 px-2">
+                                                <span class="block px-4 py-2 text-xs font-bold text-zinc-700">Filter</span>
+                                                <span class="block px-4 py-1 text-zinc-700 font-bold text-xs">Classification</span>
+                                                <div class="px-4 py-2 text-xs block items-center">
+                                                    <label class="flex items-center space-x-2 py-1">
+                                                        <input type="checkbox" value="Individual" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Status" />
+                                                        <span>Individual</span>
+                                                    </label>
+                                                    <label class="flex items-center space-x-2 py-1">
+                                                        <input type="checkbox" value="Non-Individual" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Status" />
+                                                        <span>Non-Individual</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center space-x-4 px-4 py-1.5 mb-1.5">
+                                                <button id="applyFiltersButton" class="flex items-center bg-white border border-gray-300 hover:border-green-500 hover:bg-green-100 hover:text-green-500 transition rounded-md px-3 py-1.5 whitespace-nowrap group">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 fill-current group-hover:fill-green-500 hover:border-green-500 hover:text-green-500 transition" viewBox="0 0 32 32">
+                                                        <path fill="currentColor" d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5z"/>
+                                                    </svg>
+                                                    <span class="text-zinc-700 transition group-hover:text-green-500 text-xs">Apply Filter</span>
+                                                </button>
+                                                <button id="clearFiltersButton" class="text-xs text-zinc-600 hover:text-zinc-900 whitespace-nowrap">Clear all filters</button>
+                                            </div>
+                                        </div>
+                                    </div>
                     
-                                    <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
-                                        <div class="py-2 px-2">
-                                            <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
-                                            <div data-sort="recently-added" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
-                                            <div data-sort="ascending" class="block px-4 py-2 w-full text-sm hover-dropdown">Ascending</div>
-                                            <div data-sort="descending" class="block px-4 py-2 w-full text-sm hover-dropdown">Descending</div>
+                                    <div class="h-8 border-l border-zinc-300"></div>
+                    
+                                    <!-- Sort by dropdown -->
+                                    <div class="relative inline-block text-left min-w-[150px]">
+                                        <button id="sortButton" class="flex items-center text-zinc-600 w-full hover:shadow-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24"><path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span id="selectedOption" class="font-normal text-sm text-zinc-600 hover:text-zinc-800 truncate">Sort by</span>
+                                            <svg class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
+                                        </button>
+                            
+                                        <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-30">
+                                            <div class="py-2 px-2">
+                                                <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
+                                                <div data-sort="recently-added" class="block px-4 py-2 w-full text-xs hover-dropdown">Recently Added</div>
+                                                <div data-sort="ascending" class="block px-4 py-2 w-full text-xs hover-dropdown">Ascending</div>
+                                                <div data-sort="descending" class="block px-4 py-2 w-full text-xs hover-dropdown">Descending</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -273,8 +313,7 @@
                                                                 contact_city: '{{ $contact->contact_city }}',
                                                                 contact_zip: '{{ $contact->contact_zip }}'
                                                             })" 
-                                                            class="hover:underline hover:text-blue-500"
-                                                        >
+                                                            class="hover:underline font-bold hover:text-blue-500">
                                                             {{ $contact->bus_name }}
                                                         </button>
                                                     </td>
@@ -412,6 +451,92 @@
             });
         }
         
+        //FILTER BUTTON
+        const filterButton = document.getElementById('filterButton');
+        const dropdownFilter = document.getElementById('dropdownFilter');
+        const applyFiltersButton = document.getElementById('applyFiltersButton');
+        const clearFiltersButton = document.getElementById('clearFiltersButton');
+        const selectedFilter = document.getElementById('selectedFilter');
+        const tableRows = document.querySelectorAll('tbody tr');
+        const dropdownArrow = document.getElementById('dropdownArrow');
+
+        filterButton.addEventListener('click', () => {
+            dropdownArrow.classList.toggle('rotate-180');
+            dropdownFilter.classList.toggle('hidden');
+        });
+
+        function getSelectedFilters() {
+            const filters = {};
+            document.querySelectorAll('.filter-checkbox:checked').forEach((checkbox) => {
+                const category = checkbox.dataset.category;
+                if (!filters[category]) filters[category] = [];
+                filters[category].push(checkbox.value);
+            });
+            return filters;
+        }
+
+        function applyFilters() {
+            const filters = getSelectedFilters(); // Retrieve selected filters
+            tableRows.forEach((row) => {
+                let isVisible = true;
+
+                // Fetch Classification column content (adjust column index if needed)
+                const classificationCell = row.cells[4]?.textContent.trim(); // Adjust index to match "Classification"
+
+                if (filters["Status"]) {
+                    const selectedValues = filters["Status"];
+                    isVisible = selectedValues.includes(classificationCell); // Check if the classification matches any selected filter
+                }
+
+                row.style.display = isVisible ? "" : "none"; // Show or hide rows based on the filter
+            });
+
+            dropdownFilter.classList.add('hidden'); // Hide dropdown after applying filters
+            selectedFilter.textContent = 'Filter'; // Reset the filter button text
+        }
+
+        function clearFilters() {
+            document.querySelectorAll('.filter-checkbox').forEach((checkbox) => (checkbox.checked = false)); // Uncheck all checkboxes
+            tableRows.forEach((row) => (row.style.display = '')); // Show all rows
+            dropdownFilter.classList.add('hidden'); // Hide dropdown
+            selectedFilter.textContent = 'Filter'; // Reset filter button text
+            updateApplyButtonState(); // Update the "Apply Filter" button state
+        }
+
+        applyFiltersButton.addEventListener('click', applyFilters);
+        clearFiltersButton.addEventListener('click', clearFilters);
+
+        window.addEventListener('click', (event) => {
+            if (!filterButton.contains(event.target) && !dropdownFilter.contains(event.target)) {
+                dropdownFilter.classList.add('hidden');
+            }
+        });
+
+        // Initial setup: disable the "Apply Filter" button
+        applyFiltersButton.disabled = true;
+        applyFiltersButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+        function updateApplyButtonState() {
+            const hasSelection = document.querySelectorAll('.filter-checkbox:checked').length > 0;
+            applyFiltersButton.disabled = !hasSelection;
+            if (hasSelection) {
+                applyFiltersButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                applyFiltersButton.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        document.querySelectorAll('.filter-checkbox').forEach((checkbox) => {
+            checkbox.addEventListener('change', updateApplyButtonState);
+        });
+
+        clearFiltersButton.addEventListener('click', () => {
+            document.querySelectorAll('.filter-checkbox').forEach((checkbox) => (checkbox.checked = false));
+            tableRows.forEach((row) => (row.style.display = ''));
+            dropdownFilter.classList.add('hidden');
+            selectedFilter.textContent = 'Filter';
+            updateApplyButtonState();
+        });
 
         // FOR SORT BUTTON
         document.getElementById('sortButton').addEventListener('click', function() {

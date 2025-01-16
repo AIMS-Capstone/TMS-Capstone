@@ -269,60 +269,8 @@ $organizationId = session('organization_id');
                                 aria-controls="tabpanelAssets">
                                 1702Q
                             </button>
-                            {{-- <!-- Tab 3: 1701 -->
-                            <button @click="selectedTab = '1701'; $dispatch('filter', { type: '1701' })" 
-                                :aria-selected="selectedTab === '1701'" 
-                                :tabindex="selectedTab === '1701' ? '0' : '-1'" 
-                                :class="selectedTab === '1701' 
-                                    ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
-                                    : 'text-zinc-600 font-medium hover:text-blue-900'" 
-                                class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
-                                type="button" 
-                                role="tab" 
-                                aria-controls="tabpanelAssets">
-                                1701
-                            </button>
-                            <!-- Tab 4: 1702RT -->
-                            <button @click="selectedTab = '1702RT'; $dispatch('filter', { type: '1702RT' })" 
-                                :aria-selected="selectedTab === '1702RT'" 
-                                :tabindex="selectedTab === '1702RT' ? '0' : '-1'" 
-                                :class="selectedTab === '1702RT' 
-                                    ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
-                                    : 'text-zinc-600 font-medium hover:text-blue-900'" 
-                                class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
-                                type="button" 
-                                role="tab" 
-                                aria-controls="tabpanelAssets">
-                                1702RT
-                            </button>
-                            <!-- Tab 5: 1702MX -->
-                            <button @click="selectedTab = '1702MX'; $dispatch('filter', { type: '1702MX' })" 
-                                :aria-selected="selectedTab === '1702MX'" 
-                                :tabindex="selectedTab === '1702MX' ? '0' : '-1'" 
-                                :class="selectedTab === '1702MX' 
-                                    ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
-                                    : 'text-zinc-600 font-medium hover:text-blue-900'" 
-                                class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
-                                type="button" 
-                                role="tab" 
-                                aria-controls="tabpanelAssets">
-                                1702MX
-                            </button>
-                            <!-- Tab 6: 1702EX -->
-                            <button @click="selectedTab = '1702EX'; $dispatch('filter', { type: '1702EX' })" 
-                                :aria-selected="selectedTab === '1702EX'" 
-                                :tabindex="selectedTab === '1702EX' ? '0' : '-1'" 
-                                :class="selectedTab === '1702EX' 
-                                    ? 'font-bold text-blue-900 bg-slate-100 rounded-lg'
-                                    : 'text-zinc-600 font-medium hover:text-blue-900'" 
-                                class="flex h-min items-center gap-2 px-4 py-2 text-sm whitespace-nowrap" 
-                                type="button" 
-                                role="tab" 
-                                aria-controls="tabpanelAssets">
-                                1702EX
-                            </button>
                         </div>
-                         --}}
+                        
                         <div x-data="{ open: false, selectedType: '', month: '' }" @open-generate-modal.window="open = true" x-cloak>
                             <div x-show="open" class="fixed inset-0 bg-gray-200 bg-opacity-50 z-50 flex items-center justify-center transition-opacity"
                                 x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"

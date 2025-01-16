@@ -21,7 +21,7 @@
     >
         <!-- Modal Header -->
         <div class="relative bg-blue-900 text-white text-center py-4">
-            <h2>Edit Employee: <span x-text="employee.first_name"></span></h2>
+            <h3 class="font-bold text-lg">Edit Employee: <span x-text="employee.first_name"></span></h3>
             <button @click="$dispatch('close-modal')"    class="absolute right-3 top-4 text-sm text-white hover:text-zinc-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <circle cx="12" cy="12" r="10" fill="white" class="transition duration-200 hover:fill-gray-300"/>

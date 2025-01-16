@@ -182,7 +182,6 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                     <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                 </div>
                                 
-                                {{-- Wait ko munang maayos yung pag-fetch ng data sa page na 'to before ko tapusin filter --}}
                                 <div class="flex flex-row items-center space-x-4">
                                     <div class="relative inline-block text-left sm:w-auto w-full z-30">
                                         <button id="filterButton" class="flex items-center text-zinc-600 hover:text-zinc-800 w-full hover:shadow-sm">
@@ -207,7 +206,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                                         <span>Above Minimum Wage Earner (AMWE)</span>
                                                     </label>
                                                 </div>
-                                                <span class="block px-4 py-1 text-zinc-700 font-bold text-xs">With Previous Employer</span>
+                                                {{-- padagdag ng kung paano siya mahihila pero hidden column niya --}}
+                                                {{-- <span class="block px-4 py-1 text-zinc-700 font-bold text-xs">With Previous Employer</span>
                                                 <div id="statusFilterContainer" class="block px-4 py-2 text-xs">
                                                     <label class="flex items-center space-x-2 py-1">
                                                         <input type="checkbox" value="Yes" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Status" />
@@ -217,7 +217,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                                         <input type="checkbox" value="No" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Status" />
                                                         <span>No</span>
                                                     </label>
-                                                </div>
+                                                </div> --}}
                                             </div>
                                             <div class="flex items-center space-x-4 px-4 py-1.5 mb-1.5">
                                                 <button id="applyFiltersButton" class="flex items-center bg-white border border-gray-300 hover:border-green-500 hover:bg-green-100 hover:text-green-500 transition rounded-md px-3 py-1.5 whitespace-nowrap group">
@@ -333,7 +333,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                                         <x-view-employees />
                                                         <button
                                                             @click="$dispatch('open-view-employee-modal', {{ @json_encode($employee) }})" 
-                                                            class="hover:underline hover:text-blue-500">
+                                                            class="font-bold hover:underline hover:text-blue-500">
                                                             {{ $employee->first_name }} {{ $employee->last_name }}
                                                         </button>
                                                     </td>   
@@ -343,21 +343,21 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                                             $wageStatus = $employee->latestEmployment->employee_wage_status ?? null;
                                                         @endphp
                                                         @if ($wageStatus === 'Minimum Wage Earner')
-                                                            <span class="inline-block px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 rounded-full">MWE</span>
+                                                            <span class="inline-block px-3 py-1 text-sm text-zinc-700 bg-zinc-100 rounded-full">MWE</span>
                                                         @elseif ($wageStatus === 'Above Minimum Wage Earner')
-                                                            <span class="inline-block px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 rounded-full">AMWE</span>
+                                                            <span class="inline-block px-3 py-1 text-sm text-zinc-700 bg-zinc-100 rounded-full">AMWE</span>
                                                         @else
-                                                            <span class="inline-block px-3 py-1 text-sm font-medium text-gray-500 bg-gray-50 rounded-full">N/A</span>
+                                                            <span class="inline-block px-3 py-1 text-sm text-zinc-500 bg-zinc-50 rounded-full">N/A</span>
                                                         @endif
                                                     </td>
                                                     <td class="text-left py-3 px-4">{{ $employee->contact_number }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->nationality }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->address->address ?? 'N/A' }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->address->zip_code ?? '0000' }}</td>
-                                                    <td class="text-left py-3 px-4">
+                                                    <td class="text-left py-3 px-3">
                                                         <x-edit-employees />
                                                         <button 
-                                                        @click="$dispatch('open-edit-employee-modal', {{@json_encode($employee) }})">
+                                                        @click="$dispatch('open-edit-employee-modal', {{@json_encode($employee) }})" class="text-blue-600 text-xs underline">
                                                         Edit Employee
                                                     </button>
                                                     </td>
@@ -482,7 +482,97 @@ $organization = \App\Models\OrgSetup::find($organizationId);
             });
         }
         
-        
+        //FILTER BUTTON
+        const filterButton = document.getElementById('filterButton');
+        const dropdownFilter = document.getElementById('dropdownFilter');
+        const applyFiltersButton = document.getElementById('applyFiltersButton');
+        const clearFiltersButton = document.getElementById('clearFiltersButton');
+        const selectedFilter = document.getElementById('selectedFilter');
+        const tableRows = document.querySelectorAll('tbody tr');
+        const dropdownArrow = document.getElementById('dropdownArrow');
+
+        filterButton.addEventListener('click', () => {
+            dropdownArrow.classList.toggle('rotate-180');
+            dropdownFilter.classList.toggle('hidden');
+        });
+
+        function getSelectedFilters() {
+            const filters = {};
+            document.querySelectorAll('.filter-checkbox:checked').forEach((checkbox) => {
+                const category = checkbox.dataset.category;
+                if (!filters[category]) filters[category] = [];
+                filters[category].push(checkbox.value);
+            });
+            return filters;
+        }
+
+        function applyFilters() {
+            const filters = getSelectedFilters();
+            tableRows.forEach((row) => {
+                let isVisible = true;
+
+                // Fetch Wage Status column content (adjust column index if needed)
+                const wageStatusCell = row.cells[3]?.textContent.trim();
+
+                if (filters["Status"]) {
+                    const selectedValues = filters["Status"];
+                    isVisible = selectedValues.some((value) => {
+                        if (value === "Minimum Wage Earner") return wageStatusCell === "MWE";
+                        if (value === "Above Minimum Wage Earner") return wageStatusCell === "AMWE";
+                        return false; // Additional conditions can go here if needed
+                    });
+                }
+
+                row.style.display = isVisible ? "" : "none";
+            });
+
+            dropdownFilter.classList.add('hidden');
+            selectedFilter.textContent = 'Filter';
+        }
+
+        function clearFilters() {
+            document.querySelectorAll('.filter-checkbox').forEach((checkbox) => (checkbox.checked = false));
+            tableRows.forEach((row) => (row.style.display = ''));
+            dropdownFilter.classList.add('hidden');
+            selectedFilter.textContent = 'Filter';
+            updateApplyButtonState();
+        }
+
+        applyFiltersButton.addEventListener('click', applyFilters);
+        clearFiltersButton.addEventListener('click', clearFilters);
+
+        window.addEventListener('click', (event) => {
+            if (!filterButton.contains(event.target) && !dropdownFilter.contains(event.target)) {
+                dropdownFilter.classList.add('hidden');
+            }
+        });
+
+        // Initial setup: disable the "Apply Filter" button
+        applyFiltersButton.disabled = true;
+        applyFiltersButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+        function updateApplyButtonState() {
+            const hasSelection = document.querySelectorAll('.filter-checkbox:checked').length > 0;
+            applyFiltersButton.disabled = !hasSelection;
+            if (hasSelection) {
+                applyFiltersButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                applyFiltersButton.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        document.querySelectorAll('.filter-checkbox').forEach((checkbox) => {
+            checkbox.addEventListener('change', updateApplyButtonState);
+        });
+
+        clearFiltersButton.addEventListener('click', () => {
+            document.querySelectorAll('.filter-checkbox').forEach((checkbox) => (checkbox.checked = false));
+            tableRows.forEach((row) => (row.style.display = ''));
+            dropdownFilter.classList.add('hidden');
+            selectedFilter.textContent = 'Filter';
+            updateApplyButtonState();
+        });
+
         // FOR SORT BUTTON
         document.getElementById('sortButton').addEventListener('click', function() {
             const dropdown = document.getElementById('dropdownMenu');

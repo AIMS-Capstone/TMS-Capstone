@@ -8,7 +8,7 @@
     x-cloak
 >
     <!-- Modal Background -->
-    <div class="fixed inset-0 bg-gray-200 bg-opacity-20"></div>
+    <div class="fixed inset-0 bg-gray-200 bg-opacity-10"></div>
 
     <!-- Modal Container -->
     <div class="bg-white rounded-lg shadow-lg w-full max-w-xl mx-auto z-10 overflow-hidden"
