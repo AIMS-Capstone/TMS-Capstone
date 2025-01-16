@@ -49,12 +49,7 @@
                             >
                                 Report
                             </a>
-                            <a 
-                                href="{{ route('tax_return.notes_activities', ['id' => $taxReturn->id]) }}" 
-                                class="text-zinc-600 font-medium hover:text-blue-900 px-4 py-2 text-sm"
-                            >
-                                Notes and Activities
-                            </a>
+                           
                         </div>
 
                         <!-- Tab Content for Input Summary -->

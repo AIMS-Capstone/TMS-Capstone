@@ -80,42 +80,59 @@ public function vatReturn(Request $request)
 
 
     // Function for showing Income Returns Table
-    public function incomeReturn()
+    public function incomeReturn(Request $request)
     {
         $organizationId = session('organization_id');
         
-        // Capture the 'type' query parameter to apply the filter
-        $filterType = request()->query('type', '1701Q');  // Default to '1701Q' if no type is passed
-        $searchTerm = request()->query('search', '');  // Get the search query parameter, default to empty
+        // Get pagination and sorting parameters
+        $perPage = $request->input('perPage', 5);
+        $sortBy = $request->input('sortBy', 'created_at');
+        $sortDirection = $request->input('sortDirection', 'desc');
+        
+        // Get filter parameters
+        $filterType = $request->input('type', '1701Q');
+        $searchTerm = $request->input('search', '');
         
         // Start the query for tax returns
-        $taxReturns = TaxReturn::with('user')  // Make sure to eager load the user relation
+        $query = TaxReturn::with('user')
             ->where('organization_id', $organizationId)
             ->whereIn('title', ['1701Q', '1702Q', '1701', '1702RT', '1702MX', '1702EX']);
         
-           
         // Apply filter if a specific type is selected
         if ($filterType) {
-            $taxReturns->where('title', $filterType);
+            $query->where('title', $filterType);
         }
-    
+        
         // Apply the search filter if a search term is provided
         if ($searchTerm) {
-            $taxReturns->where(function($query) use ($searchTerm) {
-                // Search on multiple fields
-                $query->where('title', 'like', '%' . $searchTerm . '%')
-                      ->orWhere('year', 'like', '%' . $searchTerm . '%')
-                      ->orWhere('month', 'like', '%' . $searchTerm . '%')
-                      ->orWhere('status', 'like', '%' . $searchTerm . '%')
-                      ->orWhereDate('created_at', 'like', '%' . $searchTerm . '%');
+            $query->where(function($query) use ($searchTerm) {
+                $query->where('title', 'like', "%{$searchTerm}%")
+                      ->orWhere('year', 'like', "%{$searchTerm}%")
+                      ->orWhere('month', 'like', "%{$searchTerm}%")
+                      ->orWhere('status', 'like', "%{$searchTerm}%")
+                      ->orWhereDate('created_at', 'like', "%{$searchTerm}%")
+                      ->orWhereHas('user', function ($q) use ($searchTerm) {
+                          $q->where('first_name', 'like', "%{$searchTerm}%")
+                            ->orWhere('last_name', 'like', "%{$searchTerm}%");
+                      });
             });
         }
-    
-        // Get the filtered tax returns
-        $taxReturns = $taxReturns->get();  // Execute the query
         
-        // Return the view with the filtered tax returns and other data
-        return view('tax_return.income_return', compact('taxReturns', 'filterType', 'searchTerm'));
+        // Apply sorting
+        $query->orderBy($sortBy, $sortDirection);
+        
+        // Get the paginated results
+        $taxReturns = $query->paginate($perPage);
+        
+        // Return the view with all necessary data
+        return view('tax_return.income_return', compact(
+            'taxReturns',
+            'filterType',
+            'searchTerm',
+            'sortBy',
+            'sortDirection',
+            'perPage'
+        ));
     }
     
 // Function for showing detailed view of Income Returns
@@ -698,16 +715,51 @@ public function showVatReport($id)
 
 
   // Function for showing Percentage Tax Return Table
-    public function percentageReturn()
-    {
-        $organizationId = session('organization_id');
-        $taxReturns = TaxReturn::with('user')
-            ->where('organization_id', $organizationId)
-            ->whereIn('title', ['2551Q', '2551M'])
-            ->get();
-
-        return view('tax_return.percentage_return', compact('taxReturns'));
-    }
+  public function percentageReturn(Request $request)
+  {
+      $organizationId = session('organization_id');
+      
+      // Get pagination and sorting parameters
+      $perPage = $request->input('perPage', 5);
+      $sortBy = $request->input('sortBy', 'created_at');
+      $sortDirection = $request->input('sortDirection', 'desc');
+      $searchTerm = $request->input('search', '');
+      
+      // Start the query for tax returns
+      $query = TaxReturn::with('user')
+          ->where('organization_id', $organizationId)
+          ->whereIn('title', ['2551Q', '2551M']);
+      
+      // Apply the search filter if a search term is provided
+      if ($searchTerm) {
+          $query->where(function($query) use ($searchTerm) {
+              $query->where('title', 'like', "%{$searchTerm}%")
+                    ->orWhere('year', 'like', "%{$searchTerm}%")
+                    ->orWhere('month', 'like', "%{$searchTerm}%")
+                    ->orWhere('status', 'like', "%{$searchTerm}%")
+                    ->orWhereDate('created_at', 'like', "%{$searchTerm}%")
+                    ->orWhereHas('user', function ($q) use ($searchTerm) {
+                        $q->where('first_name', 'like', "%{$searchTerm}%")
+                          ->orWhere('last_name', 'like', "%{$searchTerm}%");
+                    });
+          });
+      }
+      
+      // Apply sorting
+      $query->orderBy($sortBy, $sortDirection);
+      
+      // Get the paginated results
+      $taxReturns = $query->paginate($perPage);
+      
+      // Return the view with all necessary data
+      return view('tax_return.percentage_return', compact(
+          'taxReturns',
+          'searchTerm',
+          'sortBy',
+          'sortDirection',
+          'perPage'
+      ));
+  }
     
 
         // Function for VAT Tax Return

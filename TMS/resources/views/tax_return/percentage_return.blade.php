@@ -392,9 +392,9 @@ $organizationId = session('organization_id');
                         </button>
                     </div>
                     {{-- Pagination --}}
-                    {{-- <div class="mx-12 mb-4">
-                        {{ $taxReturns->appends(['type' => $type])->links('vendor.pagination.custom') }}
-                    </div> --}}
+                    <div class="mx-12 mb-4">
+                        {{ $taxReturns->appends(request()->input())->links('vendor.pagination.custom') }}
+                    </div>
                 </div>
             </div>
         </div>
