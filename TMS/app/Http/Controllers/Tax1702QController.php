@@ -101,17 +101,25 @@ class Tax1702QController extends Controller
             // Find or create Tax1702Q for this tax return
             $tax1702q = Tax1702Q::where('tax_return_id', $taxReturn->id)->first();
 
-            if (!$tax1702q) {
+            $messageType = 'success'; // Default message type for new record
+            $messageText = 'Form 1702Q has been submitted successfully!'; // Default message for new record
+        
+            if ($tax1702q) {
+                $messageType = 'success2'; // Set this to 'success2' for edited records
+                $messageText = 'Form 1702Q has been updated successfully!'; // Message for updated record
+            } else {
+                // Create a new Tax1702Q if it doesn't exist
                 $tax1702q = new Tax1702Q();
                 $tax1702q->tax_return_id = $taxReturn->id;
             }
-            
+        
             $tax1702q->fill($validated);
             $tax1702q->save();
-
+        
+            // Redirect to the report view page with appropriate message
             return redirect()
                 ->route('tax_return.corporate_quarterly_pdf', ['taxReturn' => $taxReturn->id])
-                ->with('success', 'Form 1702Q has been submitted successfully.');
+                ->with($messageType, $messageText);
         
 
         } catch (\Exception $e) {
