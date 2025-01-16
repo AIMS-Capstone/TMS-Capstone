@@ -163,6 +163,10 @@ class DynamicModal extends Component
             $this->dispatch('refreshPurchaseDropdown', [
                 'options' => $options
             ]);
+            $this->dispatch('show-toast', [
+                'message' => 'Contact added successfully',
+                'type' => 'success'
+            ]);
     
             // Show success message
             session()->flash('message', 'Vendor successfully added.');

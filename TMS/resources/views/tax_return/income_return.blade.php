@@ -463,8 +463,11 @@ $organizationId = session('organization_id');
                                         @endforeach
                                     @endif
                                 </tbody>
+                          
                             </table>
+                            
                         </div>
+                        {{ $taxReturns->appends(request()->input())->links('vendor.pagination.custom') }}
                     </div>
                     <div 
                     x-show="showConfirmDeleteModal" 
@@ -503,6 +506,7 @@ $organizationId = session('organization_id');
                                 </button>
                             </div>
                         </div>
+                        
                     </div>
                 </div>
 
