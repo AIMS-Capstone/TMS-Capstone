@@ -17,8 +17,8 @@ class ActivityLogController extends Controller
             ->when($request->search, function ($query) use ($request) {
                 $query->where('description', 'like', '%' . $request->search . '%') // Search in activity description
                     ->orWhereHas('causer', function ($q) use ($request) {
-                        $q->where('name', 'like', '%' . $request->search . '%'); // Search in user name
-                    });
+                        $q->where('log_name', 'like', '%' . $request->search . '%'); // Search in user name
+                    }); 
             })
             ->when($request->filter, function ($query) use ($request) {
                 switch ($request->filter) {

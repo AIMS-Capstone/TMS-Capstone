@@ -8,6 +8,7 @@ use App\Models\TaxType;
 use App\Models\Coa;
 use App\Models\Transactions;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class SalesTransaction extends Component
 {
@@ -254,9 +255,9 @@ private function numberToOrdinal($number)
         );
         // Retrieve organization ID from the session
         $this->organization_id = session('organization_id');
-        
-        // Create a transaction with 'Sales' type
+
         try {
+            // Create a transaction with 'Sales' type
             $transaction = Transactions::create([
                 'transaction_type' => 'Sales',
                 'date' => $this->date,
@@ -267,18 +268,26 @@ private function numberToOrdinal($number)
                 'vatable_sales' => $this->vatableSales,
                 'vat_amount' => $this->vatAmount,
                 'non_vatable_sales' => $this->nonVatableSales,
-                'organization_id' => $this->organization_id, // Ensure this is included
-                'status'=> 'Draft'
+                'organization_id' => $this->organization_id,
+                'status' => 'Draft'
             ]);
-    
-            // Log the transaction ID after saving
-            Log::info('Transaction saved successfully with ID: ' . $transaction->id);
-    
+
+            // Log the transaction creation activity
+            activity('Transaction Management')
+                ->performedOn($transaction)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'transaction_id' => $transaction->id,
+                    'transaction_type' => 'Sales',
+                    'organization_id' => $this->organization_id,
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log("Transaction {$transaction->inv_number} was created.");
+
             // Save each tax row linked to the transaction
             foreach ($this->taxRows as $row) {
-                // If the tax type is 'Percentage Tax' and there is an ATC code
                 if ($row['tax_type'] && $row['tax_type'] == 'PT' && !empty($row['tax_code'])) {
-                    // Calculate and set ATC Amount in the row
                     $atc = ATC::find($row['tax_code']); // Find the ATC by its code
                     $atcRate = $atc ? $atc->tax_rate : 0;
                     if ($atcRate > 0) {
@@ -286,9 +295,9 @@ private function numberToOrdinal($number)
                         $row['atc_amount'] = $netSales * ($atcRate / 100); // ATC amount
                     }
                 }
-    
-                // Insert the tax row, including the atc_amount if applicable
-                TaxRow::create([
+
+                // Insert the tax row
+                $taxRow = TaxRow::create([
                     'transaction_id' => $transaction->id,
                     'description' => $row['description'],
                     'amount' => $row['amount'],
@@ -297,18 +306,37 @@ private function numberToOrdinal($number)
                     'tax_amount' => $row['tax_amount'],
                     'net_amount' => $row['net_amount'],
                     'coa' => !empty($row['coa']) ? $row['coa'] : null,
-                    'atc_amount' => isset($row['atc_amount']) ? $row['atc_amount'] : 0,  // Insert the atc_amount
+                    'atc_amount' => isset($row['atc_amount']) ? $row['atc_amount'] : 0,
                 ]);
+
+                // Log each tax row creation
+                activity('Transaction Management')
+                    ->performedOn($taxRow)
+                    ->causedBy(Auth::user())
+                    ->withProperties([
+                        'transaction_id' => $transaction->id,
+                        'tax_row_id' => $taxRow->id,
+                        'description' => $row['description'],
+                        'ip' => request()->ip(),
+                        'browser' => request()->header('User-Agent'),
+                    ])
+                    ->log("Tax row {$taxRow->id} was added to Transaction {$transaction->inv_number}.");
             }
-    
+
             // Provide feedback to the user
             session()->flash('message', 'Transaction saved successfully!');
             return redirect()->route('transactions.show', ['transaction' => $transaction->id]);
-    
+
         } catch (\Exception $e) {
-            // Log the error for further investigation
-            Log::error('Error saving transaction: ' . $e->getMessage());
+            // Log the error
+            Log::error('Error saving transaction: ' . $e->getMessage(), [
+                'organization_id' => $this->organization_id,
+                'user_id' => Auth::id(),
+                'ip' => request()->ip(),
+            ]);
+
             session()->flash('error', 'There was an error saving the transaction.');
+            return redirect()->back();
         }
     }
     

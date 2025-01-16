@@ -44,13 +44,17 @@
                         <!-- Filter/Search Section -->
                         <div class="flex flex-row items-center">
                             <div class="relative w-80 p-5">
-                                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search"
-                                class="w-full pl-10 pr-4 py-2 text-sm border border-zinc-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-900 focus:border-blue-900" 
-                                aria-label="Search Term" 
-                                placeholder="Search..." 
-                                @input.debounce="$el.form.requestSubmit()" 
-                                @search="$el.form.requestSubmit()"
-                                />
+                                <form x-target="audit_table" action="/audit_log/index" role="search" aria-label="Table" autocomplete="off">
+                                    <input 
+                                        type="search" 
+                                        name="search" 
+                                        class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
+                                        aria-label="Search Term" 
+                                        placeholder="Search..." 
+                                        @input.debounce="$el.form.requestSubmit()" 
+                                        @search="$el.form.requestSubmit()"
+                                    >
+                                </form>
                                 <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-zinc-400"></i>
                             </div>
 
@@ -93,7 +97,7 @@
 
                         <!-- Table -->
                         <div class="my-4 overflow-y-auto h-auto">
-                            <table class="w-full items-start text-left text-sm text-neutral-600 p-4">
+                            <table class="w-full items-start text-left text-sm text-neutral-600 p-4" id="audit_table">
                                 <thead class="bg-neutral-100 text-sm text-neutral-700">
                                     <tr>
                                         <th class="py-3 px-4">Timestamp</th>
@@ -254,5 +258,9 @@
             document.body.appendChild(form);
             form.submit();
         }
+
+        document.addEventListener('search', event => {
+            window.location.href = `?search=${event.detail.search}`;
+        });
     </script>
 </x-organization-layout>
