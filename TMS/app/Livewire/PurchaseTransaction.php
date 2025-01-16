@@ -244,7 +244,8 @@ class PurchaseTransaction extends Component
                 ->log("Purchase transaction {$transaction->inv_number} was created.");
 
             session()->flash('message', 'Purchase transaction saved successfully!');
-            return redirect()->route('transactions.show', ['transaction' => $transaction->id]);
+            return redirect()->route('transactions.show', ['transaction' => $transaction->id])
+    ->with('successTransaction', 'Transaction completed successfully!');
 
         } catch (\Exception $e) {
             // Log error details

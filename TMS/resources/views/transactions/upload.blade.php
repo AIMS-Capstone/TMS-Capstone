@@ -196,7 +196,26 @@
                                             <label class="block text-sm font-semibold text-zinc-700">Date</label>
                                             <input type="date" name="date" 
                                                 class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none @error('date') border-b-red-500 @enderror" 
-                                                value="{{ old('date', session('cleanedData')['date'] ?? null ? \Carbon\Carbon::parse(session('cleanedData')['date'])->format('Y-m-d') : '') }}" />
+                                                @php
+                                                $date = session('cleanedData')['date'] ?? null;
+                                                $formattedDate = '';
+                                                if ($date) {
+                                                    // Try multiple date formats
+                                                    $formats = ['m-d-Y', 'd-m-Y', 'Y-m-d'];
+                                                    foreach ($formats as $format) {
+                                                        try {
+                                                            $formattedDate = \Carbon\Carbon::createFromFormat($format, $date)->format('Y-m-d');
+                                                            break; // Exit loop if successful
+                                                        } catch (\Exception $e) {
+                                                            continue; // Try the next format if it fails
+                                                        }
+                                                    }
+                                                }
+                                            @endphp
+                                            
+                                            value="{{ old('date', $formattedDate) }}" />
+                                            
+                                                
                                             @error('date')
                                                 <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                                             @enderror
@@ -216,8 +235,9 @@
                                             <label class="block text-sm font-semibold text-zinc-700">Organization Type</label>
                                             <select name="organization_type" 
                                                 class="peer py-3 block w-full bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-zinc-200 text-sm focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-900 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none @error('organization_type') border-b-red-500 @enderror">
-                                                <option value="Individual" {{ old('organization_type') == 'Individual' ? 'selected' : '' }}>Individual</option>
                                                 <option value="Non-Individual" {{ old('organization_type') == 'Non-Individual' ? 'selected' : '' }}>Non-Individual</option>
+                                                <option value="Individual" {{ old('organization_type') == 'Individual' ? 'selected' : '' }}>Individual</option>
+                                              
                                             </select>
                                             @error('organization_type')
                                                 <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
@@ -283,6 +303,7 @@
                                             <label class="block text-sm font-semibold text-zinc-700">ATC</label>
                                             <select name="tax_code" 
                                                 class="block py-2.5 px-0 w-full text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-zinc-200 appearance-none cursor-pointer focus:outline-none focus:ring-0 focus:border-blue-900 peer @error('tax_code') border-b-red-500 @enderror">
+                                                <option value="" disabled selected> Select Tax Code </option> 
                                                 @foreach($tax_codes as $tax_code)
                                                     <option value="{{ $tax_code->id }}" {{ old('tax_code') == $tax_code->id ? 'selected' : '' }}>
                                                         {{ $tax_code->tax_code }} - {{ $tax_code->category }}

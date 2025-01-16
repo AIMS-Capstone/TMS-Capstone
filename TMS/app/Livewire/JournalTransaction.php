@@ -167,7 +167,8 @@ class JournalTransaction extends Component
 
         // Provide feedback and redirect
         session()->flash('message', 'Transaction saved successfully!');
-        return redirect()->route('transactions.show', ['transaction' => $transaction->id]);
+        return redirect()->route('transactions.show', ['transaction' => $transaction->id])
+    ->with('successTransaction', 'Transaction completed successfully!');
     } catch (\Exception $e) {
         $this->addError('general', 'Failed to save transaction. ' . $e->getMessage());
         return;

@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
-        static::$hashedPassword ??= Hash::make('123');
+        static::$hashedPassword ??= Hash::make('@TaxuriTMS01');
         User::create([
             'first_name' => 'Admin',
             'last_name' => 'User',
