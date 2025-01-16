@@ -307,7 +307,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                             </th>
                                             <th scope="col" class="text-left py-4 px-4">Employee Name</th>
                                             <th scope="col" class="text-left py-4 px-4">TIN</th>
-                                            <th scope="col" class="text-left py-4 px-4">Date of Birth</th>
+                                            <th scope="col" class="text-left py-4 px-4">Wage Status</th>
                                             <th scope="col" class="text-left py-4 px-4">Contact</th>
                                             <th scope="col" class="text-left py-4 px-4">Nationality</th>
                                             <th scope="col" class="text-left py-4 px-4">Address</th>
@@ -338,7 +338,18 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                                         </button>
                                                     </td>   
                                                     <td class="text-left py-3 px-4">{{ $employee->tin }}</td>
-                                                    <td class="text-left py-3 px-4">{{ \Carbon\Carbon::parse($employee->date_of_birth)->format('F d, Y') }}</td>
+                                                    <td class="text-left py-3 px-4">
+                                                        @php
+                                                            $wageStatus = $employee->latestEmployment->employee_wage_status ?? null;
+                                                        @endphp
+                                                        @if ($wageStatus === 'Minimum Wage Earner')
+                                                            <span class="inline-block px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 rounded-full">MWE</span>
+                                                        @elseif ($wageStatus === 'Above Minimum Wage Earner')
+                                                            <span class="inline-block px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 rounded-full">AMWE</span>
+                                                        @else
+                                                            <span class="inline-block px-3 py-1 text-sm font-medium text-gray-500 bg-gray-50 rounded-full">N/A</span>
+                                                        @endif
+                                                    </td>
                                                     <td class="text-left py-3 px-4">{{ $employee->contact_number }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->nationality }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->address->address ?? 'N/A' }}</td>

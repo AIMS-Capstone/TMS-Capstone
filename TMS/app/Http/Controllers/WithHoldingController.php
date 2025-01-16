@@ -20,15 +20,71 @@ use App\Exports\sources_template;
 
 class WithHoldingController extends Controller
 {
-    // etong parent withHoldingController na gamit ko sa 1601C
     public function index1601C(Request $request)
     {
         $organizationId = session('organization_id');
-
-        // Get the perPage value from the request, default to 5
         $perPage = $request->input('perPage', 5);
 
-        $with_holdings = $this->getWithHoldings($organizationId, '1601C', $perPage);
+        // Map month names to their corresponding integers
+        $monthMapping = [
+            'january' => 1,
+            'february' => 2,
+            'march' => 3,
+            'april' => 4,
+            'may' => 5,
+            'june' => 6,
+            'july' => 7,
+            'august' => 8,
+            'september' => 9,
+            'october' => 10,
+            'november' => 11,
+            'december' => 12,
+        ];
+
+        // Start the query with the organization filter and type
+        $query = WithHolding::where('type', '1601C')
+            ->where('organization_id', $organizationId);
+
+        if ($request->has('search') && $request->search != '') {
+            $search = trim($request->search); // Trim whitespace from the search term
+
+            // Convert search term to lowercase for case-insensitive matching
+            $lowerSearch = strtolower($search);
+
+            // Check if the search term is a valid month name
+            $monthValue = $monthMapping[$lowerSearch] ?? null;
+
+            // Log the detected month value (if any)
+            Log::info('Search term and month mapping', [
+                'search' => $search,
+                'mapped_month' => $monthValue,
+            ]);
+
+            // Add separate search conditions for year, month, and creator
+            $query->where(function ($q) use ($search, $monthValue) {
+                // Search for year or mapped month value
+                $q->where('year', 'LIKE', '%' . $search . '%');
+
+                if ($monthValue) {
+                    $q->orWhere('month', $monthValue); // Use direct match for month
+                }
+            })->orWhereHas('creator', function ($q) use ($search) {
+                // Search in creator's first_name or last_name
+                $q->where('first_name', 'LIKE', '%' . $search . '%')
+                ->orWhere('last_name', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        // Paginate the results
+        $with_holdings = $query->paginate($perPage);
+
+        // Log the results
+        Log::info('Search results', [
+            'total_results' => $with_holdings->total(),
+            'current_page' => $with_holdings->currentPage(),
+            'per_page' => $with_holdings->perPage(),
+        ]);
+
         return view('tax_return.with_holding.1601C', compact('with_holdings'));
     }
 
@@ -68,6 +124,21 @@ class WithHoldingController extends Controller
             'created_by' => Auth::id(),
         ]);
 
+        // Log activity
+        activity('Withholding Tax Generation')
+            ->performedOn($withHolding)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'type' => $request->type,
+                'month' => $request->month,
+                'year' => $request->year,
+                'organization_id' => $organizationId,
+                'created_by' => Auth::id(),
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log("Withholding Tax Return for 1601C (Month: {$request->month}, Year: {$request->year}) was generated.");
+
         return redirect()->route('with_holding.1601C_summary', ['id' => $withHolding->id])
             ->with('success', 'Withholding Tax Return for 1601C has been generated.');
     }
@@ -88,7 +159,6 @@ class WithHoldingController extends Controller
         Log::info('Received WithHolding IDs for soft deletion: ', $ids);
 
         try {
-
             foreach ($withHoldings as $withHolding) {
                 // Set the 'deleted_by' field to the currently authenticated user
                 $withHolding->deleted_by = Auth::id();
@@ -100,10 +170,16 @@ class WithHoldingController extends Controller
 
             // Log each deletion activity
             foreach ($withHoldings as $withHolding) {
-                activity('withholdings')
+                activity('Withholding Deletion')
                     ->performedOn($withHolding)
                     ->causedBy(Auth::user())
-                    ->log("WithHolding ID {$withHolding->id} was soft deleted");
+                    ->withProperties([
+                        'withholding_id' => $withHolding->id,
+                        'organization_id' => $withHolding->organization_id,
+                        'ip' => $request->ip(),
+                        'browser' => $request->header('User-Agent'),
+                    ])
+                    ->log("WithHolding ID {$withHolding->id} was soft deleted.");
             }
 
             // Return success response
@@ -111,7 +187,11 @@ class WithHoldingController extends Controller
 
         } catch (\Exception $e) {
             // Log any errors that occurred during deletion
-            Log::error('Error during soft deletion of WithHoldings: ' . $e->getMessage());
+            Log::error('Error during soft deletion of WithHoldings: ' . $e->getMessage(), [
+                'ids' => $ids,
+                'user_id' => Auth::id(),
+                'ip' => $request->ip(),
+            ]);
 
             // Return error response
             return response()->json(['error' => 'An error occurred while deleting records'], 500);
@@ -171,10 +251,36 @@ class WithHoldingController extends Controller
         $perPage = $request->input('perPage', 5);
 
         // Fetch sources with related employee and employment data
-        $sources = $withHolding->sources()
+        $sourcesQuery = $withHolding->sources()
             ->with(['employee.latestEmployment'])
-            ->where('status', 'Active') 
-            ->paginate($perPage);
+            ->where('status', 'Active'); // Only include active sources
+
+        // Check for search input
+        if ($request->has('search') && $request->search != '') {
+            $search = trim($request->search);
+
+            // Apply search conditions
+            $sourcesQuery->where(function ($q) use ($search) {
+                $q->whereHas('employee', function ($q) use ($search) {
+                    $q->where('first_name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('last_name', 'LIKE', '%' . $search . '%');
+                })
+                ->orWhereHas('employment', function ($q) use ($search) {
+                    $q->where('employee_wage_status', 'LIKE', '%' . $search . '%');
+                })
+                ->orWhere('payment_date', 'LIKE', '%' . $search . '%')
+                ->orWhere('gross_compensation', 'LIKE', '%' . $search . '%')
+                ->orWhere('tax_due', 'LIKE', '%' . $search . '%')
+                ->orWhere('statutory_minimum_wage', 'LIKE', '%' . $search . '%')
+                ->orWhere('de_minimis_benefits', 'LIKE', '%' . $search . '%')
+                ->orWhere('sss_gsis_phic_hdmf_union_dues', 'LIKE', '%' . $search . '%')
+                ->orWhere('other_non_taxable_compensation', 'LIKE', '%' . $search . '%')
+                ->orWhere('taxable_compensation', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        // Paginate the results
+        $sources = $sourcesQuery->paginate($perPage);
 
         return view('tax_return.with_holding.1601C_sources', [
             'with_holding' => $withHolding,
@@ -228,7 +334,7 @@ class WithHoldingController extends Controller
 
         $data = $request->all();
 
-        // Nullers the fields if "Above Minimum Wage"
+        // Null fields for "Above Minimum Wage"
         $statutoryFields = [
             'statutory_minimum_wage',
             'holiday_pay',
@@ -257,7 +363,7 @@ class WithHoldingController extends Controller
         $finalTaxDue = $request->tax_due ?? $computedTaxDue;
 
         // Create Source Record
-        Source::create([
+        $source = Source::create([
             'withholding_id' => $id,
             'employee_id' => $data['employee_id'],
             'employment_id' => $employment->id,
@@ -275,6 +381,22 @@ class WithHoldingController extends Controller
             'sss_gsis_phic_hdmf_union_dues' => $data['sss_gsis_phic_hdmf_union_dues'],
             'other_non_taxable_compensation' => $data['other_non_taxable_compensation'],
         ]);
+
+        // Log activity
+        activity('Withholding Source Management')
+            ->performedOn($source)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'withholding_id' => $id,
+                'source_id' => $source->id,
+                'employee_id' => $data['employee_id'],
+                'payment_date' => $data['payment_date'],
+                'tax_due' => $finalTaxDue,
+                'organization_id' => $withHolding->organization_id,
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log("Source record ID {$source->id} for Withholding ID {$id} was created.");
 
         return redirect()->back()->with('success', 'Source record added successfully.');
     }
@@ -330,50 +452,107 @@ class WithHoldingController extends Controller
 
     public function deactivateSources1601C(Request $request)
     {
-        Log::info('Deactivate Request Received', ['ids' => $request->ids]);
+        activity('Source Deactivation')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'request_ids' => $request->ids,
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log('Deactivate request received.');
 
+        // Validate the request
         $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:sources,id',
         ]);
 
+        // Fetch the sources to be deactivated
         $sources = Source::whereIn('id', $request->ids)->get();
-        Log::info('Sources Count:', ['count' => $sources->count()]);
+
+        // Log the number of sources to be updated
+        activity('Source Deactivation')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'source_count' => $sources->count(),
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log('Number of sources to be deactivated.');
 
         foreach ($sources as $source) {
             $oldStatus = $source->status;
+
+            // Update the status to 'Inactive'
             $source->update(['status' => 'Inactive']);
-            Log::info('Source Updated', ['source_id' => $source->id, 'status' => 'Inactive']);
+
+            // Log the status change for each source
+            activity('Source Deactivation')
+                ->performedOn($source)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'source_id' => $source->id,
+                    'old_status' => $oldStatus,
+                    'new_status' => 'Inactive',
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log("Source ID {$source->id} status updated to 'Inactive'.");
         }
 
         return response()->json(['message' => 'Selected Sources have been deactivated.']);
     }
 
-    public function archiveSources1601C(Request $request, $id){
+    public function archiveSources1601C(Request $request, $id)
+    {
         // Fetch the withholding tax record and ensure it is type 1601C
         $withHolding = WithHolding::where('id', $id)
             ->where('type', '1601C')
             ->firstOrFail();
 
         // Fetch employees with their latest employment
-        $employees = Employee::with('latestEmployment')
-            ->get();
+        $employees = Employee::with('latestEmployment')->get();
 
         // Get the perPage value from the request, default to 5
         $perPage = $request->input('perPage', 5);
 
         // Fetch sources with related employee and employment data
-        $sources = $withHolding->sources()
+        $sourcesQuery = $withHolding->sources()
             ->with(['employee.latestEmployment'])
-            ->where('status', 'Inactive')
-            ->paginate($perPage);
+            ->where('status', 'Inactive'); // Only include inactive sources
+
+        // Check for search input
+        if ($request->has('search') && $request->search != '') {
+            $search = trim($request->search);
+            
+            // Apply search conditions
+            $sourcesQuery->where(function ($q) use ($search) {
+                $q->whereHas('employee', function ($q) use ($search) {
+                    $q->where('first_name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('last_name', 'LIKE', '%' . $search . '%');
+                })
+                ->orWhereHas('employment', function ($q) use ($search) {
+                    $q->where('employee_wage_status', 'LIKE', '%' . $search . '%');
+                })
+                ->orWhere('payment_date', 'LIKE', '%' . $search . '%')
+                ->orWhere('gross_compensation', 'LIKE', '%' . $search . '%')
+                ->orWhere('tax_due', 'LIKE', '%' . $search . '%')
+                ->orWhere('statutory_minimum_wage', 'LIKE', '%' . $search . '%')
+                ->orWhere('de_minimis_benefits', 'LIKE', '%' . $search . '%')
+                ->orWhere('sss_gsis_phic_hdmf_union_dues', 'LIKE', '%' . $search . '%')
+                ->orWhere('other_non_taxable_compensation', 'LIKE', '%' . $search . '%')
+                ->orWhere('taxable_compensation', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        // Paginate the results
+        $sources = $sourcesQuery->paginate($perPage);
 
         return view('tax_return.with_holding.1601C_sources_archive', [
             'with_holding' => $withHolding,
             'sources' => $sources,
             'employees' => $employees,
         ]);
-
     }
 
     public function destroySources1601C(Request $request)
@@ -440,15 +619,18 @@ class WithHoldingController extends Controller
 
     public function downloadSources1601C(Request $request, $id)
     {
+        // Fetch the withholding record
         $withHolding = WithHolding::where('id', $id)
             ->where('type', '1601C')
             ->firstOrFail();
 
+        // Fetch the active sources associated with the withholding record
         $sources = Source::where('status', 'Active')
             ->where('withholding_id', $withHolding->id)
             ->with(['employee', 'employment'])
             ->get();
 
+        // Prepare data for the PDF
         $data = [
             'title' => 'Available Sources',
             'date' => date('m/d/Y'),
@@ -456,8 +638,23 @@ class WithHoldingController extends Controller
             'withholding' => $withHolding,
         ];
 
+        // Generate the PDF
         $pdf = PDF::loadView('tax_return.with_holding.1601C_sources_download', $data);
 
+        // Log the download activity
+        activity('Source Download')
+            ->performedOn($withHolding)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'withholding_id' => $withHolding->id,
+                'type' => $withHolding->type,
+                'source_count' => $sources->count(),
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log("PDF of active sources for Withholding ID {$withHolding->id} was downloaded.");
+
+        // Return the generated PDF for download
         return $pdf->download('Sources.pdf');
     }
 
@@ -518,7 +715,6 @@ class WithHoldingController extends Controller
             'agent_category' => 'required|string',
         ]);
 
-        // Fetch the withholding tax record
         $withHolding = WithHolding::findOrFail($id);
 
         $orgSetupId = $withHolding->organization_id ?? session('organization_id');
@@ -526,10 +722,8 @@ class WithHoldingController extends Controller
             return redirect()->back()->withErrors(['error' => 'Organization setup ID not found.']);
         }
 
-        // Retrieve sources for calculations
         $sources = $withHolding->sources()->get();
 
-        // Calculate remittance and penalties
         $totalTaxesWithheld = $sources->sum('tax_due');
         $adjustment = $request->adjustment_taxes_withheld ?? 0;
         $taxRemitted = $request->tax_remitted_return ?? 0;
@@ -570,13 +764,39 @@ class WithHoldingController extends Controller
                     'other_remittances' => $otherRemittances,
                     'total_amount_due' => $totalAmountStillDue,
                     'agent_category' => $request->agent_category,
-
                 ]
             );
+
+            // Log the activity
+            activity('Form Submission')
+                ->performedOn($form)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'withholding_id' => $id,
+                    'form_id' => $form->id,
+                    'filing_period' => $filingPeriod->format('Y-m'),
+                    'total_taxes_withheld' => $totalTaxesWithheld,
+                    'total_amount_due' => $totalAmountStillDue,
+                    'organization_id' => $withHolding->organization_id,
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log("Form 1601C was submitted or updated for Withholding ID {$id}.");
 
             return redirect()->route('with_holding.1601C_summary', ['id' => $id])
                 ->with('success', '1601C Form has been successfully submitted.');
         } catch (\Exception $e) {
+            // Log the error
+            activity('Form Submission Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'withholding_id' => $id,
+                    'error_message' => $e->getMessage(),
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log('An error occurred during the submission of Form 1601C.');
+
             return redirect()->back()
                 ->withErrors(['error' => 'An error occurred: ' . $e->getMessage()]);
         }
@@ -585,9 +805,8 @@ class WithHoldingController extends Controller
     public function previewForm1601C($id)
     {
         $form = Form1601C::with([
-            'withholding',
+            'withholding.organization', // Load the organization relationship from withholding
             'atc',
-            'organization',
             'sources.employee',
         ])->findOrFail($id);
 
@@ -631,6 +850,7 @@ class WithHoldingController extends Controller
         $form = Form1601C::findOrFail($id);
 
         try {
+            // Validate the request
             $validated = $request->validate([
                 'atc_id' => 'required|exists:atcs,id',
                 'amended_return' => 'required|boolean',
@@ -641,14 +861,16 @@ class WithHoldingController extends Controller
                 'surcharge' => 'nullable|numeric|min:0',
                 'interest' => 'nullable|numeric|min:0',
                 'compromise' => 'nullable|numeric|min:0',
-                //added fields
                 'agent_category' => 'required|string',
                 'tax_relief' => 'required|boolean',
                 'adjustment_taxes_withheld' => 'nullable|numeric|min:0',
                 'tax_remitted_return' => 'nullable|numeric|min:0',
             ]);
 
-            // Proceed to update the form
+            // Track original attributes before updating
+            $originalAttributes = $form->getOriginal();
+
+            // Update the form
             $form->update([
                 'atc_id' => $request->atc_id,
                 'amended_return' => $request->amended_return,
@@ -665,10 +887,79 @@ class WithHoldingController extends Controller
                 'tax_remitted_return' => $request->tax_remitted_return,
             ]);
 
+            // Log activity
+            activity('Form Update')
+                ->performedOn($form)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'form_id' => $form->id,
+                    'withholding_id' => $form->withholding_id,
+                    'changes' => [
+                        'before' => $originalAttributes,
+                        'after' => $form->getAttributes(),
+                    ],
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log("Form 1601C ID {$form->id} was updated.");
+
             return redirect()->route('form1601C.preview', ['id' => $form->id])
                 ->with('success', 'Form 1601C updated successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
-            dd('Validation failed', $e->errors());
+            // Log validation error details
+            activity('Form Update Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'form_id' => $form->id,
+                    'validation_errors' => $e->errors(),
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log("Validation failed for Form 1601C ID {$form->id}.");
+
+            return redirect()->back()->withErrors($e->errors());
+        }
+    }
+
+    public function markForm1601CFiled($formId)
+    {   
+        try {
+            // Fetch the Form0619E record
+            $form = Form1601C::findOrFail($formId);
+
+            // Fetch the related WithHolding record
+            $withHolding = WithHolding::findOrFail($form->withholding_id);
+
+            $withHolding->update(['status' => 'Filed']);
+
+            activity('Status Update')
+                ->performedOn($withHolding)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'withholding_id' => $withHolding->id,
+                    'form_id' => $form->id,
+                    'previous_status' => $withHolding->getOriginal('status'),
+                    'new_status' => 'Filed',
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log("WithHolding ID {$withHolding->id} and Form0619E ID {$form->id} marked as Filed.");
+
+            return redirect()->route('form0619E.preview', ['id' => $form->withholding_id])
+                ->with('success', "Form 0619E (ID: {$formId}) and its related WithHolding record have been marked as Filed.");
+        } catch (\Exception $e) {
+            // Log any exceptions
+            activity('Status Update Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'form_id' => $formId,
+                    'error_message' => $e->getMessage(),
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log('An error occurred while marking Form0619E as Filed.');
+
+            return redirect()->back()->withErrors(['error' => 'An error occurred while updating the status.']);
         }
     }
 
@@ -694,6 +985,20 @@ class WithHoldingController extends Controller
 
         // Save the file temporarily
         $path = $request->file('file')->store('temp');
+
+        // Log the import activity
+        activity('Source Import')
+            ->performedOn($withHolding)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'withholding_id' => $id,
+                'file_name' => $request->file('file')->getClientOriginalName(),
+                'file_type' => $request->file('file')->getMimeType(),
+                'file_path' => $path,
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log("Import initiated for Withholding ID {$id} with file {$request->file('file')->getClientOriginalName()}.");
 
         // Pass withholdingId to the Blade view
         return view('tax_return.with_holding.1601C_sources', [

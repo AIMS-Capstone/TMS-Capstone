@@ -27,6 +27,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use thiagoalessio\TesseractOCR\TesseractOCR;
 use Imagick;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -199,47 +201,87 @@ public function getAllTransactions(Request $request)
         }
 
         // Find the specific tax return by ID
-        $taxReturn = TaxReturn::findOrFail($taxReturnId);  // Ensure the tax return exists
-        
+        $taxReturn = TaxReturn::findOrFail($taxReturnId); // Ensure the tax return exists
+
         // Detach the transactions from the tax_return_transactions pivot table
         $taxReturn->transactions()->detach($transactionIds);
-        
-        // Optionally, you can return a success response
+
+        // Log the activity for each detached transaction
+        foreach ($transactionIds as $transactionId) {
+            activity('Transaction Management')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'tax_return_id' => $taxReturnId,
+                    'transaction_id' => $transactionId,
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log("Transaction with ID {$transactionId} was archived from Tax Return ID {$taxReturnId}.");
+        }
+
+        // Return a success response
         return response()->json(['message' => 'Transactions archived successfully']);
     }
+
     public function deactivateTransaction(Request $request)
-{
-    // Get the tax_return_id, transaction_ids, and activeTab from the request
-    $taxReturnId = $request->input('tax_return_id');
-    $transactionIds = $request->input('ids');
-    $activeTab = $request->input('activeTab');  // Either 'individual' or 'spouse'
-    
-    // Make sure the 'ids' is an array and not empty
-    if (empty($transactionIds)) {
-        return response()->json(['message' => 'No transactions selected'], 400);
-    }
-
-    // Find the specific tax return by ID
-    $taxReturn = TaxReturn::findOrFail($taxReturnId);  // Ensure the tax return exists
-
-    // Check the activeTab to determine whether to deactivate individual or spouse transactions
-    if ($activeTab === 'individual') {
-
-        $taxReturn->individualTransaction()->detach($transactionIds);
+    {
+        // Get the tax_return_id, transaction_ids, and activeTab from the request
+        $taxReturnId = $request->input('tax_return_id');
+        $transactionIds = $request->input('ids');
+        $activeTab = $request->input('activeTab'); // Either 'individual' or 'spouse'
         
-    } elseif ($activeTab === 'spouse') {
-        // Deactivate or remove transactions associated with the spouse
-        // Similarly, use the spouse_transaction table or relationship.
-        $taxReturn->spouseTransactions()->detach($transactionIds);
+        // Make sure the 'ids' is an array and not empty
+        if (empty($transactionIds)) {
+            return response()->json(['message' => 'No transactions selected'], 400);
+        }
+
+        // Find the specific tax return by ID
+        $taxReturn = TaxReturn::findOrFail($taxReturnId); // Ensure the tax return exists
+
+        if ($activeTab === 'individual') {
+            // Detach individual transactions
+            $taxReturn->individualTransaction()->detach($transactionIds);
+
+            // Log activity for individual transactions
+            foreach ($transactionIds as $transactionId) {
+                activity('Transaction Management')
+                    ->causedBy(Auth::user())
+                    ->withProperties([
+                        'tax_return_id' => $taxReturnId,
+                        'transaction_id' => $transactionId,
+                        'type' => 'individual',
+                        'ip' => $request->ip(),
+                        'browser' => $request->header('User-Agent'),
+                    ])
+                    ->log("Individual transaction with ID {$transactionId} was archived from Tax Return ID {$taxReturnId}.");
+            }
+
+        } elseif ($activeTab === 'spouse') {
+            // Detach spouse transactions
+            $taxReturn->spouseTransactions()->detach($transactionIds);
+
+            // Log activity for spouse transactions
+            foreach ($transactionIds as $transactionId) {
+                activity('Transaction Management')
+                    ->causedBy(Auth::user())
+                    ->withProperties([
+                        'tax_return_id' => $taxReturnId,
+                        'transaction_id' => $transactionId,
+                        'type' => 'spouse',
+                        'ip' => $request->ip(),
+                        'browser' => $request->header('User-Agent'),
+                    ])
+                    ->log("Spouse transaction with ID {$transactionId} was archived from Tax Return ID {$taxReturnId}.");
+            }
+
+        } else {
+            // If an invalid activeTab is passed
+            return response()->json(['message' => 'Invalid activeTab specified'], 400);
+        }
         
-    } else {
-        // If an invalid activeTab is passed
-        return response()->json(['message' => 'Invalid activeTab specified'], 400);
+        // Return a success response
+        return response()->json(['message' => 'Transactions archived successfully']);
     }
-    
-    // Optionally, return a success response
-    return response()->json(['message' => 'Transactions archived successfully']);
-}
 
 
     /**
@@ -285,46 +327,68 @@ public function getAllTransactions(Request $request)
         return redirect()->back()->with('success', 'Transaction added to tax return successfully!');
     }
     public function addTransaction(Request $request)
-{
-    $isSpouse = filter_var($request->input('is_spouse'), FILTER_VALIDATE_BOOLEAN);
+    {
+        $isSpouse = filter_var($request->input('is_spouse'), FILTER_VALIDATE_BOOLEAN);
 
-    // Manually set the 'is_spouse' input to the boolean value
-    $request->merge(['is_spouse' => $isSpouse]);
-    
-    // Now validate
-    $request->validate([
-        'transaction_id' => 'required|exists:transactions,id',
-        'tax_return_id' => 'required|exists:tax_returns,id',
-        'is_spouse' => 'required|boolean',
-    ]);
-    
-    // Get the active TaxReturn
-    $taxReturn = TaxReturn::find($request->tax_return_id);
+        // Manually set the 'is_spouse' input to the boolean value
+        $request->merge(['is_spouse' => $isSpouse]);
+        
+        // Validate the request
+        $request->validate([
+            'transaction_id' => 'required|exists:transactions,id',
+            'tax_return_id' => 'required|exists:tax_returns,id',
+            'is_spouse' => 'required|boolean',
+        ]);
+        
+        // Get the active TaxReturn
+        $taxReturn = TaxReturn::find($request->tax_return_id);
 
-    if (!$taxReturn) {
-        return redirect()->back()->with('error', 'Tax return not found.');
+        if (!$taxReturn) {
+            return redirect()->back()->with('error', 'Tax return not found.');
+        }
+
+        // Check if the transaction is for an individual or spouse
+        if ($request->is_spouse) {
+            // Add the transaction to the spouse's transactions table
+            $spouseTransaction = new SpouseTransaction();
+            $spouseTransaction->tax_return_id = $taxReturn->id;
+            $spouseTransaction->transaction_id = $request->transaction_id;
+            $spouseTransaction->save();
+
+            // Log activity
+            activity('Transaction Management')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'tax_return_id' => $taxReturn->id,
+                    'transaction_id' => $request->transaction_id,
+                    'type' => 'spouse',
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log("Transaction with ID {$request->transaction_id} was added to the spouse's transactions in Tax Return ID {$taxReturn->id}.");
+        } else {
+            // Add the transaction to the individual's transactions table
+            $individualTransaction = new IndividualTransaction();
+            $individualTransaction->tax_return_id = $taxReturn->id;
+            $individualTransaction->transaction_id = $request->transaction_id;
+            $individualTransaction->save();
+
+            // Log activity
+            activity('Transaction Management')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'tax_return_id' => $taxReturn->id,
+                    'transaction_id' => $request->transaction_id,
+                    'type' => 'individual',
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log("Transaction with ID {$request->transaction_id} was added to the individual's transactions in Tax Return ID {$taxReturn->id}.");
+        }
+
+        // Return success message and redirect back
+        return redirect()->back()->with('success', 'Transaction added successfully!');
     }
-
-    // Check if the transaction is for an individual or spouse
-    if ($request->is_spouse) {
-        // Add the transaction to the spouse's transactions table
-        $spouseTransaction = new SpouseTransaction();
-        $spouseTransaction->tax_return_id = $taxReturn->id;
-        $spouseTransaction->transaction_id = $request->transaction_id;
-    
-        $spouseTransaction->save();
-    } else {
-        // Add the transaction to the individual's transactions table
-        $individualTransaction = new IndividualTransaction();
-        $individualTransaction->tax_return_id = $taxReturn->id;
-        $individualTransaction->transaction_id = $request->transaction_id;
-   
-        $individualTransaction->save();
-    }
-
-    // Return success message and redirect back
-    return redirect()->back()->with('success', 'Transaction added successfully!');
-}
 
 public function storeUpload(Request $request)
 {
@@ -431,7 +495,20 @@ public function upload(Request $request)
         
         // Clean and parse the extracted text
         $cleanedData = $this->cleanExtractedText($extractedText);
-        
+
+        // Log activity
+        activity('Receipt Upload')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'file_path' => $path,
+                'processed_path' => $processedPath,
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+                'extracted_text_preview' => substr($extractedText, 0, 100), // Log a preview of the extracted text
+            ])
+            ->log('A receipt was uploaded and processed.');
+
+        // Return back with success message and data
         // Store the cleaned data in the session
         session()->flash('cleanedData', $cleanedData);
         
@@ -461,6 +538,7 @@ public function upload(Request $request)
         return redirect()->back()->withErrors(['error' => $e->getMessage()]);
     }
 }
+
     private function cleanExtractedText($extractedText)
 {
     // Basic cleanup: Remove unnecessary newlines and extra spaces
@@ -668,12 +746,24 @@ private function extractTextFromReceipt($filePath)
     public function edit($transactionId)
     {
         $transaction = Transactions::with('contactDetails', 'taxRows')->findOrFail($transactionId);
-       
+        
         $type = $transaction->transaction_type;
-      
+
+        // Log activity
+        activity('Transaction Management')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'transaction_id' => $transactionId,
+                'transaction_type' => $type,
+                'ip' => request()->ip(),
+                'browser' => request()->header('User-Agent'),
+            ])
+            ->log("Viewed edit form for Transaction ID {$transactionId}.");
+
         // Pass 'transaction_type' to the view
         return view('transactions.edit', compact('transaction', 'type'));
     }
+
     public function mark($transactionId)
     {
         $transaction = Transactions::findOrFail($transactionId);
@@ -682,20 +772,24 @@ private function extractTextFromReceipt($filePath)
         $transaction->status = 'posted';
         $transaction->save();
 
-        activity('transactions')
+        // Enhanced activity logging
+        activity('Transaction Management')
             ->performedOn($transaction)
             ->causedBy(Auth::user())
             ->withProperties([
+                'transaction_id' => $transaction->id,
                 'organization_id' => session('organization_id'),
+                'status' => 'posted',
                 'attributes' => $transaction->toArray(),
+                'ip' => request()->ip(),
+                'browser' => request()->header('User-Agent'),
             ])
-            ->log("Transaction {$transaction->inv_number} was mark as posted");
+            ->log("Transaction {$transaction->inv_number} was marked as posted.");
 
-
-        // Optionally, you can return a response or redirect to another page
+        // Flash success message
         session()->flash('success', 'Transaction has been successfully marked as Posted.');
-        
-        // You can redirect to the transaction show page, or wherever needed
+
+        // Redirect to the transaction show page, or any other relevant page
         return redirect()->route('transactions.show', ['transaction' => $transactionId]);
     }
     public function markAsPaid(Request $request, Transactions $transaction)
@@ -746,7 +840,7 @@ private function extractTextFromReceipt($filePath)
     public function update(Request $request, $id)
     {
         $transaction = Transactions::findOrFail($id);
-    
+        
         // Validate input data
         $validated = $request->validate([
             'date' => 'required|date',
@@ -755,14 +849,29 @@ private function extractTextFromReceipt($filePath)
             'total_amount' => 'required|numeric',
             // Add other fields as needed
         ]);
-    
+        
+        // Track the original attributes before updating
+        $originalAttributes = $transaction->getOriginal();
+        
         // Update transaction with validated data
         $transaction->update($validated);
-
-
-    
-        // Optionally, handle any additional fields, such as tax rows
-    
+        
+        // Log activity
+        activity('Transaction Management')
+            ->performedOn($transaction)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'transaction_id' => $transaction->id,
+                'changes' => [
+                    'before' => $originalAttributes,
+                    'after' => $transaction->getAttributes(),
+                ],
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log("Transaction {$transaction->inv_number} was updated.");
+        
+        // Redirect to the transaction show page with a success message
         return redirect()->route('transactions.show', $transaction->id)->with('success', 'Transaction updated successfully.');
     }
 
@@ -804,15 +913,32 @@ private function extractTextFromReceipt($filePath)
             'file' => 'required|mimes:csv,txt'
         ]);
 
-        // Import the file
-        Excel::import(new SalesImport, $request->file('file'));
+        // Get the uploaded file
+        $file = $request->file('file');
 
+        // Import the file
+        Excel::import(new SalesImport, $file);
+
+        // Log activity
+        activity('Transaction Import')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'file_name' => $file->getClientOriginalName(),
+                'file_type' => $file->getClientMimeType(),
+                'file_size' => $file->getSize(),
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log('Transactions were imported from a file.');
+
+        // Return back with success message
         return back()->with('success', 'Transactions imported successfully!');
     }
+
     public function importPreview(Request $request)
     {
         // Validate the file input
-        $request->validate([
+        $request->validate([                    
             'file' => 'required|mimes:csv,txt'
         ]);
 
@@ -826,23 +952,32 @@ private function extractTextFromReceipt($filePath)
     {
         // Get the organization ID from the session
         $organizationId = session('organization_id');
-    
+        
         // Fetch all transactions for the specific organization, with related contact details and tax rows
         $transactions = Transactions::with(['contactDetails', 'taxRows'])
-                                ->where('organization_id', $organizationId)
-                                ->whereIn('transaction_type', ['Sales', 'Purchase']) 
-                                ->get();
+                                    ->where('organization_id', $organizationId)
+                                    ->whereIn('transaction_type', ['Sales', 'Purchase'])
+                                    ->get();
 
-    
         // Check if transactions exist, if not, handle the case
         if ($transactions->isEmpty()) {
             return back()->with('alert', 'No transactions found for this organization.');
         }
-        
-    
+
+        // Log activity
+        activity('Transaction Download')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'organization_id' => $organizationId,
+                'transaction_count' => $transactions->count(),
+                'ip' => request()->ip(),
+                'browser' => request()->header('User-Agent'),
+            ])
+            ->log('Downloaded transactions as a PDF.');
+
         // Generate the PDF
         $pdf = PDF::loadView('transactions.pdf', compact('transactions'));
-    
+
         // Download the PDF with a specific name
         return $pdf->download('transactions_list.pdf');
     }

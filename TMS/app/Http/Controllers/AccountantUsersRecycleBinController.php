@@ -14,15 +14,14 @@ class AccountantUsersRecycleBinController extends Controller
         $perPage = $request->input('perPage', 5);
 
         // Search functionality
-        if ($request->filled('user_search')) {
-            $search = $request->input('user_search');
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+
             $query->where(function ($q) use ($search) {
-                $q->where('email', 'LIKE', '%' . $search . '%')
-                    ->orWhereHas('orgSetup', function ($q) use ($search) {
-                        $q->where('registration_name', 'LIKE', '%' . $search . '%')
-                            ->orWhere('tax_type', 'LIKE', '%' . $search . '%')
-                            ->orWhere('type', 'LIKE', '%' . $search . '%'); // Add other fields as needed
-                    });
+                $q->where('first_name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('last_name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('email', 'LIKE', '%' . $search . '%')
+                    ->orWhere('role', 'LIKE', '%' . $search . '%');
             });
         }
 

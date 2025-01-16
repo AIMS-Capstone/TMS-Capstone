@@ -19,6 +19,7 @@ use Codedge\Fpdf\Fpdf\Fpdf;
 use mikehaertl\pdftk\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use FPDM;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -121,7 +122,7 @@ public function vatReturn(Request $request)
 public function showIncome($id, $type)
 {
     // Retrieve the tax return by its ID
-    $taxReturn = TaxReturn::findOrFail($id);
+    $taxReturn = TaxReturn::findOrFail($id);    
     $organization_id = session("organization_id");
 
     // Check if the 'type' (or title) matches '1701Q'
@@ -286,20 +287,61 @@ public function showIncome($id, $type)
 
     public function markAsFiled($id)
     {
-        $taxReturn = TaxReturn::findOrFail($id);
-        
-        // Check if the current status is not already "Filed"
-        if ($taxReturn->status === 'Filed') {
-            return redirect()->back()->with('error', 'This tax return is already marked as Filed.');
-        }
-        
-        // Update the status to "Filed"
-        $taxReturn->status = 'Filed';
-        $taxReturn->save();
-        
-        return redirect()->back()->with('successMark', 'Tax return has been marked as Filed.');
+        try {
+            // Fetch the tax return record
+            $taxReturn = TaxReturn::findOrFail($id);
 
+            // Check if the current status is already "Filed"
+            if ($taxReturn->status === 'Filed') {
+                activity('Tax Return Status Check')
+                    ->performedOn($taxReturn)
+                    ->causedBy(Auth::user())
+                    ->withProperties([
+                        'tax_return_id' => $taxReturn->id,
+                        'current_status' => $taxReturn->status,
+                        'ip' => request()->ip(),
+                        'browser' => request()->header('User-Agent'),
+                    ])
+                    ->log('Attempted to mark a tax return as Filed, but it was already Filed.');
+
+                return redirect()->back()->with('error', 'This tax return is already marked as Filed.');
+            }
+
+            // Update the status to "Filed"
+            $originalStatus = $taxReturn->status;
+            $taxReturn->status = 'Filed';
+            $taxReturn->save();
+
+            // Log the status update
+            activity('Tax Return Status Update')
+                ->performedOn($taxReturn)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'tax_return_id' => $taxReturn->id,
+                    'original_status' => $originalStatus,
+                    'new_status' => 'Filed',
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log('Tax return status updated to Filed.');
+
+            return redirect()->back()->with('successMark', 'Tax return has been marked as Filed.');
+        } catch (\Exception $e) {
+            // Log any errors that occur during the process
+            activity('Tax Return Update Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'tax_return_id' => $id,
+                    'error_message' => $e->getMessage(),
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log('Failed to update tax return status to Filed.');
+
+            return redirect()->back()->withErrors(['error' => 'An error occurred while marking the tax return as Filed. Please try again.']);
+        }
     }
+
   // Function for showing Value Added Tax Report Preview
 public function showVatReport($id)
 {
@@ -650,15 +692,43 @@ public function showVatReport($id)
   }
   
   
-  public function edit2550Q(TaxReturn $taxReturn)
-  {
-      $tax2550q = Tax2550Q::where('tax_return_id', $taxReturn->id)->firstOrFail();
-      
-      return view('tax_return.vat_report_edit', [
-          'taxReturn' => $taxReturn,
-          'tax2550q' => $tax2550q
-      ]);
-  }
+    public function edit2550Q(TaxReturn $taxReturn)
+    {
+        try {
+            // Fetch the associated Tax2550Q record
+            $tax2550q = Tax2550Q::where('tax_return_id', $taxReturn->id)->firstOrFail();
+
+            // Log the access to the edit form
+            activity('Tax Return Edit Access')
+                ->performedOn($tax2550q)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'tax_return_id' => $taxReturn->id,
+                    'tax2550q_id' => $tax2550q->id,
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log('Accessed the edit form for Tax Return 2550Q.');
+
+            return view('tax_return.vat_report_edit', [
+                'taxReturn' => $taxReturn,
+                'tax2550q' => $tax2550q,
+            ]);
+        } catch (\Exception $e) {
+            // Log any errors that occur
+            activity('Edit Access Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'tax_return_id' => $taxReturn->id,
+                    'error_message' => $e->getMessage(),
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log('Failed to access the edit form for Tax Return 2550Q.');
+
+            return redirect()->back()->withErrors(['error' => 'Failed to access the edit form. Please try again.']);
+        }
+    }
   
 
 
@@ -680,130 +750,223 @@ public function showVatReport($id)
         // Function for VAT Tax Return
     public function store(StoreTaxReturnRequest $request)
     {
-      
-        // Step 1: Create the tax return
-        $taxReturn = TaxReturn::create([
-            'title' => $request->type,
-            'year' => $request->year, // This is the tax return's year (from the request)
-            'month' => $request->month,
-            'created_by' => auth()->id(),
-            'organization_id' => $request->organization_id, 
-            'status' => 'Unfiled',
-        ]);
-    
-        // Step 2: Get the organization's start date
-        $organization = OrgSetup::find($request->organization_id);
-        $organizationStartDate = Carbon::parse($organization->start_date); // Assume start_date is a date field
-    
-        // Step 3: Determine the date range based on the selected month/quarter
-        $startDate = null;
-        $endDate = null;
-    
-        // If it's a month selection (1-12)
-        if (is_numeric($request->month)) {
-            // Use the tax return's year for month calculation
-            $startDate = Carbon::create($request->year, $request->month, 1)->startOfMonth();
-            $endDate = Carbon::create($request->year, $request->month, 1)->endOfMonth();
-        } 
-        // If it's a quarter (Q1, Q2, Q3, Q4) and it's based on the organization's start date
-        else {
-            // Determine the quarter based on the organization's start_date
-            $startMonth = $organizationStartDate->month;
-    
-            // Calculate the start and end dates for the quarter based on the organization's start date
-            if ($request->month == 'Q1') {
-                // First quarter starts from the organization's start month, within the tax return's year
-                $startDate = Carbon::create($request->year, $startMonth, 1); // Start of the first quarter
-                $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the third month
-            } else if ($request->month == 'Q2') {
-                $startDate = Carbon::create($request->year, $startMonth + 3, 1); // Start of second quarter (3 months after start month)
-                $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the sixth month
-            } else if ($request->month == 'Q3') {
-                $startDate = Carbon::create($request->year, $startMonth + 6, 1); // Start of third quarter (6 months after start month)
-                $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the ninth month
-            } else if ($request->month == 'Q4') {
-                $startDate = Carbon::create($request->year, $startMonth + 9, 1); // Start of fourth quarter (9 months after start month)
-                $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the twelfth month
+        try {
+            // Step 1: Create the tax return
+            $taxReturn = TaxReturn::create([
+                'title' => $request->type,
+                'year' => $request->year,
+                'month' => $request->month,
+                'created_by' => Auth::user(),
+                'organization_id' => $request->organization_id,
+                'status' => 'Unfiled',
+            ]);
+
+            activity('Tax Return Creation')
+                ->performedOn($taxReturn)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'tax_return_id' => $taxReturn->id,
+                    'organization_id' => $request->organization_id,
+                    'year' => $request->year,
+                    'month' => $request->month,
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log('Tax Return created successfully.');
+
+            // Step 2: Get the organization's start date
+            $organization = OrgSetup::find($request->organization_id);
+            $organizationStartDate = Carbon::parse($organization->start_date);
+
+            // Step 3: Determine the date range
+            $startDate = null;
+            $endDate = null;
+
+            if (is_numeric($request->month)) {
+                $startDate = Carbon::create($request->year, $request->month, 1)->startOfMonth();
+                $endDate = Carbon::create($request->year, $request->month, 1)->endOfMonth();
+            } else {
+                $startMonth = $organizationStartDate->month;
+                if ($request->month == 'Q1') {
+                    $startDate = Carbon::create($request->year, $startMonth, 1);
+                    $endDate = $startDate->copy()->addMonths(2)->endOfMonth();
+                } else if ($request->month == 'Q2') {
+                    $startDate = Carbon::create($request->year, $startMonth + 3, 1);
+                    $endDate = $startDate->copy()->addMonths(2)->endOfMonth();
+                } else if ($request->month == 'Q3') {
+                    $startDate = Carbon::create($request->year, $startMonth + 6, 1);
+                    $endDate = $startDate->copy()->addMonths(2)->endOfMonth();
+                } else if ($request->month == 'Q4') {
+                    $startDate = Carbon::create($request->year, $startMonth + 9, 1);
+                    $endDate = $startDate->copy()->addMonths(2)->endOfMonth();
+                }
             }
+
+            activity('Date Range Calculation')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'start_date' => $startDate,
+                    'end_date' => $endDate,
+                    'organization_id' => $request->organization_id,
+                ])
+                ->log('Date range calculated for Tax Return.');
+
+            // Step 4: Fetch transactions
+            $transactions = Transactions::where('organization_id', $request->organization_id)
+                ->whereBetween('date', [$startDate, $endDate])
+                ->get();
+
+            activity('Transaction Fetching')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'transaction_count' => $transactions->count(),
+                    'organization_id' => $request->organization_id,
+                    'start_date' => $startDate,
+                    'end_date' => $endDate,
+                ])
+                ->log('Transactions fetched for Tax Return.');
+
+            // Step 5: Attach transactions if any
+            if ($transactions->isNotEmpty()) {
+                $taxReturn->transactions()->attach($transactions->pluck('id'));
+
+                activity('Transaction Attachment')
+                    ->performedOn($taxReturn)
+                    ->causedBy(Auth::user())
+                    ->withProperties([
+                        'tax_return_id' => $taxReturn->id,
+                        'attached_transaction_ids' => $transactions->pluck('id'),
+                    ])
+                    ->log('Transactions attached to Tax Return.');
+            }
+
+            // Step 6: Return success message
+            return back()->with('success', 'Tax Return created successfully.' . ($transactions->isEmpty() ? ' No transactions found for the selected period.' : ' Transactions associated successfully.'));
+        } catch (\Exception $e) {
+            // Log any errors that occur
+            activity('Tax Return Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'error_message' => $e->getMessage(),
+                    'organization_id' => $request->organization_id,
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log('Error occurred while creating Tax Return.');
+
+            return back()->withErrors(['error' => 'Failed to create Tax Return. Please try again.']);
         }
-    
-        // Step 4: Fetch transactions based on date range and organization_id
-        $transactions = Transactions::where('organization_id', $request->organization_id)
-            ->whereBetween('date', [$startDate, $endDate])
-            ->get();
-    
-        // Step 5: Attach transactions to the tax return only if there are any
-        if ($transactions->isNotEmpty()) {
-            $taxReturn->transactions()->attach($transactions->pluck('id'));
-        }
-    
-        // Step 6: Return back to the same page with success message
-        return back()->with('success', 'Tax Return created successfully.' . ($transactions->isEmpty() ? ' No transactions found for the selected period.' : ' Transactions associated successfully.'));
     }
+
       // Function for Creating Percentage Tax Return
     public function storePercentage(StoreTaxReturnRequest $request)
     {
-        // Step 1: Create the tax return
-        $taxReturn = TaxReturn::create([
-            'title' => $request->type,
-            'year' => $request->year, // This is the tax return's year (from the request)
-            'month' => $request->month,
-            'created_by' => auth()->id(),
-            'organization_id' => $request->organization_id, 
-            'status' => 'Unfiled',
-        ]);
-    
-        // Step 2: Get the organization's start date
-        $organization = OrgSetup::find($request->organization_id);
-        $organizationStartDate = Carbon::parse($organization->start_date); // Assume start_date is a date field
-    
-        // Step 3: Determine the date range based on the selected month/quarter
-        $startDate = null;
-        $endDate = null;
-    
-        // If it's a month selection (1-12)
-        if (is_numeric($request->month)) {
-            // Use the tax return's year for month calculation
-            $startDate = Carbon::create($request->year, $request->month, 1)->startOfMonth();
-            $endDate = Carbon::create($request->year, $request->month, 1)->endOfMonth();
-        } 
-        // If it's a quarter (Q1, Q2, Q3, Q4) and it's based on the organization's start date
-        else {
-            // Determine the quarter based on the organization's start_date
-            $startMonth = $organizationStartDate->month;
-    
-            // Calculate the start and end dates for the quarter based on the organization's start date
-            if ($request->month == 'Q1') {
-                // First quarter starts from the organization's start month, within the tax return's year
-                $startDate = Carbon::create($request->year, $startMonth, 1); // Start of the first quarter
-                $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the third month
-            } else if ($request->month == 'Q2') {
-                $startDate = Carbon::create($request->year, $startMonth + 3, 1); // Start of second quarter (3 months after start month)
-                $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the sixth month
-            } else if ($request->month == 'Q3') {
-                $startDate = Carbon::create($request->year, $startMonth + 6, 1); // Start of third quarter (6 months after start month)
-                $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the ninth month
-            } else if ($request->month == 'Q4') {
-                $startDate = Carbon::create($request->year, $startMonth + 9, 1); // Start of fourth quarter (9 months after start month)
-                $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the twelfth month
+        try {
+            // Step 1: Create the tax return
+            $taxReturn = TaxReturn::create([
+                'title' => $request->type,
+                'year' => $request->year, // This is the tax return's year (from the request)
+                'month' => $request->month,
+                'created_by' => Auth::user(),
+                'organization_id' => $request->organization_id,
+                'status' => 'Unfiled',
+            ]);
+
+            // Log the creation of the tax return
+            activity('Tax Return Creation')
+                ->performedOn($taxReturn)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'title' => $request->type,
+                    'year' => $request->year,
+                    'month' => $request->month,
+                    'organization_id' => $request->organization_id,
+                    'status' => 'Unfiled',
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log('Created a new tax return.');
+
+            // Step 2: Get the organization's start date
+            $organization = OrgSetup::find($request->organization_id);
+            $organizationStartDate = Carbon::parse($organization->start_date); // Assume start_date is a date field
+
+            // Step 3: Determine the date range based on the selected month/quarter
+            $startDate = null;
+            $endDate = null;
+
+            // If it's a month selection (1-12)
+            if (is_numeric($request->month)) {
+                $startDate = Carbon::create($request->year, $request->month, 1)->startOfMonth();
+                $endDate = Carbon::create($request->year, $request->month, 1)->endOfMonth();
+            } else {
+                $startMonth = $organizationStartDate->month;
+
+                if ($request->month == 'Q1') {
+                    $startDate = Carbon::create($request->year, $startMonth, 1);
+                    $endDate = $startDate->copy()->addMonths(2)->endOfMonth();
+                } else if ($request->month == 'Q2') {
+                    $startDate = Carbon::create($request->year, $startMonth + 3, 1);
+                    $endDate = $startDate->copy()->addMonths(2)->endOfMonth();
+                } else if ($request->month == 'Q3') {
+                    $startDate = Carbon::create($request->year, $startMonth + 6, 1);
+                    $endDate = $startDate->copy()->addMonths(2)->endOfMonth();
+                } else if ($request->month == 'Q4') {
+                    $startDate = Carbon::create($request->year, $startMonth + 9, 1);
+                    $endDate = $startDate->copy()->addMonths(2)->endOfMonth();
+                }
             }
+
+            // Step 4: Fetch transactions based on date range and organization_id
+            $transactions = Transactions::where('organization_id', $request->organization_id)
+                ->whereBetween('date', [$startDate, $endDate])
+                ->get();
+
+            // Step 5: Attach transactions to the tax return only if there are any
+            if ($transactions->isNotEmpty()) {
+                $taxReturn->transactions()->attach($transactions->pluck('id'));
+
+                // Log transaction association
+                activity('Transaction Association')
+                    ->performedOn($taxReturn)
+                    ->causedBy(Auth::user())
+                    ->withProperties([
+                        'transaction_ids' => $transactions->pluck('id'),
+                        'transaction_count' => $transactions->count(),
+                        'ip' => request()->ip(),
+                        'browser' => request()->header('User-Agent'),
+                    ])
+                    ->log('Associated transactions with the tax return.');
+            }
+
+            // Log success message
+            activity('Tax Return Process Success')
+                ->performedOn($taxReturn)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'transactions_found' => $transactions->isNotEmpty(),
+                    'transaction_count' => $transactions->count(),
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log('Tax return created successfully.');
+
+            // Step 6: Return back to the same page with success message
+            return back()->with('success', 'Tax Return created successfully.' . ($transactions->isEmpty() ? ' No transactions found for the selected period.' : ' Transactions associated successfully.'));
+        } catch (\Exception $e) {
+            // Log any errors that occur
+            activity('Tax Return Process Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'error_message' => $e->getMessage(),
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log('Failed to create the tax return.');
+
+            return back()->withErrors(['error' => 'Failed to create the tax return. Please try again.']);
         }
-    
-        // Step 4: Fetch transactions based on date range and organization_id
-        $transactions = Transactions::where('organization_id', $request->organization_id)
-            ->whereBetween('date', [$startDate, $endDate])
-            ->get();
-    
-        // Step 5: Attach transactions to the tax return only if there are any
-        if ($transactions->isNotEmpty()) {
-            $taxReturn->transactions()->attach($transactions->pluck('id'));
-        }
-    
-        // Step 6: Return back to the same page with success message
-        return back()->with('success', 'Tax Return created successfully.' . ($transactions->isEmpty() ? ' No transactions found for the selected period.' : ' Transactions associated successfully.'));
     }
-    
-    
 
        // Function for Creating 2550Q Value Added Tax Return Report
     public function store2550Q(Request $request, $taxReturn)
@@ -902,6 +1065,8 @@ public function showVatReport($id)
         'total_allowable_input_Tax.numeric' => 'The total allowable input tax must be a number.',
         'excess_input_tax.numeric' => 'The excess input tax must be a number.',
     ];
+
+    try {
      // Step 1: Validate incoming data
         $validatedData = $request->validate([
             'period' => 'required|string',
@@ -975,15 +1140,34 @@ public function showVatReport($id)
             'total_allowable_input_Tax' => 'nullable|numeric',
             'excess_input_tax' => 'nullable|numeric',
         ], $messages);
+        // Log data validation success
+        activity('Validation Success')
+            ->withProperties([
+                'tax_return_id' => $taxReturn,
+                'user_id' => Auth::user(),
+                'ip' => request()->ip(),
+            ])
+            ->log('Validation of Tax2550Q data succeeded.');
+
         // Step 2: Attach the tax return ID to the validated data
         $validatedData['tax_return_id'] = $taxReturn;
-  
-    
+
         $tax2550Q = Tax2550Q::updateOrCreate(
-            ['tax_return_id' => $taxReturn], // Find existing record by tax_return_id
-            $validatedData // Use validated data for creation or update
+            ['tax_return_id' => $taxReturn],
+            $validatedData
         );
-        
+
+        // Log record creation or update
+        activity('Tax2550Q Record Update')
+            ->performedOn($tax2550Q)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'tax_return_id' => $taxReturn,
+                'updated_data' => $validatedData,
+                'ip' => request()->ip(),
+            ])
+            ->log('Created or updated a Tax2550Q record.');
+    
         // Step 4: Determine the message type based on whether it's an update or new creation
         $messageType = $tax2550Q->wasRecentlyCreated ? 'success' : 'success2';
         $messageText = $tax2550Q->wasRecentlyCreated 
@@ -994,8 +1178,20 @@ public function showVatReport($id)
         return redirect()
             ->route('tax_return.2550q.pdf', ['taxReturn' => $taxReturn])
             ->with($messageType, $messageText);
-        
+    } catch (\Exception $e) {
+        // Log any errors
+        activity('Tax2550Q Process Error')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'tax_return_id' => $taxReturn,
+                'error_message' => $e->getMessage(),
+                'ip' => request()->ip(),
+            ])
+            ->log('An error occurred while processing Tax2550Q.');
+
+        return redirect()->back()->withErrors(['error' => 'An error occurred. Please try again.']);
     }
+}
     
       // Function for Creating 2551Q Percentage Tax Return Report
       public function store2551Q(Request $request, $taxReturn)
@@ -1070,6 +1266,17 @@ public function showVatReport($id)
                   'total_amount_payable' => 'required|numeric',
                   'schedule' => 'nullable|array',
               ], $messages);
+
+                // Log validation success
+                activity('Validation Success')
+                    ->withProperties([
+                        'tax_return_id' => $taxReturn,
+                        'validated_data' => $validatedData,
+                        'ip' => request()->ip(),
+                        'user_id' => Auth::user(),
+                    ])
+                    ->log('Validation of Tax2551Q data succeeded.');
+
       
               // Add the tax_return_id to the validated data
               $validatedData['tax_return_id'] = $taxReturn;
@@ -1084,6 +1291,18 @@ public function showVatReport($id)
                       ['tax_return_id' => $taxReturn],
                       $validatedData
                   );
+
+                // Log Tax2551Q creation or update
+                activity('Tax2551Q Record Update')
+                    ->performedOn($tax2551Q)
+                    ->causedBy(Auth::user())
+                    ->withProperties([
+                        'tax_return_id' => $taxReturn,
+                        'updated_data' => $validatedData,
+                        'ip' => request()->ip(),
+                    ])
+                    ->log('Created or updated a Tax2551Q record.');
+
       
                   // Process schedule if exists
                   if (isset($validatedData['schedule']) && !empty($validatedData['schedule'])) {
@@ -1109,6 +1328,16 @@ public function showVatReport($id)
                               ]
                           );
                       }
+                      // Log schedule processing success
+                    activity('Schedule Processing Success')
+                        ->performedOn($tax2551Q)
+                        ->causedBy(Auth::user())
+                        ->withProperties([
+                            'schedule_data' => $validatedData['schedule'],
+                            'ip' => request()->ip(),
+                        ])
+                        ->log('Processed schedule data successfully.');
+
                   }
       
                   DB::commit();
@@ -1120,6 +1349,16 @@ public function showVatReport($id)
       
               } catch (\Exception $e) {
                   DB::rollBack();
+                  // Log final success
+                    activity('Tax2551Q Submission Success')
+                        ->performedOn($tax2551Q)
+                        ->causedBy(Auth::user())
+                        ->withProperties([
+                            'tax_return_id' => $taxReturn,
+                            'ip' => request()->ip(),
+                        ])
+                        ->log('Tax2551Q successfully submitted.');
+
                   return redirect()
                       ->back()
                       ->withInput()
@@ -1132,6 +1371,16 @@ public function showVatReport($id)
                   ->withErrors($e->validator)
                   ->withInput();
           } catch (\Exception $e) {
+
+            activity('Unexpected Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'tax_return_id' => $taxReturn,
+                    'error_message' => $e->getMessage(),
+                    'ip' => request()->ip(),
+                ])
+                ->log('An unexpected error occurred while processing Tax2551Q.');
+
               return redirect()
                   ->back()
                   ->withInput()
@@ -2276,16 +2525,51 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
     {
         // Get the array of IDs from the request
         $ids = $request->input('ids');  // Assuming the IDs are passed as an array
-        
+
         // Check if there are IDs to delete
         if (empty($ids)) {
+            // Log the no-selection error
+            activity('Deletion Attempt')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'ids' => $ids,
+                    'ip' => request()->ip(),
+                    'user_id' => Auth::user(),
+                ])
+                ->log('Deletion attempted with no IDs selected.');
+
             return back()->with('error', 'No rows selected for deletion.');
         }
-        
-        // Perform the soft delete on the selected IDs
-        TaxReturn::whereIn('id', $ids)->delete();  // Soft delete the tax returns by their IDs
-        
-        return back()->with('success', 'Selected tax returns deleted successfully!');
+
+        try {
+            // Perform the soft delete on the selected IDs
+            TaxReturn::whereIn('id', $ids)->delete();
+
+            // Log the successful deletion
+            activity('Tax Returns Deleted')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'deleted_ids' => $ids,
+                    'ip' => request()->ip(),
+                    'user_id' => Auth::user(),
+                ])
+                ->log('Successfully soft-deleted selected tax returns.');
+
+            return back()->with('success', 'Selected tax returns deleted successfully!');
+        } catch (\Exception $e) {
+            // Log any errors during the deletion process
+            activity('Deletion Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'ids' => $ids,
+                    'error_message' => $e->getMessage(),
+                    'ip' => request()->ip(),
+                    'user_id' => Auth::user(),
+                ])
+                ->log('An error occurred during the deletion process.');
+
+            return back()->with('error', 'An error occurred while deleting the selected tax returns. Please try again.');
+        }
     }
     
 }

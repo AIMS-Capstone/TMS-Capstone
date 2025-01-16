@@ -23,11 +23,26 @@ class withHolding0619EController extends Controller
     public function index0619E(Request $request)
     {
         $organizationId = session('organization_id');
-        $perPage = $request->input('perPage', 5); // Get the perPage value from the request, default to 5
-        $with_holdings = $this->getWithHoldings($organizationId, '0619E', $perPage);
-        
-        return view('tax_return.with_holding.0619E', compact('with_holdings'));
+        $perPage = $request->input('perPage', 5);
 
+        // Start the query with the organization filter and type
+        $query = WithHolding::where('type', '0619E')
+            ->where('organization_id', $organizationId); // Filter by organization ID
+
+        if ($request->has('search') && $request->search != '') {
+            $search = trim($request->search); // Trim whitespace from the search term
+
+            // Add search conditions
+            $query->where(function ($q) use ($search) {
+                $q->where('year', 'LIKE', '%' . $search . '%')
+                    ->orWhere('month', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        // Paginate the results
+        $with_holdings = $query->paginate($perPage);
+
+        return view('tax_return.with_holding.0619E', compact('with_holdings'));
     }
 
     public function generate0619E(Request $request)
@@ -36,7 +51,7 @@ class withHolding0619EController extends Controller
         $request->validate([
             'year' => 'required|numeric|min:1900|max:' . date('Y'),
             'month' => 'required|numeric|min:1|max:12',
-            'type' => 'required|string|in:0619E', 
+            'type' => 'required|string|in:0619E',
         ]);
 
         $organizationId = session('organization_id');
@@ -48,19 +63,42 @@ class withHolding0619EController extends Controller
             ->where('organization_id', $organizationId)
             ->first();
 
-            if ($existingRecord) {
-                // Check if 0619E form already exists for this withholding
-                $existingForm = Form0619E::where('withholding_id', $existingRecord->id)->first();
+        if ($existingRecord) {
+            // Check if 0619E form already exists for this withholding
+            $existingForm = Form0619E::where('withholding_id', $existingRecord->id)->first();
 
-                if ($existingForm) {
-                    return redirect()->route('form0619E.preview', ['id' => $existingForm->id]);
-                }
+            if ($existingForm) {
+                // Log the redirection to the existing form
+                activity('Form Access')
+                    ->causedBy(Auth::user())
+                    ->withProperties([
+                        'form_id' => $existingForm->id,
+                        'withholding_id' => $existingRecord->id,
+                        'type' => '0619E',
+                        'ip' => $request->ip(),
+                        'browser' => $request->header('User-Agent'),
+                    ])
+                    ->log("Accessed existing Form 0619E with ID {$existingForm->id}.");
 
-                return redirect()->route('form0619E.create', ['id' => $existingRecord->id])
-                    ->with('success', 'Withholding Tax Return for 0619E has been generated.');
+                return redirect()->route('form0619E.preview', ['id' => $existingForm->id]);
             }
 
-        // Create the record
+            // Log the redirection to create the form
+            activity('Form Generation')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'withholding_id' => $existingRecord->id,
+                    'type' => '0619E',
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log("Redirected to create Form 0619E for Withholding ID {$existingRecord->id}.");
+
+            return redirect()->route('form0619E.create', ['id' => $existingRecord->id])
+                ->with('success', 'Withholding Tax Return for 0619E has been generated.');
+        }
+
+        // Create the withholding record
         $withHolding = WithHolding::create([
             'type' => $request->type,
             'organization_id' => $organizationId,
@@ -69,6 +107,21 @@ class withHolding0619EController extends Controller
             'year' => $request->year,
             'created_by' => Auth::id(),
         ]);
+
+        // Log the creation of the new withholding record
+        activity('Withholding Record Creation')
+            ->performedOn($withHolding)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'withholding_id' => $withHolding->id,
+                'type' => '0619E',
+                'month' => $request->month,
+                'year' => $request->year,
+                'organization_id' => $organizationId,
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log("Created a new Withholding record for 0619E (ID: {$withHolding->id}).");
 
         return redirect()->route('form0619E.create', ['id' => $withHolding->id])
             ->with('success', 'Withholding Tax Return for 0619E has been generated.');
@@ -87,10 +140,16 @@ class withHolding0619EController extends Controller
         $withHoldings = WithHolding::whereIn('id', $ids)->get();
 
         // Log the incoming IDs for debugging
-        Log::info('Received WithHolding IDs for soft deletion: ', $ids);
+        activity('Withholding Deletion Request')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'requested_ids' => $ids,
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log('Received request to delete Withholding records.');
 
         try {
-
             foreach ($withHoldings as $withHolding) {
                 // Set the 'deleted_by' field to the currently authenticated user
                 $withHolding->deleted_by = Auth::id();
@@ -102,18 +161,31 @@ class withHolding0619EController extends Controller
 
             // Log each deletion activity
             foreach ($withHoldings as $withHolding) {
-                activity('withholdings')
+                activity('Withholding Deletion')
                     ->performedOn($withHolding)
                     ->causedBy(Auth::user())
-                    ->log("WithHolding ID {$withHolding->id} was soft deleted");
+                    ->withProperties([
+                        'withholding_id' => $withHolding->id,
+                        'organization_id' => $withHolding->organization_id,
+                        'ip' => $request->ip(),
+                        'browser' => $request->header('User-Agent'),
+                    ])
+                    ->log("WithHolding ID {$withHolding->id} was soft deleted.");
             }
 
             // Return success response
             return response()->json(['message' => 'WithHolding soft deleted successfully.'], 200);
-
         } catch (\Exception $e) {
             // Log any errors that occurred during deletion
-            Log::error('Error during soft deletion of WithHoldings: ' . $e->getMessage());
+            activity('Withholding Deletion Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'requested_ids' => $ids,
+                    'error_message' => $e->getMessage(),
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log('An error occurred during the deletion of Withholding records.');
 
             // Return error response
             return response()->json(['error' => 'An error occurred while deleting records'], 500);
@@ -154,11 +226,15 @@ class withHolding0619EController extends Controller
 
     public function storeForm0619E(Request $request, $id)
     {
-        // Log the beginning of the method
-        Log::info("Initiating 0619E form submission", ['withholding_id' => $id]);
-
-        // Log incoming data
-        Log::info("Incoming Request Data", $request->all());
+        // Log the initiation of the method
+        activity('Form Submission')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'withholding_id' => $id,
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log('Initiating 0619E form submission.');
 
         try {
             $request->validate([
@@ -176,24 +252,40 @@ class withHolding0619EController extends Controller
                 'compromise' => 'nullable|numeric|min:0',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error("Validation failed", [
-                'errors' => $e->errors()
-            ]);
+            activity('Validation Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'errors' => $e->errors(),
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log('Validation failed for 0619E form submission.');
+
             return redirect()->back()->withErrors($e->errors())->withInput();
         }
 
         // Fetch the withholding record
         $withHolding = WithHolding::findOrFail($id);
-        Log::info("Fetched withholding record", ['organization_id' => $withHolding->organization_id]);
+
+        activity('Form Submission')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'withholding_id' => $id,
+                'organization_id' => $withHolding->organization_id,
+            ])
+            ->log('Fetched withholding record for 0619E form submission.');
 
         // Calculate penalties and total amount due
         $totalPenalties = ($request->surcharge ?? 0) + ($request->interest ?? 0) + ($request->compromise ?? 0);
         $totalAmountDue = ($request->amount_of_remittance ?? 0) - ($request->remitted_previous ?? 0) + $totalPenalties;
 
-        Log::info("Calculated totals", [
-            'totalPenalties' => $totalPenalties,
-            'totalAmountDue' => $totalAmountDue
-        ]);
+        activity('Form Calculation')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'totalPenalties' => $totalPenalties,
+                'totalAmountDue' => $totalAmountDue,
+            ])
+            ->log('Calculated totals for 0619E form.');
 
         // Create the form record
         $form = Form0619E::create([
@@ -216,10 +308,14 @@ class withHolding0619EController extends Controller
             'total_amount_due' => $totalAmountDue,
         ]);
 
-        Log::info("0619E Form created successfully", [
-            'form_id' => $form->id,
-            'form_data' => $form->toArray()
-        ]);
+        activity('Form Creation')
+            ->performedOn($form)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'form_id' => $form->id,
+                'form_data' => $form->toArray(),
+            ])
+            ->log("0619E Form created successfully (ID: {$form->id}).");
 
         // Redirect back with a success message
         return redirect()->route('with_holding.0619E')
@@ -233,7 +329,7 @@ class withHolding0619EController extends Controller
 
         if ($form) {
             // If form exists, redirect to preview
-            return view('tax_return.with_holding.0619E_preview', compact('form'));
+            return view('tax_return.with_holding.0619E_preview', compact('form', 'withHolding'));
         }
 
         // Otherwise, proceed to create form
@@ -260,6 +356,7 @@ class withHolding0619EController extends Controller
     {
         $form = Form0619E::findOrFail($id);
 
+        // Validate the request
         $validated = $request->validate([
             'for_month' => 'required|date_format:Y-m',
             'due_date' => 'required|date',
@@ -275,16 +372,37 @@ class withHolding0619EController extends Controller
             'compromise' => 'nullable|numeric|min:0',
         ]);
 
+        // Track the original attributes before updating
+        $originalAttributes = $form->getOriginal();
+
         // Calculate penalties and total amount due
         $totalPenalties = ($validated['surcharge'] ?? 0) + ($validated['interest'] ?? 0) + ($validated['compromise'] ?? 0);
         $totalAmountDue = ($validated['amount_of_remittance'] ?? 0) - ($validated['remitted_previous'] ?? 0) + $totalPenalties;
 
-        // Update form details
+        // Update the form details
         $form->update(array_merge($validated, [
             'net_amount_of_remittance' => ($validated['amount_of_remittance'] ?? 0) - ($validated['remitted_previous'] ?? 0),
             'total_penalties' => $totalPenalties,
             'total_amount_due' => $totalAmountDue,
         ]));
+
+        // Log activity for the update
+        activity('Form Update')
+            ->performedOn($form)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'form_id' => $form->id,
+                'withholding_id' => $form->withholding_id,
+                'changes' => [
+                    'before' => $originalAttributes,
+                    'after' => $form->getAttributes(),
+                ],
+                'total_penalties' => $totalPenalties,
+                'total_amount_due' => $totalAmountDue,
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log("Form 0619E ID {$form->id} was updated.");
 
         // Redirect to preview using the withholding ID
         return redirect()->route('form0619E.preview', ['id' => $form->withholding_id])
@@ -299,14 +417,70 @@ class withHolding0619EController extends Controller
         // Get the related organization from the form
         $organization = $form->organization;
 
+        // Log the download activity
+        activity('Form Download')
+            ->performedOn($form)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'form_id' => $form->id,
+                'withholding_id' => $form->withholding_id,
+                'organization_id' => $organization->id ?? null,
+                'filename' => '0619E_Form_' . $form->for_month . '.pdf',
+                'ip' => request()->ip(),
+                'browser' => request()->header('User-Agent'),
+            ])
+            ->log("0619E Form (ID: {$form->id}) was downloaded.");
+
         // Load the PDF view and pass the form and organization data
         $pdf = Pdf::loadView('tax_return.with_holding.0619E_pdf', compact('form', 'organization'));
 
         // Customize the filename
         $filename = '0619E_Form_' . $form->for_month . '.pdf';
-
+                
         // Return PDF download response
         return $pdf->download($filename);
+    }
+
+    public function markForm0619EFiled($formId)
+    {   
+        try {
+            // Fetch the Form0619E record
+            $form = Form0619E::findOrFail($formId);
+
+            // Fetch the related WithHolding record
+            $withHolding = WithHolding::findOrFail($form->withholding_id);
+
+            $withHolding->update(['status' => 'Filed']);
+
+            activity('Status Update')
+                ->performedOn($withHolding)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'withholding_id' => $withHolding->id,
+                    'form_id' => $form->id,
+                    'previous_status' => $withHolding->getOriginal('status'),
+                    'new_status' => 'Filed',
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log("WithHolding ID {$withHolding->id} and Form0619E ID {$form->id} marked as Filed.");
+
+            return redirect()->route('form0619E.preview', ['id' => $form->withholding_id])
+                ->with('success', "Form 0619E (ID: {$formId}) and its related WithHolding record have been marked as Filed.");
+        } catch (\Exception $e) {
+            // Log any exceptions
+            activity('Status Update Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'form_id' => $formId,
+                    'error_message' => $e->getMessage(),
+                    'ip' => request()->ip(),
+                    'browser' => request()->header('User-Agent'),
+                ])
+                ->log('An error occurred while marking Form0619E as Filed.');
+
+            return redirect()->back()->withErrors(['error' => 'An error occurred while updating the status.']);
+        }
     }
 
     private function getWithHoldings($organizationId, $type, $perPage = 5)

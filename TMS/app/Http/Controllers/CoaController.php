@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\account_type_template;
 use App\Exports\import_template;
+use App\Exports\sub_type_template;
 use App\Imports\CoaImport;
 use App\Models\Coa;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -27,8 +28,11 @@ class CoaController extends Controller
 
         $organizationId = session('organization_id'); // Using session-based organization ID
 
-        $query = Coa::where('organization_id', $organizationId)
-            ->where('status', 'Active');
+        $query = Coa::where(function ($query) use ($organizationId) {
+            $query->where('organization_id', $organizationId)
+                ->orWhereNull('organization_id');
+        })->where('status', 'Active');
+
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -63,11 +67,11 @@ class CoaController extends Controller
 
         if ($submitAction === 'manual') {
             $request->validate([
-                'type' => 'required|string|max:255',
-                'sub_type' => 'required|string|max:255',
+                'type' => 'required|string',
+                'sub_type' => 'required|string|max:50',
                 'code' => 'required|string|max:10',
                 'name' => 'required|string|max:150',
-                'description' => 'nullable|string|max:255',
+                'description' => 'nullable|string|max:100',
             ]);
 
             $coa = Coa::create([
@@ -117,7 +121,7 @@ class CoaController extends Controller
         $request->validate([
             'account_type_input' => 'required|string|max:255',
             'sub_type' => 'required|string|max:255',
-            'code' => 'required|string|max:10',
+            'code' => 'required|string|max:5|min:4',
             'name' => 'required|string|max:150',
             'description' => 'nullable|string|max:255',
         ]);
@@ -321,6 +325,12 @@ class CoaController extends Controller
     {
         return MaatExcel::download(new account_type_template, 'account_type_template.xlsx');
     }
+
+    public function sub_type_template()
+    {
+        return MaatExcel::download(new sub_type_template, 'sub_type_template.xlsx');
+    }
+
 
     public function exportCoas()
     {

@@ -99,19 +99,19 @@
                     <div class="flex flex-row space-x-2 items-center justify-between">
                         <div class="flex flex-row space-x-2 items-center ps-6">
                             <!-- Search row -->
-                            <div class="relative w-80 p-4">
-                                <form x-target="QAP" action="/1601EQ_Qap" role="search" aria-label="Table" autocomplete="off">
+                            <div class="w-80 p-5">
+                                <form x-target="QAP" action="/tax_return/with_holding/{{ $withHolding->id }}/1601EQ_Qap" role="search" method="GET" aria-label="Table" autocomplete="off">
                                     <input 
                                         type="search" 
-                                        name="search" 
-                                        class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900 focus:border-sky-900" 
+                                        name="search"
+                                        class="w-full pl-10 pr-4 py-[7px] text-sm border border-zinc-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-900 focus:border-blue-900" 
                                         aria-label="Search Term" 
                                         placeholder="Search..." 
                                         @input.debounce="$el.form.requestSubmit()" 
                                         @search="$el.form.requestSubmit()"
                                     >
+                                    <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-zinc-400"></i>
                                 </form>
-                                <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                             </div>
                             <!-- Sort by dropdown -->
                             <div class="relative inline-block text-left min-w-[150px]">
@@ -233,7 +233,7 @@
                                         <tr>
                                             <th class="py-2 px-4">
                                                 <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer">
-                                                    <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"/>
+                                                    <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition"/>
                                                 </label>
                                             </th>
                                             <th scope="col" class="py-4 px-4">Vendor</th>
@@ -249,7 +249,7 @@
                                             <tr class="hover:bg-blue-50">
                                                 <td class="p-4">
                                                     <label x-show="showCheckboxes" class="flex items-center cursor-pointer">
-                                                        <input type="checkbox" @click="toggleCheckbox('{{ $taxRow->transaction->id }}')" :checked="selectedRows.includes('{{ $taxRow->transaction->id }}')" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"/>
+                                                        <input type="checkbox" @click="toggleCheckbox('{{ $taxRow->transaction->id }}')" :checked="selectedRows.includes('{{ $taxRow->transaction->id }}')" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition"/>
                                                     </label>
                                                 </td>
                                                 <td class="py-4 px-4">{{ optional($taxRow->transaction->contactDetails)->bus_name ?? 'N/A' }}</td>
@@ -268,7 +268,6 @@
                                                     <p class="text-sm text-neutral-500 mt-2">Start adding with the + button <br>at the top.</p>
                                                 </td>
                                             </tr>
-                                        @else
                                         @endif
                                     </tbody>
                                 </table>
@@ -353,7 +352,7 @@
                                         required>
                                         <option value="" disabled>Select Transaction</option>
                                         @foreach ($unassignedTransactions as $transaction)
-                                            <option value="{{ $transaction->id }}">{{ $transaction->contactDetails->bus_name }}</option>
+                                            <option value="{{ $transaction->id }}">{{ $transaction->contactDetails->bus_name ?? "N/A" }}</option>
                                         @endforeach
                                     </select>
                                 </div>
