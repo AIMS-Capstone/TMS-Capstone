@@ -295,7 +295,7 @@
                                         <thead class="bg-neutral-100 text-sm text-neutral-700">
                                             <tr>
                                                 <th scope="col" class="p-4">
-                                                    <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-green-600">
+                                                    <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-green-600" x-cloak>
                                                         <div class="relative flex items-center">
                                                             <input type="checkbox" x-model="checkAll" id="checkAll" @change="toggleAll()" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-green-600 checked:before:bg-green-600 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-green-600 checked:focus:outline-green-600 active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
                                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2  peer-checked:visible text-white">
@@ -321,7 +321,7 @@
                                                     @foreach($transaction->taxRows as $taxRow)
                                                     <tr class="border-b hover:bg-gray-50">
                                                         <td class="p-4">
-                                                            <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
+                                                            <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600" x-cloak>
                                                                 <div class="relative flex items-center">
                                                                     <input type="checkbox" @change="toggleCheckbox('{{ $transaction->id }}')" :checked="selectedRows.includes('{{ $transaction->id }}')" class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-neutral-300 bg-white before:absolute before:inset-0 checked:border-green-600 checked:before:bg-green-600 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-green-600 checked:focus:outline-green-600 active:outline-offset-0 dark:border-neutral-700 dark:bg-neutral-900 dark:checked:border-white dark:checked:before:bg-white dark:focus:outline-neutral-300 dark:checked:focus:outline-white" />
                                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="4" class="pointer-events-none invisible absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 peer-checked:visible text-white">
@@ -346,7 +346,7 @@
                                                 @endforeach
                                             @else
                                                 <tr>
-                                                    <td colspan="9" class="text-center p-6">
+                                                    <td colspan="10" class="text-center p-6">
                                                         <img src="{{ asset('images/Wallet.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
                                                         <h1 class="font-extrabold mt-4">No Purchase Transactions Available</h1>
                                                         <p class="text-sm text-neutral-500 mt-2">You can start adding new purchase transactions by <br> going to the transactions page.</p>
