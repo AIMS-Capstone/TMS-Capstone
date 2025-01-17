@@ -583,10 +583,10 @@ class withHolding1601EQController extends Controller
         $unassignedTransactions = $unassignedTransactionsQuery->get();
 
         Log::info('Unassigned transactions retrieved', [
-            'count' => $unassignedTransactions->count(),
+            'count' => $unassignedTransactions->count(),    
         ]);
 
-        return view('tax_return.with_holding.1601EQ_Qap', [
+        return view('tax_return.with_holding.1601EQ_Qap_archive', [
             'withHolding' => $withHolding,
             'taxRows' => $taxRows,
             'unassignedTransactions' => $unassignedTransactions,

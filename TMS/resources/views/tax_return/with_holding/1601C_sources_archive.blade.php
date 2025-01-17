@@ -45,6 +45,8 @@ $organizationId = session('organization_id');
                         isDisabled: false,
                         showConfirmUnarchiveModal: false, 
                         showConfirmDeleteModal: false,
+                        showSuccessUnarchiveModal: false,
+                        showSuccessDeleteModal: false,
 
                         disableButtons() {
                             this.isDisabled = true;
@@ -91,7 +93,12 @@ $organizationId = session('organization_id');
                             })
                             .then(response => {
                                 if (response.ok) {
-                                    location.reload();  // Reload page to reflect deletion
+                                    this.showSuccessDeleteModal = true;
+                                    this.selectedRows = [];
+                                    this.checkAll = false;
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 700);
                                 } else {
                                     alert('Error deleting rows.');
                                 }
@@ -113,7 +120,12 @@ $organizationId = session('organization_id');
                             })
                             .then(response => {
                                 if (response.ok) {
-                                    location.reload();  // Reload page to reflect restoration
+                                    this.showSuccessUnarchiveModal = true;
+                                    this.selectedRows = [];
+                                    this.checkAll = false;
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 700);
                                 } else {
                                     alert('Error restoring rows.');
                                 }
@@ -396,7 +408,7 @@ $organizationId = session('organization_id');
                                 @click.away="showConfirmUnarchiveModal = false"
                                 x-effect="document.body.classList.toggle('overflow-hidden', showConfirmUnarchiveModal)"
                             >
-                                <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
                                     <div class="flex flex-col items-center">
                                         <!-- Icon -->
                                         <div class="mb-4">
@@ -438,7 +450,7 @@ $organizationId = session('organization_id');
                                 x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
                                 @click.away="showConfirmDeleteModal = false"
                                 >
-                                <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
                                     <div class="flex flex-col items-center">
                                         <!-- Icon -->
                                         <div class="mb-4">
@@ -471,6 +483,44 @@ $organizationId = session('organization_id');
                                     </div>
                                 </div>
                             </div>
+
+                                    <!-- Success Unarchive Modal -->
+                                        <div 
+                                            x-show="showSuccessUnarchiveModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showSuccessUnarchiveModal)"
+                                            @click.away="showSuccessUnarchiveModal = false"
+                                        >
+                                            <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <i class="fas fa-check-circle text-green-500 text-6xl mb-4"></i>
+                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Unarchived Successful!</h2>
+                                                    <p class="text-sm text-zinc-700 text-center">
+                                                        The selected items have been successfully unarchived.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Success Delete Modal -->
+                                        <div 
+                                            x-show="showSuccessDeleteModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showSuccessDeleteModal)"
+                                            @click.away="showSuccessDeleteModal = false"
+                                        >
+                                            <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <i class="fas fa-check-circle text-red-500 text-6xl mb-4"></i>
+                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Deletion Successful!</h2>
+                                                    <p class="text-sm text-zinc-700 text-center">
+                                                        The selected items have been permanently deleted.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
 
                             <div class="flex justify-center py-4" x-cloak>
                                 <!-- Delete and Cancel buttons -->

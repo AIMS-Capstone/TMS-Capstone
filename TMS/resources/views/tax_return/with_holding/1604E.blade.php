@@ -35,6 +35,9 @@ $organizationId = session('organization_id');
                     checkAll: false,
                     selectedRows: [],
                     showDeleteCancelButtons: false,
+                    showConfirmDeleteModal: false,
+                    showSuccessDeleteModal: false,
+
 
                     // Toggle a single row
                     toggleCheckbox(id) {
@@ -63,8 +66,6 @@ $organizationId = session('organization_id');
                             alert('No rows selected for deletion.');
                             return;
                         }
-
-                        if (confirm('Are you sure you want to archive the selected row/s?')) {
                             fetch('/tax_return/with_holding/1604E/destroy', {
                                 method: 'POST',
                                 headers: {
@@ -75,12 +76,16 @@ $organizationId = session('organization_id');
                             })
                             .then(response => {
                                 if (response.ok) {
-                                    location.reload();
+                                    this.showSuccessDeleteModal = true;
+                                    this.selectedRows = [];
+                                    this.checkAll = false;
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 700);
                                 } else {
                                     alert('Error deleting rows.');
                                 }
                             });
-                        }
                     },
 
                     // Cancel selection
@@ -386,43 +391,66 @@ $organizationId = session('organization_id');
                         </div>
                     </div>
 
-                    {{-- <!-- Delete Confirmation Modal -->Hindi nag-aappear lahat ng delete modal sa TAX RETURNS, pls help --}}
-                    <div  x-show="showConfirmDeleteModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
-                        x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)">
-                        
-                        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
-                            <div class="flex flex-col items-center">
-                                <!-- Icon -->
-                                <div class="mb-4">
-                                    <i class="fas fa-exclamation-triangle text-red-700 text-8xl"></i>
-                                </div>
+                    <!-- Delete Confirmation Modal -->
+                                        <div 
+                                            x-show="showConfirmDeleteModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
+                                            @click.away="showConfirmDeleteModal = false"
+                                        >
+                                            <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <!-- Icon -->
+                                                    <div class="mb-4">
+                                                        <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>
+                                                    </div>
 
-                                <!-- Title -->
-                                <h2 class="text-2xl font-extrabold text-zinc-700 mb-2">Delete Item(s)</h2>
+                                                    <!-- Title -->
+                                                    <h2 class="text-2xl font-extrabold text-zinc-800 mb-2">Delete Contact</h2>
 
-                                <!-- Description -->
-                                <p class="text-sm text-zinc-700 text-center">
-                                    You're going to Delete the selected item(s) in the Withholding Tax Return table. Are you sure?
-                                </p>
+                                                    <!-- Description -->
+                                                    <p class="text-sm text-zinc-600 text-center">
+                                                        You're going to delete permanently the selected withholding 1601EQ item(s). Are you sure?
+                                                    </p>
 
-                                <!-- Actions -->
-                                <div class="flex justify-center space-x-8 mt-6 w-full">
-                                    <button 
-                                        @click="showConfirmDeleteModal = false; showDeleteCancelButtons = true;" 
-                                        class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
-                                        > 
-                                        Cancel
-                                    </button>
-                                    <button 
-                                        @click="deleteRows(); showConfirmDeleteModal = false;" 
-                                        class="px-5 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg text-sm font-medium transition"
-                                        > 
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                                    <!-- Actions -->
+                                                    <div class="flex justify-center space-x-8 mt-6 w-full">
+                                                        <button 
+                                                            @click="showConfirmDeleteModal = false; enableButtons(); enableButtons(); showDeleteCancelButtons = true; disableButtons();" 
+                                                            class="px-4 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-900 font-bold transition"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        <button 
+                                                            @click="deleteRows(); showConfirmDeleteModal = false;" 
+                                                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                     <!-- Success Delete Modal -->
+                                        <div 
+                                            x-show="showSuccessDeleteModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showSuccessDeleteModal)"
+                                            @click.away="showSuccessDeleteModal = false"
+                                        >
+                                            <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <i class="fas fa-check-circle text-red-500 text-6xl mb-4"></i>
+                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Deletion Successful!</h2>
+                                                    <p class="text-sm text-zinc-700 text-center">
+                                                        The selected withholding 1601EQ have been move to recyle bin.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
 
                     <!-- Action Buttons --> 
                     <div x-show="showDeleteCancelButtons" class="flex justify-center py-4" x-cloak>

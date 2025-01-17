@@ -132,14 +132,9 @@ class SalesController extends Controller
         foreach ($transactions as $transaction) {
             $oldStatus = $transaction->status;
 
-            // Disable logging temporarily
-            Transactions::$disableLogging = true;
 
             // Update to posted
             $transaction->update(['status' => 'posted']);
-
-            // Re-enable logging
-            Transactions::$disableLogging = false;
 
             activity('sales')
                 ->performedOn($transaction)
@@ -175,14 +170,9 @@ class SalesController extends Controller
         foreach ($transactions as $transaction) {
             $oldStatus = $transaction->status;
 
-            // Disable logging temporarily
-            Transactions::$disableLogging = true;
-
             // Update to draft
             $transaction->update(['status' => 'draft']);
 
-            // Re-enable logging
-            Transactions::$disableLogging = false;
 
             activity('sales')
                 ->performedOn($transaction)

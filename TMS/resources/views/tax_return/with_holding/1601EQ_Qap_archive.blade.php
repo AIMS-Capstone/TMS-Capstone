@@ -45,6 +45,8 @@
                         deleteMode: false,
                         showConfirmActivateModal: false, 
                         showConfirmDeleteModal: false,
+                        showSuccessUnarchiveModal: false,
+                        showSuccessDeleteModal: false,
 
                         disableButtons() {
                             this.isDisabled = true;
@@ -91,12 +93,16 @@
                                 },
                                 body: JSON.stringify({ ids: this.selectedRows })
                             })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    location.reload();
+                            .then(response => {
+                                if (response.ok) {
+                                    this.showSuccessDeleteModal = true;
+                                    this.selectedRows = [];
+                                    this.checkAll = false;
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 700);
                                 } else {
-                                    alert('Failed to activate transactions.');
+                                    alert('Error deleting rows.');
                                 }
                             });
                         },
@@ -116,12 +122,16 @@
                                 },
                                 body: JSON.stringify({ ids: this.selectedRows })
                             })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    location.reload();
+                            .then(response => {
+                                if (response.ok) {
+                                    this.showSuccessUnarchiveModal = true;
+                                    this.selectedRows = [];
+                                    this.checkAll = false;
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 700);
                                 } else {
-                                    alert('Failed to delete transactions.');
+                                    alert('Error restoring rows.');
                                 }
                             });
                         },
@@ -438,6 +448,44 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Success Unarchive Modal -->
+                                        <div 
+                                            x-show="showSuccessUnarchiveModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showSuccessUnarchiveModal)"
+                                            @click.away="showSuccessUnarchiveModal = false"
+                                        >
+                                            <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <i class="fas fa-check-circle text-green-500 text-6xl mb-4"></i>
+                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Unarchived Successful!</h2>
+                                                    <p class="text-sm text-zinc-700 text-center">
+                                                        The selected items have been successfully unarchived.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Success Delete Modal -->
+                                        <div 
+                                            x-show="showSuccessDeleteModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showSuccessDeleteModal)"
+                                            @click.away="showSuccessDeleteModal = false"
+                                        >
+                                            <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <i class="fas fa-check-circle text-red-500 text-6xl mb-4"></i>
+                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Deletion Successful!</h2>
+                                                    <p class="text-sm text-zinc-700 text-center">
+                                                        The selected items have been permanently deleted.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
 
                         <div class="flex justify-center py-4" x-cloak>
                             <!-- Delete and Cancel buttons -->

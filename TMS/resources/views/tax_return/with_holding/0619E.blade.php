@@ -421,7 +421,7 @@ $organizationId = session('organization_id');
                                             x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
                                             @click.away="showConfirmDeleteModal = false"
                                         >
-                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                            <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
                                                 <div class="flex flex-col items-center">
                                                     <!-- Icon -->
                                                     <div class="mb-4">
@@ -470,12 +470,12 @@ $organizationId = session('organization_id');
                                             x-effect="document.body.classList.toggle('overflow-hidden', showSuccessDeleteModal)"
                                             @click.away="showSuccessDeleteModal = false"
                                         >
-                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                            <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
                                                 <div class="flex flex-col items-center">
                                                     <i class="fas fa-check-circle text-red-500 text-6xl mb-4"></i>
                                                     <h2 class="text-2xl font-bold text-zinc-700 mb-2">Deletion Successful!</h2>
                                                     <p class="text-sm text-zinc-700 text-center">
-                                                        The selected items have been permanently deleted.
+                                                        The selected withholding 0619E have been move to recyle bin.
                                                     </p>
                                                 </div>
                                             </div>

@@ -40,6 +40,7 @@
                     selectedRows: [],
                     showDeleteCancelButtons: false,
                     showConfirmArchiveModal: false,
+                    showSuccessArchiveModal: false,
                     
                     toggleCheckbox(id) {
                         if (this.selectedRows.includes(id)) {
@@ -75,14 +76,21 @@
                             },
                             body: JSON.stringify({ ids: this.selectedRows })
                         })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                location.reload();
-                            } else {
-                                alert('Failed to deactivate transactions.');
-                            }
-                        });
+                        .then(response => {
+                                if (response.ok) {
+                                    this.showSuccessArchiveModal = true;
+                                    this.selectedRows = [];
+                                    this.checkAll = false;
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 700);
+                                } else {
+                                    return response.json().then(data => {
+                                        console.error('Error Response:', data);
+                                        alert('Error archiving rows: ' + (data.message || 'Unknown error occurred.'));
+                                    });
+                                }
+                            })
                     },
                     
                     cancelSelection() {
@@ -232,7 +240,7 @@
                                     <thead class="bg-neutral-100 text-sm text-neutral-700">
                                         <tr>
                                             <th class="py-2 px-4">
-                                                <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer">
+                                                <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer" x-cloak>
                                                     <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition"/>
                                                 </label>
                                             </th>
@@ -274,7 +282,7 @@
                             </div>
 
                             <div x-show="showDeleteCancelButtons" class="flex justify-center py-4" x-cloak>
-                                <button @click="deactivate" = true; showDeleteCancelButtons = true;" :disabled="selectedRows.length === 0"
+                                <button  @click="showConfirmArchiveModal = true; showDeleteCancelButtons = true;" :disabled="selectedRows.length === 0"
                                     class="border px-3 py-2 rounded-lg text-sm text-gray-800 border-gray-800 bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-zinc-800" viewBox="0 0 24 24">
                                         <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
@@ -291,10 +299,29 @@
                             @endif
                         </div>
 
+                        <!-- Success Delete Modal -->
+                                        <div 
+                                            x-show="showSuccessArchiveModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showSuccessArchiveModal)"
+                                            @click.away="showSuccessArchiveModal = false"
+                                        >
+                                            <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <i class="fas fa-check-circle text-zinc-700 text-6xl mb-4"></i>
+                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Archive Successful!</h2>
+                                                    <p class="text-sm text-zinc-700 text-center">
+                                                        The selected Quarterly Alphalist of Payees have been archived.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
                         <!-- Confirmation Modal -->
                         <div x-show="showConfirmArchiveModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
                             x-effect="document.body.classList.toggle('overflow-hidden', showConfirmArchiveModal)">
-                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
+                            <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
                                 <div class="flex flex-col items-center">
                                     <!-- Icon -->
                                     <div class="mb-4">
@@ -312,7 +339,7 @@
                                             class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"> 
                                             Cancel
                                         </button>
-                                        <button @click="confirmDeactivation" 
+                                        <button @click="confirmDeactivation; showConfirmArchiveModal = false;" 
                                             class="px-5 py-2 bg-zinc-700 hover:bg-zinc-800 text-white rounded-lg text-sm font-medium transition"> 
                                             Archive
                                         </button>
@@ -320,6 +347,7 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
