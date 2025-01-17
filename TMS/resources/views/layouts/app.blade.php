@@ -83,8 +83,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                             </a>
                         </li>
 
-                        <li x-data="{ open: {{ request()->routeIs('income_return', 'tax_return.income_input_summary', 'income_return.show', 'income_return.report', 'tax_return.income_show_sales', 'tax_return.income_show_coa', 'tax_return.background_information.update', 
-                            'tax_return.spouse_information', 'tax_return.sales_revenue', 'tax_return.background_information', 'tax_return.tax_option_rate.update',
+                        <li x-data="{ open: {{ request()->routeIs('income_return', 'tax_return.income_input_summary', 'income_return.show', 'income_return.report', 'tax_return.income_show_sales', 'tax_return.income_show_coa', 'tax_return.background_information.update', 'tax_return.tax_option_rate',
+                            'tax_return.spouse_information', 'tax_return.sales_revenue', 'tax_return.background_information', 'tax_return.tax_option_rate.update', 'tax_return.corporate_quarterly.edit', 'tax_return.1701q.edit', 'income_return.report', 'income_return.reportPDF', 'tax_return.corporate_quarterly_pdf',
                             'vat_return', 'tax_return.slsp_data', 'tax_return.summary', 'tax_return.report', 'tax_return.2550q.pdf', 
                             'percentage_return', 'percentage_return.slsp_data', 'tax-returns.percentage-summary', 'percentage_return.report', 'tax_return.2551q.pdf', 
                             'with_holding.1601C', 'with_holding.1601C.generate', 'with_holding.1601C_summary', 'with_holding.1601C_sources', 'with_holding.1601C_sources_store', 'form1601C.create', 'form1601C.store', 'with_holding.1601C_import', 'Sources1601C.archive', 'form1601C.preview', 'form1601C.edit', 'form1601C.update',
@@ -119,8 +119,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                 </li>
                                 <li>
                                     <a href="{{ route('income_return') }}" class="flex items-center w-full p-2 text-[13px] ease-in transition-all rounded-lg pl-11 group
-                                    {{ request()->routeIs('income_return') || request()->routeIs('tax_return.income_input_summary', 'income_return.show', 'income_return.report', 'tax_return.income_show_coa', 'tax_return.income_show_sales', 
-                                    'tax_return.background_information.update', 'tax_return.spouse_information', 'tax_return.sales_revenue', 'tax_return.background_information', 'tax_return.tax_option_rate.update') ? 'sidebar-submenu-active' : '' }}">
+                                    {{ request()->routeIs('income_return') || request()->routeIs('tax_return.income_input_summary', 'income_return.show', 'income_return.report', 'tax_return.income_show_coa', 'tax_return.income_show_sales', 'income_return.reportPDF', 'tax_return.tax_option_rate',
+                                    'tax_return.background_information.update', 'tax_return.spouse_information', 'tax_return.sales_revenue', 'tax_return.background_information', 'tax_return.tax_option_rate.update', 'tax_return.corporate_quarterly.edit', 'tax_return.1701q.edit', 'income_return.report', 'tax_return.corporate_quarterly_pdf') ? 'sidebar-submenu-active' : '' }}">
                                         Income Tax Return
                                     </a>
                                 </li>
