@@ -15,7 +15,7 @@
                                     </svg>
                                     <a href="{{ route('percentage_return') }}" 
                                         class="ms-1 text-sm font-medium {{ Request::routeIs('percentage_return') ? 'font-bold text-blue-900' : 'text-zinc-500' }} md:ms-2">
-                                        2551M/Q
+                                        2551Q
                                     </a>
                                 </div>
                             </li>

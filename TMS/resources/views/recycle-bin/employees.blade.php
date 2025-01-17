@@ -177,7 +177,7 @@
                                             return this.selectedRows.length; 
                                         }
                                     }"
-                                    class="mb-12 mx-12 overflow-hidden max-w-full">
+                                    class="mb-12 overflow-hidden max-w-full">
 
                     <div class="flex flex-col md:flex-row justify-between">
                         <div class="w-full mt-8 ml-0 h-auto border border-zinc-300 rounded-lg p-4 bg-white">
@@ -202,18 +202,19 @@
 
                                     <!-- Sort by Dropdown -->
                                     <div class="relative inline-block text-left sm:w-auto">
-                                        <button id="sortButton" class="flex items-center text-zinc-600 w-full">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
-                                                <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
+                                        <button id="sortButton" class="flex items-center text-zinc-600 w-full hover:shadow-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24"><path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
                                             </svg>
-                                            <span id="selectedOption" class="font-normal text-md text-zinc-700 truncate">Sort by</span>
+                                            <span id="selectedOption" class="font-normal text-sm text-zinc-600 hover:text-zinc-800 truncate">Sort by</span>
+                                            <svg class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
                                         </button>
-                                        <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
+                            
+                                        <div id="dropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-30">
                                             <div class="py-2 px-2">
                                                 <span class="block px-4 py-2 text-sm font-bold text-zinc-700">Sort by</span>
-                                                <div data-sort="recently-added" class="block px-4 py-2 w-full text-sm hover-dropdown">Recently Added</div>
-                                                <div data-sort="ascending" class="block px-4 py-2 w-full text-sm hover-dropdown">Ascending</div>
-                                                <div data-sort="descending" class="block px-4 py-2 w-full text-sm hover-dropdown">Descending</div>
+                                                <div data-sort="recently-deleted" class="block px-4 py-2 w-full text-xs hover-dropdown">Recently Deleted</div>
+                                                <div data-sort="ascending" class="block px-4 py-2 w-full text-xs hover-dropdown">Ascending</div>
+                                                <div data-sort="descending" class="block px-4 py-2 w-full text-xs hover-dropdown">Descending</div>
                                             </div>
                                         </div>
                                     </div>
@@ -221,26 +222,23 @@
                                     <!-- Bulk Action Buttons -->
                                     <div class="ml-auto flex flex-row items-center space-x-4">
                                         <button 
-                                                type="button" 
-                                                    @click="showCheckboxes = !showCheckboxes; showRestoreCancelButtons = !showRestoreCancelButtons; disableButtons();" 
-                                                    :disabled="selectedRows.length === 1 || isDisabled"
-                                                    class="border px-3 py-2 rounded-lg text-sm text-gray-600 hover:border-green-500 hover:text-green-500 hover:bg--green-500 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
-                                                    >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-green-500" viewBox="0 0 24 24">
-                                                        <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
-                                                    </svg>
-                                                    <span class="text-zinc-600 transition group-hover:text-green-500">Restore</span>
-                                                </button>
-                                                <!-- Delete Button -->
-                                                <button 
-                                                    type="button" 
-                                                    @click="showCheckboxes = !showCheckboxes; showDeleteCancelButtons = !showDeleteCancelButtons; disableButtons();" 
-                                                    :disabled="selectedRows.length === 1 || isDisabled"
-                                                    class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-red-800 hover:text-red-800 hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
-                                                    >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
-                                                    <span class="text-zinc-600 transition group-hover:text-red-500">Delete</span>
-                                                </button>
+                                        type="button" 
+                                            @click="showCheckboxes = !showCheckboxes; showRestoreCancelButtons = !showRestoreCancelButtons; disableButtons();" 
+                                            :disabled="selectedRows.length === 1 || isDisabled"
+                                            class="border border-zinc-300 rounded-lg p-2 text-zinc-600 text-sm flex items-center hover:border-blue-500 hover:text-blue-500 hover:bg-blue-100 transition space-x-1 group">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-blue-500" viewBox="0 0 24 24"><path fill="currentColor" d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89l.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7s-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.95 8.95 0 0 0 13 21a9 9 0 0 0 0-18m-1 5v5l4.28 2.54l.72-1.21l-3.5-2.08V8z"/></svg>
+                                            <span class="text-zinc-600 transition group-hover:text-blue-500">Restore</span>
+                                        </button>
+                                        <!-- Delete Button -->
+                                        <button 
+                                            type="button" 
+                                            @click="showCheckboxes = !showCheckboxes; showDeleteCancelButtons = !showDeleteCancelButtons; disableButtons();" 
+                                            :disabled="selectedRows.length === 1 || isDisabled"
+                                            class="border px-3 py-2 rounded-lg text-sm text-zinc-600 hover:border-red-800 hover:text-red-800 hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
+                                            >
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
+                                            <span class="text-zinc-600 transition group-hover:text-red-500">Delete</span>
+                                        </button>
                                         <div class="relative inline-block space-x-4 text-left sm:w-auto">
                                             <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" class="flex items-center text-zinc-500 hover:text-zinc-700" type="button">
                                                 <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
@@ -328,7 +326,7 @@
                                                         <td class="py-3 px-4">{{ $employee->tin ?? 'N/A' }}</td>
                                                         <td class="py-3 px-4">{{ \Carbon\Carbon::parse($employee->date_of_birth)->format('F d, Y') }}</td>
                                                         <td class="text-left py-3 px-4">{{ $employee->contact_number }}</td>
-                                                        <td class="p-4">{{ \Carbon\Carbon::parse($employee->deleted_at)->format('F d, Y') ?? 'N/A' }}</td>
+                                                        <td class="p-4">{{ \Carbon\Carbon::parse($employee->deleted_at)->format('F d, Y h:i A') ?? 'N/A' }}</td>
                                                         <td class="py-3 px-4">{{ $employee->deletedByUser->name ?? 'Unknown' }}</td>
                                                     </tr>
                                                 @endforeach
@@ -408,126 +406,136 @@
                                 </div>
 
                                 <!-- Restore Confirmation Modal -->
-                                        <div 
-                                            x-show="showConfirmRestoreModal" 
-                                            x-cloak 
-                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                                            @click.away="showConfirmRestoreModal = false"
-                                            x-effect="document.body.classList.toggle('overflow-hidden', showConfirmRestoreModal)"
-                                        >
-                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-                                                <div class="flex flex-col items-center">
-                                                    <!-- Icon -->
-                                                    <div class="mb-4">
-                                                        <i class="fas fa-exclamation-triangle text-green-500 text-8xl"></i>
-                                                    </div>
-
-                                                    <!-- Title -->
-                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Restore Item(s)</h2>
-
-                                                    <!-- Description -->    
-                                                    <p class="text-sm text-zinc-700 text-center">
-                                                        You're going to restore the selected item(s) in the Employee Recycle Bin. Are you sure?
-                                                    </p>
-
-                                                    <!-- Actions -->
-                                                    <div class="flex justify-center space-x-8 mt-6 w-full">
-                                                        <button 
-                                                            @click="showConfirmRestoreModal = false; enableButtons(); showRestoreCancelButtons = true; disableButtons();" 
-                                                            class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
-                                                        >
-                                                            Cancel
-                                                        </button>
-                                                        <button 
-                                                            @click="restoreRows(); showConfirmRestoreModal = false;" 
-                                                            class="px-4 py-2 bg-zinc-700 hover:bg-green-500 text-white rounded-lg text-sm transition"
-                                                        >
-                                                            Restore
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                <div 
+                                x-show="showConfirmRestoreModal" 
+                                x-cloak 
+                                class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
+                                @click.away="showConfirmRestoreModal = false"
+                                x-effect="document.body.classList.toggle('overflow-hidden', showConfirmRestoreModal)"
+                                >
+                                <div class="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative">
+                                    <div class="flex flex-col items-center">
+                                        <button @click="showConfirmRestoreModal = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                        <!-- Icon -->
+                                        <div class="mb-4">
+                                            <i class="fas fa-exclamation-triangle text-blue-600 text-8xl"></i>
                                         </div>
 
-                                        <!-- Delete Confirmation Modal -->
-                                        <div 
-                                            x-show="showConfirmDeleteModal" 
-                                            x-cloak 
-                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                                            x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
-                                            @click.away="showConfirmDeleteModal = false"
-                                        >
-                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-                                                <div class="flex flex-col items-center">
-                                                    <!-- Icon -->
-                                                    <div class="mb-4">
-                                                        <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>
-                                                    </div>
+                                        <!-- Title -->
+                                        <h2 class="text-2xl font-extrabold text-blue-600 mb-2">Restore Employee(s)</h2>
 
-                                                    <!-- Title -->
-                                                    <h2 class="text-2xl font-extrabold text-zinc-800 mb-2">Delete Employee</h2>
+                                        <!-- Description -->    
+                                        <p class="text-sm text-zinc-700 text-center">You're going to restore the selected employee(s) in the Recycle Bin table. Are you sure?</p>
 
-                                                    <!-- Description -->
-                                                    <p class="text-sm text-zinc-600 text-center">
-                                                        You're going to delete permanently the selected item(s) in the Employee Recycle. Are you sure?
-                                                    </p>
+                                        <!-- Actions -->
+                                        <div class="flex justify-center space-x-8 mt-6 w-full">
+                                            <button 
+                                                @click="showConfirmRestoreModal = false; enableButtons(); showRestoreCancelButtons = true; disableButtons();" 
+                                                class="px-4 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-900 font-bold transition"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button 
+                                                @click="restoreRows(); showConfirmRestoreModal = false;" 
+                                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition"
+                                            >
+                                                Restore
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                                                    <!-- Actions -->
-                                                    <div class="flex justify-center space-x-8 mt-6 w-full">
-                                                        <button 
-                                                            @click="showConfirmDeleteModal = false; enableButtons(); enableButtons(); showDeleteCancelButtons = true; disableButtons();" 
-                                                            class="px-4 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-900 font-bold transition"
-                                                        >
-                                                            Cancel
-                                                        </button>
-                                                        <button 
-                                                            @click="deleteRows(); showConfirmDeleteModal = false;" 
-                                                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition"
-                                                        >
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </div>
+                                <!-- Delete Confirmation Modal -->
+                                <div 
+                                    x-show="showConfirmDeleteModal" 
+                                    x-cloak 
+                                    class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
+                                    x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
+                                    @click.away="showConfirmDeleteModal = false"
+                                    >
+                                    <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative">
+                                        <div class="flex flex-col items-center">
+                                            <button @click="showConfirmDeleteModal = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                            <!-- Icon -->
+                                            <div class="mb-4">
+                                                <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>
+                                            </div>
+
+                                            <!-- Title -->
+                                            <h2 class="text-2xl font-extrabold text-zinc-800 mb-2">Delete Employee(s)</h2>
+
+                                            <!-- Description -->
+                                            <p class="text-sm text-zinc-600 text-center">
+                                                You're going to delete permanently the selected employee(s) in the Employee Recycle Bin table. Are you sure?
+                                            </p>
+
+                                            <!-- Actions -->
+                                            <div class="flex justify-center space-x-8 mt-6 w-full">
+                                                <button 
+                                                    @click="showConfirmDeleteModal = false; enableButtons(); enableButtons(); showDeleteCancelButtons = true; disableButtons();" 
+                                                    class="px-4 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-900 font-bold transition"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button 
+                                                    @click="deleteRows(); showConfirmDeleteModal = false;" 
+                                                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition"
+                                                >
+                                                    Delete
+                                                </button>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
 
-                                        <!-- Success Restore Modal -->
-                                        <div 
-                                            x-show="showSuccessRestoreModal" 
-                                            x-cloak 
-                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                                            x-effect="document.body.classList.toggle('overflow-hidden', showSuccessRestoreModal)"
-                                            @click.away="showSuccessRestoreModal = false"
-                                        >
-                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-                                                <div class="flex flex-col items-center">
-                                                    <i class="fas fa-check-circle text-green-500 text-6xl mb-4"></i>
-                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Restoration Successful!</h2>
-                                                    <p class="text-sm text-zinc-700 text-center">
-                                                        The selected items have been successfully restored.
-                                                    </p>
-                                                </div>
+                                <!-- Success Restore Modal -->
+                                <div 
+                                    x-show="showSuccessRestoreModal" 
+                                    x-cloak 
+                                    class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
+                                    x-effect="document.body.classList.toggle('overflow-hidden', showSuccessRestoreModal)"
+                                    @click.away="showSuccessRestoreModal = false"
+                                    >
+                                    <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                        <div class="flex flex-col items-center">
+                                            <div class="flex justify-center align-middle mb-4">
+                                                <img src="{{ asset('images/Success.png') }}" alt="Item(s) Posted" class="w-28 h-28">
                                             </div>
+                                            <h2 class="text-2xl font-bold text-emerald-500 mb-4">Restoration Successful!</h2>
+                                            <p class="text-sm text-zinc-600 text-center mb-6">
+                                                The selected items have been successfully restored.
+                                            </p>
                                         </div>
-
-                                        <!-- Success Delete Modal -->
-                                        <div 
-                                            x-show="showSuccessDeleteModal" 
-                                            x-cloak 
-                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                                            x-effect="document.body.classList.toggle('overflow-hidden', showSuccessDeleteModal)"
-                                            @click.away="showSuccessDeleteModal = false"
-                                        >
-                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-                                                <div class="flex flex-col items-center">
-                                                    <i class="fas fa-check-circle text-red-500 text-6xl mb-4"></i>
-                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Deletion Successful!</h2>
-                                                    <p class="text-sm text-zinc-700 text-center">
-                                                        The selected items have been permanently deleted.
-                                                    </p>
-                                                </div>
-                                            </div>
+                                    </div>
+                                </div>
+                                    
+                                <!-- Success Delete Modal -->
+                                <div 
+                                    x-show="showSuccessDeleteModal" 
+                                    x-cloak 
+                                    class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
+                                    x-effect="document.body.classList.toggle('overflow-hidden', showSuccessDeleteModal)"
+                                    @click.away="showSuccessDeleteModal = false"
+                                    >
+                                    <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                        <div class="flex flex-col items-center">
+                                            <i class="fas fa-check-circle text-red-500 text-6xl mb-4"></i>
+                                            <h2 class="text-2xl font-bold text-zinc-700 mb-2">Deletion Successful!</h2>
+                                            <p class="text-sm text-zinc-700 text-center">
+                                                The selected items have been permanently deleted.
+                                            </p>
                                         </div>
+                                    </div>
+                                </div>
 
                                 </div>
 
@@ -559,60 +567,16 @@
                                             type = "button"
                                             @click="showConfirmRestoreModal = true; showRestoreCancelButtons = true;"
                                             :disabled="selectedRows.length === 0"
-                                            class="border px-3 py-2 rounded-lg text-sm text-gray-800 border-gray-800 hover:text-green-500 hover:border-green-500 bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-green-500" viewBox="0 0 24 24">
-                                                <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
-                                            </svg>
-                                            <span class="text-zinc-600 transition group-hover:text-green-500">Restore Selected</span><span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
+                                            class="border border-zinc-300 rounded-lg p-2 text-zinc-600 text-sm flex items-center hover:border-blue-500 hover:text-blue-500 hover:bg-blue-100 transition space-x-1 group">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-blue-500" viewBox="0 0 24 24"><path fill="currentColor" d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89l.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7s-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.95 8.95 0 0 0 13 21a9 9 0 0 0 0-18m-1 5v5l4.28 2.54l.72-1.21l-3.5-2.08V8z"/></svg>
+                                        
+                                            <span class="text-zinc-600 transition group-hover:text-blue-500">Restore Selected</span><span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
                                         </button>
                                         <button @click="cancelSelection(); enableButtons();" class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition">
                                             Cancel
                                         </button>
                                     </div>
                                 </div>
-
-                                {{-- Action buttons Inalis ko muna yung iba, ayaw kasi gumana; should be the same with other tables--}}
-                                {{-- <div class="flex justify-center py-4" x-cloak>
-                                    <!-- Delete and Cancel buttons -->
-                                    <div class="flex justify-center py-4" x-show="showDeleteCancelButtons">
-                                        <button 
-                                            type="button" 
-                                            @click="showConfirmDeleteModal = true; showDeleteCancelButtons = true;"
-                                            :disabled="selectedRows.length === 0"
-                                            class="border px-3 py-2 mx-2 rounded-lg text-sm text-red-600 border-red-600 bg-red-100 hover:bg-red-200 transition disabled:opacity-50 disabled:cursor-not-allowed group flex items-center space-x-2"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24">
-                                                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/>
-                                            </svg>
-                                            <span class="text-red-600 transition group-hover:text-red-600">Delete Selected <span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span></span>
-                                        </button>
-                                        <button 
-                                            @click="cancelSelection(); enableButtons();" 
-                                            class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                    <!-- Restore and cancel buttons -->
-                                    <div class="flex justify-center py-4" x-show="showRestoreCancelButtons">
-                                        <button 
-                                            type = "button"
-                                            @click="showConfirmUnarchiveModal = true; showRestoreCancelButtons = true;"
-                                            :disabled="selectedRows.length === 0"
-                                            class="border px-3 py-2 rounded-lg text-sm text-gray-800 border-gray-800 bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-zinc-800" viewBox="0 0 24 24">
-                                                <path fill="currentColor" d="M3 10H2V4.003C2 3.449 2.455 3 2.992 3h18.016A.99.99 0 0 1 22 4.003V10h-1v10.002a.996.996 0 0 1-.993.998H3.993A.996.996 0 0 1 3 20.002zm16 0H5v9h14zM4 5v3h16V5zm5 7h6v2H9z"/>
-                                            </svg>
-                                            <span class="text-zinc-600 transition group-hover:text-zinc-800">Restore Selected</span><span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
-                                        </button>
-                                        <button @click="cancelSelection(); enableButtons();" class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition">
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div> --}}
-
                             </div>
                         </div>
                     </div>
@@ -623,10 +587,12 @@
 
     <script>
 
-        // FOR SORT BUTTON
+       // FOR SORT BUTTON
     document.getElementById('sortButton').addEventListener('click', function() {
         const dropdown = document.getElementById('dropdownMenu');
+        const dropdownArrow = this.querySelector('svg:nth-child(3)');
         dropdown.classList.toggle('hidden');
+        dropdownArrow.classList.toggle('rotate-180');
     });
 
     // FOR SORT BY
@@ -634,16 +600,12 @@
         const table = document.querySelector('table tbody');
         const rows = Array.from(table.querySelectorAll('tr')).filter(row => row.querySelector('td')); // Filter rows with data
         let sortedRows;
-
-        if (criteria === 'recently-added') {
-            // Sort by the order of rows (assuming they are in the order of addition)
+        if (criteria === 'recently-deleted') {
             sortedRows = rows.reverse();
         } else {
-            // Sort by text content of the 'Employee' column
             sortedRows = rows.sort((a, b) => {
                 const aText = a.querySelector('td:nth-child(2)').textContent.trim().toLowerCase();
                 const bText = b.querySelector('td:nth-child(2)').textContent.trim().toLowerCase();
-
                 if (criteria === 'ascending') {
                     return aText.localeCompare(bText);
                 } else if (criteria === 'descending') {
@@ -651,12 +613,9 @@
                 }
             });
         }
-
-        // Append sorted rows back to the table body
         table.innerHTML = '';
         sortedRows.forEach(row => table.appendChild(row));
     }
-
     // Dropdown event listeners
     document.querySelectorAll('#dropdownMenu div[data-sort]').forEach(item => {
         item.addEventListener('click', function() {
@@ -664,6 +623,11 @@
             document.getElementById('selectedOption').textContent = this.textContent; // Update selected option text
             sortItems(criteria);
         });
+    });
+    window.addEventListener('click', (event) => {
+        if (!sortButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+            dropdownMenu.classList.add('hidden');
+        }
     });
 
     // FOR SHOW ENTRIES

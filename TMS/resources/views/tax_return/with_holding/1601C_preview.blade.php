@@ -74,13 +74,18 @@
                                 <div 
                                     x-show="showConfirmFileModal" 
                                     x-cloak 
-                                    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                    class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
                                     @click.away="showConfirmFileModal = false"
                                     x-effect="document.body.classList.toggle('overflow-hidden', showConfirmFileModal)"
-                                >
-                                    <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                    >
+                                    <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative">
+                                        <button @click="showConfirmFileModal = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
                                         <div class="flex flex-col items-center">
-                                            <i class="fas fa-exclamation-triangle text-green-500 text-8xl mb-4"></i>
+                                            <i class="fas fa-exclamation-triangle text-yellow-500 text-8xl mb-4"></i>
                                             <h2 class="text-2xl font-bold text-zinc-700 mb-2">FILE REPORT</h2>
                                             <p class="text-sm text-zinc-700 text-center">
                                                 You're about to file the report. Are you sure?
@@ -94,7 +99,7 @@
                                                 </button>
                                                 <button 
                                                     @click="fileReport(); showConfirmFileModal = false;" 
-                                                    class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition"
+                                                    class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg text-sm transition"
                                                 >
                                                     File
                                                 </button>
@@ -107,11 +112,11 @@
                                 <div 
                                     x-show="showSuccessFileModal" 
                                     x-cloak 
-                                    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                    class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
                                     x-effect="document.body.classList.toggle('overflow-hidden', showSuccessFileModal)"
                                     @click.away="showSuccessFileModal = false"
-                                >
-                                    <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                    >
+                                    <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
                                         <div class="flex flex-col items-center">
                                             <i class="fas fa-check-circle text-green-500 text-6xl mb-4"></i>
                                             <h2 class="text-2xl font-bold text-zinc-700 mb-2">File Report Successful!</h2>

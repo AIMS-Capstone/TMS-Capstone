@@ -16,6 +16,73 @@
             <div class="flex justify-between items-center">
                 <!-- Title -->
                 <h1 class="text-3xl font-bold text-blue-900">Add New Sale</h1>
+                <div
+                x-data="{ 
+                    show: false, 
+                    message: 'Contact added successfully', 
+                    type: 'success',
+                    init() {
+                        console.log('Alpine component initialized');
+                
+                        // Listen for your custom 'show-toast' event
+                        document.addEventListener('show-toast', event => {
+                            console.log('Toast event triggered:', event.detail);
+                            this.show = true;
+                            setTimeout(() => { this.show = false }, 3000);
+                        });
+                
+                        // Listen for Livewire events (if needed)
+                        Livewire.on('show-toast', data => {
+                            console.log('Livewire toast event received:', data);
+                            this.show = true;
+                            setTimeout(() => { this.show = false }, 3000);
+                        });
+                    }
+                }"
+                x-show="show"
+                x-transition:enter="transform ease-out duration-300 transition"
+                x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+                x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
+                x-transition:leave="transition ease-in duration-100"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed bottom-4 right-4 z-50"
+                style="display: none;"
+                >
+                <div class="rounded-lg p-4 shadow-lg" 
+                     :class="{
+                        'bg-green-500': type === 'success',
+                        'bg-red-500': type === 'error',
+                        'bg-blue-500': type === 'info'
+                     }">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <!-- Success Icon -->
+                            <template x-if="type === 'success'">
+                                <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </template>
+                            <!-- Error Icon -->
+                            <template x-if="type === 'error'">
+                                <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                                </svg>
+                            </template>
+                            <!-- Info Icon -->
+                            <template x-if="type === 'info'">
+                                <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 17.25V6.75a2.25 2.25 0 012.25-2.25h0a2.25 2.25 0 012.25 2.25v10.5M14 21h4.25a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0018.25 4.5h-4.5A2.25 2.25 0 0011.5 6.75v10.5" />
+                                </svg>
+                            </template>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-white" x-text="message">Contact added successfully</p>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                
             </div>
             
         </x-slot:description>
@@ -207,15 +274,15 @@
         
                 <!-- Save Button on the Right -->
                 <div class="text-right">
+              
                     <x-button type="submit" class="ml-4 text-white px-4 py-2 rounded-lg shadow-md">
                         {{ __('Save Transaction') }}
                     </x-button>
                 </div>
             </div>
         </x-slot:actions>
-        
-        
-    
+:     
+
 </x-transaction-form-section>
 
 @assets
@@ -226,6 +293,7 @@
 
 @script
     <script>
+ 
         @if(session('alert'))
 
         alert("{{ session('alert') }}");

@@ -2250,14 +2250,36 @@
 
     <div>
         @if ($errors->any())
-    <div class="mb-4">
-        <ul class="list-disc list-inside text-red-600">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+        <div x-data="{ show: true }" 
+             x-show="show" 
+             x-transition:enter="transform transition-transform duration-300"
+             x-transition:enter-start="translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             class="fixed top-5 right-5 z-50 w-full max-w-md">
+            <div class="bg-white rounded-lg shadow-lg border border-red-500 p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="text-red-500 font-medium">Please fix the following errors:</h4>
+                    <button @click="show = false" 
+                    type="button"
+                            class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" 
+                             class="h-5 w-5" 
+                             viewBox="0 0 20 20" 
+                             fill="currentColor">
+                            <path fill-rule="evenodd" 
+                                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" 
+                                  clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+                <ul class="space-y-2">
+                    @foreach ($errors->all() as $error)
+                        <li class="text-red-500 text-sm">{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
 
     
     </div>

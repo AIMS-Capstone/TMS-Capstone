@@ -93,6 +93,10 @@ class DynamicModal extends Component
         $this->dispatch('refreshDropdown', [
             'options' => $options
         ]);
+        $this->dispatch('show-toast', [
+            'message' => 'Contact added successfully',
+            'type' => 'success'
+        ]);
     }
     public function savePurchase()
     {
@@ -158,6 +162,10 @@ class DynamicModal extends Component
             // Dispatch event to update dropdown
             $this->dispatch('refreshPurchaseDropdown', [
                 'options' => $options
+            ]);
+            $this->dispatch('show-toast', [
+                'message' => 'Contact added successfully',
+                'type' => 'success'
             ]);
     
             // Show success message

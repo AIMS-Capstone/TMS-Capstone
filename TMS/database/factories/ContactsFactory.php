@@ -1,6 +1,7 @@
 <?php
 namespace Database\Factories;
 
+use App\Models\OrgSetup;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -32,7 +33,6 @@ class ContactsFactory extends Factory
             'contact_address' => fake()->address(),
             'contact_city' => fake()->city(),   
             'contact_zip' =>  fake()->numberBetween(1000, 9999),
-            'classification' => 'Individual',
         ];
     }   
 
