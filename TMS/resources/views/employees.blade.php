@@ -312,7 +312,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                             <th scope="col" class="text-left py-4 px-4">Nationality</th>
                                             <th scope="col" class="text-left py-4 px-4">Address</th>
                                             <th scope="col" class="text-left py-4 px-4">Zip Code</th>
-                                            <th scope="col" class="text-left py-4 px-4">Action</th>
+                                            {{-- <th scope="col" class="text-left py-4 px-4">Action</th> --}}
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-neutral-300 text-left py-[7px]">
@@ -330,9 +330,9 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                                         </label>
                                                     </td>
                                                     <td class="text-left py-3 px-4">
-                                                        <x-view-employees />
+                                                        <x-edit-employees />
                                                         <button
-                                                            @click="$dispatch('open-view-employee-modal', {{ @json_encode($employee) }})" 
+                                                            @click="$dispatch('open-edit-employee-modal', {{@json_encode($employee) }})"" 
                                                             class="hover:underline hover:text-blue-500">
                                                             {{ $employee->first_name }} {{ $employee->last_name }}
                                                         </button>
@@ -354,13 +354,13 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                                     <td class="text-left py-3 px-4">{{ $employee->nationality }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->address->address ?? 'N/A' }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->address->zip_code ?? '0000' }}</td>
-                                                    <td class="text-left py-3 px-4">
+                                                    {{-- <td class="text-left py-3 px-4">
                                                         <x-edit-employees />
                                                         <button 
                                                         @click="$dispatch('open-edit-employee-modal', {{@json_encode($employee) }})">
                                                         Edit Employee
                                                     </button>
-                                                    </td>
+                                                    </td> --}}
                                                 </tr>
                                             @endforeach
                                         @else
