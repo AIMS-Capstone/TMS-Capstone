@@ -333,7 +333,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                                         <x-edit-employees />
                                                         <button
                                                         
-                                                            @click="$dispatch('open-view-employee-modal', {{ @json_encode($employee) }})" 
+                                                            @click="$dispatch('open-edit-employee-modal', {{ @json_encode($employee) }})" 
                                                             class="font-bold hover:underline hover:text-blue-500">
 
                                                             {{ $employee->first_name }} {{ $employee->last_name }}
