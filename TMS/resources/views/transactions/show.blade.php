@@ -676,7 +676,7 @@
                 <div class="flex flex-col items-center">
 
                     <div class="flex justify-center mb-4">
-                        <img src="{{ asset('images/Success.png') }}" alt="Organization Added" class="w-28 h-28">
+                        <img src="{{ asset('images/Success.png') }}" alt="Mark as Posted" class="w-28 h-28">
                     </div>
 
                     <!-- Title -->
@@ -710,14 +710,12 @@
             
             <div class="flex flex-col items-center">
                 <!-- Icon -->
-                <div class="mb-6">
-                    <div class="flex items-center justify-center w-24 h-24 rounded-full bg-green-600">
-                        <i class="fas fa-check text-white text-6xl"></i>
-                    </div>
+                <div class="flex justify-center mb-4">
+                    <img src="{{ asset('images/Success.png') }}" alt="Payment Added" class="w-28 h-28">
                 </div>
 
                 <!-- Title -->
-                <a href="{{route('transactions.mark', $transaction->id)}}" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Payment Added</a>
+                <a href="{{route('transactions.mark', $transaction->id)}}" class="text-emerald-500 font-bold text-3xl mb-2">Payment Added</a>
 
                 <!-- Description -->
                 <p class="text-sm text-gray-600 text-center mb-6">
@@ -727,7 +725,7 @@
                 <!-- Close Button -->
                 <button 
                     @click="showSuccessPaymentModal = false" 
-                    class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition w-1/2"
+                    class="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm transition w-1/2"
                 >
                     OK
                 </button>
