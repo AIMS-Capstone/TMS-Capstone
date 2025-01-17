@@ -41,6 +41,7 @@ $organizationId = session('organization_id');
                     selectedRows: [],
                     showDeleteCancelButtons: false,
                     showConfirmArchiveModal: false,
+                    showSuccessArchiveModal: false,
                                     
                     // Toggle a single row
                     toggleCheckbox(id) {
@@ -80,7 +81,12 @@ $organizationId = session('organization_id');
                             })
                             .then(response => {
                                 if (response.ok) {
-                                    location.reload();
+                                    this.showSuccessArchiveModal = true;
+                                    this.selectedRows = [];
+                                    this.checkAll = false;
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 700);
                                 } else {
                                     return response.json().then(data => {
                                         console.error('Error Response:', data);
@@ -547,7 +553,7 @@ $organizationId = session('organization_id');
                                 class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
                                 x-effect="document.body.classList.toggle('overflow-hidden', showConfirmArchiveModal)"
                                 >
-                                <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
+                                <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
                                     <div class="flex flex-col items-center">
                                         <!-- Icon -->
                                         <div class="mb-4">
@@ -580,6 +586,25 @@ $organizationId = session('organization_id');
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Success Delete Modal -->
+                                        <div 
+                                            x-show="showSuccessArchiveModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showSuccessDeleteModal)"
+                                            @click.away="showSuccessDeleteModal = false"
+                                        >
+                                            <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <i class="fas fa-check-circle text-zinc-700 text-6xl mb-4"></i>
+                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Archive Successful!</h2>
+                                                    <p class="text-sm text-zinc-700 text-center">
+                                                        The selected employees compensation have been archived.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
 
                             <!-- Action Buttons -->
                             <div x-show="showDeleteCancelButtons" class="flex justify-center py-4" x-cloak>

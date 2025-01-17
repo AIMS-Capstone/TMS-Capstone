@@ -35,26 +35,26 @@ $organizationId = session('organization_id');
                     checkAll: false,
                     selectedRows: [],
                     showDeleteCancelButtons: false,
+                    showConfirmDeleteModal: false,
+                    showSuccessDeleteModal: false,
 
                     // Toggle a single row
                     toggleCheckbox(id) {
                         if (this.selectedRows.includes(id)) {
                             this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
                         } else {
-                        this.selectedRows.push(id);
+                            this.selectedRows.push(id);
                         }
-                        console.log(this.selectedRows); // Debugging line
                     },
-                                        
+
                     // Toggle all rows
                     toggleAll() {
-                    this.checkAll = !this.caheckAll;
-                    if (this.checkAll) {
-                        this.selectedRows = {{ json_encode($with_holdings->pluck('id')->toArray()) }}; 
-                    } else {
-                        this.selectedRows = []; 
-                    }
-                        console.log(this.selectedRows); // Debugging line
+                        this.checkAll = !this.checkAll;
+                        if (this.checkAll) {
+                            this.selectedRows = {{ json_encode($with_holdings->pluck('id')->toArray()) }};
+                        } else {
+                            this.selectedRows = [];
+                        }
                     },
 
                     // Handle deletion
@@ -63,38 +63,40 @@ $organizationId = session('organization_id');
                             alert('No rows selected for deletion.');
                             return;
                         }
-
-                        if (confirm('Are you sure you want to archive the selected row/s?')) {
-                            fetch('/tax_return/with_holding/1601C/destroy', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                },
-                                body: JSON.stringify({ ids: this.selectedRows })
-                            })
+                        fetch('/tax_return/with_holding/1601C/destroy', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            },
+                            body: JSON.stringify({ ids: this.selectedRows }),
+                        })
                             .then(response => {
                                 if (response.ok) {
-                                    location.reload();
+                                    this.showSuccessDeleteModal = true;
+                                    this.selectedRows = [];
+                                    this.checkAll = false;
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 700);
                                 } else {
                                     alert('Error deleting rows.');
                                 }
                             });
-                        }
                     },
 
                     // Cancel selection
                     cancelSelection() {
-                        this.selectedRows = []; 
+                        this.selectedRows = [];
                         this.checkAll = false;
-                        this.showCheckboxes = false; 
+                        this.showCheckboxes = false;
                         this.showDeleteCancelButtons = false;
                     },
 
                     get selectedCount() {
                         return this.selectedRows.length;
-                    }
-                    }" class="container mx-auto pt-2 overflow-hidden">
+                    },
+                }" class="container mx-auto pt-2 overflow-hidden">
 
                     <!-- Fourth Header -->
                     <div class="container mx-auto">
@@ -262,6 +264,8 @@ $organizationId = session('organization_id');
                                     </button>
                                 </a> --}}
                             </div>
+                            
+                            {{-- Generate Modal --}}
                             <div x-data="{ open: false, month: '', year: '' }" @open-generate-modal.window="open = true" x-cloak>
                                 <!-- Modal Background -->
                                 <div x-show="open" class="fixed inset-0 bg-gray-200 bg-opacity-50 z-50 flex items-center justify-center transition-opacity"
@@ -333,6 +337,7 @@ $organizationId = session('organization_id');
                                     </div>
                                 </div>
                             </div>
+
                         </div>
 
                         <!-- Table -->
@@ -396,47 +401,71 @@ $organizationId = session('organization_id');
                         </div>
                     </div>
 
-                    {{-- <!-- Delete Confirmation Modal -->Hindi nag-aappear lahat ng delete modal sa TAX RETURNS, pls help --}}
-                    <div  x-show="showConfirmDeleteModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
-                        x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)">
-                        
-                        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
-                            <div class="flex flex-col items-center">
-                                <!-- Icon -->
-                                <div class="mb-4">
-                                    <i class="fas fa-exclamation-triangle text-red-700 text-8xl"></i>
-                                </div>
+                    <!-- Delete Confirmation Modal -->
+                                        <div 
+                                            x-show="showConfirmDeleteModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
+                                            @click.away="showConfirmDeleteModal = false"
+                                        >
+                                            <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <!-- Icon -->
+                                                    <div class="mb-4">
+                                                        <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>
+                                                    </div>
 
-                                <!-- Title -->
-                                <h2 class="text-2xl font-extrabold text-zinc-700 mb-2">Delete Item(s)</h2>
+                                                    <!-- Title -->
+                                                    <h2 class="text-2xl font-extrabold text-zinc-800 mb-2">Delete Contact</h2>
 
-                                <!-- Description -->
-                                <p class="text-sm text-zinc-700 text-center">
-                                    You're going to Delete the selected item(s) in the Withholding Tax Return table. Are you sure?
-                                </p>
+                                                    <!-- Description -->
+                                                    <p class="text-sm text-zinc-600 text-center">
+                                                        You're going to delete permanently the selected withholding 1601C item(s). Are you sure?
+                                                    </p>
 
-                                <!-- Actions -->
-                                <div class="flex justify-center space-x-8 mt-6 w-full">
-                                    <button 
-                                        @click="showConfirmDeleteModal = false; showDeleteCancelButtons = true;" 
-                                        class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
-                                        > 
-                                        Cancel
-                                    </button>
-                                    <button 
-                                        @click="deleteRows(); showConfirmDeleteModal = false;" 
-                                        class="px-5 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg text-sm font-medium transition"
-                                        > 
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                                    <!-- Actions -->
+                                                    <div class="flex justify-center space-x-8 mt-6 w-full">
+                                                        <button 
+                                                            @click="showConfirmDeleteModal = false; enableButtons(); enableButtons(); showDeleteCancelButtons = true; disableButtons();" 
+                                                            class="px-4 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-900 font-bold transition"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        <button 
+                                                            @click="deleteRows(); showConfirmDeleteModal = false;" 
+                                                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                     <!-- Success Delete Modal -->
+                                        <div 
+                                            x-show="showSuccessDeleteModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showSuccessDeleteModal)"
+                                            @click.away="showSuccessDeleteModal = false"
+                                        >
+                                            <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <i class="fas fa-check-circle text-red-500 text-6xl mb-4"></i>
+                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Deletion Successful!</h2>
+                                                    <p class="text-sm text-zinc-700 text-center">
+                                                        The selected withholding 1601C have been move to recyle bin.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
 
                     <!-- Action Buttons --> 
                     <div x-show="showDeleteCancelButtons" class="flex justify-center py-4" x-cloak>
-                        <button @click="deleteRows" :disabled="selectedRows.length === 0" 
+                        <button @click="showConfirmDeleteModal = true; showDeleteCancelButtons = true;" 
+                            :disabled="selectedRows.length === 0"
                             class="border px-3 py-2 rounded-lg text-sm text-red-600 border-red-600 bg-red-100 hover:bg-red-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
                             <span class="text-red-600 transition group-hover:text-red-600">Delete Selected</span><span class="transition group-hover:text-red-500" x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
