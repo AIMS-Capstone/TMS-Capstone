@@ -43,6 +43,12 @@
                                 paymentDate: '',
                                 referenceNumber: '',
                                 bankAccount: '',
+                                get formattedTransactionTotalAmount() {
+                                    return parseFloat(this.transactionTotalAmount).toLocaleString('en-US', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    });
+                                },
                                 markAsPaid() {
                                     // Make an AJAX request or send form data to the backend to mark as paid
                                     fetch('/transactions/mark-as-paid/{{ $transaction->id }}', {
@@ -105,7 +111,7 @@
                                         <!-- Left Side -->
                                         <div>
                                             <p class="text-sm font-bold text-zinc-600">
-                                                You are about to pay: <span class="font-bold text-blue-900 text-xl">₱<span x-text="transactionTotalAmount"></span></span>
+                                                You are about to pay: <span class="font-bold text-blue-900 text-xl">₱<span x-text="formattedTransactionTotalAmount"></span></span>
                                             </p>
                                             <p class="text-xs text-zinc-600 mt-4">
                                                 Please enter the required fields and mark this transaction as Paid. Make sure that you are entering correct information to match your Sales/Purchases transaction. 
