@@ -1,119 +1,140 @@
 <x-app-layout>
-    <div class="py-12">
+    <div class="max-w-6xl mx-auto py-12 px-6">
         <div class="relative flex items-center mb-6">
-            <button onclick="history.back()" class="flex items-center text-gray-600 hover:text-gray-800 transition duration-150">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M16 12H8m4-4l-4 4l4 4"/>
-                    </g>
+            <button onclick="window.location.href='{{ route('form1601EQ.preview', ['id' => $form->id]) }}'" class="text-zinc-600 hover:text-zinc-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5" viewBox="0 0 24 24">
+                    <g fill="none" stroke="#52525b" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 12H8m4-4l-4 4l4 4"/></g>
                 </svg>
-                <span class="text-sm font-medium">Go Back</span>
+                <span class="text-zinc-600 text-sm font-normal hover:text-zinc-700">Go Back</span>
             </button>
         </div>
-        <div class="max-w-5xl mx-auto px-6">
-            <div class="bg-white p-10 shadow-lg rounded-lg">
-                <h1 class="text-4xl font-extrabold text-gray-800 mb-8">Edit 1601EQ Form</h1>
-                
-                <form method="POST" action="{{ route('form1601EQ.update', $form->id) }}" class="space-y-6">
-                    @csrf
-                    @method('PUT')
 
+        <div class="px-6 py-4 bg-white shadow-sm sm:rounded-lg">
+            <div class="container px-4">
+                <div class="flex justify-between items-center mt-2">
+                    <div class="flex flex-col items-start">
+                        <!-- BIR Form text on top -->
+                        <p class="text-sm taxuri-color">BIR Form No. 1601EQ Edit</p>
+                        <p class="font-bold text-xl taxuri-color">Quartely Remittance Return <span class="text-lg">(of Creditable Income Taxes Withheld (Expanded))</span></p>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center mt-2 mb-4">
+                    <div class="flex items-center">
+                        <p class="taxuri-text font-normal text-sm">
+                            Verify the tax information below, with some fields pre-filled from your organization's setup. Select options as needed to generate the BIR form.
+                        </p>
+                    </div>
+                </div>  
+            </div>
+        </div>
+
+        <div class="bg-white shadow-sm mt-6 rounded-lg overflow-hidden">
+            <form method="POST" action="{{ route('form1601EQ.update', $form->id) }}" class="space-y-6">
+                @csrf
+                @method('PUT')
+                <div class="px-8 py-10">
+                    <h3 class="font-bold text-zinc-700 text-lg mb-4">Filing Period</h3>
                     <!-- Amended Return -->
-                    <div>
-                        <label class="block text-lg font-medium text-gray-800">Amended Return?</label>
-                        <div class="mt-2 flex items-center space-x-6">
-                            <label class="flex items-center">
-                                <input type="radio" name="amended_return" value="1" class="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500" {{ $form->amended_return ? 'checked' : '' }}>
-                                <span class="ml-2 text-gray-700">Yes</span>
+                    <div class="mb-2 flex flex-row justify-between gap-96">
+                        <label class="indent-4 block text-zinc-700 text-sm w-1/3">Amended Return?</label>
+                        <div class="flex items-center space-x-4 w-full py-2">
+                            <label class="flex items-center text-zinc-700 text-sm">
+                                <input type="radio" name="amended_return" value="1" class="h-5 w-5 text-blue-600 border-zinc-300 focus:ring-blue-500" {{ $form->amended_return ? 'checked' : '' }}>
+                                <span class="ml-2 text-zinc-700">Yes</span>
                             </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="amended_return" value="0" class="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500" {{ !$form->amended_return ? 'checked' : '' }}>
-                                <span class="ml-2 text-gray-700">No</span>
+                            <label class="flex items-center text-zinc-700 text-sm">
+                                <input type="radio" name="amended_return" value="0" class="h-5 w-5 text-blue-600 border-zinc-300 focus:ring-blue-500" {{ !$form->amended_return ? 'checked' : '' }}>
+                                <span class="ml-2 text-zinc-700">No</span>
                             </label>
                         </div>
                     </div>
 
                     <!-- Any Taxes Withheld -->
-                    <div>
-                        <label class="block text-lg font-medium text-gray-800">Any Taxes Withheld?</label>
-                        <div class="mt-2 flex items-center space-x-6">
-                            <label class="flex items-center">
-                                <input type="radio" name="any_taxes_withheld" value="1" class="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500" {{ $form->any_taxes_withheld ? 'checked' : '' }}>
-                                <span class="ml-2 text-gray-700">Yes</span>
+                    <div class="mb-2 flex flex-row justify-between gap-96">
+                        <label class="indent-4 block text-zinc-700 text-sm w-1/3">Any Taxes Withheld?</label>
+                        <div class="flex items-center space-x-4 w-full py-2">
+                            <label class="flex items-center text-zinc-700 text-sm">
+                                <input type="radio" name="any_taxes_withheld" value="1" class="h-5 w-5 text-blue-600 border-zinc-300 focus:ring-blue-500" {{ $form->any_taxes_withheld ? 'checked' : '' }}>
+                                <span class="ml-2 text-zinc-700">Yes</span>
                             </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="any_taxes_withheld" value="0" class="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500" {{ !$form->any_taxes_withheld ? 'checked' : '' }}>
-                                <span class="ml-2 text-gray-700">No</span>
+                            <label class="flex items-center text-zinc-700 text-sm">
+                                <input type="radio" name="any_taxes_withheld" value="0" class="h-5 w-5 text-blue-600 border-zinc-300 focus:ring-blue-500" {{ !$form->any_taxes_withheld ? 'checked' : '' }}>
+                                <span class="ml-2 text-zinc-700">No</span>
                             </label>
                         </div>
                     </div>
 
                     <!-- Category of Withholding Agent -->
-                    <div>
-                        <label class="block text-lg font-medium text-gray-800">Category of Withholding Agent</label>
-                        <div class="mt-2 flex items-center space-x-6">
-                            <label class="flex items-center">
-                                <input type="radio" name="category" value="1" class="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500" {{ $form->category == 1 ? 'checked' : '' }}>
-                                <span class="ml-2 text-gray-700">Private</span>
+                    <div class="mb-2 flex flex-row justify-between gap-14">
+                        <label class="indent-4 block text-zinc-700 text-sm w-full">Category of Withholding Agent</label>
+                        <div class="flex items-center space-x-4 w-full py-2">
+                            <label class="flex items-center text-zinc-700 text-sm">
+                                <input type="radio" name="category" value="1" class="h-5 w-5 text-blue-600 border-zinc-300 focus:ring-blue-500" {{ $form->category == 1 ? 'checked' : '' }}>
+                                <span class="ml-2 text-zinc-700">Private</span>
                             </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="category" value="0" class="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500" {{ $form->category == 0 ? 'checked' : '' }}>
-                                <span class="ml-2 text-gray-700">Government</span>
+                            <label class="flex items-center text-zinc-700 text-sm">
+                                <input type="radio" name="category" value="0" class="h-5 w-5 text-blue-600 border-zinc-300 focus:ring-blue-500" {{ $form->category == 0 ? 'checked' : '' }}>
+                                <span class="ml-2 text-zinc-700">Government</span>
                             </label>
                         </div>
                     </div>
 
+                    <h3 class="font-bold text-zinc-700 text-lg mb-4">Computation of Tax</h3>
+
                     <!-- Tax Remitted Previously -->
-                    <div>
-                        <label for="remitted_previous" class="block text-lg font-medium text-gray-800">22. Tax Remitted Previously</label>
+                    <div class="mb-2 flex flex-row justify-between gap-14">
+                        <label for="remitted_previous" class="indent-4 block text-zinc-700 text-sm w-full">Tax Remitted in Return Previously Filed</label>
                         <input type="number" name="remitted_previous" value="{{ old('remitted_previous', $form->remitted_previous) }}" 
-                            class="mt-1 block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 rounded-lg shadow-sm">
+                        class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                     </div>
 
                     <!-- Over-remittance -->
-                    <div>
-                        <label for="over_remittance" class="block text-lg font-medium text-gray-800">23. Over-remittance</label>
+                    <div class="mb-2 flex flex-row justify-between gap-14">
+                        <label for="over_remittance" class="indent-4 block text-zinc-700 text-sm w-full">Over-remittance from Previous Quarter of the same taxable year</label>
                         <input type="number" name="over_remittance" value="{{ old('over_remittance', $form->over_remittance) }}" 
-                            class="mt-1 block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 rounded-lg shadow-sm">
+                        class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                     </div>
 
                     <!-- Other Payments Made -->
-                    <div>
-                        <label for="other_payments" class="block text-lg font-medium text-gray-800">24. Other Payments Made</label>
+                    <div class="mb-2 flex flex-row justify-between gap-14">
+                        <label for="other_payments" class="indent-4 block text-zinc-700 text-sm w-full">Other Payments Made</label>
                         <input type="number" name="other_payments" value="{{ old('other_payments', $form->other_payments) }}" 
-                            class="mt-1 block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 rounded-lg shadow-sm">
+                        class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                     </div>
 
                     <!-- Surcharge -->
-                    <div>
-                        <label for="surcharge" class="block text-lg font-medium text-gray-800">27. Surcharge</label>
+                    <div class="mb-2 flex flex-row justify-between gap-14">
+                        <label for="surcharge" class="indent-4 block text-zinc-700 text-sm w-full">Surcharge</label>
                         <input type="number" name="surcharge" value="{{ old('surcharge', $form->surcharge) }}" 
-                            class="mt-1 block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 rounded-lg shadow-sm">
+                        class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                     </div>
 
                     <!-- Interest -->
-                    <div>
-                        <label for="interest" class="block text-lg font-medium text-gray-800">28. Interest</label>
+                    <div class="mb-2 flex flex-row justify-between gap-14">
+                        <label for="interest" class="indent-4 block text-zinc-700 text-sm w-full">Interest</label>
                         <input type="number" name="interest" value="{{ old('interest', $form->interest) }}" 
-                            class="mt-1 block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 rounded-lg shadow-sm">
+                        class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                     </div>
 
                     <!-- Compromise -->
-                    <div>
-                        <label for="compromise" class="block text-lg font-medium text-gray-800">29. Compromise</label>
+                    <div class="mb-2 flex flex-row justify-between gap-14">
+                        <label for="compromise" class="indent-4 block text-zinc-700 text-sm w-full">Compromise</label>
                         <input type="number" name="compromise" value="{{ old('compromise', $form->compromise) }}" 
-                            class="mt-1 block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 rounded-lg shadow-sm">
+                        class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                     </div>
 
                     <!-- Submit Button -->
                     <div class="mt-8 flex justify-center items-center">
-                        <button type="submit" class="flex justify-center px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                            Update Form
+                        <button type="submit" class="w-56 bg-blue-900 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-950">
+                            Update Report
                         </button>
+                        <a href="{{ route('form1601EQ.preview', ['id' => $form->id]) }}"
+                            class="ml-4 text-zinc-600 hover:text-zinc-900 hover:font-bold font-medium py-2 px-4">
+                            Cancel
+                        </a>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 

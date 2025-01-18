@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('1601EQ_forms', function (Blueprint $table) {
+        Schema::create('1601eq_forms', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('org_setup_id');
             $table->unsignedBigInteger('withholding_id');

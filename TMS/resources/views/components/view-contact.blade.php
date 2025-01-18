@@ -8,7 +8,7 @@
     x-cloak
 >
     <!-- Modal Background -->
-    <div class="fixed inset-0 bg-gray-200 bg-opacity-50"></div>
+    <div class="fixed inset-0 bg-gray-200 bg-opacity-10"></div>
 
     <!-- Modal Container -->
     <div class="bg-white rounded-lg shadow-lg w-full max-w-xl mx-auto z-10 overflow-hidden"
@@ -120,9 +120,17 @@
             <div class="flex justify-end">
                 <x-edit-contact />
                 <button 
-                    @click="$dispatch('open-edit-contact-modal', contact)" 
-                    class="bg-blue-900 text-white px-5 py-2 font-semibold rounded-md hover:bg-blue-950 transition"
-                    >
+                    @click="$dispatch('open-edit-contact-modal', { 
+                        id: contact.id,
+                        bus_name: contact.bus_name,
+                        contact_type: contact.contact_type,
+                        contact_tin: contact.contact_tin,
+                        classification: contact.classification,
+                        contact_address: contact.contact_address,
+                        contact_city: contact.contact_city,
+                        contact_zip: contact.contact_zip
+                    })" 
+                    class="bg-blue-900 text-white px-5 py-2 font-semibold rounded-md hover:bg-blue-950 transition">
                     Edit
                 </button>
             </div>

@@ -85,7 +85,7 @@ class TaxReturn extends Model
     //Organization name fetch
     public function Organization()
     {
-        return $this->belongsTo(Orgsetup::class, 'organization_id');
+        return $this->belongsTo(OrgSetup::class, 'organization_id');
     }
 
       public function deletedByUser(): BelongsTo

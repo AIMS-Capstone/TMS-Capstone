@@ -7,6 +7,8 @@ use App\Models\TaxReturn;
 use App\Http\Requests\StoreTaxReturnRequest;
 use App\Http\Requests\UpdateTaxReturnRequest;
 use App\Models\OrgSetup;
+use App\Models\Tax1701Q;
+use App\Models\Tax1702Q;
 use App\Models\Tax2550Q;
 use App\Models\Tax2551Q;
 use App\Models\TaxReturnTransaction;
@@ -17,6 +19,7 @@ use Codedge\Fpdf\Fpdf\Fpdf;
 use mikehaertl\pdftk\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use FPDM;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -42,78 +45,128 @@ class TaxReturnController extends Controller
         //
     }
 // Function for showing 2550Q Returns Table
-    public function vatReturn()
-    {
-        $organizationId = session('organization_id');
-        $taxReturns = TaxReturn::with('user')
-            ->where('organization_id', $organizationId)
-            ->whereIn('title', ['2550Q', '2550M'])
-            ->get();
+public function vatReturn(Request $request)
+{
+    $organizationId = session('organization_id');
+    $perPage = $request->input('perPage', 5);
+    $search = $request->input('search');
+    $sortBy = $request->input('sortBy', 'created_at');  // Default sort column
+    $sortDirection = $request->input('sortDirection', 'desc');  // Default sort direction
 
-        return view('tax_return.vat_return', compact('taxReturns'));
+    $query = TaxReturn::with('user')
+        ->where('organization_id', $organizationId)
+        ->whereIn('title', ['2550Q', '2550M']);
+
+    // Apply search filter
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+              ->orWhere('status', 'like', "%{$search}%")
+              ->orWhereHas('user', function ($q) use ($search) {
+                  $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%");
+              });
+        });
     }
+
+    // Apply sorting
+    $query->orderBy($sortBy, $sortDirection);
+
+    // Paginate results
+    $taxReturns = $query->paginate($perPage);
+
+    return view('tax_return.vat_return', compact('taxReturns'));
+}
+
+
     // Function for showing Income Returns Table
-    public function incomeReturn()
+    public function incomeReturn(Request $request)
     {
         $organizationId = session('organization_id');
         
-        // Capture the 'type' query parameter to apply the filter
-        $filterType = request()->query('type', '1701Q');  // Default to '1701Q' if no type is passed
-        $searchTerm = request()->query('search', '');  // Get the search query parameter, default to empty
+        // Get pagination and sorting parameters
+        $perPage = $request->input('perPage', 5);
+        $sortBy = $request->input('sortBy', 'created_at');
+        $sortDirection = $request->input('sortDirection', 'desc');
+        
+        // Get filter parameters
+        $filterType = $request->input('type', '1701Q');
+        $searchTerm = $request->input('search', '');
         
         // Start the query for tax returns
-        $taxReturns = TaxReturn::with('user')  // Make sure to eager load the user relation
+        $query = TaxReturn::with('user')
             ->where('organization_id', $organizationId)
             ->whereIn('title', ['1701Q', '1702Q', '1701', '1702RT', '1702MX', '1702EX']);
         
-           
         // Apply filter if a specific type is selected
         if ($filterType) {
-            $taxReturns->where('title', $filterType);
+            $query->where('title', $filterType);
         }
-    
+        
         // Apply the search filter if a search term is provided
         if ($searchTerm) {
-            $taxReturns->where(function($query) use ($searchTerm) {
-                // Search on multiple fields
-                $query->where('title', 'like', '%' . $searchTerm . '%')
-                      ->orWhere('year', 'like', '%' . $searchTerm . '%')
-                      ->orWhere('month', 'like', '%' . $searchTerm . '%')
-                      ->orWhere('status', 'like', '%' . $searchTerm . '%')
-                      ->orWhereDate('created_at', 'like', '%' . $searchTerm . '%');
+            $query->where(function($query) use ($searchTerm) {
+                $query->where('title', 'like', "%{$searchTerm}%")
+                      ->orWhere('year', 'like', "%{$searchTerm}%")
+                      ->orWhere('month', 'like', "%{$searchTerm}%")
+                      ->orWhere('status', 'like', "%{$searchTerm}%")
+                      ->orWhereDate('created_at', 'like', "%{$searchTerm}%")
+                      ->orWhereHas('user', function ($q) use ($searchTerm) {
+                          $q->where('first_name', 'like', "%{$searchTerm}%")
+                            ->orWhere('last_name', 'like', "%{$searchTerm}%");
+                      });
             });
         }
-    
-        // Get the filtered tax returns
-        $taxReturns = $taxReturns->get();  // Execute the query
         
-        // Return the view with the filtered tax returns and other data
-        return view('tax_return.income_return', compact('taxReturns', 'filterType', 'searchTerm'));
+        // Apply sorting
+        $query->orderBy($sortBy, $sortDirection);
+        
+        // Get the paginated results
+        $taxReturns = $query->paginate($perPage);
+        
+        // Return the view with all necessary data
+        return view('tax_return.income_return', compact(
+            'taxReturns',
+            'filterType',
+            'searchTerm',
+            'sortBy',
+            'sortDirection',
+            'perPage'
+        ));
     }
     
 // Function for showing detailed view of Income Returns
-    public function showIncome($id, $type)
-    {
-        // Retrieve the tax return by its ID
-        $taxReturn = TaxReturn::findOrFail($id);
-        $organization_id = session("organization_id");
+public function showIncome($id, $type)
+{
+    // Retrieve the tax return by its ID
+    $taxReturn = TaxReturn::findOrFail($id);
+    $organization_id = session("organization_id");
 
-        // Check if the 'type' (or title) matches '1701Q'
-        if ($taxReturn->title === '1701Q') {
-            // If title is 1701Q, show the specific view for 1701Q
-            return view('tax_return.income_input_summary', compact('taxReturn'));
+    // Check if the 'type' (or title) matches '1701Q'
+    if ($taxReturn->title === '1701Q') {
+        // If title is 1701Q, show the specific view for 1701Q
+        return view('tax_return.income_input_summary', compact('taxReturn'));
+    }
+
+    if ($taxReturn->title === '1702Q') {
+        // Check if an existing 1702Q entry exists for this tax return
+        $existing1702q = Tax1702Q::where('tax_return_id', $taxReturn->id)->first();
+
+        if ($existing1702q) {
+            // Redirect to the PDF route if the 1702Q entry exists
+            return redirect()->route('tax_return.corporate_quarterly_pdf', ['taxReturn' => $taxReturn]);
         }
-        if ($taxReturn->title === '1702Q') {
-            // If title is 1701Q, show the specific view for 1701Q
-            $organization = OrgSetup::with("rdo")
+
+        // If no existing 1702Q entry, proceed with the view preparation
+        $organization = OrgSetup::with("rdo")
             ->where('id', $organization_id)
             ->first();
-    
+
         $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
-    
+
         // Parse the start_date using Carbon
         $startDate = Carbon::parse($organization->start_date);
-    
+
         // Determine the year ended based on the start_date
         $yearEnded = null;
         if ($startDate->month == 1 && $startDate->day == 1) {
@@ -123,13 +176,14 @@ class TaxReturnController extends Controller
             // Fiscal year - Ends on the last day of the same month next year
             $yearEnded = $startDate->addYear()->lastOfMonth();
         }
+
         // Check whether the organization follows a calendar or fiscal period
         $period = ($yearEnded->month == 12 && $yearEnded->day == 31) ? 'calendar' : 'fiscal';
-    
+
         // Format the year ended date as 'YYYY-MM'
         $yearEndedFormatted = $yearEnded->format('Y-m');
         $yearEndedFormattedForDisplay = $yearEnded->format('m/Y'); // e.g., "12/2024"
-    
+
         // Get the transaction IDs related to this tax return
         $transactionIds = $taxReturn->transactions->pluck('id');
         $taxRows = TaxRow::whereHas('transaction', function ($query) use ($transactionIds) {
@@ -140,22 +194,20 @@ class TaxReturnController extends Controller
         })->with(['transaction.contactDetails', 'atc', 'taxType'])
           ->get();
 
-          return view('1702q.preview', compact(
+        return view('1702q.preview', compact(
             'taxReturn',
             'organization',
             'yearEndedFormatted',
             'yearEndedFormattedForDisplay',
             'period',
             'rdoCode',
-    
         ));
-            
-        }
-
-        // If title is not 1701Q, you can handle other cases or show a different view
-        // For example, you can use a default view or handle other titles like '1702Q', etc.
-        return view('tax_return.show', compact('taxReturn'));
     }
+
+    // If title is not 1701Q or 1702Q, show a default view
+    return view('tax_return.show', compact('taxReturn'));
+}
+
 
     
     // Function for showing Percentage Report Preview
@@ -256,14 +308,37 @@ class TaxReturnController extends Controller
         
         // Check if the current status is not already "Filed"
         if ($taxReturn->status === 'Filed') {
+            activity('Tax Return Status Check')
+            ->performedOn($taxReturn)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'tax_return_id' => $taxReturn->id,
+                'current_status' => $taxReturn->status,
+                'ip' => request()->ip(),
+                'browser' => request()->header('User-Agent'),
+            ])
+            ->log('Attempted to mark a tax return as Filed, but it was already Filed.');
             return redirect()->back()->with('error', 'This tax return is already marked as Filed.');
         }
         
         // Update the status to "Filed"
+        $originalStatus = $taxReturn->status;
         $taxReturn->status = 'Filed';
         $taxReturn->save();
+        activity('Tax Return Status Update')
+        ->performedOn($taxReturn)
+        ->causedBy(Auth::user())
+        ->withProperties([
+            'tax_return_id' => $taxReturn->id,
+            'original_status' => $originalStatus,
+            'new_status' => 'Filed',
+            'ip' => request()->ip(),
+            'browser' => request()->header('User-Agent'),
+        ])
+        ->log('Tax return status updated to Filed.');
         
-        return redirect()->route('tax_return.2551q.pdf', $taxReturn->id)->with('success', 'Tax return has been marked as Filed.');
+        return redirect()->back()->with('successMark', 'Tax return has been marked as Filed.');
+
     }
   // Function for showing Value Added Tax Report Preview
 public function showVatReport($id)
@@ -277,19 +352,31 @@ public function showVatReport($id)
         ->where('id', $organization_id)
         ->first();
 
+        $existing2550q = Tax2550Q::where('tax_return_id', $taxReturn->id)->first();
+        if ($existing2550q) {
+            // If a Tax2550q is already available, redirect to the PDF report
+            return redirect()->route('tax_return.2550q.pdf', ['taxReturn' => $taxReturn->id]);
+        }
     // Extract the RDO code from the organization data
     $rdoCode = optional($organization->Rdo)->rdo_code ?? '';
 
     // Parse the organization's start date to determine the fiscal year
     $startDate = Carbon::parse($organization->start_date);
-    $yearEnded = $startDate->month == 1 && $startDate->day == 1
-        ? $startDate->addYear()->endOfYear()  // Calendar year end
-        : $startDate->addYear()->lastOfMonth(); // Fiscal year end
-
+    $taxYear = Carbon::parse($taxReturn->year);
+    
+    // Use the month from the organization's start date and the year from the tax return
+    $yearEnded = Carbon::createFromDate($taxYear->year, $startDate->month, $startDate->day);
+    
+    // Determine the correct end of the period
+    $yearEnded = $yearEnded->month == 1 && $yearEnded->day == 1
+        ? $yearEnded->addYear()->endOfYear()  // Calendar year end
+        : $yearEnded->addYear()->lastOfMonth(); // Fiscal year end
+    
     // Determine whether it's a calendar or fiscal year
     $period = $yearEnded->month == 12 && $yearEnded->day == 31 ? 'calendar' : 'fiscal';
     $yearEndedFormatted = $yearEnded->format('Y-m');
     $yearEndedFormattedForDisplay = $yearEnded->format('m/Y');
+    
 
     // Retrieve current quarter and year
     $currentQuarter = (int)filter_var($taxReturn->month, FILTER_SANITIZE_NUMBER_INT); // Extract quarter number
@@ -452,7 +539,12 @@ public function showVatReport($id)
       // Fetch the tax return and organization setup data
       $taxReturn = TaxReturn::findOrFail($id);
       $organization_id = session("organization_id");
-  
+      $tax1701Q = Tax1701Q::where('tax_return_id', $id)->first();
+
+      // If a Tax1701Q exists, redirect to the reportPDF page
+      if ($tax1701Q) {
+          return redirect()->route('income_return.reportPDF', ['taxReturn' => $taxReturn->id]);
+      }
       // Load the organization and its RDO relationship
       $organization = OrgSetup::with("rdo")
           ->where('id', $organization_id)
@@ -463,6 +555,13 @@ public function showVatReport($id)
   
       // Retrieve the individual and spouse background information
       $individualBackground = $taxReturn->individualBackgroundInformation;
+      if (!$individualBackground) {
+        return back()->with('error', 'Please set up Background Information first.');
+    }
+    $individualTaxOptionRate = $individualBackground->taxOptionRate()->first();
+    if (!$individualTaxOptionRate) {
+        return back()->with('error', 'Please set up Tax Rate for the individual first.');
+    }
       $spouseBackground = $individualBackground->spouseInformation ?? null;
   
       // Fetch tax option rate for individual background information
@@ -591,23 +690,76 @@ public function showVatReport($id)
   }
   
   
-
+  public function edit2550Q(TaxReturn $taxReturn)
+  {
+      $tax2550q = Tax2550Q::where('tax_return_id', $taxReturn->id)->firstOrFail();
+      activity('Tax Return Edit Access')
+      ->performedOn($tax2550q)
+      ->causedBy(Auth::user())
+      ->withProperties([
+          'tax_return_id' => $taxReturn->id,
+          'tax2550q_id' => $tax2550q->id,
+          'ip' => request()->ip(),
+          'browser' => request()->header('User-Agent'),
+      ])
+      ->log('Accessed the edit form for Tax Return 2550Q.');
+      
+      return view('tax_return.vat_report_edit', [
+          'taxReturn' => $taxReturn,
+          'tax2550q' => $tax2550q
+      ]);
+  }
   
 
 
 
 
   // Function for showing Percentage Tax Return Table
-    public function percentageReturn()
-    {
-        $organizationId = session('organization_id');
-        $taxReturns = TaxReturn::with('user')
-            ->where('organization_id', $organizationId)
-            ->whereIn('title', ['2551Q', '2551M'])
-            ->get();
-
-        return view('tax_return.percentage_return', compact('taxReturns'));
-    }
+  public function percentageReturn(Request $request)
+  {
+      $organizationId = session('organization_id');
+      
+      // Get pagination and sorting parameters
+      $perPage = $request->input('perPage', 5);
+      $sortBy = $request->input('sortBy', 'created_at');
+      $sortDirection = $request->input('sortDirection', 'desc');
+      $searchTerm = $request->input('search', '');
+      
+      // Start the query for tax returns
+      $query = TaxReturn::with('user')
+          ->where('organization_id', $organizationId)
+          ->whereIn('title', ['2551Q', '2551M']);
+      
+      // Apply the search filter if a search term is provided
+      if ($searchTerm) {
+          $query->where(function($query) use ($searchTerm) {
+              $query->where('title', 'like', "%{$searchTerm}%")
+                    ->orWhere('year', 'like', "%{$searchTerm}%")
+                    ->orWhere('month', 'like', "%{$searchTerm}%")
+                    ->orWhere('status', 'like', "%{$searchTerm}%")
+                    ->orWhereDate('created_at', 'like', "%{$searchTerm}%")
+                    ->orWhereHas('user', function ($q) use ($searchTerm) {
+                        $q->where('first_name', 'like', "%{$searchTerm}%")
+                          ->orWhere('last_name', 'like', "%{$searchTerm}%");
+                    });
+          });
+      }
+      
+      // Apply sorting
+      $query->orderBy($sortBy, $sortDirection);
+      
+      // Get the paginated results
+      $taxReturns = $query->paginate($perPage);
+      
+      // Return the view with all necessary data
+      return view('tax_return.percentage_return', compact(
+          'taxReturns',
+          'searchTerm',
+          'sortBy',
+          'sortDirection',
+          'perPage'
+      ));
+  }
     
 
         // Function for VAT Tax Return
@@ -623,6 +775,19 @@ public function showVatReport($id)
             'organization_id' => $request->organization_id, 
             'status' => 'Unfiled',
         ]);
+
+        activity('Tax Return Creation')
+        ->performedOn($taxReturn)
+        ->causedBy(Auth::user())
+        ->withProperties([
+            'tax_return_id' => $taxReturn->id,
+            'organization_id' => $request->organization_id,
+            'year' => $request->year,
+            'month' => $request->month,
+            'ip' => $request->ip(),
+            'browser' => $request->header('User-Agent'),
+        ])
+        ->log('Tax Return created successfully.');
     
         // Step 2: Get the organization's start date
         $organization = OrgSetup::find($request->organization_id);
@@ -659,15 +824,43 @@ public function showVatReport($id)
                 $endDate = $startDate->copy()->addMonths(2)->endOfMonth(); // End of the twelfth month
             }
         }
-    
+        
+        activity('Date Range Calculation')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'start_date' => $startDate,
+                    'end_date' => $endDate,
+                    'organization_id' => $request->organization_id,
+                ])
+                ->log('Date range calculated for Tax Return.');
+
         // Step 4: Fetch transactions based on date range and organization_id
         $transactions = Transactions::where('organization_id', $request->organization_id)
             ->whereBetween('date', [$startDate, $endDate])
             ->get();
+
+            activity('Transaction Fetching')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'transaction_count' => $transactions->count(),
+                'organization_id' => $request->organization_id,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+            ])
+            ->log('Transactions fetched for Tax Return.');
+
     
         // Step 5: Attach transactions to the tax return only if there are any
         if ($transactions->isNotEmpty()) {
             $taxReturn->transactions()->attach($transactions->pluck('id'));
+            activity('Transaction Attachment')
+                    ->performedOn($taxReturn)
+                    ->causedBy(Auth::user())
+                    ->withProperties([
+                        'tax_return_id' => $taxReturn->id,
+                        'attached_transaction_ids' => $transactions->pluck('id'),
+                    ])
+                    ->log('Transactions attached to Tax Return.');
         }
     
         // Step 6: Return back to the same page with success message
@@ -685,6 +878,19 @@ public function showVatReport($id)
             'organization_id' => $request->organization_id, 
             'status' => 'Unfiled',
         ]);
+        activity('Tax Return Creation')
+        ->performedOn($taxReturn)
+        ->causedBy(Auth::user())
+        ->withProperties([
+            'title' => $request->type,
+            'year' => $request->year,
+            'month' => $request->month,
+            'organization_id' => $request->organization_id,
+            'status' => 'Unfiled',
+            'ip' => request()->ip(),
+            'browser' => request()->header('User-Agent'),
+        ])
+        ->log('Created a new tax return.');
     
         // Step 2: Get the organization's start date
         $organization = OrgSetup::find($request->organization_id);
@@ -730,7 +936,27 @@ public function showVatReport($id)
         // Step 5: Attach transactions to the tax return only if there are any
         if ($transactions->isNotEmpty()) {
             $taxReturn->transactions()->attach($transactions->pluck('id'));
+            activity('Transaction Association')
+            ->performedOn($taxReturn)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'transaction_ids' => $transactions->pluck('id'),
+                'transaction_count' => $transactions->count(),
+                'ip' => request()->ip(),
+                'browser' => request()->header('User-Agent'),
+            ])
+            ->log('Associated transactions with the tax return.');
         }
+        activity('Tax Return Process Success')
+        ->performedOn($taxReturn)
+        ->causedBy(Auth::user())
+        ->withProperties([
+            'transactions_found' => $transactions->isNotEmpty(),
+            'transaction_count' => $transactions->count(),
+            'ip' => request()->ip(),
+            'browser' => request()->header('User-Agent'),
+        ])
+        ->log('Tax return created successfully.');
     
         // Step 6: Return back to the same page with success message
         return back()->with('success', 'Tax Return created successfully.' . ($transactions->isEmpty() ? ' No transactions found for the selected period.' : ' Transactions associated successfully.'));
@@ -910,19 +1136,40 @@ public function showVatReport($id)
         ], $messages);
         // Step 2: Attach the tax return ID to the validated data
         $validatedData['tax_return_id'] = $taxReturn;
+        activity('Validation Success')
+        ->withProperties([
+            'tax_return_id' => $taxReturn,
+            'user_id' => Auth::user(),
+            'ip' => request()->ip(),
+        ])
+        ->log('Validation of Tax2550Q data succeeded.');
   
     
-        // Step 3: Create or update the Tax2550Q record
         $tax2550Q = Tax2550Q::updateOrCreate(
             ['tax_return_id' => $taxReturn], // Find existing record by tax_return_id
             $validatedData // Use validated data for creation or update
         );
-    
-        // Step 4: Return a response
+        
+        // Step 4: Determine the message type based on whether it's an update or new creation
+        $messageType = $tax2550Q->wasRecentlyCreated ? 'success' : 'success2';
+        $messageText = $tax2550Q->wasRecentlyCreated 
+            ? 'Tax return successfully submitted and PDF generated.' 
+            : 'Tax return successfully updated and PDF generated.';
+
+            activity('Tax2550Q Record Update')
+            ->performedOn($tax2550Q)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'tax_return_id' => $taxReturn,
+                'updated_data' => $validatedData,
+                'ip' => request()->ip(),
+            ])
+            ->log('Created or updated a Tax2550Q record.');
+        
+        // Step 5: Return a response
         return redirect()
             ->route('tax_return.2550q.pdf', ['taxReturn' => $taxReturn])
-            ->with('success', 'Tax return successfully submitted and PDF generated.');
-            
+            ->with($messageType, $messageText);
         
     }
     
@@ -999,6 +1246,14 @@ public function showVatReport($id)
                   'total_amount_payable' => 'required|numeric',
                   'schedule' => 'nullable|array',
               ], $messages);
+              activity('Validation Success')
+              ->withProperties([
+                  'tax_return_id' => $taxReturn,
+                  'validated_data' => $validatedData,
+                  'ip' => request()->ip(),
+                  'user_id' => Auth::user(),
+              ])
+              ->log('Validation of Tax2551Q data succeeded.');
       
               // Add the tax_return_id to the validated data
               $validatedData['tax_return_id'] = $taxReturn;
@@ -1008,6 +1263,7 @@ public function showVatReport($id)
       
               try {
                   // Create or update Tax2551Q
+                  $exists = Tax2551Q::where('tax_return_id', $taxReturn)->exists();
                   $tax2551Q = Tax2551Q::updateOrCreate(
                       ['tax_return_id' => $taxReturn],
                       $validatedData
@@ -1040,10 +1296,19 @@ public function showVatReport($id)
                   }
       
                   DB::commit();
+                  $successType = $exists ? 'success2' : 'success';
+                  activity('Tax2551Q Submission Success')
+                  ->performedOn($tax2551Q)
+                  ->causedBy(Auth::user())
+                  ->withProperties([
+                      'tax_return_id' => $taxReturn,
+                      'ip' => request()->ip(),
+                  ])
+                  ->log('Tax2551Q successfully submitted.');
       
                   return redirect()
                       ->route('tax_return.2551q.pdf', ['taxReturn' => $taxReturn])
-                      ->with('success', 'Tax return successfully submitted and PDF generated.');
+                      ->with($successType, 'Tax return successfully ' . ($exists ? 'updated' : 'submitted') . ' and PDF generated.');
       
               } catch (\Exception $e) {
                   DB::rollBack();
@@ -1316,8 +1581,11 @@ public function showIncomeCoaData(TaxReturn $taxReturn, Request $request)
         
             // Get the tax rows and eager load taxType to access tax_rate and transaction_type
             $taxRows = TaxRow::whereIn('transaction_id', $transactionIds)
-                ->with('taxType') // Eager load taxType to get transaction_type and tax_rate
-                ->get();
+            ->whereNull('credit') // Skip rows with a value in the credit column
+            ->whereNull('debit')  // Skip rows with a value in the debit column
+            ->with('taxType')     // Eager load taxType to get transaction_type and tax_rate
+            ->get();
+
         
             // Initialize an array to store the summary data, grouped by tax type
             $summaryData = [];
@@ -1930,7 +2198,8 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
         // Serve the filled PDF in a view
         return view('tax_return.percentage_report', [
             'taxReturn' => $taxReturn,
-            'pdfPath' => asset('storage/filled_report.pdf'), // Serve the PDF from public storage
+            'pdfPath' => asset('storage/filled_report.pdf'),
+            'success' => session('success') // Serve the PDF from public storage
         ]);
     }
     public function percentageEdit($id)
@@ -2182,6 +2451,7 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
         return view('tax_return.vat_report', [
             'taxReturn' => $taxReturn,
             'pdfPath' => asset('storage/2550Q.pdf'), // Serve the PDF from public storage
+            'success' => session('success')
         ]);
     }
     
@@ -2201,11 +2471,27 @@ $totalCurrentPurchasesTax = $totalCapitalGoodsUnder1MTax + $totalCapitalGoodsOve
         
         // Check if there are IDs to delete
         if (empty($ids)) {
+            activity('Deletion Attempt')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'ids' => $ids,
+                    'ip' => request()->ip(),
+                    'user_id' => Auth::user(),
+                ])
+                ->log('Deletion attempted with no IDs selected.');
             return back()->with('error', 'No rows selected for deletion.');
         }
         
         // Perform the soft delete on the selected IDs
         TaxReturn::whereIn('id', $ids)->delete();  // Soft delete the tax returns by their IDs
+        activity('Tax Returns Deleted')
+        ->causedBy(Auth::user())
+        ->withProperties([
+            'deleted_ids' => $ids,
+            'ip' => request()->ip(),
+            'user_id' => Auth::user(),
+        ])
+        ->log('Successfully soft-deleted selected tax returns.');
         
         return back()->with('success', 'Selected tax returns deleted successfully!');
     }

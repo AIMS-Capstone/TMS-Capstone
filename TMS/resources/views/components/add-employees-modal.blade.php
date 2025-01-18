@@ -183,12 +183,22 @@
 
                                 <div class="mb-6 flex justify-between items-start">
                                     <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                        <label for="tin" class="text-zinc-700 font-semibold whitespace-nowrap">Tax Identification Number (TIN) <span class="text-red-500">*</span></label>
-                                        <input type="text" id="tin" name="tin" placeholder="000-000-000-000" maxlength="17" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
+                                        <label for="tin" class="text-zinc-700 font-semibold whitespace-nowrap">
+                                            Tax Identification Number (TIN) <span class="text-red-500">*</span>
+                                        </label>
+                                        <input 
+                                            type="text" 
+                                            id="tin" 
+                                            name="tin" 
+                                            placeholder="000-000-000-000" 
+                                            maxlength="15" 
+                                            minlength="15"
+                                            class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
+                                            required>
                                     </div>
                                     <div class="w-2/3 pr-4 flex items-center space-x-4">
                                         <label for="zip_code" class="text-zinc-700 font-semibold whitespace-nowrap">Zip Code <span class="text-red-500">*</span></label>
-                                        <input type="text" id="zip_code" name="zip_code" placeholder="e.g., 1203" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
+                                        <input type="text" id="zip_code" name="zip_code" maxlength="4" minlength="4" placeholder="e.g., 1203" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                                     </div>
                                 </div>
                             </div>
@@ -352,7 +362,7 @@
                                         <label class="flex items-center">
                                             <input type="radio" name="employee_wage_status" value="Above Minimum Wage Earner" class="mr-2"> Above Minimum Wage Earner
                                         </label>
-                                    </div>
+                                    </div>  
                                 </div>
                             </div>
 
@@ -448,7 +458,7 @@
                                         <input type="text" name="prev_address" placeholder="e.g., 145 Yakal St." class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"">
                                     </div>
                                     <div class="w-2/3 pr-4 flex items-center space-x-4">
-                                        <label class="font-semibold text-zinc-700 whitespace-nowrap">Reason for Separation <span class="text-red-500">*</span></label>
+                                        <label class="font-semibold text-zinc-700 whitespace-nowrap">Reason for Separation</label>
                                         <input type="text" name="prev_reason_for_separation" placeholder="Optional" class="block w-full px-0 text-xs text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer"">
                                     </div>
                                 </div>
@@ -479,6 +489,7 @@
                                 <button 
                                     x-show="currentStep > 1" 
                                     @click="currentStep--" 
+                                    @click.prevent="prevStep()"
                                     type="button" 
                                     id="prevBtn"
                                     class="px-6 py-2 bg-white text-blue-900 font-semibold border border-blue-900 rounded-lg">
@@ -488,6 +499,7 @@
                                 <button 
                                     x-show="currentStep < 4" 
                                     @click="currentStep++" 
+                                    @click.prevent="nextStep()"
                                     type="button" 
                                     id="nextBtn"
                                     class="px-6 py-2 bg-blue-900 text-white font-semibold rounded-lg">
@@ -581,4 +593,5 @@
             rateInput.placeholder = "0.00";
         }
     });
+
 </script>

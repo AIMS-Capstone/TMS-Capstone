@@ -14,7 +14,7 @@
                                 </svg>
                                 <a href="{{ route('vat_return') }}" 
                                     class="ms-1 text-sm font-medium {{ Request::routeIs('vat_return') ? 'font-bold text-blue-900' : 'text-zinc-500' }} md:ms-2">
-                                    2550M/Q
+                                    2550Q
                                 </a>
                             </div>
                         </li>
@@ -64,7 +64,7 @@
 
                 // Handle deletion
              
-deleteRows() {
+                    deleteRows() {
           
 
                         fetch('/tax-return-transaction/deactivate', {
@@ -119,28 +119,24 @@ deleteRows() {
                                 updateSearch() {
                                     this.$refs.searchForm.submit();
                                 }
-                            }"
-                            x-ref="searchForm"
-                            action="{{ route('tax_return.slsp_data', $taxReturn->id) }}" 
-                            method="GET" 
-                            role="search" 
-                            aria-label="Table" 
-                            autocomplete="off"
-                            >
-                            <input 
-                                type="search" 
-                                name="search" 
-                                x-model="search"
-                                x-on:input.debounce.500ms="updateSearch"
-                                class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
-                                aria-label="Search Term" 
-                                placeholder="Search..." 
-                            >
-                            
-                            <input type="hidden" name="type" x-model="type">
-                            <input type="hidden" name="perPage" x-model="perPage">
-                        </form>
-                            
+                             }"
+                                x-ref="searchForm"
+                                action="{{ route('tax_return.slsp_data', $taxReturn->id) }}" 
+                                method="GET" 
+                                role="search" 
+                                aria-label="Table" 
+                                autocomplete="off"
+                                >
+                                <input type="search" name="search" x-model="search" x-on:input.debounce.500ms="updateSearch"
+                                    class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900" 
+                                    aria-label="Search Term" 
+                                    placeholder="Search..." 
+                                >
+                                
+                                <input type="hidden" name="type" x-model="type">
+                                <input type="hidden" name="perPage" x-model="perPage">
+                            </form>
+                                
                             <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                         </div>
                         <!-- Sort by dropdown -->
@@ -354,11 +350,17 @@ deleteRows() {
                                                 {{ $taxRow->transaction->contactDetails->contact_tin }}</td>
                                             <td class="text-left py-3 px-2">{{ $taxRow->description }}</td>
                                             <td class="text-left py-3 px-2">{{ $taxRow->transaction->inv_number }}</td>
-                                            <td class="text-left py-3 px-2">{{ $taxRow->atc->tax_code }}</td>
+                                            <td class="text-left py-3 px-2">
+                                                {{ $taxRow->atc?->tax_code ?? 'N/A' }}
+                                            </td>                                            
                                             <td class="text-left py-3 px-2">{{ \Carbon\Carbon::parse($taxRow->transaction->date)->format(' F j, Y') }}</td>
                                             <td class="text-left py-3 px-2">{{ $taxRow->net_amount }}</td>
-                                            <td class="text-left py-3 px-2">{{ $taxRow->atc_amount }}</td>
-                                            <td class="text-left py-3 px-2">{{ $taxRow->atc->tax_rate }}</td>
+                                            <td class="text-left py-3 px-2">
+                                                {{ $taxRow->atc_amount ?? 'N/A' }}
+                                            </td>
+                                            <td class="text-left py-3 px-2">
+                                                {{ $taxRow->atc?->tax_rate ?? 'N/A' }}
+                                            </td>                                            
                                             <td class="text-left py-3 px-2">{{ $taxRow->coaAccount->code ?? 'No Code Available' }}</td>
                                         </tr>
                                     @endforeach
@@ -615,9 +617,6 @@ document.addEventListener('search', event => {
     document.body.appendChild(form);
     form.submit();
 }
-
-
-    
 
 </script>
 

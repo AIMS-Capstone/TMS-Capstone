@@ -2490,15 +2490,95 @@
             </div>
         </div> --}}
         @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
+        <div x-data="{ show: true }" 
+             x-show="show" 
+             x-transition:enter="transform transition-transform duration-300"
+             x-transition:enter-start="translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             class="fixed top-5 right-5 z-50 w-full max-w-md">
+            <div class="bg-white rounded-lg shadow-lg border border-red-500 p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="text-red-500 font-medium">Please fix the following errors:</h4>
+                    <button @click="show = false" 
+                    type="button"
+                            class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" 
+                             class="h-5 w-5" 
+                             viewBox="0 0 20 20" 
+                             fill="currentColor">
+                            <path fill-rule="evenodd" 
+                                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" 
+                                  clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+                <ul class="space-y-2">
+                    @foreach ($errors->all() as $error)
+                        <li class="text-red-500 text-sm">{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
+        <div x-data="{ 
+    showSuccessModal: @if(session('showModal')) true @else false @endif,
+    pdfUrl: '{{ session('pdfUrl') }}',
+    redirectToPdf() {
+        setTimeout(() => {
+            window.location.href = this.pdfUrl;
+        }, 1500); // 1.5 second delay before redirect
+    }
+}" 
+    x-init="$watch('showSuccessModal', value => {
+        if (value) redirectToPdf();
+    })"
+    x-show="showSuccessModal"
+    x-cloak
+    class="fixed inset-0 z-50 flex items-center justify-center"
+    x-effect="document.body.classList.toggle('overflow-hidden', showSuccessModal)"
+>
+    <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
+    
+    <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative" 
+        x-show="showSuccessModal"
+        x-transition:enter="transition ease-out duration-300 transform"
+        x-transition:enter-start="opacity-0 scale-90"
+        x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-200 transform"
+        x-transition:leave-start="opacity-100 scale-100"
+        x-transition:leave-end="opacity-0 scale-90"
+    >
+        <button @click="showSuccessModal = false" 
+            class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <div class="flex flex-col items-center">
+            <!-- Icon -->
+            <div class="flex justify-center align-middle mb-4">
+                <img src="{{ asset('images/Success.png') }}" alt="Item(s) Posted" class="w-28 h-28">
+            </div>
+
+            <!-- Title -->
+            <h2 class="text-2xl font-bold text-emerald-500 mb-4">Tax Return Generated</h2>
+
+            <!-- Description -->
+            <p class="text-sm text-zinc-600 text-center mb-6">
+                The 2550Q Tax Return has been successfully generated. 
+                <span class="block mt-2">Redirecting to PDF...</span>
+            </p>
+
+            <!-- Loading indicator -->
+            <div class="flex items-center justify-center space-x-2">
+                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+            </div>
+        </div>
     </div>
-@endif
-        
+</div>
     </div>
         <!-- Submit Button -->
         <div class="flex items-center justify-center mt-6">
@@ -2510,6 +2590,12 @@
     </div>
 </x-app-layout>
 <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        window.showSuccessModal = false;
+        @if(session('showModal'))
+            window.showSuccessModal = true;
+        @endif
+    });
     // Function to calculate Total Available Input Tax (Sum of Items 43B and 50B)
     function calculateTotalAvailableInputTax() {
         // Retrieve values for Total Input Tax and Total Current Purchase Input Tax

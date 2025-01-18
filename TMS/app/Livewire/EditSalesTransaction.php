@@ -76,17 +76,17 @@ class EditSalesTransaction extends Component
     }
 
     public function addTaxRow()
-    {
-        $this->taxRows[] = [
-            'description' => '',
-            'tax_type' => '',
-            'tax_code' => null,
-            'coa' => '',
-            'amount' => 0,
-            'tax_amount' => 0,
-            'net_amount' => 0,
-        ];
-    }
+{
+    $this->taxRows[] = [
+        'description' => '',
+        'tax_type' => null,  // Changed from empty string to null
+        'tax_code' => null,
+        'coa' => null,       // Changed from empty string to null
+        'amount' => 0,
+        'tax_amount' => 0,
+        'net_amount' => 0,
+    ];
+}
 
     public function removeTaxRow($index)
     {
@@ -97,29 +97,32 @@ class EditSalesTransaction extends Component
 
     public function updateTaxRow($data)
     {
-        $this->taxRows[$data['index']] = $data;
-        $this->calculateTotals(); // Recalculate after updating a row
+        if (isset($data['index']) && isset($data['taxRow'])) {
+            $this->taxRows[$data['index']] = $data['taxRow'];
+            $this->calculateTotals();
+        }
     }
 
     public function calculateTotals()
     {
-        // Initialize totals to zero
         $this->vatableSales = 0;
         $this->vatAmount = 0;
         $this->totalAmount = 0;
-        $this->nonVatableSales = 0; // Reset non-vatable sales
+        $this->nonVatableSales = 0;
     
-        // Loop through each tax row to calculate the totals
         foreach ($this->taxRows as $row) {
-            $taxType = TaxType::find($row['tax_type']);
-            $vatRate = $taxType ? $taxType->VAT : 0; // Get VAT rate (0 or 12)
+            // Add safety checks
+            if (!isset($row['tax_type']) || !isset($row['amount']) || !isset($row['tax_amount'])) {
+                continue;
+            }
+    
+            $taxType = !empty($row['tax_type']) ? TaxType::find($row['tax_type']) : null;
+            $vatRate = $taxType ? $taxType->VAT : 0;
     
             if ($vatRate > 0) {
-                // VATable sales
                 $this->vatableSales += $row['amount'] - $row['tax_amount'];
                 $this->vatAmount += $row['tax_amount'];
             } else {
-                // Non-VATable sales
                 $this->nonVatableSales += $row['amount'];
             }
             

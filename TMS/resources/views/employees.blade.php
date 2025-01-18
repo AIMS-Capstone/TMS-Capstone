@@ -106,14 +106,13 @@ $organization = \App\Models\OrgSetup::find($organizationId);
 
                         // Toggle all rows
                         toggleAll() {
-                            this.checkAll = !this.checkAll;
-                            if (this.checkAll) {
-                                this.selectedRows = [...document.querySelectorAll('[id^=contact]')].map(el => el.id.replace('contact', ''));
-                            } else {
-                                this.selectedRows = [];
-                            }
-                            console.log('All rows:', this.selectedRows); // Debugging
-                        },
+                                            this.checkAll = !this.checkAll;
+                                            if (this.checkAll) {
+                                                this.selectedRows = {{ json_encode($employees->pluck('id')->toArray()) }}; 
+                                            } else {
+                                                this.selectedRows = []; // Unselect all
+                                            }
+                                        },
 
                         // Handle delete (soft delete)
                         deleteRows() {
@@ -122,9 +121,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                 return;
                             }
 
-
                             // Send the request to the backend
-                            fetch('{{ route("employees.destroy") }}', {
+                            fetch('{{ route('employees.destroy') }}', {
                                 method: 'DELETE',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -184,7 +182,6 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                     <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                 </div>
                                 
-                                {{-- Wait ko munang maayos yung pag-fetch ng data sa page na 'to before ko tapusin filter --}}
                                 <div class="flex flex-row items-center space-x-4">
                                     <div class="relative inline-block text-left sm:w-auto w-full z-30">
                                         <button id="filterButton" class="flex items-center text-zinc-600 hover:text-zinc-800 w-full hover:shadow-sm">
@@ -209,7 +206,8 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                                         <span>Above Minimum Wage Earner (AMWE)</span>
                                                     </label>
                                                 </div>
-                                                <span class="block px-4 py-1 text-zinc-700 font-bold text-xs">With Previous Employer</span>
+                                                {{-- padagdag ng kung paano siya mahihila pero hidden column niya --}}
+                                                {{-- <span class="block px-4 py-1 text-zinc-700 font-bold text-xs">With Previous Employer</span>
                                                 <div id="statusFilterContainer" class="block px-4 py-2 text-xs">
                                                     <label class="flex items-center space-x-2 py-1">
                                                         <input type="checkbox" value="Yes" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Status" />
@@ -219,7 +217,7 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                                         <input type="checkbox" value="No" class="filter-checkbox rounded-full peer checked:bg-blue-900 checked:ring-2 checked:ring-blue-900 focus:ring-blue-900" data-category="Status" />
                                                         <span>No</span>
                                                     </label>
-                                                </div>
+                                                </div> --}}
                                             </div>
                                             <div class="flex items-center space-x-4 px-4 py-1.5 mb-1.5">
                                                 <button id="applyFiltersButton" class="flex items-center bg-white border border-gray-300 hover:border-green-500 hover:bg-green-100 hover:text-green-500 transition rounded-md px-3 py-1.5 whitespace-nowrap group">
@@ -298,9 +296,9 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                     <thead class="bg-neutral-100 text-sm text-neutral-700">
                                         <tr>
                                             <th scope="col" class="p-4">
-                                                <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
+                                                <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600" x-cloak>
                                                     <div class="relative flex items-center">
-                                                        <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition" />
+                                                        <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition" />
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                                         </svg>
@@ -309,12 +307,12 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                             </th>
                                             <th scope="col" class="text-left py-4 px-4">Employee Name</th>
                                             <th scope="col" class="text-left py-4 px-4">TIN</th>
-                                            <th scope="col" class="text-left py-4 px-4">Date of Birth</th>
+                                            <th scope="col" class="text-left py-4 px-4">Wage Status</th>
                                             <th scope="col" class="text-left py-4 px-4">Contact</th>
                                             <th scope="col" class="text-left py-4 px-4">Nationality</th>
                                             <th scope="col" class="text-left py-4 px-4">Address</th>
                                             <th scope="col" class="text-left py-4 px-4">Zip Code</th>
-                                            <th scope="col" class="text-left py-4 px-4">Action</th>
+                                            {{-- <th scope="col" class="text-left py-4 px-4">Action</th> --}}
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-neutral-300 text-left py-[7px]">
@@ -322,9 +320,9 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                             @foreach ($employees as $employee)
                                                 <tr class="hover:bg-blue-50 cursor-pointer ease-in-out">
                                                     <td class="p-4">
-                                                        <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
+                                                        <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600" x-cloak>
                                                             <div class="relative flex items-center">
-                                                                <input type="checkbox" @click="toggleCheckbox('{{ $employee->id }}')" :checked="selectedRows.includes('{{ $employee->id }}')" id="contact{{ $employee->id }}" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition" />
+                                                                <input type="checkbox" @click="toggleCheckbox('{{ $employee->id }}')" :checked="selectedRows.includes('{{ $employee->id }}')" id="contact{{ $employee->id }}" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition" />
                                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                                                 </svg>
@@ -332,26 +330,32 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                                                         </label>
                                                     </td>
                                                     <td class="text-left py-3 px-4">
-                                                        <x-view-employees />
+                                                        <x-edit-employees />
                                                         <button
-                                                            @click="$dispatch('open-view-employee-modal', {{ @json_encode($employee) }})" 
-                                                            class="hover:underline hover:text-blue-500">
+                                                        
+                                                            @click="$dispatch('open-edit-employee-modal', {{ @json_encode($employee) }})" 
+                                                            class="font-bold hover:underline hover:text-blue-500">
+
                                                             {{ $employee->first_name }} {{ $employee->last_name }}
                                                         </button>
                                                     </td>   
                                                     <td class="text-left py-3 px-4">{{ $employee->tin }}</td>
-                                                    <td class="text-left py-3 px-4">{{ \Carbon\Carbon::parse($employee->date_of_birth)->format('F d, Y') }}</td>
+                                                    <td class="text-left py-3 px-4">
+                                                        @php
+                                                            $wageStatus = $employee->latestEmployment->employee_wage_status ?? null;
+                                                        @endphp
+                                                        @if ($wageStatus === 'Minimum Wage Earner')
+                                                            <span class="inline-block px-3 py-1 text-sm text-zinc-700 bg-zinc-100 rounded-full">MWE</span>
+                                                        @elseif ($wageStatus === 'Above Minimum Wage Earner')
+                                                            <span class="inline-block px-3 py-1 text-sm text-zinc-700 bg-zinc-100 rounded-full">AMWE</span>
+                                                        @else
+                                                            <span class="inline-block px-3 py-1 text-sm text-zinc-500 bg-zinc-50 rounded-full">N/A</span>
+                                                        @endif
+                                                    </td>
                                                     <td class="text-left py-3 px-4">{{ $employee->contact_number }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->nationality }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->address->address ?? 'N/A' }}</td>
                                                     <td class="text-left py-3 px-4">{{ $employee->address->zip_code ?? '0000' }}</td>
-                                                    <td class="text-left py-3 px-4">
-                                                        <x-edit-employees />
-                                                        <button 
-                                                        @click="$dispatch('open-edit-employee-modal', {{@json_encode($employee) }})">
-                                                        Edit Employee
-                                                    </button>
-                                                    </td>
                                                 </tr>
                                             @endforeach
                                         @else
@@ -392,8 +396,13 @@ $organization = \App\Models\OrgSetup::find($organizationId);
                         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
                         x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
                         >
-                        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
+                        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto relative">
                             <div class="flex flex-col items-center">
+                                <button @click="showConfirmDeleteModal = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
                                 <!-- Icon -->
                                 <div class="mb-4">
                                     <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>
@@ -468,7 +477,97 @@ $organization = \App\Models\OrgSetup::find($organizationId);
             });
         }
         
-        
+        //FILTER BUTTON
+        const filterButton = document.getElementById('filterButton');
+        const dropdownFilter = document.getElementById('dropdownFilter');
+        const applyFiltersButton = document.getElementById('applyFiltersButton');
+        const clearFiltersButton = document.getElementById('clearFiltersButton');
+        const selectedFilter = document.getElementById('selectedFilter');
+        const tableRows = document.querySelectorAll('tbody tr');
+        const dropdownArrow = document.getElementById('dropdownArrow');
+
+        filterButton.addEventListener('click', () => {
+            dropdownArrow.classList.toggle('rotate-180');
+            dropdownFilter.classList.toggle('hidden');
+        });
+
+        function getSelectedFilters() {
+            const filters = {};
+            document.querySelectorAll('.filter-checkbox:checked').forEach((checkbox) => {
+                const category = checkbox.dataset.category;
+                if (!filters[category]) filters[category] = [];
+                filters[category].push(checkbox.value);
+            });
+            return filters;
+        }
+
+        function applyFilters() {
+            const filters = getSelectedFilters();
+            tableRows.forEach((row) => {
+                let isVisible = true;
+
+                // Fetch Wage Status column content (adjust column index if needed)
+                const wageStatusCell = row.cells[3]?.textContent.trim();
+
+                if (filters["Status"]) {
+                    const selectedValues = filters["Status"];
+                    isVisible = selectedValues.some((value) => {
+                        if (value === "Minimum Wage Earner") return wageStatusCell === "MWE";
+                        if (value === "Above Minimum Wage Earner") return wageStatusCell === "AMWE";
+                        return false; // Additional conditions can go here if needed
+                    });
+                }
+
+                row.style.display = isVisible ? "" : "none";
+            });
+
+            dropdownFilter.classList.add('hidden');
+            selectedFilter.textContent = 'Filter';
+        }
+
+        function clearFilters() {
+            document.querySelectorAll('.filter-checkbox').forEach((checkbox) => (checkbox.checked = false));
+            tableRows.forEach((row) => (row.style.display = ''));
+            dropdownFilter.classList.add('hidden');
+            selectedFilter.textContent = 'Filter';
+            updateApplyButtonState();
+        }
+
+        applyFiltersButton.addEventListener('click', applyFilters);
+        clearFiltersButton.addEventListener('click', clearFilters);
+
+        window.addEventListener('click', (event) => {
+            if (!filterButton.contains(event.target) && !dropdownFilter.contains(event.target)) {
+                dropdownFilter.classList.add('hidden');
+            }
+        });
+
+        // Initial setup: disable the "Apply Filter" button
+        applyFiltersButton.disabled = true;
+        applyFiltersButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+        function updateApplyButtonState() {
+            const hasSelection = document.querySelectorAll('.filter-checkbox:checked').length > 0;
+            applyFiltersButton.disabled = !hasSelection;
+            if (hasSelection) {
+                applyFiltersButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                applyFiltersButton.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        document.querySelectorAll('.filter-checkbox').forEach((checkbox) => {
+            checkbox.addEventListener('change', updateApplyButtonState);
+        });
+
+        clearFiltersButton.addEventListener('click', () => {
+            document.querySelectorAll('.filter-checkbox').forEach((checkbox) => (checkbox.checked = false));
+            tableRows.forEach((row) => (row.style.display = ''));
+            dropdownFilter.classList.add('hidden');
+            selectedFilter.textContent = 'Filter';
+            updateApplyButtonState();
+        });
+
         // FOR SORT BUTTON
         document.getElementById('sortButton').addEventListener('click', function() {
             const dropdown = document.getElementById('dropdownMenu');

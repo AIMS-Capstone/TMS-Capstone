@@ -53,9 +53,9 @@ use App\Http\Controllers\ClientAuthController;
 use App\Http\Controllers\ClientFinancialController;
 use App\Http\Controllers\ClientProfileController;
 use App\Http\Controllers\ClientAnalyticsController;
-
+use App\Http\Controllers\Tax1702QController;
 //Models
-use App\Models\rdo;
+use App\Models\Rdo;
 use App\Models\TaxReturn;
 
 // Public Routes
@@ -113,7 +113,7 @@ Route::middleware([
     Route::post('/user-account-destroy', [UserController::class, 'destroy'])->name('users.destroy');
     Route::post('/user-account-store', [UserController::class, 'store'])->name('users.store');
     Route::get('/export-atc/{type}', [AtcController::class, 'exportAtcs'])->name('export.atcs');
-    Route::get('/export-coa', [CoaController::class, 'exportCoas']);
+    Route::get('/export-coa', [CoaController::class, 'exportCoas'])->name('export.coa');
     Route::get('/export-tax-type/{type}', [TaxTypeController::class, 'exportTaxType'])->name('export.taxType');
     Route::get('/edit-sales/{transaction}', [TransactionsController::class, 'editSales']);
     Route::get('/tax-return/{taxReturn}/2551q-pdf', [TaxReturnController::class, 'showPercentageReportPDF'])
@@ -220,6 +220,8 @@ Route::post('/tax-return/store1701Q/{taxReturn}', [Tax1701QController::class, 's
           ->name('tax_return.store2551Q');
         Route::post('tax-return/{taxReturn}/2550q', [TaxReturnController::class, 'store2550Q'])
         ->name('tax_return.store2550Q');
+        Route::post('tax-return/{taxReturn}/1702Q', [Tax1702QController::class, 'store'])
+        ->name('tax_return.store1702Q');
         Route::post('/tax-return-transaction/deactivate', [TransactionsController::class, 'deactivate'])
     ->name('tax-return-transaction.deactivate');
     // This is for deactivating transactions on Spouse or Individual
@@ -228,6 +230,8 @@ Route::post('/tax-return/store1701Q/{taxReturn}', [Tax1701QController::class, 's
         // Tax Return Routes
         Route::resource('tax_return', TaxReturnController::class);
         Route::get('/vat_return', [TaxReturnController::class, 'vatReturn'])->name('vat_return');
+        Route::get('/tax-return/{taxReturn}/2550q/edit', [TaxReturnController::class, 'edit2550q'])
+        ->name('tax_return.2550Q.edit');
         Route::get('/income_return', [TaxReturnController::class, 'incomeReturn'])->name('income_return');
         Route::get('/percentage_return/{id}/report', [TaxReturnController::class, 'showPercentageReport'])
     ->name('percentage_return.report');
@@ -239,6 +243,8 @@ Route::post('/tax-return/store1701Q/{taxReturn}', [Tax1701QController::class, 's
     ->name('income_return.report');
     Route::get('/tax-return/{taxReturn}/1701q/report', [Tax1701QController::class, 'reportPDF'])
     ->name('income_return.reportPDF');
+    Route::get('/tax-return/{taxReturn}/1701q/edit', [Tax1701QController::class, 'edit'])
+    ->name('tax_return.1701q.edit');
 
 
 Route::get('/tax-return/{taxReturn}/1701q/download', [Tax1701QController::class, 'downloadPdf'])
@@ -247,6 +253,22 @@ Route::get('/tax-return/{taxReturn}/1701q/download', [Tax1701QController::class,
 Route::get('/tax-return/{taxReturn}/1701q/stream', [Tax1701QController::class, 'streamPdf'])
     ->name('income_return.stream');
 
+
+// Edit existing 1702Q form
+Route::get('/tax-return/{taxReturn}/1702q/edit', [Tax1702QController::class, 'edit'])
+    ->name('tax_return.corporate_quarterly.edit');
+
+// View PDF report in browser
+Route::get('/tax-return/{taxReturn}/1702q/pdf', [Tax1702QController::class, 'reportPDF'])
+    ->name('tax_return.corporate_quarterly_pdf');
+
+// Download PDF
+Route::get('/tax-return/{tax_return_id}/1702q/download', [Tax1702QController::class, 'downloadPdf'])
+    ->name('tax_return.corporate_quarterly.download');
+
+// Stream PDF
+Route::get('/tax-return/{tax_return_id}/1702q/stream', [Tax1702QController::class, 'streamPdf'])
+    ->name('tax_return.corporate_quarterly.stream');
 
         Route::get('tax_return/{id}/income-input-summary', [TaxReturnController::class, 'showIncomeInputSummary'])->name('tax_return.income_input_summary');
         
@@ -292,6 +314,7 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
         Route::get('/download_coa', [CoaController::class, 'download_coa']);
         Route::get('/coa/import_template', [CoaController::class, 'import_template']);
         Route::get('/coa/account_type_template', [CoaController::class, 'account_type_template']);
+        Route::get('/coa/sub_type_template', [CoaController::class, 'sub_type_template']);
         Route::put('/coa/{coa}', [CoaController::class, 'update'])->name('coa.update');
 
 
@@ -370,6 +393,7 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
                 Route::get('/{id}/1601C/edit', [withHoldingController::class, 'editForm1601C'])->name('form1601C.edit');
                 Route::put('/{id}/1601C/update', [withHoldingController::class, 'updateForm1601C'])->name('form1601C.update');
                 Route::get('/{id}/1601C/download', [withHoldingController::class, 'downloadForm1601C'])->name('form1601C.download');
+                Route::post('/{id}/1601C/mark-filed', [withHoldingController::class, 'markForm1601CFiled'])->name('form1601C.markFiled');
 
                 //Route for import
                 Route::post('/withholding/1601C/{id}/import', [WithHoldingController::class, 'importSources1601C'])->name('with_holding.1601C_import');
@@ -388,6 +412,8 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
                 Route::get('/{id}/0619E/edit', [withHolding0619EController::class, 'editForm0619E'])->name('form0619E.edit');
                 Route::put('/{id}/0619E/update', [withHolding0619EController::class, 'updateForm0619E'])->name('form0619E.update');
                 Route::get('/{id}/0619E/download', [withHolding0619EController::class, 'downloadForm0619E'])->name('form0619E.download');
+                Route::post('/{id}/0619E/mark-filed', [withHolding0619EController::class, 'markForm0619EFiled'])->name('form0619E.markFiled');
+
             
             // Routes for generating withholding tax return for 1601EQ
                 Route::get('/1601EQ', [withHolding1601EQController::class, 'index1601EQ'])->name('with_holding.1601EQ');
@@ -407,6 +433,7 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
                 Route::get('/{id}/1601EQ/edit', [withHolding1601EQController::class, 'editForm1601EQ'])->name('form1601EQ.edit');
                 Route::put('/{id}/1601EQ/update', [withHolding1601EQController::class, 'updateForm1601EQ'])->name('form1601EQ.update');
                 Route::get('/{id}/1601EQ/download', [WithHolding1601EQController::class, 'downloadForm1601EQ'])->name('form1601EQ.download');
+                Route::post('/{id}/1601EQ/mark-filed', [withHolding1601EQController::class, 'markForm1601EQFiled'])->name('form1601EQ.markFiled');
                 
             // Route for generating witholding tax return for 1604C
                 Route::get('/1604C', [withHolding1604CController::class, 'index1604C'])->name('with_holding.1604C');
@@ -436,6 +463,7 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
                 Route::get('/{id}/1604E/edit', [withHolding1604EController::class, 'editForm1604E'])->name('form1604E.edit');
                 Route::put('/{id}/1604E/update', [withHolding1604EController::class, 'updateForm1604E'])->name('form1604E.update');
                 Route::get('/{id}/1604E/download', [WithHolding1604EController::class, 'downloadForm1604E'])->name('form1604E.download');
+                Route::post('/{id}/1604E/mark-filed', [withHolding1604EController::class, 'markForm1604EFiled'])->name('form1604E.markFiled');
 
 
         });//ending of tax_return/with_holding prefix

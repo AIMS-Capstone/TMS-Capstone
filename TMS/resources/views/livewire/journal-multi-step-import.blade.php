@@ -84,17 +84,17 @@
                                     <div class="flex justify-center mb-4 pl-8">
                                         <ul class="list-disc text-[11px]">
                                             <li class="pl-2">
-                                                <span class="inline-block align-top">a CSV file containing transaction information (You can <a class="text-blue-600" href="{{ url('') }}">download</a> this template for importing transactions), or</span>
+                                                <span class="inline-block align-top">a CSV file containing transaction information (You can <a href="{{ asset('csv/Journal-Entry-template.csv') }}" download="Journal-Entry-template.csv" class="text-blue-600 hover:font-bold hover:underline">download</a> this template for importing transactions), or</span>
                                             </li>
                                             <li class="pl-2">
-                                                <span class="inline-block align-top">a COA/Chart of Accounts column added to your Manual Journal transactions (<a class="text-blue-600" href="{{ url('/export-coa') }}">download list).</a> This is a required<br/>field.</span>
+                                                <span class="inline-block align-top">a COA/Chart of Accounts column added to your Manual Journal transactions <a class="text-blue-600 hover:font-bold hover:underline" href="{{ url('/export-coa') }}">(download list).</a> This is a required<br/>field.</span>
                                             </li>
                                             <li class="pl-2">
                                                 <span class="inline-block align-top">to create a separate line items for Debit and Credit, make sure that its <b>Date</b> and <b>Reference Numbers</b> are the<br/>same. Otherwise, it will be recognized as different entries.</span>
                                             </li>
                                         </ul>
                                     </div>
-                                    <p class="flex items-center pl-24 text-xs mb-4"><b>Important:</b> Debit and Credit must be equal or balanced.</p>
+                                    <p class="flex items-center pl-24 text-xs mb-4"><strong>Important: </strong> Debit and Credit must be equal or balanced.</p>
                                 </div>
                             </div>
                         </div>

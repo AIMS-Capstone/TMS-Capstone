@@ -43,6 +43,12 @@
                                 paymentDate: '',
                                 referenceNumber: '',
                                 bankAccount: '',
+                                get formattedTransactionTotalAmount() {
+                                    return parseFloat(this.transactionTotalAmount).toLocaleString('en-US', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    });
+                                },
                                 markAsPaid() {
                                     // Make an AJAX request or send form data to the backend to mark as paid
                                     fetch('/transactions/mark-as-paid/{{ $transaction->id }}', {
@@ -105,7 +111,7 @@
                                         <!-- Left Side -->
                                         <div>
                                             <p class="text-sm font-bold text-zinc-600">
-                                                You are about to pay: <span class="font-bold text-blue-900 text-xl">₱<span x-text="transactionTotalAmount"></span></span>
+                                                You are about to pay: <span class="font-bold text-blue-900 text-xl">₱<span x-text="formattedTransactionTotalAmount"></span></span>
                                             </p>
                                             <p class="text-xs text-zinc-600 mt-4">
                                                 Please enter the required fields and mark this transaction as Paid. Make sure that you are entering correct information to match your Sales/Purchases transaction. 
@@ -203,7 +209,12 @@
                                 <tr>
                                     <td class="border px-4 py-2">{{ $row->description }}</td>
                                     <td class="border px-4 py-2">{{ $row->taxType->tax_type }} ({{ $row->taxType->VAT }}%)</td>
-                                    <td class="border px-4 py-2">{{ $row->atc->tax_code }} ({{ $row->atc->tax_rate }}%)</td>
+                                    <td class="border px-4 py-2">@if($row->atc)
+                                        {{ $row->atc->tax_code }} ({{ $row->atc->tax_rate }}%)
+                                    @else
+                                        N/A (N/A%)
+                                    @endif
+                                    </td>
                                     <td class="border px-4 py-2">{{ $row->coa }}</td>
                                     <td class="border px-4 py-2">{{ number_format($row->amount, 2) }}</td>
                                     <td class="border px-4 py-2">{{ number_format($row->tax_amount, 2) }}</td>
@@ -463,7 +474,12 @@
                                 <tr>
                                     <td class="border px-4 py-2">{{ $row['description'] }}</td>
                                     <td class="border px-4 py-2">{{ $row->taxType->tax_type }} ({{ $row->taxType->VAT }}%)</td>
-                                    <td class="border px-4 py-2">{{ $row->atc->tax_code }} ({{ $row->atc->tax_rate }}%)</td>
+                                    <td class="border px-4 py-2">@if($row->atc)
+                                        {{ $row->atc->tax_code }} ({{ $row->atc->tax_rate }}%)
+                                    @else
+                                        N/A (N/A%)
+                                    @endif
+                                    </td>
                                     <td class="border px-4 py-2">{{ $row['coa'] }}</td>
                                     <td class="border px-4 py-2">{{ number_format($row['amount'], 2) }}</td>
                                     <td class="border px-4 py-2">{{ number_format($row['tax_amount'], 2) }}</td>
@@ -660,7 +676,7 @@
                 <div class="flex flex-col items-center">
 
                     <div class="flex justify-center mb-4">
-                        <img src="{{ asset('images/Success.png') }}" alt="Organization Added" class="w-28 h-28">
+                        <img src="{{ asset('images/Success.png') }}" alt="Mark as Posted" class="w-28 h-28">
                     </div>
 
                     <!-- Title -->
@@ -694,14 +710,12 @@
             
             <div class="flex flex-col items-center">
                 <!-- Icon -->
-                <div class="mb-6">
-                    <div class="flex items-center justify-center w-24 h-24 rounded-full bg-green-600">
-                        <i class="fas fa-check text-white text-6xl"></i>
-                    </div>
+                <div class="flex justify-center mb-4">
+                    <img src="{{ asset('images/Success.png') }}" alt="Payment Added" class="w-28 h-28">
                 </div>
 
                 <!-- Title -->
-                <a href="{{route('transactions.mark', $transaction->id)}}" class="block px-4 py-2 text-sm text-zinc-700 hover-dropdown">Payment Added</a>
+                <a href="{{route('transactions.mark', $transaction->id)}}" class="text-emerald-500 font-bold text-3xl mb-2">Payment Added</a>
 
                 <!-- Description -->
                 <p class="text-sm text-gray-600 text-center mb-6">
@@ -711,7 +725,7 @@
                 <!-- Close Button -->
                 <button 
                     @click="showSuccessPaymentModal = false" 
-                    class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition w-1/2"
+                    class="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm transition w-1/2"
                 >
                     OK
                 </button>
@@ -720,7 +734,48 @@
     </div>
     @endif
 
+    <div 
+    x-data="{ 
+        showSuccessModalTransaction: {{ session()->has('successTransaction') ? 'true' : 'false' }} 
+    }"
+    x-show="showSuccessModalTransaction" 
+    x-cloak 
+    class="fixed inset-0 z-50 flex items-center justify-center"
+    x-effect="document.body.classList.toggle('overflow-hidden', showSuccessModalTransaction)"
+>
+    <div class="fixed inset-0 bg-gray-200 opacity-50"></div>
 
+    <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full relative" 
+        x-show="showSuccessModalTransaction" 
+        x-transition:enter="transition ease-out duration-300 transform" 
+        x-transition:enter-start="opacity-0 scale-90" 
+        x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-200 transform" 
+        x-transition:leave-start="opacity-100 scale-100" 
+        x-transition:leave-end="opacity-0 scale-90"
+    >
+        <button @click="showSuccessModalTransaction = false" 
+            class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <div class="flex flex-col items-center">
+            <!-- Icon -->
+            <div class="flex justify-center align-middle mb-4">
+                <img src="{{ asset('images/Success.png') }}" alt="Item(s) Posted" class="w-28 h-28">
+            </div>
+
+            <!-- Title -->
+            <h2 class="text-2xl font-bold text-emerald-500 mb-4">Transaction Generated</h2>
+
+            <!-- Description -->
+            <p class="text-sm text-zinc-600 text-center mb-6">
+                The Transaction has been generated successfully.
+            </p>
+        </div>
+    </div>
+</div>
     
 </div>
 </x-app-layout>

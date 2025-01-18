@@ -50,36 +50,53 @@ class SelectInput extends Component
         'selectedValue.required' => 'Please select a contact.',
     ];
 
-    public function updateOptions($data = null)
-    {
-        if ($data && isset($data['id']) && $data['id'] === $this->id) {
-            $this->options = $data['options'];
-        } else {
-            $this->options = $this->fetchOptions();
-        }
+  public function updateOptions($data = null)
+{
+    $organizationId = session()->get('organization_id'); // Retrieve organization_id from session
 
-        // Ensure the selected value is still valid
-        if (!collect($this->options)->pluck($this->valueKey)->contains($this->selectedValue)) {
-            $this->selectedValue = 'default'; // Reset to default if invalid
-        }
-
-        // Dispatch event to refresh Select2 dropdown
-        $this->dispatch('refreshDropdown', [
-            'id' => $this->id,
-            'options' => $this->options,
-        ]);
+    if ($data && isset($data['id']) && $data['id'] === $this->id) {
+        $this->options = $data['options'];
+    } else {
+        $this->options = $this->fetchOptions($organizationId); // Pass organization_id to fetchOptions
     }
 
-    protected function fetchOptions()
-    {
-        return Contacts::all()->map(function ($contact) {
+    // Ensure the selected value is still valid
+    if (!collect($this->options)->pluck($this->valueKey)->contains($this->selectedValue)) {
+        $this->selectedValue = 'default'; // Reset to default if invalid
+    }
+
+    // Dispatch event to refresh Select2 dropdown
+    $this->dispatch('refreshDropdown', [
+        'id' => $this->id,
+        'options' => $this->options,
+    ]);
+}
+
+
+protected function fetchOptions($organizationId)
+{
+    $query = Contacts::where('organization_id', $organizationId);
+
+    // Filter based on transaction type
+    if ($this->type === 'sales') {
+        $query->where('contact_type', 'Customer');
+    } elseif ($this->type === 'purchase') {
+        $query->where('contact_type', 'Vendor');
+    }
+
+    return $query->select('id', 'bus_name', 'contact_tin')
+        ->orderBy('bus_name')
+        ->get()
+        ->map(function ($contact) {
             return [
                 'value' => $contact->id,
                 'name' => $contact->bus_name,
-                'tax_identification_number' => $contact->contact_tin,
+                'tax_identification_number' => $contact->contact_tin ?? 'N/A'
             ];
-        })->toArray();
-    }
+        })
+        ->toArray();
+}
+    
 
     public function render()
     {

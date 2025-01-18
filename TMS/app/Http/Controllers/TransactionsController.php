@@ -27,9 +27,14 @@ use Maatwebsite\Excel\Facades\Excel;
 use thiagoalessio\TesseractOCR\TesseractOCR;
 use Imagick;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class TransactionsController extends Controller
 {
+    private const VAT_RATE = 0.12; 
     /**
      * Display a listing of the resource.
      */
@@ -197,47 +202,87 @@ public function getAllTransactions(Request $request)
         }
 
         // Find the specific tax return by ID
-        $taxReturn = TaxReturn::findOrFail($taxReturnId);  // Ensure the tax return exists
-        
+        $taxReturn = TaxReturn::findOrFail($taxReturnId); // Ensure the tax return exists
+
         // Detach the transactions from the tax_return_transactions pivot table
         $taxReturn->transactions()->detach($transactionIds);
-        
-        // Optionally, you can return a success response
+
+        // Log the activity for each detached transaction
+        foreach ($transactionIds as $transactionId) {
+            activity('Transaction Management')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'tax_return_id' => $taxReturnId,
+                    'transaction_id' => $transactionId,
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log("Transaction with ID {$transactionId} was archived from Tax Return ID {$taxReturnId}.");
+        }
+
+        // Return a success response
         return response()->json(['message' => 'Transactions archived successfully']);
     }
+
     public function deactivateTransaction(Request $request)
-{
-    // Get the tax_return_id, transaction_ids, and activeTab from the request
-    $taxReturnId = $request->input('tax_return_id');
-    $transactionIds = $request->input('ids');
-    $activeTab = $request->input('activeTab');  // Either 'individual' or 'spouse'
-    
-    // Make sure the 'ids' is an array and not empty
-    if (empty($transactionIds)) {
-        return response()->json(['message' => 'No transactions selected'], 400);
-    }
-
-    // Find the specific tax return by ID
-    $taxReturn = TaxReturn::findOrFail($taxReturnId);  // Ensure the tax return exists
-
-    // Check the activeTab to determine whether to deactivate individual or spouse transactions
-    if ($activeTab === 'individual') {
-
-        $taxReturn->individualTransaction()->detach($transactionIds);
+    {
+        // Get the tax_return_id, transaction_ids, and activeTab from the request
+        $taxReturnId = $request->input('tax_return_id');
+        $transactionIds = $request->input('ids');
+        $activeTab = $request->input('activeTab'); // Either 'individual' or 'spouse'
         
-    } elseif ($activeTab === 'spouse') {
-        // Deactivate or remove transactions associated with the spouse
-        // Similarly, use the spouse_transaction table or relationship.
-        $taxReturn->spouseTransactions()->detach($transactionIds);
+        // Make sure the 'ids' is an array and not empty
+        if (empty($transactionIds)) {
+            return response()->json(['message' => 'No transactions selected'], 400);
+        }
+
+        // Find the specific tax return by ID
+        $taxReturn = TaxReturn::findOrFail($taxReturnId); // Ensure the tax return exists
+
+        if ($activeTab === 'individual') {
+            // Detach individual transactions
+            $taxReturn->individualTransaction()->detach($transactionIds);
+
+            // Log activity for individual transactions
+            foreach ($transactionIds as $transactionId) {
+                activity('Transaction Management')
+                    ->causedBy(Auth::user())
+                    ->withProperties([
+                        'tax_return_id' => $taxReturnId,
+                        'transaction_id' => $transactionId,
+                        'type' => 'individual',
+                        'ip' => $request->ip(),
+                        'browser' => $request->header('User-Agent'),
+                    ])
+                    ->log("Individual transaction with ID {$transactionId} was archived from Tax Return ID {$taxReturnId}.");
+            }
+
+        } elseif ($activeTab === 'spouse') {
+            // Detach spouse transactions
+            $taxReturn->spouseTransactions()->detach($transactionIds);
+
+            // Log activity for spouse transactions
+            foreach ($transactionIds as $transactionId) {
+                activity('Transaction Management')
+                    ->causedBy(Auth::user())
+                    ->withProperties([
+                        'tax_return_id' => $taxReturnId,
+                        'transaction_id' => $transactionId,
+                        'type' => 'spouse',
+                        'ip' => $request->ip(),
+                        'browser' => $request->header('User-Agent'),
+                    ])
+                    ->log("Spouse transaction with ID {$transactionId} was archived from Tax Return ID {$taxReturnId}.");
+            }
+
+        } else {
+            // If an invalid activeTab is passed
+            return response()->json(['message' => 'Invalid activeTab specified'], 400);
+        }
         
-    } else {
-        // If an invalid activeTab is passed
-        return response()->json(['message' => 'Invalid activeTab specified'], 400);
+        // Return a success response
+        return response()->json(['message' => 'Transactions archived successfully']);
     }
-    
-    // Optionally, return a success response
-    return response()->json(['message' => 'Transactions archived successfully']);
-}
 
 
     /**
@@ -246,13 +291,21 @@ public function getAllTransactions(Request $request)
     public function showUploadForm()
     {
         // Retrieve the necessary data from the database
-        $coas = Coa::all(); 
-        $tax_types = TaxType::all();
-        $tax_codes = Atc::all();
-    
+        $organization_id = session('organization_id');  // Assuming organization_id is stored in the session
+        
+        // Fetch COA records based on the organization_id (if available) or null
+        $coas = Coa::where('organization_id', $organization_id)->orWhereNull('organization_id')->get();
+        
+        // Fetch tax types with transaction_type as 'purchase'
+        $tax_types = TaxType::where('transaction_type', 'purchase')->get();
+        
+        // Fetch tax codes with transaction_type as 'purchase'
+        $tax_codes = Atc::where('transaction_type', 'purchase')->get();
+        
         // Pass the data to the view
         return view('transactions.upload', compact('coas', 'tax_types', 'tax_codes'));
     }
+    
     public function store(StoreTransactionsRequest $request)
     {
         //
@@ -283,182 +336,289 @@ public function getAllTransactions(Request $request)
         return redirect()->back()->with('success', 'Transaction added to tax return successfully!');
     }
     public function addTransaction(Request $request)
-{
-    $isSpouse = filter_var($request->input('is_spouse'), FILTER_VALIDATE_BOOLEAN);
-
-    // Manually set the 'is_spouse' input to the boolean value
-    $request->merge(['is_spouse' => $isSpouse]);
-    
-    // Now validate
-    $request->validate([
-        'transaction_id' => 'required|exists:transactions,id',
-        'tax_return_id' => 'required|exists:tax_returns,id',
-        'is_spouse' => 'required|boolean',
-    ]);
-    
-    // Get the active TaxReturn
-    $taxReturn = TaxReturn::find($request->tax_return_id);
-
-    if (!$taxReturn) {
-        return redirect()->back()->with('error', 'Tax return not found.');
-    }
-
-    // Check if the transaction is for an individual or spouse
-    if ($request->is_spouse) {
-        // Add the transaction to the spouse's transactions table
-        $spouseTransaction = new SpouseTransaction();
-        $spouseTransaction->tax_return_id = $taxReturn->id;
-        $spouseTransaction->transaction_id = $request->transaction_id;
-    
-        $spouseTransaction->save();
-    } else {
-        // Add the transaction to the individual's transactions table
-        $individualTransaction = new IndividualTransaction();
-        $individualTransaction->tax_return_id = $taxReturn->id;
-        $individualTransaction->transaction_id = $request->transaction_id;
-   
-        $individualTransaction->save();
-    }
-
-    // Return success message and redirect back
-    return redirect()->back()->with('success', 'Transaction added successfully!');
-}
-
-    public function storeUpload(Request $request)
-{
- 
-    // Step 1: Create or find a Contact
-    $contact = Contacts::firstOrCreate(
-        [
-            'bus_name' => $request->vendor, 
-            'contact_tin' => $request->customer_tin
-        ],
-        [
-            'contact_address' => $request->address,
-            'contact_type' => $request->organization_type,  // Use the submitted 'organization_type' value
-            'contact_city' => $request->city,
-            'contact_zip' => $request->zip_code  // Add 'city' field to the contact
-        ]
-    );
-
-    // Step 2: Create the Transaction
-    $transaction = Transactions::create([
-        'date' => $request->date,
-        'reference' => $request->reference_number,
-        'total_amount' => $request->amount,
-        'vat_amount' => $request->tax_amount,  // tax_amount goes to vat_amount
-        'vatable_purchase' => $request->net_amount, // net_amount goes to vatable_purchase
-        'transaction_type'=> 'Purchase',
-        'organization_id' => session('organization_id') ,
-        'contact' => $contact->id,
-        
-    ]);
-
-    activity('transactions')
-        ->performedOn($transaction)
-        ->causedBy(Auth::user())
-        ->withProperties([
-            'organization_id' => session('organization_id'),
-            'attributes' => $transaction->toArray(),
-        ])
-        ->log('Transaction using upload was created');
-
-
-    // Step 3: Add a TaxRow for each item in the transaction
-    $taxRow = new ModelsTaxRow([
-        'description' => $request->description,
-        'tax_type' => $request->tax_type,
-        'tax_code' => $request->tax_code,
-        'coa' => $request->coa,
-        'amount' => $request->amount,
-        'tax_amount' => $request->tax_amount,
-        'net_amount' => $request->net_amount
-    ]);
-
-    // Associate the TaxRow with the Transaction
-    $transaction->taxRows()->save($taxRow);
-
-    // Redirect back with a success message
-    return redirect()->route('transactions')->with('success', 'Transaction and tax rows saved successfully!');
-}
-
-
-    public function upload(Request $request)
     {
-        // Validate and process the file
+        $isSpouse = filter_var($request->input('is_spouse'), FILTER_VALIDATE_BOOLEAN);
+
+        // Manually set the 'is_spouse' input to the boolean value
+        $request->merge(['is_spouse' => $isSpouse]);
+        
+        // Validate the request
+        $request->validate([
+            'transaction_id' => 'required|exists:transactions,id',
+            'tax_return_id' => 'required|exists:tax_returns,id',
+            'is_spouse' => 'required|boolean',
+        ]);
+        
+        // Get the active TaxReturn
+        $taxReturn = TaxReturn::find($request->tax_return_id);
+
+        if (!$taxReturn) {
+            return redirect()->back()->with('error', 'Tax return not found.');
+        }
+
+        // Check if the transaction is for an individual or spouse
+        if ($request->is_spouse) {
+            // Add the transaction to the spouse's transactions table
+            $spouseTransaction = new SpouseTransaction();
+            $spouseTransaction->tax_return_id = $taxReturn->id;
+            $spouseTransaction->transaction_id = $request->transaction_id;
+            $spouseTransaction->save();
+
+            // Log activity
+            activity('Transaction Management')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'tax_return_id' => $taxReturn->id,
+                    'transaction_id' => $request->transaction_id,
+                    'type' => 'spouse',
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log("Transaction with ID {$request->transaction_id} was added to the spouse's transactions in Tax Return ID {$taxReturn->id}.");
+        } else {
+            // Add the transaction to the individual's transactions table
+            $individualTransaction = new IndividualTransaction();
+            $individualTransaction->tax_return_id = $taxReturn->id;
+            $individualTransaction->transaction_id = $request->transaction_id;
+            $individualTransaction->save();
+
+            // Log activity
+            activity('Transaction Management')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'tax_return_id' => $taxReturn->id,
+                    'transaction_id' => $request->transaction_id,
+                    'type' => 'individual',
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log("Transaction with ID {$request->transaction_id} was added to the individual's transactions in Tax Return ID {$taxReturn->id}.");
+        }
+
+        // Return success message and redirect back
+        return redirect()->back()->with('success', 'Transaction added successfully!');
+    }
+
+public function storeUpload(Request $request)
+{
+    // Validate the request using Laravel's built-in validation
+    $validated = $request->validate([
+        'vendor' => 'required|string|max:255',
+        'customer_tin' => 'required|string|max:20',
+        'address' => 'required|string|max:255',
+        'organization_type' => 'required|string|in:Individual,Non-Individual',
+        'city' => 'required|string|max:100',
+        'zip_code' => 'required|string|max:10',
+        'date' => 'required|date',
+        'reference_number' => 'required|string|unique:transactions,reference',
+        'amount' => 'required|numeric|min:0',
+        'tax_amount' => 'required|numeric|min:0',
+        'net_amount' => 'required|numeric|min:0',
+        'description' => 'required|string|max:255',
+        'tax_type' => 'required|exists:tax_types,id',
+        'tax_code' => 'nullable|exists:atcs,id',
+        'coa' => 'required|exists:coas,id'
+    ]);
+
+    try {
+        DB::beginTransaction();
+        
+        // Create or find contact
+        $contact = Contacts::firstOrCreate(
+            [
+                'bus_name' => $validated['vendor'],
+                'contact_tin' => $validated['customer_tin']
+            ],
+            [
+                'contact_address' => $validated['address'],
+                'contact_type' => $validated['organization_type'],
+                'contact_city' => $validated['city'],
+                'contact_zip' => $validated['zip_code']
+            ]
+        );
+
+        // Create transaction
+        $transaction = Transactions::create([
+            'date' => $validated['date'],
+            'reference' => $validated['reference_number'],
+            'total_amount' => $validated['amount'],
+            'vat_amount' => $validated['tax_amount'],
+            'vatable_purchase' => $validated['net_amount'],
+            'transaction_type' => 'Purchase',
+            'organization_id' => session('organization_id'),
+            'contact' => $contact->id,
+        ]);
+
+        // Create tax row
+        $transaction->taxRows()->create([
+            'description' => $validated['description'],
+            'tax_type' => $validated['tax_type'],
+            'tax_code' => $validated['tax_code'],
+            'coa' => $validated['coa'],
+            'amount' => $validated['amount'],
+            'tax_amount' => $validated['tax_amount'],
+            'net_amount' => $validated['net_amount']
+        ]);
+
+        // Log activity
+        activity('transactions')
+            ->performedOn($transaction)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'organization_id' => session('organization_id'),
+                'attributes' => $transaction->toArray(),
+            ])
+            ->log('Transaction using upload was created');
+
+        DB::commit();
+        return redirect()->route('transactions')->with('success', 'Transaction saved successfully!');
+
+    } catch (ValidationException $e) {
+        return back()
+            ->withErrors($e->errors())
+            ->withInput()
+            ->with('uploaded_image', session('uploaded_image')); // Re-flash the image
+    }
+    catch (\Exception $e) {
+        DB::rollBack();
+        return back()
+            ->withErrors(['error' => 'Failed to save transaction: ' . $e->getMessage()])
+            ->withInput()
+            ->with('uploaded_image', session('uploaded_image')); // Re-flash the image
+    }
+}
+
+
+public function upload(Request $request)
+{
+    try {
+        // Validate the request
+        $request->validate([
+            'receipt' => 'required|file|mimes:jpeg,png|max:5120' // 5MB max
+        ]);
+
+        // Process the file
         $path = $request->file('receipt')->store('transactions');
         $processedPath = $this->preprocessImage(storage_path("app/$path"));
         $extractedText = $this->extractTextFromReceipt($processedPath);
         
         // Clean and parse the extracted text
         $cleanedData = $this->cleanExtractedText($extractedText);
+
+        // Log activity
+        activity('Receipt Upload')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'file_path' => $path,
+                'processed_path' => $processedPath,
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+                'extracted_text_preview' => substr($extractedText, 0, 100), // Log a preview of the extracted text
+            ])
+            ->log('A receipt was uploaded and processed.');
+
+        // Return back with success message and data
+        // Store the cleaned data in the session
+        session()->flash('cleanedData', $cleanedData);
         
-        return back()->with([
-            'success' => 'Receipt uploaded and processed successfully!',
-            'cleanedData' => $cleanedData,  // Pass the cleaned data to the view
-            'uncleanData' => $extractedText,
+        // Store the uploaded image in the session for display
+        $imageData = base64_encode(file_get_contents($request->file('receipt')));
+        $imageSrc = 'data:' . $request->file('receipt')->getMimeType() . ';base64,' . $imageData;
+        session()->flash('uploaded_image', $imageSrc);
+        
+        // If it's an AJAX request, return JSON
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'cleanedData' => $cleanedData
+            ]);
+        }
+        
+        // If it's a regular form submit, redirect back with the data
+        return redirect()->back()->with([
+            'success' => 'Receipt processed successfully',
+            'cleanedData' => $cleanedData
         ]);
+
+    } catch (\Exception $e) {
+        if ($request->ajax()) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+        return redirect()->back()->withErrors(['error' => $e->getMessage()]);
     }
+}
+
+
     private function cleanExtractedText($extractedText)
+
 {
     // Basic cleanup: Remove unnecessary newlines and extra spaces
     $cleanedText = preg_replace('/\s+/', ' ', $extractedText);
 
-    // Apply OCR error corrections (basic example)
+    // Apply OCR error corrections
     $cleanedText = $this->cleanOcrText($cleanedText);
 
-    // DEBUG: Output cleaned text to inspect what's happening
-    // echo $cleanedText;
-
-    // Extract Vendor Name: We capture the first valid part of the text, stopping when we reach a section indicating address or receipt labels
+    // Extract vendor name
     preg_match("/([A-Za-z0-9\s\.\-]+(?:\s+[A-Za-z0-9\s\.\-]+)*)\s*[:,\n]/", $cleanedText, $vendor);
-
     $vendor = $vendor ? trim($vendor[1]) : 'Unknown Vendor';
-    
 
-  
-
-    // Extract Address: This regex captures the next meaningful block of text after the vendor name, but stops before other structured information like TIN, Date, etc.
+    // Extract address
     preg_match("/([A-Za-z0-9\s\.\-\d]+)(?=\s*(?:TIN|Date|TOTAL|Cashier|Ref|Time|OfficialReceipt|Amount))/i", $cleanedText, $address);
     $address = $address ? trim($address[1]) : 'Unknown Address';
 
-    // Extract TIN (look for TIN patterns)
+    // Extract TIN
     preg_match("/(?:MIN|TIN)[\s:\-]*([\d\-]+)/i", $cleanedText, $tin);
     $tin = $tin ? $tin[1] : 'N/A';
-    // Extract Date (support both slash and hyphen date formats)
+
+    // Extract date
     preg_match("/(?:Date[:\-\s]*|)(\d{1,4}[-\/]\d{1,2}[-\/]\d{1,4})/", $cleanedText, $date);
     $date = $date ? $date[1] : 'Unknown Date';
 
-
-    // Extract Invoice Number (commonly starts with Invoice, Ref, or other labels)
+    // Extract invoice number
     preg_match("/(?:Invoice|Ref|SlF|OfficialReceipt)\s*[:\-]?\s*(\d{4,})/", $cleanedText, $invoiceNumber);
     $invoiceNumber = $invoiceNumber ? $invoiceNumber[1] : 'Unknown Invoice Number';
 
-    // Extract Total Amount (look for 'TOTAL', 'TOTALAMOUNT')
-    preg_match("/TOTAL[\s\w]*\s*(PHP[\d,\.]+)/", $cleanedText, $totalAmount);
-    $totalAmount = $totalAmount ? $totalAmount[1] : '0.00';
+    // Extract amounts and clean them
+    // Total Amount (VAT inclusive)
+    preg_match("/TOTAL[\s\w]*\s*(?:PHP)?[\s]*([\d,\.]+)/", $cleanedText, $totalAmount);
+    $totalAmount = $totalAmount ? $this->cleanAmount($totalAmount[1]) : null;
 
-    // Extract Tax Amount (for VAT-related terms)
-    preg_match("/(\d{1,2}%\s*VAT)\s*([\w]*[\d,\.]+)/i", $cleanedText, $taxAmount);
-    $taxAmount = $taxAmount ? $taxAmount[2] : '0.00';
+    // Tax Amount (VAT)
+    preg_match("/(\d{1,2}%\s*VAT)\s*(?:PHP)?[\s]*([\d,\.]+)/i", $cleanedText, $taxAmount);
+    $taxAmount = $taxAmount ? $this->cleanAmount($taxAmount[2]) : null;
 
+    // Net Amount (VAT exclusive)
+    preg_match("/(?:Change|Net)\s*[\s\-]*(?:PHP)?[\s]*([\d,\.]+)/", $cleanedText, $netAmount);
+    $netAmount = $netAmount ? $this->cleanAmount($netAmount[1]) : null;
 
-    // Extract Net Amount (from 'Change' or 'Net' terms)
-    preg_match("/(?:Change|Net)\s*[\s\-]*([\d,\.]+)/", $cleanedText, $netAmount);
-    $netAmount = $netAmount ? 'PHP' . $netAmount[1] : 'PHP0.00';
+    // Calculate missing values based on what we have
+    $calculatedAmounts = $this->calculateMissingAmounts($totalAmount, $taxAmount, $netAmount);
 
-    // Return the extracted and cleaned information as an array
     return [
         'vendor' => $vendor,
         'tin' => $tin,
         'date' => $date,
         'invoice_number' => $invoiceNumber,
-        'total_amount' => $totalAmount,
-        'tax_amount' => $taxAmount,
-        'net_amount' => $netAmount,
+        'total_amount' => $calculatedAmounts['total_amount'],
+        'tax_amount' => $calculatedAmounts['tax_amount'],
+        'net_amount' => $calculatedAmounts['net_amount'],
         'address' => $address,
     ];
 }
+
+// Helper method to clean amount values
+private function cleanAmount($amount)
+{
+    // Remove any currency symbols, spaces, and normalize decimal separator
+    $cleaned = preg_replace('/[^0-9,\.]/', '', $amount);
+    
+    // Convert to standard decimal format
+    $cleaned = str_replace(',', '', $cleaned);
+    
+    // Ensure proper decimal format
+    return number_format((float)$cleaned, 2, '.', '');
+}
+
 
     
     
@@ -606,12 +766,24 @@ private function extractTextFromReceipt($filePath)
     public function edit($transactionId)
     {
         $transaction = Transactions::with('contactDetails', 'taxRows')->findOrFail($transactionId);
-       
+        
         $type = $transaction->transaction_type;
-      
+
+        // Log activity
+        activity('Transaction Management')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'transaction_id' => $transactionId,
+                'transaction_type' => $type,
+                'ip' => request()->ip(),
+                'browser' => request()->header('User-Agent'),
+            ])
+            ->log("Viewed edit form for Transaction ID {$transactionId}.");
+
         // Pass 'transaction_type' to the view
         return view('transactions.edit', compact('transaction', 'type'));
     }
+
     public function mark($transactionId)
     {
         $transaction = Transactions::findOrFail($transactionId);
@@ -620,20 +792,24 @@ private function extractTextFromReceipt($filePath)
         $transaction->status = 'posted';
         $transaction->save();
 
-        activity('transactions')
+        // Enhanced activity logging
+        activity('Transaction Management')
             ->performedOn($transaction)
             ->causedBy(Auth::user())
             ->withProperties([
+                'transaction_id' => $transaction->id,
                 'organization_id' => session('organization_id'),
+                'status' => 'posted',
                 'attributes' => $transaction->toArray(),
+                'ip' => request()->ip(),
+                'browser' => request()->header('User-Agent'),
             ])
-            ->log("Transaction {$transaction->inv_number} was mark as posted");
+            ->log("Transaction {$transaction->inv_number} was marked as posted.");
 
-
-        // Optionally, you can return a response or redirect to another page
+        // Flash success message
         session()->flash('success', 'Transaction has been successfully marked as Posted.');
-        
-        // You can redirect to the transaction show page, or wherever needed
+
+        // Redirect to the transaction show page, or any other relevant page
         return redirect()->route('transactions.show', ['transaction' => $transactionId]);
     }
     public function markAsPaid(Request $request, Transactions $transaction)
@@ -684,7 +860,7 @@ private function extractTextFromReceipt($filePath)
     public function update(Request $request, $id)
     {
         $transaction = Transactions::findOrFail($id);
-    
+        
         // Validate input data
         $validated = $request->validate([
             'date' => 'required|date',
@@ -693,14 +869,29 @@ private function extractTextFromReceipt($filePath)
             'total_amount' => 'required|numeric',
             // Add other fields as needed
         ]);
-    
+        
+        // Track the original attributes before updating
+        $originalAttributes = $transaction->getOriginal();
+        
         // Update transaction with validated data
         $transaction->update($validated);
-
-
-    
-        // Optionally, handle any additional fields, such as tax rows
-    
+        
+        // Log activity
+        activity('Transaction Management')
+            ->performedOn($transaction)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'transaction_id' => $transaction->id,
+                'changes' => [
+                    'before' => $originalAttributes,
+                    'after' => $transaction->getAttributes(),
+                ],
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log("Transaction {$transaction->inv_number} was updated.");
+        
+        // Redirect to the transaction show page with a success message
         return redirect()->route('transactions.show', $transaction->id)->with('success', 'Transaction updated successfully.');
     }
 
@@ -742,15 +933,32 @@ private function extractTextFromReceipt($filePath)
             'file' => 'required|mimes:csv,txt'
         ]);
 
-        // Import the file
-        Excel::import(new SalesImport, $request->file('file'));
+        // Get the uploaded file
+        $file = $request->file('file');
 
+        // Import the file
+        Excel::import(new SalesImport, $file);
+
+        // Log activity
+        activity('Transaction Import')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'file_name' => $file->getClientOriginalName(),
+                'file_type' => $file->getClientMimeType(),
+                'file_size' => $file->getSize(),
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log('Transactions were imported from a file.');
+
+        // Return back with success message
         return back()->with('success', 'Transactions imported successfully!');
     }
+
     public function importPreview(Request $request)
     {
         // Validate the file input
-        $request->validate([
+        $request->validate([                    
             'file' => 'required|mimes:csv,txt'
         ]);
 
@@ -764,23 +972,83 @@ private function extractTextFromReceipt($filePath)
     {
         // Get the organization ID from the session
         $organizationId = session('organization_id');
-    
+        
         // Fetch all transactions for the specific organization, with related contact details and tax rows
         $transactions = Transactions::with(['contactDetails', 'taxRows'])
                                     ->where('organization_id', $organizationId)
+                                    ->whereIn('transaction_type', ['Sales', 'Purchase'])
                                     ->get();
-    
+
         // Check if transactions exist, if not, handle the case
         if ($transactions->isEmpty()) {
-            return response()->json(['message' => 'No transactions found for this organization.'], 404);
+            return back()->with('alert', 'No transactions found for this organization.');
         }
-    
+
+        // Log activity
+        activity('Transaction Download')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'organization_id' => $organizationId,
+                'transaction_count' => $transactions->count(),
+                'ip' => request()->ip(),
+                'browser' => request()->header('User-Agent'),
+            ])
+            ->log('Downloaded transactions as a PDF.');
+
         // Generate the PDF
         $pdf = PDF::loadView('transactions.pdf', compact('transactions'));
-    
+
         // Download the PDF with a specific name
         return $pdf->download('transactions_list.pdf');
     }
    
-
+    private function calculateMissingAmounts($totalAmount, $taxAmount, $netAmount) {
+        $vatRate = 0.12;
+        
+        // Convert string values to floats for calculation
+        $totalAmount = $totalAmount ? (float)$totalAmount : null;
+        $taxAmount = $taxAmount ? (float)$taxAmount : null;
+        $netAmount = $netAmount ? (float)$netAmount : null;
+    
+        // If we have total amount only
+        if ($totalAmount && !$taxAmount && !$netAmount) {
+            $taxAmount = round($totalAmount - ($totalAmount / (1 + $vatRate)), 2);
+            $netAmount = $totalAmount - $taxAmount;
+        }
+        // If we have net amount only
+        elseif (!$totalAmount && !$taxAmount && $netAmount) {
+            $taxAmount = round($netAmount * $vatRate, 2);
+            $totalAmount = $netAmount + $taxAmount;
+        }
+        // If we have tax amount only
+        elseif (!$totalAmount && $taxAmount && !$netAmount) {
+            $netAmount = round($taxAmount / $vatRate, 2);
+            $totalAmount = $netAmount + $taxAmount;
+        }
+        // If we have total and tax amount
+        elseif ($totalAmount && $taxAmount && !$netAmount) {
+            $netAmount = $totalAmount - $taxAmount;
+        }
+        // If we have total and net amount
+        elseif ($totalAmount && !$taxAmount && $netAmount) {
+            $taxAmount = $totalAmount - $netAmount;
+        }
+        // If we have tax and net amount
+        elseif (!$totalAmount && $taxAmount && $netAmount) {
+            $totalAmount = $netAmount + $taxAmount;
+        }
+        // If we don't have any amounts, set defaults
+        elseif (!$totalAmount && !$taxAmount && !$netAmount) {
+            $totalAmount = '0.00';
+            $taxAmount = '0.00';
+            $netAmount = '0.00';
+        }
+    
+        // Format all amounts to 2 decimal places
+        return [
+            'total_amount' => number_format($totalAmount, 2, '.', ''),
+            'tax_amount' => number_format($taxAmount, 2, '.', ''),
+            'net_amount' => number_format($netAmount, 2, '.', '')
+        ];
+    }
 }

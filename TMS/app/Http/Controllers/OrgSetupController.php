@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class OrgSetupController extends Controller
 {
@@ -95,8 +96,18 @@ class OrgSetupController extends Controller
             $validatedData['start_date'] = $validatedData['start_date'] . '-01';
     
             // Create the organization
-            OrgSetup::create($validatedData);
-    
+            $organization = OrgSetup::create($validatedData);
+
+            // Log activity
+            activity('Organization Management')
+                ->performedOn($organization)
+                ->causedBy(Auth::user())
+                ->withProperties(array_merge($validatedData, [
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ]))
+                ->log("Organization {$organization->registration_name} created.");
+
             return response()->json(['success' => true]);
     
         } catch (ValidationException $e) {
@@ -126,10 +137,8 @@ class OrgSetupController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // Find the organization by ID
         $organization = OrgSetup::findOrFail($id);
-    
-        // Manually validate the request
+
         $validatedData = $request->validate([
             'address_line' => 'required|string|max:255',
             'region' => 'required|string|max:255',
@@ -139,11 +148,22 @@ class OrgSetupController extends Controller
             'contact_number' => 'required|string|max:20',
             'email' => 'required|email|max:255',
         ]);
-    
-        // Update the organization with validated data
+
+        $originalData = $organization->getOriginal();
         $organization->update($validatedData);
-    
-        // Redirect back with success message
+
+        // Log activity
+        activity('Organization Management')
+            ->performedOn($organization)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'before' => $originalData,
+                'after' => $validatedData,
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log("Organization {$organization->registration_name} updated.");
+
         return redirect()->back()->with('success', 'Organization details updated successfully.');
     }
     
@@ -158,7 +178,19 @@ class OrgSetupController extends Controller
         ]);
 
         $organization = OrgSetup::findOrFail($request->organization_id);
-        $organization->delete(); // Perform the soft delete
+        $organizationName = $organization->registration_name;
+        $organization->delete();
+
+        // Log activity
+        activity('Organization Management')
+            ->performedOn($organization)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'organization_id' => $organization->id,
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log("Organization {$organizationName} deleted.");
 
         return redirect()->back()->with('success', 'Organization deleted successfully and moved to Recycle Bin.');
     }

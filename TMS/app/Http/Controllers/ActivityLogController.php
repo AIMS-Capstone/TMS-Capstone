@@ -10,14 +10,15 @@ class ActivityLogController extends Controller
 {
     public function audit_log(Request $request)
     {
+        $perPage = $request->input('perPage', 5);
         // Fetch activities with filters
         $activities = Activity::query()
             ->with('causer') // Load related user data
             ->when($request->search, function ($query) use ($request) {
                 $query->where('description', 'like', '%' . $request->search . '%') // Search in activity description
                     ->orWhereHas('causer', function ($q) use ($request) {
-                        $q->where('name', 'like', '%' . $request->search . '%'); // Search in user name
-                    });
+                        $q->where('log_name', 'like', '%' . $request->search . '%'); // Search in user name
+                    }); 
             })
             ->when($request->filter, function ($query) use ($request) {
                 switch ($request->filter) {
@@ -44,7 +45,7 @@ class ActivityLogController extends Controller
                 $query->where('properties->organization_id', $request->organization_id);
             })
             ->latest()
-            ->paginate(10);
+            ->paginate($perPage);
 
         // Fetch all organizations for the dropdown filter
         $organizations = OrgSetup::all();

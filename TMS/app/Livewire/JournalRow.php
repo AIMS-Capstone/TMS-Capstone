@@ -16,6 +16,19 @@ class JournalRow extends Component
   
     public $type; // Journal entry type (journal, sales, purchase, etc.)
     public $mode; // Mode for the row (create/edit)
+    protected $rules = [
+        'description' => 'required|string',
+        'coa' => 'required|exists:coas,id',
+        'debit' => 'required|numeric|min:0',
+        'credit' => 'required|numeric|min:0',
+    ];
+
+    protected $messages = [
+        'description.required' => 'Description is required.',
+        'coa.required' => 'Please select an account.',
+        'debit.numeric' => 'Debit must be a valid number.',
+        'credit.numeric' => 'Credit must be a valid number.',
+    ];
 
     public function mount($index, $journalRow = [], $type = 'journal', $mode = 'create')
     {
@@ -39,8 +52,16 @@ class JournalRow extends Component
     // Watch for updates on debit or credit fields
     public function updated($field)
     {
-        if (in_array($field, ['debit', 'credit', 'coa'])) {
-            // Make sure to adjust totals and dispatch updates when debit/credit change
+        $this->validateOnly($field);
+
+        if (in_array($field, ['debit', 'credit'])) {
+            // Ensure only one field can have a value
+            if ($this->debit > 0 && $this->credit > 0) {
+                $this->addError('balance', 'Cannot have both debit and credit values.');
+                return;
+            }
+
+            // Your existing update logic
             $this->dispatch('journalRowUpdated', [
                 'index' => $this->index,
                 'description' => $this->description,
@@ -50,6 +71,7 @@ class JournalRow extends Component
             ])->to($this->getParentComponentClass());
         }
     }
+    
 
     protected function getParentComponentClass()
     {

@@ -386,7 +386,7 @@
   { "name": "San Isidro", "province": "Nueva Ecija", "city": true, "zip_code": "3106" },
   { "name": "San Jose", "province": "Nueva Ecija", "city": true, "zip_code": "3121" },
   { "name": "San Leonardo", "province": "Nueva Ecija", "city": true, "zip_code": "3102" },
-  { "name": "Santa Rosa", "province": "Nueva Ecija", "city": true, "zip_code": "3101" },
+  { "name": "Santa Rosa (Nueva Ecija)", "province": "Nueva Ecija", "city": true, "zip_code": "3101" },
   { "name": "Santo Domingo", "province": "Nueva Ecija", "city": true, "zip_code": "3133" },
   { "name": "Talavera", "province": "Nueva Ecija", "city": true, "zip_code": "3114" },
   { "name": "Talugtug", "province": "Nueva Ecija", "city": true, "zip_code": "3118" },

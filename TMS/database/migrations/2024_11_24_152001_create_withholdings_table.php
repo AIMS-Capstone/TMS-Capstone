@@ -21,6 +21,7 @@ class CreateWithholdingsTable extends Migration
             $table->unsignedTinyInteger('month')->nullable();
             $table->unsignedTinyInteger('quarter')->nullable();
             $table->unsignedSmallInteger('year');
+            $table->enum('status', ['Filed', 'Unfiled'])->default('Unfiled'); 
             $table->timestamps();
             $table->softDeletes(); // For soft delete
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();

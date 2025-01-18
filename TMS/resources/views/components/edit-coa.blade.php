@@ -32,15 +32,21 @@
                 @method('PUT')
 
                 <div class="mb-5 flex justify-between items-start">
-                    <!-- COA Type -->
+                    <!-- COA Type -->   
                     <div class="w-2/3 pr-4">
                         <label for="coaType" class="block text-sm font-bold text-zinc-700">Account Type</label>
-                        <input type="text" id="coaType" name="account_type_input" 
+                        <select id="coaType" name="account_type_input" 
                             x-bind:value="coa.type" 
                             class="block w-full py-3 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" 
-                            required 
-                            placeholder="Expense"
-                        >
+                            required>
+                            <option value="" disabled selected>Select Account Type</option>
+                            <option value="Assets">Assets</option>
+                            <option value="Liabilities">Liabilities</option>
+                            <option value="Equity">Equity</option>
+                            <option value="Revenue">Revenue</option>
+                            <option value="Cost of Sales">Cost of Sales</option>
+                            <option value="Expenses">Expenses</option>
+                        </select>
                     </div>
                     <div class="w-2/3 pr-3">
                         <label for="coaSubType" class="block text-sm font-bold text-zinc-700">Sub Type</label>

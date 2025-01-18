@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Log;
 
 class WithHolding extends Model
 {
@@ -24,6 +23,7 @@ class WithHolding extends Model
         'month',
         'quarter',
         'year',
+        'status',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -95,7 +95,6 @@ class WithHolding extends Model
        static::deleting(function ($withHolding) {
             if (!$withHolding->isForceDeleting()) {
                 $withHolding->deleted_by = Auth::id();
-                Log::info("Soft deleting WithHolding ID: {$withHolding->id}, deleted_by: {$withHolding->deleted_by}");
                 $withHolding->save();
             }
         });

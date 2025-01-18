@@ -9,7 +9,7 @@ class Form1601EQAtcDetail extends Model
 {
     use HasFactory;
 
-    protected $table = '1601eq_atc_details';
+    protected $table = '1601EQ_atc_details';
 
     protected $fillable = [
         'withholding_id', 

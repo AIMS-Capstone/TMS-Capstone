@@ -172,7 +172,7 @@ $organizationId = session('organization_id');
                                     </div>
                                 </div>
                             </div>
-
+       
                             <!-- End row -->
                             <div class="flex space-x-4 items-center pr-10 ml-auto">
                                 <button 
@@ -329,6 +329,9 @@ $organizationId = session('organization_id');
                                         @endif
                                     </tbody>
                                 </table>
+                                <div class="mx-12 mb-4">
+                                    {{ $taxReturns->appends(request()->input())->links('vendor.pagination.custom') }}
+                                 </div>
                             </div>
                         </div>
                     </div>
@@ -415,12 +418,12 @@ $organizationId = session('organization_id');
                                 <select id="year" name="year" class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer" required>
                                     <option value="">Select Year</option>
                                     @php
-                                        $currentYear = date('Y');
-                                        $startYear = $currentYear - 100;
-                                    @endphp
-                                    @for ($year = $startYear; $year <= $currentYear; $year++)
-                                        <option value="{{ $year }}">{{ $year }}</option>
-                                    @endfor
+                                    $currentYear = date('Y');
+                                    $startYear = $currentYear - 100;
+                                @endphp
+                                @for ($year = $currentYear; $year >= $startYear; $year--)
+                                    <option value="{{ $year }}">{{ $year }}</option>
+                                @endfor
                                 </select>
                             </div>
 
@@ -431,19 +434,6 @@ $organizationId = session('organization_id');
                                     @change="selectedType = month.includes('Q') ? '2550Q' : '2550M'" 
                                     required>
                                     <option value="">Select Month</option>
-                                    <!-- Monthly options -->
-                                    <option value="1">January</option>
-                                    <option value="2">February</option>
-                                    <option value="3">March</option>
-                                    <option value="4">April</option>
-                                    <option value="5">May</option>
-                                    <option value="6">June</option>
-                                    <option value="7">July</option>
-                                    <option value="8">August</option>
-                                    <option value="9">September</option>
-                                    <option value="10">October</option>
-                                    <option value="11">November</option>
-                                    <option value="12">December</option>
                                     <!-- Quarterly options -->
                                     <option value="Q1">January - March (Q1)</option>
                                     <option value="Q2">April - June (Q2)</option>

@@ -35,16 +35,18 @@ $organizationId = session('organization_id');
                     checkAll: false,
                     selectedRows: [],
                     showDeleteCancelButtons: false,
+                    showConfirmDeleteModal: false,
+                    showSuccessDeleteModal: false,
 
-                    // Toggle a single row
                     toggleCheckbox(id) {
-                        if (this.selectedRows.includes(id)) {
-                            this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
-                        } else {
-                        this.selectedRows.push(id);
-                        }
-                        console.log(this.selectedRows); // Debugging line
-                    },
+                                            if (this.selectedRows.includes(id)) {
+                                                this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
+                                            } else {
+                                                this.selectedRows.push(id);
+                                            }
+                                            // Update the checkAll state based on all checkboxes' status
+                                            this.checkAll = this.selectedRows.length === {{ json_encode($with_holdings->count()) }};
+                                        },
                                         
                     // Toggle all rows
                     toggleAll() {
@@ -63,9 +65,7 @@ $organizationId = session('organization_id');
                             alert('No rows selected for deletion.');
                             return;
                         }
-
-                        if (confirm('Are you sure you want to archive the selected row/s?')) {
-                            fetch('/tax_return/with_holding/0619E/destroy', {
+                        fetch('/tax_return/with_holding/0619E/destroy', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -75,12 +75,15 @@ $organizationId = session('organization_id');
                             })
                             .then(response => {
                                 if (response.ok) {
-                                    location.reload();
-                                } else {
-                                    alert('Error deleting rows.');
-                                }
+                                                    this.showSuccessDeleteModal = true; // Show success modal
+                                                    setTimeout(() => {
+                                                        location.reload();
+                                                    }, 700);
+                                                } else {
+                                                    alert('Error deleting rows.');
+                                                
+                                } 
                             });
-                        }
                     },
 
                     // Cancel selection
@@ -100,20 +103,20 @@ $organizationId = session('organization_id');
                     <div class="container mx-auto">
                         <div class="flex flex-row space-x-2 items-center justify-between">
                             <div class="flex flex-row space-x-2 items-center ps-6">
-                                <div class="relative w-80 p-4">
-                                    <form x-target="table0619E" action="/0619E" role="search" aria-label="Table" autocomplete="off">
-                                        <input 
+                                <div class="relative w-80 p-5">
+                                        <form x-target="table0619E" action="/tax_return/with_holding/0619E" role="search" aria-label="Table" autocomplete="off">
+                                            <input 
                                             type="search" 
-                                            name="search" 
-                                            class="w-full pl-10 pr-4 py-[7px] text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900" 
+                                            name="search"
+                                            class="w-full pl-10 pr-4 py-[7px] text-sm border border-zinc-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-900 focus:border-blue-900" 
                                             aria-label="Search Term" 
                                             placeholder="Search..." 
                                             @input.debounce="$el.form.requestSubmit()" 
                                             @search="$el.form.requestSubmit()"
-                                        >
-                                    </form>
-                                    <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                </div>
+                                            >
+                                            </form>
+                                        <i class="fa-solid fa-magnifying-glass absolute left-8 top-1/2 transform -translate-y-1/2 text-zinc-400"></i>
+                                    </div>
                                 <div class="flex flex-row items-center space-x-4">
                                     <div class="relative inline-block text-left sm:w-auto w-full z-30">
                                         <button id="filterButton" class="flex items-center text-zinc-600 hover:text-zinc-800 w-full hover:shadow-sm">
@@ -355,9 +358,9 @@ $organizationId = session('organization_id');
                                     <thead class="bg-neutral-100 text-sm text-neutral-700">
                                         <tr>
                                             <th scope="col" class="p-4">
-                                                <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
+                                                <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600" x-cloak>
                                                     <div class="relative flex items-center">
-                                                        <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"
+                                                        <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition"
                                                         />
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -374,19 +377,19 @@ $organizationId = session('organization_id');
                                     </thead>
                                     <tbody class="divide-y divide-neutral-300 py-[7px]">
                                         @forelse ($with_holdings as $with_holding)
-                                            <tr class="hover:bg-blue-50 cursor-pointer ease-in-out">
-                                                <td class="p-4">
-                                                    <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
-                                                        <div class="relative flex items-center">
-                                                            <input type="checkbox" @click="toggleCheckbox('{{ $with_holding->id }}')" :checked="selectedRows.includes('{{ $with_holding->id }}')" id="with_holding{{ $with_holding->id }}" 
-                                                                class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"
-                                                            />
-                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                                            </svg>
-                                                        </div>
-                                                    </label>
-                                                </td>
+                                            <td class="py-3 px-4">
+                                                        <!-- Body Checkbox for Individual Selection -->
+                                                            <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600" x-cloak>
+                                                                <div class="relative flex items-center">
+                                                                    <input type="checkbox" @click="toggleCheckbox('{{ $with_holding->id }}')" :checked="selectedRows.includes('{{ $with_holding->id }}')" id="with_holding{{ $with_holding->id }}" 
+                                                                        class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition"
+                                                                    />
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                                                    </svg>
+                                                                </div>
+                                                            </label>
+                                                        </td>
                                                 <td class="py-3 px-4 text-[13px] font-semibold hover:font-bold hover:underline hover:text-blue-500" 
                                                     onclick="window.location='{{ route('form0619E.create', ['id' => $with_holding->id]) }}'">{{ $with_holding->title ?? 'N/A' }}</td>
                                                 <td class="py-3 px-4">{{ \Carbon\Carbon::createFromDate($with_holding->year, $with_holding->month, 1)->format('F Y') ?? 'N/A' }}</td>
@@ -410,55 +413,47 @@ $organizationId = session('organization_id');
                         </div>
                     </div>
 
-                    {{-- <!-- Delete Confirmation Modal -->Hindi nag-aappear lahat ng delete modal sa TAX RETURNS, pls help --}}
-                    <div  x-show="showConfirmDeleteModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50"
-                        x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)">
-                        
-                        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full overflow-auto">
-                            <div class="flex flex-col items-center">
-                                <!-- Icon -->
-                                <div class="mb-4">
-                                    <i class="fas fa-exclamation-triangle text-red-700 text-8xl"></i>
-                                </div>
+                    <!-- Delete Confirmation Modal -->
+                                        <div 
+                                            x-show="showConfirmDeleteModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
+                                            @click.away="showConfirmDeleteModal = false"
+                                        >
+                                            <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <!-- Icon -->
+                                                    <div class="mb-4">
+                                                        <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>
+                                                    </div>
 
-                                <!-- Title -->
-                                <h2 class="text-2xl font-extrabold text-zinc-700 mb-2">Delete Item(s)</h2>
+                                                    <!-- Title -->
+                                                    <h2 class="text-2xl font-extrabold text-zinc-800 mb-2">Delete 0619E</h2>
 
-                                <!-- Description -->
-                                <p class="text-sm text-zinc-700 text-center">
-                                    You're going to Delete the selected item(s) in the Withholding Tax Return table. Are you sure?
-                                </p>
+                                                    <!-- Description -->
+                                                    <p class="text-sm text-zinc-600 text-center">
+                                                        You're going to delete permanently the selected item(s) in the Withholding 0619E. Are you sure?
+                                                    </p>
 
-                                <!-- Actions -->
-                                <div class="flex justify-center space-x-8 mt-6 w-full">
-                                    <button 
-                                        @click="showConfirmDeleteModal = false; showDeleteCancelButtons = true;" 
-                                        class="px-4 py-2 rounded-lg text-sm text-zinc-700 font-bold transition"
-                                        > 
-                                        Cancel
-                                    </button>
-                                    <button 
-                                        @click="deleteRows(); showConfirmDeleteModal = false;" 
-                                        class="px-5 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg text-sm font-medium transition"
-                                        > 
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons --> 
-                    <div x-show="showDeleteCancelButtons" class="flex justify-center py-4" x-cloak>
-                        <button @click="deleteRows" :disabled="selectedRows.length === 0" 
-                            class="border px-3 py-2 rounded-lg text-sm text-red-600 border-red-600 bg-red-100 hover:bg-red-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 group">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
-                            <span class="text-red-600 transition group-hover:text-red-600">Delete Selected</span><span class="transition group-hover:text-red-500" x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span>
-                        </button>
-                        <button @click="cancelSelection" class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"> 
-                            Cancel
-                        </button>
-                    </div>
+                                                    <!-- Actions -->
+                                                    <div class="flex justify-center space-x-8 mt-6 w-full">
+                                                        <button 
+                                                            @click="showConfirmDeleteModal = false; enableButtons(); enableButtons(); showDeleteCancelButtons = true; disableButtons();" 
+                                                            class="px-4 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-900 font-bold transition"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        <button 
+                                                            @click="deleteRows(); showConfirmDeleteModal = false;" 
+                                                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
                     <!-- Pagination -->
                     @if (count($with_holdings) > 0)
@@ -466,6 +461,50 @@ $organizationId = session('organization_id');
                             {{ $with_holdings->links('vendor.pagination.custom') }}
                         </div>
                     @endif
+
+                    <!-- Success Delete Modal -->
+                                        <div 
+                                            x-show="showSuccessDeleteModal" 
+                                            x-cloak 
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-effect="document.body.classList.toggle('overflow-hidden', showSuccessDeleteModal)"
+                                            @click.away="showSuccessDeleteModal = false"
+                                        >
+                                            <div class="bg-zinc-200 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                                <div class="flex flex-col items-center">
+                                                    <i class="fas fa-check-circle text-red-500 text-6xl mb-4"></i>
+                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Deletion Successful!</h2>
+                                                    <p class="text-sm text-zinc-700 text-center">
+                                                        The selected withholding 0619E have been move to recyle bin.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                    <!-- Action Buttons --> 
+                    <div x-show="showDeleteCancelButtons" class="flex justify-center py-4" x-cloak>
+                        <div class="flex justify-center py-4" x-cloak>
+                                    <!-- Delete and Cancel buttons -->
+                                    <div class="flex justify-center py-4" x-show="showDeleteCancelButtons">
+                                        <button 
+                                            type="button" 
+                                            @click="showConfirmDeleteModal = true; showDeleteCancelButtons = true;"
+                                            :disabled="selectedRows.length === 0"
+                                            class="border px-3 py-2 mx-2 rounded-lg text-sm text-red-600 border-red-600 bg-red-100 hover:bg-red-200 transition disabled:opacity-50 disabled:cursor-not-allowed group flex items-center space-x-2"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition group-hover:text-red-500" viewBox="0 0 24 24">
+                                                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/>
+                                            </svg>
+                                            <span class="text-red-600 transition group-hover:text-red-600">Delete Selected <span x-text="selectedCount > 0 ? '(' + selectedCount + ')' : ''"></span></span>
+                                        </button>
+                                        <button 
+                                            @click="cancelSelection(); enableButtons();" 
+                                            class="border px-3 py-2 mx-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-100 transition"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                    </div>
                 </div>
             </div>
         </div>

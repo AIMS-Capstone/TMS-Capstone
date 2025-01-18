@@ -179,7 +179,7 @@
 
                                         @if($clients->isEmpty())
                                             <tr>
-                                                <td colspan="5" class="text-center p-2">
+                                                <td colspan="6" class="text-center p-2">
                                                     <img src="{{ asset('images/Box.png') }}" alt="No data available" class="mx-auto w-40 h-40" />
                                                     <h1 class="font-extrabold">No Client Users yet</h1>
                                                     <p class="text-sm text-neutral-500">Start creating client user accounts in the <br> organization table.</p>

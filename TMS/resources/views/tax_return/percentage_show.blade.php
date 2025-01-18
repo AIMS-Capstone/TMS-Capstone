@@ -1,5 +1,82 @@
 <x-app-layout>
-    <div class="py-12">
+    <div  x-data="{
+        showCheckboxes: false, 
+          showConfirmDeleteModal: false,
+        checkAll: false, 
+        selectedRows: [], 
+        showDeleteCancelButtons: false,
+
+        selectedType: '',
+        
+        // Toggle a single row
+        toggleCheckbox(id) {
+            if (this.selectedRows.includes(id)) {
+                this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
+            } else {
+                this.selectedRows.push(id);
+            }
+        },
+
+        // Toggle all rows
+        toggleAll() {
+            if (this.checkAll) {
+            this.selectedRows = {{ json_encode($paginatedTaxRows->pluck('transaction_id')->toArray()) }};
+
+            } else {
+                this.selectedRows = []; 
+            }
+            console.log(this.selectedRows); // For debugging
+        },
+
+        // Handle deletion
+        deleteRows() {
+            if (this.selectedRows.length === 0) {
+                alert('No rows selected for deletion.');
+                return;
+            }
+
+            if (confirm('Are you sure you want to archive the selected transaction(s)?')) {
+                fetch('/tax-return-transaction/deactivate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ ids: this.selectedRows,
+                    tax_return_id: {{ $taxReturn->id }}
+                    }),
+                    
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();  
+                    } else {
+                        alert('Error deleting transactions.');
+                    }
+                });
+            }
+        },
+
+        // Cancel selection
+        cancelSelection() {
+            this.selectedRows = []; 
+            this.checkAll = false; 
+            this.showCheckboxes = false; 
+            this.showDeleteCancelButtons = false;
+        },
+
+        get selectedCount() {
+            return this.selectedRows.length;
+        },
+
+        // Handle filter change
+        filterTransactions() {
+            const url = new URL(window.location.href);
+            url.searchParams.set('type', this.selectedType);
+            window.location.href = url.toString();
+        }
+    }"
+    class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow-sm sm:rounded-lg">
                 {{-- Breadcrumbs --}}
@@ -130,82 +207,7 @@
 
                     <!-- Transactions Header -->
                     <div 
-                        x-data="{
-                        showCheckboxes: false, 
-                        checkAll: false, 
-                        selectedRows: [], 
-                        showDeleteCancelButtons: false,
-
-                        selectedType: '',
-                        
-                        // Toggle a single row
-                        toggleCheckbox(id) {
-                            if (this.selectedRows.includes(id)) {
-                                this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
-                            } else {
-                                this.selectedRows.push(id);
-                            }
-                        },
-
-                        // Toggle all rows
-                        toggleAll() {
-                            if (this.checkAll) {
-                            this.selectedRows = {{ json_encode($paginatedTaxRows->pluck('transaction_id')->toArray()) }};
-
-                            } else {
-                                this.selectedRows = []; 
-                            }
-                            console.log(this.selectedRows); // For debugging
-                        },
-
-                        // Handle deletion
-                        deleteRows() {
-                            if (this.selectedRows.length === 0) {
-                                alert('No rows selected for deletion.');
-                                return;
-                            }
-
-                            if (confirm('Are you sure you want to archive the selected transaction(s)?')) {
-                                fetch('/tax-return-transaction/deactivate', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                    },
-                                    body: JSON.stringify({ ids: this.selectedRows,
-                                    tax_return_id: {{ $taxReturn->id }}
-                                    }),
-                                    
-                                })
-                                .then(response => {
-                                    if (response.ok) {
-                                        location.reload();  
-                                    } else {
-                                        alert('Error deleting transactions.');
-                                    }
-                                });
-                            }
-                        },
-
-                        // Cancel selection
-                        cancelSelection() {
-                            this.selectedRows = []; 
-                            this.checkAll = false; 
-                            this.showCheckboxes = false; 
-                            this.showDeleteCancelButtons = false;
-                        },
-
-                        get selectedCount() {
-                            return this.selectedRows.length;
-                        },
-
-                        // Handle filter change
-                        filterTransactions() {
-                            const url = new URL(window.location.href);
-                            url.searchParams.set('type', this.selectedType);
-                            window.location.href = url.toString();
-                        }
-                    }"
+                       
                     class="container mx-auto pt-2 overflow-hidden">
                     <!-- Table -->
                     <div class="mb-12 mt-1 mx-12 overflow-hidden max-w-full border-neutral-300">

@@ -1,0 +1,5 @@
+﻿Date,Amount,Tax Type,Category,ATC,COA Code,Invoice No.,Reference No.,Description,Contact TIN,Contact Name,First Name,Last Name,Middle Name,Address Line,City,Zip Code
+11/10/2024,20000,VOS,Goods,VQ010,190,21423,51742,Vat on Purchase,123-123-123-12345,Jeff,Ramos,James,Rodriguez,123 Yakal Street,Santa Rosa,4026
+11/10/2024,45000,STG,Goods,VM040,501,21443,51666,Capital Goods,123-456-789,Peter,Santos,Garcia,Villanueva,#453 Salaban,San Pedro,4026
+11/8/2024,25000,ZRS,Goods,VM110,160,21443,51666,Goods not Qualified ,123-123-124,Peter,Santos,Garcia,Villanueva,#453 Salaban,San Pedro,4026
+11/8/2024,35000,TES,Goods,VM120,314,21443,51666,Tax Exempt Sales,124-245-123-247,Peter,Santos,Garcia,Villanueva,#453 Salaban,San Pedro,4026

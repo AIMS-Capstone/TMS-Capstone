@@ -16,7 +16,7 @@ class OrgsetupSeeder extends Seeder
         // Original data
         Orgsetups::create([
             'type' => 'Non-individual',
-            'registration_name' => 'PUPSRC ET AL NIG',
+            'registration_name' => 'Polytechnic University',
             'line_of_business' => 'Software Development',
             'address_line' => 'Brgy, Tagapo',
             'region' => 'Region 4-A',

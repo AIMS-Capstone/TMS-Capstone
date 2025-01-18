@@ -20,16 +20,33 @@ class withHolding1604EController extends Controller
     public function index1604E(Request $request)
     {
         $organizationId = session('organization_id');
-
-        // Get the perPage value from the request, default to 5
         $perPage = $request->input('perPage', 5);
-        $with_holdings = $this->getWithHoldings($organizationId, '1604E', $perPage);
+
+        // Start the query with the organization filter and type
+        $query = WithHolding::where('type', '1604E')
+            ->where('organization_id', $organizationId); // Filter by organization ID
+
+        if ($request->has('search') && $request->search != '') {
+            $search = trim($request->search); // Trim whitespace from the search term
+
+            // Add search conditions
+            $query->where(function ($q) use ($search) {
+                $q->where('year', 'LIKE', '%' . $search . '%');
+            })->orWhereHas('creator', function ($q) use ($search) {
+                $q->where('first_name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('last_name', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        // Paginate the results
+        $with_holdings = $query->paginate($perPage);
+
         return view('tax_return.with_holding.1604E', compact('with_holdings'));
     }
 
     public function generate1604E(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'year' => 'required|numeric|min:1900|max:' . date('Y'),
             'type' => 'required|string|in:1604E',
         ]);
@@ -37,39 +54,81 @@ class withHolding1604EController extends Controller
         $organizationId = session('organization_id');
 
         if (!$organizationId) {
+            activity('Generate 1604E Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'error' => 'Organization setup ID not found',
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log('Failed to generate 1604E due to missing organization ID.');
+
             return redirect()->back()->withErrors(['error' => 'Organization setup ID not found.']);
         }
 
         // Check for existing WithHolding record
         $existingWithHolding = WithHolding::where('type', '1604E')
-            ->where('year', $request->year)
+            ->where('year', $validated['year'])
             ->where('organization_id', $organizationId)
             ->first();
 
         // Check for existing Form1604E record
-        $existingForm1604E = Form1604E::where('year', $request->year)
+        $existingForm1604E = Form1604E::where('year', $validated['year'])
             ->where('org_setup_id', $organizationId)
             ->first();
 
-        // Redirect if either exists
         if ($existingWithHolding) {
+            activity('Duplicate Withholding Record')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'withholding_id' => $existingWithHolding->id,
+                    'year' => $validated['year'],
+                    'organization_id' => $organizationId,
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log('Attempted to generate 1604E but withholding record already exists.');
+
             return redirect()->route('form1604E.preview', ['id' => $existingWithHolding->id])
                 ->with('warning', '1604E Withholding form already exists for this year.');
         }
 
         if ($existingForm1604E) {
+            activity('Duplicate Form Record')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'form_id' => $existingForm1604E->id,
+                    'year' => $validated['year'],
+                    'organization_id' => $organizationId,
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log('Attempted to generate 1604E but form record already exists.');
+
             return redirect()->route('form1604E.preview', ['id' => $existingForm1604E->id])
                 ->with('warning', '1604E form already exists for this year.');
         }
 
-        // Create new withholding record if neither exists
+        // Create new withholding record
         $withHolding = WithHolding::create([
-            'type' => $request->type,
+            'type' => $validated['type'],
             'organization_id' => $organizationId,
             'title' => 'Annual Information Return of Creditable Income Taxes Withheld (Expanded)',
-            'year' => $request->year,
+            'year' => $validated['year'],
             'created_by' => Auth::id(),
         ]);
+
+        activity('Withholding Record Creation')
+            ->performedOn($withHolding)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'withholding_id' => $withHolding->id,
+                'year' => $validated['year'],
+                'organization_id' => $organizationId,
+                'ip' => $request->ip(),
+                'browser' => $request->header('User-Agent'),
+            ])
+            ->log('Withholding record created for 1604E.');
 
         return redirect()->route('with_holding.1604E', ['id' => $withHolding->id])
             ->with('success', 'Withholding Tax Return for 1604E has been generated.');
@@ -240,7 +299,10 @@ class withHolding1604EController extends Controller
 
         $orgSetup = OrgSetup::findOrFail(session('organization_id'));
 
-        return view('tax_return.with_holding.1604E_form', compact('withHolding', 'orgSetup'));
+        // Pass form1604E as null (or other logic if needed)
+        $form1604E = null;
+
+        return view('tax_return.with_holding.1604E_form', compact('withHolding', 'orgSetup', 'form1604E'));
     }
 
     /**
@@ -248,26 +310,83 @@ class withHolding1604EController extends Controller
      */
     public function storeForm1604E(Request $request, $id)
     {
-        $request->validate([
-            'year' => 'required|numeric|digits:4|min:1900|max:' . date('Y'),
-            'amended_return' => 'required|boolean',
-            'number_of_sheets' => 'nullable|integer|min:1',
-            'agent_category' => 'required|string|in:Government,Private',
-            'agent_top' => 'nullable|required_if:agent_category,Private|in:Yes,No',
-        ]);
+        try {
+            // Validate the request
+            $validated = $request->validate([
+                'year' => 'required|numeric|digits:4|min:1900|max:' . date('Y'),
+                'amended_return' => 'required|boolean',
+                'number_of_sheets' => 'nullable|integer|min:1',
+                'agent_category' => 'required|string|in:Government,Private',
+                'agent_top' => 'nullable|required_if:agent_category,Private|in:Yes,No',
+            ]);
+
+            // Log successful validation
+            activity('Form Validation')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'withholding_id' => $id,
+                    'validated_data' => $validated,
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log('Validation succeeded for Form 1604E submission.');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Log validation errors
+            activity('Validation Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'withholding_id' => $id,
+                    'errors' => $e->errors(),
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log('Validation failed for Form 1604E submission.');
+
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        }
 
         $organizationId = session('organization_id');
 
-        $form1604E = Form1604E::updateOrCreate(
-            ['withholding_id' => $id],
-            $request->only(['year', 'amended_return', 'number_of_sheets', 'agent_category', 'agent_top']) + [
-                'org_setup_id' => $organizationId,
-            ]
-        );
+        try {
+            // Create or update the Form1604E record
+            $form1604E = Form1604E::updateOrCreate(
+                ['withholding_id' => $id],
+                $validated + [
+                    'org_setup_id' => $organizationId,
+                ]
+            );
 
-        // Redirect with withholding ID
-        return redirect()->route('form1604E.preview', ['id' => $id])
-            ->with('success', 'Form 1604E submitted successfully.');
+            // Log the creation or update of the form
+            activity('Form Submission')
+                ->performedOn($form1604E)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'form_id' => $form1604E->id,
+                    'withholding_id' => $id,
+                    'form_data' => $form1604E->toArray(),
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log('Form 1604E created or updated successfully.');
+
+            return redirect()->route('form1604E.preview', ['id' => $id])
+                ->with('success', 'Form 1604E submitted successfully.');
+
+        } catch (\Exception $e) {
+            // Log errors during creation or update
+            activity('Form Submission Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'withholding_id' => $id,
+                    'error_message' => $e->getMessage(),
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log('Error occurred during Form 1604E submission.');
+
+            return redirect()->back()->withErrors(['error' => 'Failed to submit Form 1604E. Please try again.']);
+        }
     }
 
     public function previewForm1604E($id)
@@ -335,40 +454,104 @@ class withHolding1604EController extends Controller
 
     public function updateForm1604E(Request $request, $id)
     {
-        $request->validate([
-            'amended_return' => 'required|boolean',
-            'agent_category' => 'required|string|in:Government,Private',
-        ]);
+        try {
+            // Validate the request
+            $validated = $request->validate([
+                'amended_return' => 'required|boolean',
+                'agent_category' => 'required|string|in:Government,Private',
+            ]);
 
-        $form1604E = Form1604E::where('withholding_id', $id)->firstOrFail();
+            // Log the validation success
+            activity('Form Validation')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'withholding_id' => $id,
+                    'validated_data' => $validated,
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log('Validation succeeded for updating Form 1604E.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Log validation errors
+            activity('Validation Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'withholding_id' => $id,
+                    'errors' => $e->errors(),
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log('Validation failed for updating Form 1604E.');
 
-        // Update the fields
-        $form1604E->update([
-            'amended_return' => $request->amended_return,
-            'agent_category' => $request->agent_category,
-        ]);
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        }
 
-        return redirect()->route('form1604E.preview', ['id' => $id])
-            ->with('success', 'Form 1604E submitted successfully.');
+        try {
+            // Find the form record
+            $form1604E = Form1604E::where('withholding_id', $id)->firstOrFail();
+
+            // Track original data for logging
+            $originalAttributes = $form1604E->getOriginal();
+
+            // Update the fields
+            $form1604E->update([
+                'amended_return' => $validated['amended_return'],
+                'agent_category' => $validated['agent_category'],
+            ]);
+
+            // Log the update success
+            activity('Form Update')
+                ->performedOn($form1604E)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'form_id' => $form1604E->id,
+                    'withholding_id' => $id,
+                    'original_data' => $originalAttributes,
+                    'updated_data' => $form1604E->getAttributes(),
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log('Form 1604E updated successfully.');
+
+            return redirect()->route('form1604E.preview', ['id' => $id])
+                ->with('success', 'Form 1604E updated successfully.');
+        } catch (\Exception $e) {
+            // Log update errors
+            activity('Update Error')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'withholding_id' => $id,
+                    'error_message' => $e->getMessage(),
+                    'ip' => $request->ip(),
+                    'browser' => $request->header('User-Agent'),
+                ])
+                ->log('Error occurred while updating Form 1604E.');
+
+            return redirect()->back()->withErrors(['error' => 'Failed to update Form 1604E. Please try again.']);
+        }
     }
 
     public function downloadForm1604E($id)
     {
+        // Fetch the form and related data
         $form = Form1604E::with(['organization', 'withholding'])->findOrFail($id);
         $withHolding = $form->withholding;
 
         $year = $withHolding->year;
         $orgSetupId = $withHolding->organization_id;
 
+        // Fetch related Form1601EQ records
         $form1601EQRecords = Form1601EQ::where('org_setup_id', $orgSetupId)
             ->where('year', $year)
             ->get();
 
+        // Calculate totals
         $totalTaxesWithheld = $form1601EQRecords->sum('total_taxes_withheld');
         $totalRemitted = $form1601EQRecords->sum('total_remittances_made');
         $totalPenalties = $form1601EQRecords->sum('penalties');
         $overRemittance = max(0, $totalRemitted - $totalTaxesWithheld);
 
+        // Quarter names and calculations
         $quarterNames = [
             1 => ['name' => '1st Quarter (January - March)'],
             2 => ['name' => '2nd Quarter (April - June)'],
@@ -384,12 +567,30 @@ class withHolding1604EController extends Controller
                 'taxes_withheld' => $records->sum('total_taxes_withheld'),
                 'penalties' => $records->sum(fn($record) => $record->calculateTotalPenalties()),
                 'total_remitted' => $records->sum(fn($record) => $record->calculateTotalRemittances()),
-                'remittance_date' => $records->max('date_of_remittance') 
-                                    ? Carbon::parse($records->max('date_of_remittance'))->format('m/d/Y') 
-                                    : Carbon::parse($records->max('created_at'))->format('m/d/Y'),
+                'remittance_date' => $records->max('date_of_remittance')
+                    ? Carbon::parse($records->max('date_of_remittance'))->format('m/d/Y')
+                    : Carbon::parse($records->max('created_at'))->format('m/d/Y'),
             ];
         });
 
+        // Log the download action
+        activity('Form Download')
+            ->performedOn($form)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'form_id' => $form->id,
+                'year' => $form->year,
+                'organization_id' => $form->organization->id ?? null,
+                'total_taxes_withheld' => $totalTaxesWithheld,
+                'total_remitted' => $totalRemitted,
+                'total_penalties' => $totalPenalties,
+                'over_remittance' => $overRemittance,
+                'ip' => request()->ip(),
+                'browser' => request()->header('User-Agent'),
+            ])
+            ->log("Form 1604E (ID: {$form->id}) was downloaded.");
+
+        // Generate PDF
         $pdf = Pdf::loadView('tax_return.with_holding.1604E_pdf', [
             'form' => $form,
             'organization' => $form->organization,
@@ -400,10 +601,78 @@ class withHolding1604EController extends Controller
             'overRemittance' => $overRemittance,
         ]);
 
+        // Customize the filename
         $filename = '1604E_Form_' . $form->year . '.pdf';
 
+        // Return the PDF for download
         return $pdf->download($filename);
     }
+
+    public function markForm1604EFiled($id)
+{
+    try {
+        Log::info('Marking WithHolding as Filed - Start', [
+            'withholding_id' => $id,
+            'user_id' => Auth::id(),
+            'timestamp' => now(),
+        ]);
+
+        // Fetch the withholding record
+        $withHolding = WithHolding::findOrFail($id);
+
+        Log::info('WithHolding record retrieved successfully', [
+            'withholding_id' => $withHolding->id,
+            'current_status' => $withHolding->status,
+        ]);
+
+        // Update the status to "Filed"
+        $withHolding->update(['status' => 'Filed']);
+
+        Log::info('WithHolding status updated to Filed', [
+            'withholding_id' => $withHolding->id,
+            'updated_status' => $withHolding->status,
+        ]);
+
+        // Record activity
+        activity('Status Update')
+            ->performedOn($withHolding)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'withholding_id' => $withHolding->id,
+                'previous_status' => $withHolding->getOriginal('status'),
+                'new_status' => 'Filed',
+                'user_id' => Auth::id(),
+                'ip' => request()->ip(),
+            ])
+            ->log("WithHolding ID {$withHolding->id} marked as Filed.");
+
+        Log::info('WithHolding marked as Filed - Success', [
+            'withholding_id' => $withHolding->id,
+            'user_id' => Auth::id(),
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'WithHolding marked as Filed.']);
+    } catch (\Exception $e) {
+        Log::error('Error marking WithHolding as Filed', [
+            'withholding_id' => $id,
+            'error_message' => $e->getMessage(),
+            'user_id' => Auth::id(),
+            'timestamp' => now(),
+        ]);
+
+        activity('Status Update Error')
+            ->withProperties([
+                'withholding_id' => $id,
+                'error_message' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'ip' => request()->ip(),
+            ])
+            ->log('An error occurred while marking WithHolding as Filed.');
+
+        return response()->json(['success' => false, 'message' => 'Failed to mark as Filed.'], 500);
+    }
+}
+
 
     private function getWithHoldings($organizationId, $type, $perPage = 5)
     {

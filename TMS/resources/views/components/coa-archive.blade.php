@@ -361,7 +361,7 @@
                                                         <!-- Header Checkbox for Select All -->
                                                         <label for="checkAll" x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                                             <div class="relative flex items-center">
-                                                                <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"
+                                                                <input type="checkbox" x-model="checkAll" id="checkAll" @click="toggleAll()" class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition"
                                                                 />
                                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -375,7 +375,7 @@
                                                     <th scope="col" class="text-left py-4 px-4">Date Archived</th>
                                                 </tr>
                                             </thead>
-                                            <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
+                                            <tbody class="divide-y divide-neutral-300">
                                                 @foreach ($inactiveCoas as $coa)
                                                     <tr class="hover:bg-blue-50 cursor-pointer ease-in-out">
                                                         <td class="p-4">
@@ -383,7 +383,7 @@
                                                             <label x-show="showCheckboxes" class="flex items-center cursor-pointer text-neutral-600">
                                                                 <div class="relative flex items-center">
                                                                     <input type="checkbox" @click="toggleCheckbox('{{ $coa->id }}')" :checked="selectedRows.includes('{{ $coa->id }}')" id="coa{{ $coa->id }}" 
-                                                                        class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-['✓'] checked:before:text-white checked:before:text-center focus:outline-none transition"
+                                                                        class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition"
                                                                     />
                                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" class="pointer-events-none invisible absolute left-1/2 top-1/2 w-3.5 h-3.5 -translate-x-1/2 -translate-y-1/2 text-neutral-100 peer-checked:visible dark:text-black">
                                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -438,16 +438,21 @@
                                             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
                                             @click.away="showConfirmUnarchiveModal = false"
                                             x-effect="document.body.classList.toggle('overflow-hidden', showConfirmUnarchiveModal)"
-                                        >
-                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                            >
+                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative">
                                                 <div class="flex flex-col items-center">
+                                                    <button @click="showConfirmUnarchiveModal = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
                                                     <!-- Icon -->
                                                     <div class="mb-4">
                                                         <i class="fas fa-exclamation-triangle text-zinc-700 text-8xl"></i>
                                                     </div>
 
                                                     <!-- Title -->
-                                                    <h2 class="text-2xl font-bold text-zinc-700 mb-2">Unarchive Item(s)</h2>
+                                                    <h2 class="text-2xl font-extrabold text-zinc-700 mb-2">Unarchive Item(s)</h2>
 
                                                     <!-- Description -->
                                                     <p class="text-sm text-zinc-700 text-center">
@@ -480,9 +485,14 @@
                                             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
                                             x-effect="document.body.classList.toggle('overflow-hidden', showConfirmDeleteModal)"
                                             @click.away="showConfirmDeleteModal = false"
-                                        >
-                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                                            >
+                                            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative">
                                                 <div class="flex flex-col items-center">
+                                                    <button @click="showConfirmDeleteModal = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
                                                     <!-- Icon -->
                                                     <div class="mb-4">
                                                         <i class="fas fa-exclamation-triangle text-red-600 text-8xl"></i>

@@ -17,7 +17,7 @@ class CreateTax2550qTable extends Migration
             $table->id();
             $table->string('period');
             $table->string('year_ended');
-            $table->enum('quarter', ['1st', '2md', '3rd', '4th']); // Quarter 1, 2, 3, or 4
+            $table->enum('quarter', ['1st', '2nd', '3rd', '4th']); // Quarter 1, 2, 3, or 4
             $table->date('return_from');
             $table->date('return_to');
             $table->enum('amended_return', ['yes', 'no']);

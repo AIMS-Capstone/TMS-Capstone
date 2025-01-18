@@ -43,19 +43,26 @@ class TaxRow extends Component
         $this->index = $index;
         $this->type = $type;
         $this->mode = $mode;
-
+    
+        $organizationId = session()->get('organization_id'); // Retrieve organization_id from session
+    
         // Load dropdown options
         $this->taxTypes = TaxType::where('transaction_type', $this->type)->get();
         $this->atcs = Atc::where('transaction_type', $this->type)->get();
-        $this->coas = Coa::where('status', 'Active')->get();
-
+        $this->coas = Coa::where('status', 'Active')
+                         ->where(function ($query) use ($organizationId) {
+                             $query->whereNull('organization_id')
+                                   ->orWhere('organization_id', $organizationId);
+                         })->get();
+    
         // Populate default or passed taxRow data
         if ($taxRow) {
             $this->taxRow = $taxRow;
         }
-
+    
         $this->calculateTax();
     }
+    
     public function updated($field)
     {
         if (strpos($field, 'taxRow.') === 0) {

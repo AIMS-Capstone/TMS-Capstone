@@ -29,10 +29,43 @@ class TaxReturnsRecycleBinController extends Controller
             $item->model_type = 'WithHolding';
         });
 
-        // Merge and sort the data
-        $mergedData = $taxReturns->merge($withHoldings)->sortByDesc('deleted_at')->values();
+        // Merge the data
+        $mergedData = $taxReturns->merge($withHoldings);
 
-        // Paginate the merged data using Laravel's LengthAwarePaginator
+        if ($request->has('search') && $request->search != '') {
+            $search = strtolower(trim($request->search)); // Convert to lowercase and trim spaces
+
+            Log::info('Search Parameter:', ['search' => $search]);
+
+            $mergedData = $mergedData->filter(function ($item) use ($search) {
+                // Get relevant attributes and convert them to lowercase for case-insensitive search
+                $organizationName = strtolower($item->Organization->registration_name ?? $item->organization->registration_name ?? '');
+                $taxType = strtolower($item->tax_type ?? $item->type ?? '');
+                $title = strtolower($item->title ?? $item->type ?? '');
+
+                // Log attributes being checked
+                Log::info('Checking Item:', [
+                    'item_id' => $item->id,
+                    'organization_name' => $organizationName,
+                    'tax_type' => $taxType,
+                    'title' => $title,
+                ]);
+
+                // Check if any field contains the search term
+                return (
+                    str_contains($organizationName, $search) ||
+                    str_contains($taxType, $search) ||
+                    str_contains($title, $search)
+                );
+            });
+
+            Log::info('Filtered Data Count:', ['count' => $mergedData->count()]);
+        }
+
+        // Sort the data by deleted_at
+        $mergedData = $mergedData->sortByDesc('deleted_at')->values();
+
+        // Paginate the filtered data
         $perPage = 5;
         $currentPage = $request->input('page', 1);
         $currentItems = $mergedData->slice(($currentPage - 1) * $perPage, $perPage);
@@ -42,16 +75,13 @@ class TaxReturnsRecycleBinController extends Controller
             $mergedData->count(),
             $perPage,
             $currentPage,
-            ['path' => $request->url(), 'query' => $request->query()]// Ensure the URL and query parameters are preserved
+            ['path' => $request->url(), 'query' => $request->query()] // Ensure the URL and query parameters are preserved
         );
-
-        $allTrashedItems = $taxReturns->merge($withHoldings)->sortByDesc('deleted_at')->values();
 
         return view('recycle-bin.tax-returns', [
             'trashedItems' => $paginatedData,
-            'allTrashedItems' => $allTrashedItems, // Send all items
+            'allTrashedItems' => $mergedData, // Send all items
         ]);
-
     }
 
     /**

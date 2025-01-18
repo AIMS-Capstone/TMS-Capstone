@@ -40,6 +40,8 @@ class CreateTax1701qTable extends Migration
             $table->decimal('show_total_amount_payable', 15, 2)->nullable();
             $table->decimal('aggregate_amount_payable', 15, 2)->nullable();
 
+        
+        
             // Sales and Revenues
             $table->decimal('sales_revenues', 15, 2)->nullable();
             $table->decimal('cost_of_sales', 15, 2)->nullable();
@@ -48,9 +50,14 @@ class CreateTax1701qTable extends Migration
             $table->decimal('osd', 15, 2)->nullable();
             $table->decimal('net_income', 15, 2)->nullable();
             $table->decimal('taxable_income', 15, 2)->nullable();
+            $table->decimal('graduated_non_op', 15, 2)->nullable();
+            $table->decimal('partner_gpp', 15, 2)->nullable();
+            $table->decimal('graduated_total_taxable_income', 15, 2)->nullable();
+            $table->decimal('tax_due_graduated', 15, 2)->nullable();
+            $table->string('graduated_non_op_specify')->nullable();
             // Fields ending with _8
             $table->decimal('sales_revenues_8', 15, 2)->nullable();
-            $table->decimal('non_op_specify_8', 15, 2)->nullable();
+            $table->string('non_op_specify_8')->nullable();
             $table->decimal('non_operating_8', 15, 2)->nullable();
             $table->decimal('total_income_8', 15, 2)->nullable();
             $table->decimal('total_prev_8', 15, 2)->nullable();
@@ -71,6 +78,12 @@ class CreateTax1701qTable extends Migration
             $table->decimal('interest', 15, 2)->nullable();
             $table->decimal('compromise', 15, 2)->nullable();
             $table->decimal('total_penalties', 15, 2)->nullable();
+            $table->decimal('total_amount_payable', 15, 2)->nullable();
+            $table->string('other_tax_credits_specify')->nullable();
+            $table->string('individual_deduction_method')->nullable();
+            
+         
+
 
             $table->timestamps(); // Timestamps for created_at and updated_at
         });
