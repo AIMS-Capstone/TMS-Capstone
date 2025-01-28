@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\OrgSetup;
 use App\Models\Rdo;
 use App\Models\TaxReturn;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -19,33 +20,37 @@ class OrgSetupController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        $search = $request->input('search');
-        $perPage = $request->input('perPage', 5); 
-        
-        $query = OrgSetup::query();
-        
-        if ($search) {  
-            $query->where('registration_name', 'like', "%{$search}%")
-                ->orWhere('tax_type', 'like', "%{$search}%")
-                ->orWhere('type', 'like', "%{$search}%");
-        }
-
-        $orgsetups = $query->paginate($perPage);
-        $unfiledTaxReturnsCount = TaxReturn::where('status', 'Unfiled')->count();
-        $filedTaxReturnsCount = TaxReturn::where('status', 'Filed')->count();
-        $orgSetupCount = OrgSetup::count();
-        $nonIndividualClients = OrgSetup::where('type', 'Non-Individual')->count();
-        $individualClients = OrgSetup::where('type', 'Individual')->count();
-        $organizations = OrgSetup::all(); // Fetch all organizations
-        $rdos = Rdo::all(); // Fetch all RDOs
-        $regions = json_decode(file_get_contents(public_path('json/regions.json')), true);
-        $provinces = json_decode(file_get_contents(public_path('json/provinces.json')), true);
-        $municipalities = json_decode(file_get_contents(public_path('json/municipalities.json')), true);
-
-
-        return view('org-setup', compact('orgsetups', 'unfiledTaxReturnsCount', 'filedTaxReturnsCount', 'orgSetupCount', 'nonIndividualClients', 'individualClients', 'rdos', 'regions', 'provinces', 'municipalities'));
+{   
+    $user = Auth::user();
+    $search = $request->input('search');
+    $perPage = $request->input('perPage', 5); 
+    
+    $query = OrgSetup::with('accountant'); // Eager load accountant
+    if ($user->role === 'Accountant') {
+        $query->where('accountant_id', $user->id);
     }
+    if ($search) {  
+        $query->where('registration_name', 'like', "%{$search}%")
+            ->orWhere('tax_type', 'like', "%{$search}%")
+            ->orWhere('type', 'like', "%{$search}%");
+    }
+
+    $orgsetups = $query->paginate($perPage);
+    $unfiledTaxReturnsCount = TaxReturn::where('status', 'Unfiled')->count();
+
+    $filedTaxReturnsCount = TaxReturn::where('status', 'Filed')->count();
+    $orgSetupCount = OrgSetup::count();
+    $nonIndividualClients = OrgSetup::where('type', 'Non-Individual')->count();
+    $individualClients = OrgSetup::where('type', 'Individual')->count();
+    $organizations = OrgSetup::all(); 
+    $rdos = Rdo::all(); 
+    $regions = json_decode(file_get_contents(public_path('json/regions.json')), true);
+    $provinces = json_decode(file_get_contents(public_path('json/provinces.json')), true);
+    $municipalities = json_decode(file_get_contents(public_path('json/municipalities.json')), true);
+    $accountants = User::where('role', 'Accountant')->get(['id', 'first_name','last_name', 'email']);
+
+    return view('org-setup', compact('orgsetups', 'unfiledTaxReturnsCount', 'filedTaxReturnsCount', 'orgSetupCount', 'nonIndividualClients', 'individualClients', 'rdos', 'regions', 'provinces', 'municipalities','accountants'));
+}
 
     /**
      * Show the form for creating a new resource.
@@ -67,6 +72,18 @@ class OrgSetupController extends Controller
 
     }   
 
+    public function assignAccountant(Request $request)
+{
+    $validated = $request->validate([
+        'organization_id' => 'required|exists:org_setups,id',
+        'accountant_id' => 'required|exists:users,id'
+    ]);
+
+    $organization = OrgSetup::findOrFail($validated['organization_id']);
+    $organization->update(['accountant_id' => $validated['accountant_id']]);
+
+    return back()->with(['message' => 'Accountant assigned successfully']);
+}
     /**
      * Store a newly created resource in storage.
      */
