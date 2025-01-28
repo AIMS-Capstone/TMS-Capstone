@@ -32,6 +32,7 @@ class OrgSetup extends Model
         'start_date',
         'financial_year_end',
         'deleted_by',
+        'accountant_id',
     ];
 
     // Relationship to OrgAccount
@@ -39,6 +40,11 @@ class OrgSetup extends Model
     {
         return $this->hasOne(OrgAccount::class, 'org_setup_id', 'id');
     }
+    public function accountant()
+{
+    return $this->belongsTo(User::class, 'accountant_id');
+}
+ 
 
     // Relationship to RDO
     public function rdo()

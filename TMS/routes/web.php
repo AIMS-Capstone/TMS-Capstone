@@ -106,6 +106,7 @@ Route::middleware([
     Route::post('/tax-return-transaction/add-percentage', [TransactionsController::class, 'addPercentage'])->name('tax_return_transaction.addPercentage');
     Route::post('/tax-return-transaction/add-transaction', [TransactionsController::class, 'addTransaction'])->name('tax_return_transaction.addTransaction');
     Route::get('/org-setup', [OrgSetupController::class, 'index'])->name('org-setup');
+    Route::post('/org-setup/assign-accountant', [OrgSetupController::class, 'assignAccountant'])->name('orgSetup.assignAccountant');
     Route::post('/org-setup', [OrgSetupController::class, 'store'])->name('OrgSetup.store');
     Route::put('/org-setup/{id}', [OrgSetupController::class, 'update'])->name('org-setup.update');
     Route::post('/org-delete', [OrgSetupController::class, 'destroy'])->name('orgSetup.destroy');

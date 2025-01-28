@@ -222,6 +222,7 @@
                                         <tr>
                                             <th class="text-left py-3 px-4 font-semibold text-sm">Name</th>
                                             <th class="text-left py-3 px-4 font-semibold text-sm">Tax Type</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-sm">Assigned To</th>
                                             <th class="text-left py-3 px-4 font-semibold text-sm">Classification</th>
                                             <th class="text-left py-3 px-4 font-semibold text-sm">Account Status</th>
                                             <th class="text-left py-3 px-4 font-semibold text-sm">Action</th>
@@ -238,6 +239,13 @@
                                                         {{ $organization->registration_name }}<br/>{{ $organization->tin }}
                                                     </td>
                                                     <td class="text-left py-[7px] px-4">{{ $organization->tax_type }}</td>
+                                                    <td class="text-left py-[7px] px-4">
+                                                        @if ($organization->accountant)
+                                                            {{ $organization->accountant->first_name }} {{ $organization->accountant->last_name }}
+                                                        @else
+                                                            Not Assigned
+                                                        @endif
+                                                    </td>
                                                     <td class="text-left py-[7px] px-4">{{ $organization->type }}</td>
                                                     <td class="text-left py-[7px] px-4">
                                                         @if ($organization->account) 
@@ -262,10 +270,17 @@
                                                                     Create Account
                                                                 </div>
                                                             @endif
+                                                            @if (Auth::user()->role === 'Admin')
+                                                            <div x-data x-on:click="$dispatch('open-assign-accountant-modal', { organizationId: '{{ $organization->id }}', organizationName: '{{ $organization->registration_name }}' })"  
+                                                                class="block px-4 py-2 w-full text-left hover-dropdown text-blue-500 cursor-pointer">
+                                                                Assign Accountant
+                                                            </div>
+                                                            @endif
                                                             <div x-data x-on:click="$dispatch('open-delete-modal', { organizationId: '{{ $organization->id }}', organizationName: '{{ $organization->registration_name }}' })"  
                                                                 class="block px-4 py-2 w-full text-left hover-dropdown text-red-500 cursor-pointer">
                                                                 Delete
                                                             </div>
+                                                            
                                                         </div>
                                                     </td>
                                                 </form>
@@ -408,6 +423,7 @@
         </div>
     </div>
     
+  
     {{-- Edit Modal: Shows Error with "PUT" + not sure about the action + Selections of Address and RDO --}}
     <div x-data="{ showEdit: false, organization: {}, formatDate(date) {const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(date).toLocaleDateString(undefined, options); } }"
@@ -645,8 +661,115 @@
             </div>
         </div>
     </div>
-
+    <div x-data="{ 
+        showAccountant: false, 
+        organizationId: null, 
+        organizationName: '', 
+        selectedAccountantId: null,
+        accountants: []
+    }" 
+        x-init="selectedAccountantId = null"
+        @open-assign-accountant-modal.window="
+            showAccountant = true; 
+            organizationId = $event.detail.organizationId; 
+            organizationName = $event.detail.organizationName;
+            selectedAccountantId = null;
+        "
+        x-effect="document.body.classList.toggle('overflow-hidden', open)" 
+       >
+        <div x-show="showAccountant" class="fixed inset-0 bg-gray-200 bg-opacity-50 z-50 flex items-center justify-center">
+            <div class="bg-white p-10 rounded-lg shadow-lg max-w-lg w-full relative" 
+                x-show="showAccountant" 
+                x-transition:enter="transition ease-out duration-300 transform" 
+                x-transition:enter-start="opacity-0 scale-90" 
+                x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-200 transform"
+                x-transition:leave-start="opacity-100 scale-100" 
+                x-transition:leave-end="opacity-0 scale-90"
+                x-cloak
+            >
+                <!-- Close Button -->
+                <button @click="showAccountant = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+    
+                <!-- Title -->
+                <h2 class="text-xl text-zinc-700 font-bold text-start mb-4">Assign Accountant to Organization</h2>
+    
+                <!-- Description -->
+                <p class="text-start mb-6 text-sm text-zinc-700">
+                    Select an accountant to assign to <strong x-text="organizationName"></strong>
+                </p>
+    
+                <!-- Accountant Dropdown -->
+                <div class="mb-6">
+                    <label for="accountant-select" class="block text-sm font-medium text-zinc-700 mb-2">Select Accountant</label>
+                    <select     x-model="selectedAccountantId" id="accountant-select" name="accountant_id"  class="w-full border border-zinc-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="" disabled selected>Choose an Accountant</option>
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                 
+                </div>
+    
+                <!-- Warning Box -->
+                <div class="bg-blue-100 border-l-8 border-blue-500 text-blue-500 p-6 rounded-lg mb-6">
+                    <ul class="list-disc pl-5 text-[13px]">
+                        <li class="pl-2">
+                            <span class="inline-block align-top">The selected accountant will get full access to this organization's financial data.</span>
+                        </li>
+                        <li class="pl-2">
+                            <span class="inline-block align-top">Ensure you're assigning the correct accountant.</span>
+                        </li>
+                    </ul>
+                </div>
+    
+                <!-- Action Buttons -->
+                <div class="flex justify-end gap-4">
+                    <button type="button" @click="showAccountant = false" class="mr-2 font-semibold text-zinc-600 px-3 py-1 rounded-md hover:text-zinc-900 transition">
+                        Cancel
+                    </button>
+                    <form method="POST" action="{{ route('orgSetup.assignAccountant') }}" class="inline">
+                        @csrf
+                        <input type="hidden" name="organization_id" x-bind:value="organizationId">
+                        <input type="hidden" name="accountant_id" x-bind:value="selectedAccountantId">
+                        <button 
+                            type="submit" 
+                            :disabled="!selectedAccountantId"
+                            :class="{
+                                'bg-blue-500 hover:bg-blue-700': selectedAccountantId,
+                                'bg-zinc-300 cursor-not-allowed': !selectedAccountantId
+                            }" 
+                            class="text-white font-semibold py-1.5 px-5 rounded-lg transition"
+                        >
+                            Assign
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const accountantsSelect = document.getElementById('accountant-select');
+    const accountants = @json($accountants);
+
+    // Populate accountants dropdown
+    function populateAccountants() {
+        accountantsSelect.innerHTML = '<option value="">Choose an Accountant</option>';
+
+        accountants.forEach(accountant => {
+            const option = document.createElement('option');
+            option.value = accountant.id;
+            option.textContent = `${accountant.first_name} ${accountant.last_name} (${accountant.email})`;
+            accountantsSelect.appendChild(option);
+        });
+    }
+
+    // Call the function to populate dropdown
+    populateAccountants();
+});
     //FILTER BUTTON
     const filterButton = document.getElementById('filterButton');
     const dropdownFilter = document.getElementById('dropdownFilter');
