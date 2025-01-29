@@ -192,7 +192,7 @@
                                                                     <input 
                                                                         type="checkbox" 
                                                                         @click="toggleCheckbox({ id: '{{ $item->id }}', model_type: '{{ $item->model_type }}' })" 
-                                                                        :checked="selectedRows.some(selected => selected.id == '{{ $item->id }}' && selected.model_type == '{{ $item->model_type }}')"
+                                                                        :checked="selectedRows.some(selected => (selected.id == '{{ $item->id }}' && selected.model_type == '{{ $item->model_type }}'))"
                                                                         id="item{{ $item->id }}" 
                                                                         class="peer relative w-5 h-5 appearance-none border border-gray-400 bg-white checked:bg-blue-900 rounded-full checked:border-blue-900 checked:before:content-[''] checked:before:text-white checked:before:text-center focus:outline-none transition"
                                                                     />
