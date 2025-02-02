@@ -77,6 +77,9 @@ Route::get('/register-success-page', function () {
     return view('components/register-success-page');
 })->name('register-success-page');
 
+//profile upload
+Route::post('/user/profile-photo', [UserController::class, 'updateProfilePhoto'])->name('user.update-profile-photo');
+
 // Email Verification Route
 Route::get('/email/verify/{id}/{hash}', [CustomVerificationController::class, 'verify'])
     ->name('verification.verify')

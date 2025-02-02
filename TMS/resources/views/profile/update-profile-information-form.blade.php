@@ -1,49 +1,65 @@
 <div submit="updateProfileInformation">
 
-    <div name="form">
-        <!-- Profile Photo -->
-        @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
-            <div x-data="{photoName: null, photoPreview: null}" class="col-span-6 sm:col-span-4">
-                <!-- Profile Photo File Input -->
-                <input type="file" id="photo" class="hidden"
-                            wire:model.live="photo"
-                            x-ref="photo"
-                            x-on:change="
-                                    photoName = $refs.photo.files[0].name;
-                                    const reader = new FileReader();
-                                    reader.onload = (e) => {
-                                        photoPreview = e.target.result;
-                                    };
-                                    reader.readAsDataURL($refs.photo.files[0]);
-                            " />
-
-                <x-label for="photo" value="{{ __('Photo') }}" />
-
-                <!-- Current Profile Photo -->
-                <div class="mt-2" x-show="! photoPreview">
-                    <img src="{{ $this->user->profile_photo_url }}" alt="{{ $this->user->name }}" class="rounded-full h-20 w-20 object-cover">
-                </div>
-
-                <!-- New Profile Photo Preview -->
-                <div class="mt-2" x-show="photoPreview" style="display: none;">
-                    <span class="block rounded-full w-20 h-20 bg-cover bg-no-repeat bg-center"
-                          x-bind:style="'background-image: url(\'' + photoPreview + '\');'">
-                    </span>
-                </div>
-
-                <x-secondary-button class="mt-2 me-2" type="button" x-on:click.prevent="$refs.photo.click()">
-                    {{ __('Select A New Photo') }}
-                </x-secondary-button>
-
-                @if ($this->user->profile_photo_path)
-                    <x-secondary-button type="button" class="mt-2" wire:click="deleteProfilePhoto">
-                        {{ __('Remove Photo') }}
-                    </x-secondary-button>
+    <div class="flex flex-col items-center mb-12">
+        <div class="relative group mb-12">
+        <!-- Profile Label -->  
+            <label id="profile-label" for="profile_photo_input" class="cursor-pointer relative inline-block">
+                <!-- Profile photo or initial letter -->
+                @if ($this->user->profile_photo_url)
+                    <img src="{{ asset('storage/' . $this->user->profile_photo_path) }}" 
+                        alt="Profile Picture" id="profile-picture" 
+                        class="w-36 h-36 rounded-full object-cover shadow-md hover:opacity-75 transition-opacity duration-300">
+                @else
+                    <div class="w-36 h-36 rounded-full bg-blue-900 flex items-center justify-center text-yellow-500 text-5xl font-bold hover:opacity-75 transition-opacity duration-300">
+                        {{ strtoupper(substr($this->user->name ?? 'PUP', 0, 1)) }}
+                    </div>
                 @endif
 
-                <x-input-error for="photo" class="mt-2" />
+                <!-- Edit Button (Now correctly positioned inside the profile image) -->
+                <span id="edit-icon-button" 
+                    class="absolute bottom-2 right-2 bg-zinc-700 hover:bg-zinc-900 rounded-full p-2 shadow-md flex items-center justify-center w-8 h-8">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24">
+                        <path fill="#ffff" d="m12.9 6.855l4.242 4.242l-9.9 9.9H3v-4.243zm1.414-1.415l2.121-2.121a1 1 0 0 1 1.414 0l2.829 2.828a1 1 0 0 1 0 1.415l-2.122 2.121z" />
+                    </svg>
+                </span>
+            </label>
+
+        <!-- Modal for Upload Restrictions -->
+        <div id="upload-restriction-modal" class="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center hidden">
+            <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full relative">
+                <button id="close-modal-button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <div class="flex justify-start mb-4">
+                    <i class="fas fa-exclamation-triangle text-amber-400 text-8xl"></i>
+                </div>
+                <h2 class="text-xl text-zinc-700 font-bold text-start mb-4">Profile Image Upload Restrictions</h2>
+                <p class="text-start mb-6 text-sm text-zinc-700">The image should meet the following criteria:</p>
+                <div class="bg-amber-100 border-l-8 border-amber-400 text-amber-500 p-6 rounded-lg mb-6">
+                    <ul class="list-disc pl-5 text-[13px]">
+                        <li class="pl-2"><span class="inline-block align-top">File Size: Maximum 5 MB</span></li>
+                        <li class="pl-2"><span class="inline-block align-top">Image Format: JPG, JPEG, PNG only</span></li>
+                        <li class="pl-2"><span class="inline-block align-top">Dimensions: Recommended 200x200 pixels or larger</span></li>
+                    </ul>
+                </div>
             </div>
-        @endif
+        </div>
+
+        <!-- Profile Photo Form -->
+        <form id="profile-photo-form" action="{{ route('user.update-profile-photo') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input type="file" name="profile_photo" id="profile_photo_input" class="hidden" accept="image/*" onchange="previewProfilePhoto()">
+        </form>
+
+        <!-- Action Buttons -->
+        <div id="action-buttons" class="hidden mt-4 gap-4">
+            <button id="cancel-button" type="button" class="text-zinc-700 hover:text-zinc-900 px-4 py-2">Cancel</button>
+            <button id="update-button" type="submit" class="bg-blue-900 hover:bg-blue-950 text-white px-4 py-2 rounded-lg">Update</button>
+        </div>
+    </div>
+    <hr>
 
         <div class="ml-4 flex flex-row justify-between">
             <div>
@@ -104,3 +120,86 @@
         </x-button>
     </x-slot>
 </div>
+
+<script>
+    // JavaScript to preview the selected profile photo and manage modals
+    function previewProfilePhoto() {
+        const fileInput = document.getElementById('profile_photo_input');
+        const profilePicture = document.getElementById('profile-picture') || document.querySelector('#profile-label > div');
+        const modal = document.getElementById('upload-restriction-modal');
+        const actionButtons = document.getElementById('action-buttons');
+
+        const file = fileInput.files[0];
+        if (file) {
+            const fileSizeMB = file.size / 1024 / 1024;
+            const allowedFormats = ['image/jpeg', 'image/png'];
+
+            if (fileSizeMB > 5 || !allowedFormats.includes(file.type)) {
+                modal.classList.remove('hidden');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                if (profilePicture.tagName === 'IMG') {
+                    profilePicture.src = e.target.result;
+                } else {
+                    profilePicture.style.backgroundImage = `url(${e.target.result})`;
+                    profilePicture.classList.add('object-cover');
+                }
+                actionButtons.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+            modal.classList.add('hidden');
+        }
+    }
+
+    // Event listeners for buttons
+    document.getElementById('edit-icon-button').addEventListener('click', () => {
+        document.getElementById('profile_photo_input').click();
+    });
+
+    document.getElementById('cancel-button').addEventListener('click', () => location.reload());
+
+    document.getElementById('update-button').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('profile-photo-form').submit();
+    });
+
+    document.getElementById('close-modal-button').addEventListener('click', () => {
+        document.getElementById('upload-restriction-modal').classList.add('hidden');
+    });
+
+
+    function previewProfilePhoto() {
+        const fileInput = document.getElementById('profile_photo_input');
+        const profilePicture = document.getElementById('profile-picture') || document.querySelector('#profile-label > div');
+        const modal = document.getElementById('upload-restriction-modal');
+        const actionButtons = document.getElementById('action-buttons');
+
+        const file = fileInput.files[0];
+        if (file) {
+            const fileSizeMB = file.size / 1024 / 1024;
+            const allowedFormats = ['image/jpeg', 'image/png'];
+
+            if (fileSizeMB > 5 || !allowedFormats.includes(file.type)) {
+                modal.classList.remove('hidden');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                if (profilePicture.tagName === 'IMG') {
+                    profilePicture.src = e.target.result;
+                } else {
+                    profilePicture.style.backgroundImage = `url(${e.target.result})`;
+                    profilePicture.classList.add('object-cover');
+                }
+                actionButtons.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+            modal.classList.add('hidden');
+        }
+    }
+
+</script>

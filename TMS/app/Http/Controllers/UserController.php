@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -187,6 +188,32 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('user-management.user');
+    }
+
+    //profilie photo ng user
+    public function updateProfilePhoto(Request $request)
+    {
+
+        $request->validate([
+            'profile_photo' => 'required|image|mimes:jpeg,png|max:5120', // Validate image size and type
+        ]);
+
+        /** @var User $user */ // Tell the IDE that this is an instance of User
+        $user = Auth::user();
+
+        // Delete the old profile photo if it exists
+        if ($user->profile_photo_path) {
+            Storage::disk('public')->delete($user->profile_photo_path);
+        }
+
+        // Store the new profile photo
+        $path = $request->file('profile_photo')->store('profile-photos', 'public');
+
+        // Update the user's profile photo path
+        $user->profile_photo_path = $path;
+        $user->save();
+
+        return redirect()->back()->with('success', 'Profile photo updated successfully.');
     }
 
 }
