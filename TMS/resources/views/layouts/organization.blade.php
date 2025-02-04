@@ -117,7 +117,7 @@
                                                     @if (Auth::user()->profile_photo_path)
                                                         <img class="h-8 w-8 rounded-full object-cover" src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" alt="{{ Auth::user()->name }}" />
                                                     @else
-                                                        <div class="flex items-center justify-center h-8 w-8 bg-yellow-500 text-blue-900 text-sm font-bold rounded-full">
+                                                        <div class="flex items-center justify-center h-8 w-8 text-yellow-500 bg-blue-900 text-sm font-bold rounded-full">
                                                             {{ strtoupper(substr(Auth::user()->first_name, 0, 1)) }}
                                                         </div>
                                                     @endif
@@ -129,7 +129,7 @@
                                                     </div> --}}
 
                                                     <!-- Dropdown Icon -->
-                                                    <svg class="ms-2 -me-0.5 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                    <svg class="-me-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                                                     </svg>
                                                 
@@ -198,7 +198,6 @@
                                             </x-slot>
                                         </x-dropdown>
                                     </div>
-                                    
                                 </div>
                             </div>
                         </div>

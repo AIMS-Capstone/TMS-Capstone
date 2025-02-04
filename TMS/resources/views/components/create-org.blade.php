@@ -385,6 +385,7 @@
                                         type="text" 
                                         name="contact_number" 
                                         id="contact_number"
+                                        maxlength="11"
                                         x-model="formData.contact_number"
                                         @input="validatePhone()"
                                         @blur="validatePhone()"

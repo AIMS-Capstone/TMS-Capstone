@@ -1,11 +1,11 @@
 <x-organization-layout>
     
     <div class="overflow-x-auto ml-20 mt-10 absolute flex items-center">
-        <button onclick="history.back()" class="text-zinc-600 hover:text-zinc-700">
+        <button onclick="history.back()" class="text-zinc-600 hover:font-bold hover:text-zinc-700">
             <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5" viewBox="0 0 24 24">
                 <g fill="none" stroke="#52525b" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 12H8m4-4l-4 4l4 4"/></g>
             </svg>
-            <span class="text-zinc-600 text-sm font-normal hover:text-zinc-700">Go Back</span>
+            <span class="text-zinc-600 text-sm font-normal hover:font-bold hover:text-zinc-700">Go Back</span>
         </button>
     </div>
 

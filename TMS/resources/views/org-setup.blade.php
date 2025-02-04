@@ -1,5 +1,5 @@
 <x-organization-layout>
-    <div class="bg-white py-8">
+    <div class="bg-white py-4">
         <div class="max-w-7xl mx-auto sm:px-0 lg:px-0">
             <div class="overflow-hidden sm:rounded-xs">
                 <div class="overflow-x-auto pt-6 px-8">
@@ -216,9 +216,9 @@
                     
                             <hr class="border-zinc-300 w-[calc(100%+2rem)] mx-[-1rem]">
                         
-                            <div class="my-4 overflow-y-auto h-auto">
+                            <div class="my-4 overflow-y-auto">
                                 <table class="min-w-full bg-white" id="tableid">
-                                    <thead class="bg-zinc-100 text-zinc-700 font-extrabold sticky top-0">
+                                    <thead class="bg-zinc-100 text-zinc-700 font-extrabold">
                                         <tr>
                                             <th class="text-left py-3 px-4 font-semibold text-sm">Name</th>
                                             <th class="text-left py-3 px-4 font-semibold text-sm">Tax Type</th>
@@ -260,7 +260,7 @@
                                                                 <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
                                                             </svg>
                                                         </button>
-                                                        <div id="dropdownAction-{{ $organization->id }}" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-40 origin-top-right overflow-y-auto max-h-64">
+                                                        <div id="dropdownAction-{{ $organization->id }}" class="absolute right-0 z-10 hidden bg-white divide-zinc-100 rounded-lg shadow-lg w-48 origin-top-right overflow-y-auto max-h-64">
                                                             <div class="py-2 px-2 text-sm text-zinc-700" aria-labelledby="dropdownMenuAction">
                                                                 <div x-data x-on:click="$dispatch('open-view-org-modal', { organization: {{ $organization->toJson() }} })" class="block px-4 py-2 w-full text-left hover-dropdown">View Details</div>
                                                                 <div x-data x-on:click="$dispatch('open-edit-org-modal', { organization: {{ $organization->toJson() }} })" class="block px-4 py-2 w-full text-left hover-dropdown">Edit</div>
@@ -272,7 +272,7 @@
                                                             @endif
                                                             @if (Auth::user()->role === 'Admin')
                                                             <div x-data x-on:click="$dispatch('open-assign-accountant-modal', { organizationId: '{{ $organization->id }}', organizationName: '{{ $organization->registration_name }}' })"  
-                                                                class="block px-4 py-2 w-full text-left hover-dropdown text-blue-500 cursor-pointer">
+                                                                class="block px-4 py-2 w-full text-left hover-dropdown cursor-pointer">
                                                                 Assign Accountant
                                                             </div>
                                                             @endif
@@ -422,7 +422,6 @@
             </div>
         </div>
     </div>
-    
   
     {{-- Edit Modal: Shows Error with "PUT" + not sure about the action + Selections of Address and RDO --}}
     <div x-data="{ showEdit: false, organization: {}, formatDate(date) {const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -661,13 +660,15 @@
             </div>
         </div>
     </div>
+
+    {{-- Assign Accountant Modal --}}
     <div x-data="{ 
         showAccountant: false, 
         organizationId: null, 
         organizationName: '', 
         selectedAccountantId: null,
         accountants: []
-    }" 
+        }" 
         x-init="selectedAccountantId = null"
         @open-assign-accountant-modal.window="
             showAccountant = true; 
@@ -675,7 +676,7 @@
             organizationName = $event.detail.organizationName;
             selectedAccountantId = null;
         "
-        x-effect="document.body.classList.toggle('overflow-hidden', open)" 
+        x-effect="document.body.classList.toggle('overflow-hidden', showAccountant)" 
        >
         <div x-show="showAccountant" class="fixed inset-0 bg-gray-200 bg-opacity-50 z-50 flex items-center justify-center">
             <div class="bg-white p-10 rounded-lg shadow-lg max-w-lg w-full relative" 
@@ -686,8 +687,7 @@
                 x-transition:leave="transition ease-in duration-200 transform"
                 x-transition:leave-start="opacity-100 scale-100" 
                 x-transition:leave-end="opacity-0 scale-90"
-                x-cloak
-            >
+                x-cloak>
                 <!-- Close Button -->
                 <button @click="showAccountant = false" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-400 text-white rounded-full p-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-3 h-3">
@@ -705,12 +705,9 @@
     
                 <!-- Accountant Dropdown -->
                 <div class="mb-6">
-                    <label for="accountant-select" class="block text-sm font-medium text-zinc-700 mb-2">Select Accountant</label>
-                    <select     x-model="selectedAccountantId" id="accountant-select" name="accountant_id"  class="w-full border border-zinc-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
+                    <select x-model="selectedAccountantId" id="accountant-select" name="accountant_id"  class="block w-full py-2 px-0 text-sm text-zinc-700 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-900 peer">
                         <option value="" disabled selected>Choose an Accountant</option>
-                        <!-- Options will be populated by JavaScript -->
                     </select>
-                 
                 </div>
     
                 <!-- Warning Box -->

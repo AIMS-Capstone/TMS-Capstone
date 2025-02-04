@@ -3,11 +3,11 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="overflow-hidden sm:rounded-xs">
                 <div class="overflow-x-auto ml-10 absolute flex items-center">
-                    <button onclick="history.back()" class="text-zinc-600 hover:text-zinc-700">
+                    <button onclick="history.back()" class="text-zinc-600 hover:font-bold hover:text-zinc-700">
                         <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5" viewBox="0 0 24 24">
                             <g fill="none" stroke="#52525b" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 12H8m4-4l-4 4l4 4"/></g>
                         </svg>
-                        <span class="text-zinc-600 text-sm font-normal hover:text-zinc-700">Go Back</span>
+                        <span class="text-zinc-600 text-sm font-normal hover:font-bold hover:text-zinc-700">Go Back</span>
                     </button>
                 </div>
                 <div class="overflow-x-auto pt-6 px-10">
@@ -78,11 +78,11 @@
 
                                 <!-- Sort by dropdown -->
                                 <div class="relative inline-block text-left sm:w-auto">
-                                    <button id="clientSortButton" class="flex items-center text-zinc-600 w-full">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24">
-                                            <path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
+                                    <button id="clientSortButton" class="flex items-center text-zinc-600 w-full hover:shadow-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" viewBox="0 0 24 24"><path fill="#696969" fill-rule="evenodd" d="M22.75 7a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h20a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H5a.75.75 0 0 1 0-1.5h14a.75.75 0 0 1 .75.75m-3 5a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75" clip-rule="evenodd"/>
                                         </svg>
-                                        <span id="selectedOption" class="font-normal text-md text-zinc-700 truncate">Sort by</span>
+                                        <span id="selectedOption" class="font-normal text-sm text-zinc-600 hover:text-zinc-800 truncate">Sort by</span>
+                                        <svg class="w-2.5 h-2.5 ms-2 transition-transform duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 4 4 4-4"/></svg>
                                     </button>
 
                                     <div id="clientDropdownMenu" class="absolute mt-2 w-44 rounded-lg shadow-lg bg-white hidden z-50">
@@ -329,10 +329,13 @@
 </div>
 
 <script>
+    // FOR SORT BUTTON
     // Client tab sorting logic
     document.getElementById('clientSortButton').addEventListener('click', function() {
         const dropdown = document.getElementById('clientDropdownMenu');
+        const dropdownArrow = this.querySelector('svg:nth-child(3)');
         dropdown.classList.toggle('hidden');
+        dropdownArrow.classList.toggle('rotate-180');
     });
 
     // Separate sorting function for Client tab
