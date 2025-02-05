@@ -3,7 +3,7 @@
         <x-slot name="logo">
             <x-authentication-card-logo /> 
             <span class="ml-3 font-extrabold taxuri-color text-3xl">TAXURI 
-                <p class="font-medium text-sm">Taxation Management System</p>
+                <p class="font-medium text-sm">for De Guzman, Pascual & Associates</p>
             </span>
         </x-slot>
 

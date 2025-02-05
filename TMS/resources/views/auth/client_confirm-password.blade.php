@@ -2,7 +2,7 @@
 <x-guest-layout>
     <x-auth-create-pass>
         <x-slot name="logo">
-            <x-authentication-card-logo /> <span class="ml-3 font-bold taxuri-color text-3xl">TAXURI <p class="font-medium text-sm">Taxation Management System</p></span>
+            <x-authentication-card-logo /> <span class="ml-3 font-bold taxuri-color text-3xl">TAXURI <p class="font-medium text-sm">for De Guzman, Pascual & Associates</p></span>
         </x-slot>
 
         <x-validation-errors class="mb-4" />
