@@ -13,8 +13,8 @@
                                     <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
                                     </svg>
-                                    <a href="{{ route('tax_return.corporate_quarterly_pdf', $taxReturn) }}" 
-                                        class="ms-1 text-sm font-medium {{ Request::routeIs('tax_return.corporate_quarterly_pdf') ? 'font-bold text-blue-900' : 'text-zinc-500' }} md:ms-2">
+                                    <a href="{{ route('income_return')}}" 
+                                        class="ms-1 text-sm font-medium {{ Request::routeIs('income_return') ? 'font-bold text-blue-900' : 'text-zinc-500' }} md:ms-2">
                                         1702Q
                                     </a>
                                 </div>

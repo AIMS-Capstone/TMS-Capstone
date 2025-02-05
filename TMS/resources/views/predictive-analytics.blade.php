@@ -186,7 +186,7 @@
                             <!-- Projected End-of-Year Tax Liability -->
                             <div class="bg-white border rounded-lg pt-4 pr-2 pl-4 pb-8 text-left h-36"> 
                                 <div class="flex justify-end items-end">
-                                <select id="taxReturnType" name="tax_return_type" class="text-sm border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <select id="taxReturnType" name="tax_return_type" class="text-sm text-zinc-700 peer w-24 block font-light bg-transparent focus:outline-none focus:ring-0 border-t-transparent border-b-1 border-x-transparent border-b-gray-200 focus:border-b-gray-200">
                                     <option value="2550q">2550Q </option>
                                     <option value="2551q">2551Q</option>
                                     <option value="tax_1701q">1701Q</option>
