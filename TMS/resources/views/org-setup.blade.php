@@ -15,12 +15,16 @@
                         </div>
                         <div class="items-end float-end">
                             <!-- routing for create org -->
+                            @if (Auth::user()->role === 'Admin')
+                    
+                       
                             <a href = {{ route('create-org') }}>
                             <button type="button" class= "text-white bg-blue-900 hover:bg-blue-950 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
                                 <i class="fas fa-plus-circle mr-1"></i>
                                     Create Organization
                             </button>   
                             </a> 
+                            @endif
                         </div>
                     </div> 
 
@@ -292,7 +296,14 @@
                                                 <td colspan="6" class="text-center p-2">
                                                     <img src="{{ asset('images/no-account.png') }}" alt="No data available" class="mx-auto w-56 h-56" />
                                                     <h1 class="font-extrabold">No Organization yet</h1>
+                                                    @if (Auth::user()->role === 'Admin')
+                    
+                       
                                                     <p class="text-sm text-neutral-500 mt-2">Start creating organizations with the <br> + Create Organization button.</p>
+                                                    @else 
+                                                    <p class="text-sm text-neutral-500 mt-2">Please await assignment from your respective representative.</p>
+                                                    @endif
+                                                   
                                                 </td>
                                             </tr>
                                         @endif
@@ -467,10 +478,12 @@
                             <select wire:model="region" name="region" id="region" class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
                                 <option value="" disabled>Select Region</option>
                                 @foreach($regions as $region)
-                                    <option value="{{ $region['designation'] }}" {{ $region['designation'] == old('region', $organization->region) ? 'selected' : '' }}>
-                                        {{ $region['name'] }}
-                                    </option>
-                                @endforeach
+                                <option value="{{ $region['designation'] }}" 
+                                    {{ $region['designation'] == old('region', isset($organization) ? $organization->region : '') ? 'selected' : '' }}>
+                                    {{ $region['name'] }}
+                                </option>
+                            @endforeach
+                            
                             </select>
                         </div>
                         <!-- Province Dropdown -->
@@ -501,10 +514,12 @@
                             <select name="rdo" id="rdo" class="peer py-3 pe-0 block w-full font-light bg-transparent border-t-transparent border-b-1 border-x-transparent border-b-gray-200 text-sm focus:border-b-gray-200">
                                 <option value="" disabled>Select RDO</option>
                                 @foreach($rdos as $rdo)
-                                    <option value="{{ $rdo->id }}" {{ $organization->rdo == $rdo->id ? 'selected' : '' }}>
-                                        {{ $rdo->rdo_code }}
-                                    </option>
-                                @endforeach
+                                <option value="{{ $rdo->id }}" 
+                                    {{ isset($organization) && $organization->rdo == $rdo->id ? 'selected' : '' }}>
+                                    {{ $rdo->rdo_code }}
+                                </option>
+                            @endforeach
+                            
                             </select>
                         </div>
                     </div>
