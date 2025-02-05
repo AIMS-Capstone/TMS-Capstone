@@ -184,10 +184,18 @@
                     <div class="col-span-7 flex flex-row space-x-10">
                         <div class="grid grid-rows-2 gap-4 flex-1">
                             <!-- Projected End-of-Year Tax Liability -->
-                            <div class="bg-white border rounded-lg p-6 text-left h-36"> 
-                                <h2 class="text-4xl font-bold text-left taxuri-color flex items-center">
+                            <div class="bg-white border rounded-lg pt-4 pr-2 pl-4 pb-8 text-left h-36"> 
+                                <div class="flex justify-end items-end">
+                                <select id="taxReturnType" name="tax_return_type" class="text-sm border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="2550q">2550Q </option>
+                                    <option value="2551q">2551Q</option>
+                                    <option value="tax_1701q">1701Q</option>
+                                    <option value="1702q">1702Q</option>
+                                </select>
+                            </div>
+                                <span class="text-4xl font-bold text-left taxuri-color prediction-value end-year-tax">
                                     ₱ {{ number_format($predictions['projected_end_of_year_tax'], 2) }}
-                                </h2>
+                                </span>
                                 <h2 class="font-semibold text-left text-zinc-700 flex items-center">
                                     Projected End-of-Year Tax Liability
                                     <span class="ml-2 group relative">
@@ -216,8 +224,8 @@
                                     </span>
                                 </h2>
                                 @foreach ($predictions['projected_quarterly_tax_estimate'] as $index => $estimate)
-                                    <p class="text-sm">Quarter {{ $index + 1 }} - ₱ {{ number_format($estimate, 2) }}</p>
-                                @endforeach
+                                <p class="text-sm quarter-{{ $index + 1 }}-estimate">Quarter {{ $index + 1 }} - ₱ {{ number_format($estimate, 2) }}</p>
+                            @endforeach
                             </div>
                         </div>
                         
@@ -510,5 +518,54 @@ const barData = {
     };
         const donutCtx = document.getElementById('donutChart').getContext('2d');
         new Chart(donutCtx, donutConfig);
+        document.getElementById('taxReturnType').addEventListener('change', function() {
+    const selectedType = this.value;
+    
+    // Show loading states for all prediction sections
+    document.querySelectorAll('.prediction-value').forEach(el => {
+        el.innerHTML = '<div class="animate-pulse bg-gray-200 h-6 w-32 rounded"></div>';
+    });
+
+    // Send AJAX request
+    fetch('{{ route("predictive-analytics") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            tax_return_type: selectedType
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update end of year tax prediction
+            const yearTaxElement = document.querySelector('.end-year-tax');
+    if (yearTaxElement) {
+        yearTaxElement.textContent = '₱ ' + new Intl.NumberFormat('en-US').format(data.predictions.projected_end_of_year_tax);
+    } else {
+        console.error('Could not find end-year-tax element');
+    }
+            // Update quarterly estimates
+            data.predictions.projected_quarterly_tax_estimate.forEach((estimate, index) => {
+        const quarterElement = document.querySelector(`.quarter-${index + 1}-estimate`);
+        if (quarterElement) {
+            quarterElement.textContent = `Quarter ${index + 1} - ₱ ${new Intl.NumberFormat('en-US').format(estimate)}`;
+        } else {
+            console.error(`Could not find quarter-${index + 1}-estimate element`);
+        }
+    });
+
+    
+        } else {
+            console.error('Failed to update predictions');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
     </script>
 </x-app-layout>

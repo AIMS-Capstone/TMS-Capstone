@@ -59,7 +59,7 @@ use App\Models\Rdo;
 use App\Models\TaxReturn;
 
 // Public Routes
-Route::get('/predictive-analytics', [PredictionController::class, 'getPredictions'])->name('predictive-analytics');
+Route::match(['get', 'post'], '/predictive-analytics', [PredictionController::class, 'getPredictions'])->name('predictive-analytics');
 Route::get('/', function () {
     return view('auth/login');
 });
@@ -303,6 +303,10 @@ Route::put('tax-return/{id}/background-information', [BackgroundInformationContr
         Route::post('/percentage_return', [TaxReturnController::class, 'storePercentage']);
         Route::post('/vat_return', [TaxReturnController::class, 'store']);
         Route::post('/income_return', [TaxReturnController::class, 'storeIncome']);
+        Route::get('/tax-returns/{taxReturn}/generate-1702q-sawt', 
+    [TaxReturnController::class, 'generate1702QSawtDatFile']
+)->name('tax-returns.generate-1702q-sawt');
+        Route::get('/tax-returns/{taxReturn}/generate-dat', [TaxReturnController::class, 'generateDatFile'])->name('tax-returns.generate-dat');
         Route::get('/tax_return/{taxReturn}/slsp-data', [TaxReturnController::class, 'showSlspData'])->name('tax_return.slsp_data');
         Route::get('/tax_return/{taxReturn}/summary', [TaxReturnController::class, 'showSummary'])->name('tax_return.summary');
         Route::get('/summary', [TaxReturnController::class, 'showSummary'])->name('summary');

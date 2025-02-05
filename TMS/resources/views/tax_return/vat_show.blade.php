@@ -160,6 +160,15 @@
                     </div>
             
                     <div class="flex space-x-4 items-center pr-10 ml-auto">
+                        <a href="{{ route('tax-returns.generate-dat', ['taxReturn' => $taxReturn, 'type' => $type]) }}">
+                            <button type="button" class="border px-3 py-2 text-sm text-zinc-600 rounded-lg hover:border-green-500 hover:text-green-500 hover:bg-green-100 transition flex items-center group">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5 transition group-hover:text-green-500" viewBox="0 0 24 24">
+                                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"/>
+                                </svg> 
+                                <span class="text-zinc-600 transition group-hover:text-green-500">Generate DAT File</span>
+                            </button>
+                        </a>
+                        
                         <button 
                             type="button"
                             x-data="{}" 
