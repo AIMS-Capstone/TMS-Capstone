@@ -14,6 +14,7 @@ use App\Models\Tax2551Q;
 use App\Models\TaxReturnTransaction;
 use App\Models\TaxRow;
 use App\Models\Transactions;
+use App\Services\BIRDatGenerator;
 use Carbon\Carbon;
 use Codedge\Fpdf\Fpdf\Fpdf;
 use mikehaertl\pdftk\Pdf;
@@ -31,6 +32,13 @@ class TaxReturnController extends Controller
     /**
      * Display a listing of the resource.
      */
+    protected $datGenerator;
+
+    public function __construct(BIRDatGenerator $datGenerator)
+    {
+        $this->datGenerator = $datGenerator;
+    }
+    
     public function index()
     {
         
@@ -44,6 +52,126 @@ class TaxReturnController extends Controller
     {
         //
     }
+    public function generate1702QSawtDatFile(TaxReturn $taxReturn, BIRDatGenerator $datGenerator)
+{
+    try {
+        // Validate the tax return
+        if (!$taxReturn) {
+            return back()->with('error', 'Invalid tax return selected');
+        }
+
+        // Generate the DAT file
+        return $datGenerator->generate1702QSawtDatFile($taxReturn);
+    } catch (\Exception $e) {
+        // Log the error
+        \Log::error('Error generating 1702Q SAWT DAT file: ' . $e->getMessage());
+
+        // Return with error message
+        return back()->with('error', 'Failed to generate DAT file: ' . $e->getMessage());
+    }
+}
+    public function generateDatFile(TaxReturn $taxReturn, Request $request)
+    {
+        $type = $request->get('type', 'sales');
+        $organizationId = session('organization_id');
+        $organization = OrgSetup::with("rdo")
+        ->where('id', $organizationId)
+        ->first();
+        
+        // Get the transaction IDs linked to this tax return
+        $transactionIds = $taxReturn->transactions->pluck('id');
+        
+        // Get all records without pagination (using same query as your show method)
+        $taxRows = TaxRow::where(function ($query) use ($type) {
+            if ($type === 'capital_goods') {
+                $query->whereHas('taxType', function ($q) {
+                    $q->where('tax_type', 'Capital Goods');
+                });
+            } elseif ($type === 'importation') {
+                $query->whereHas('taxType', function ($q) {
+                    $q->where('tax_type', 'Importation of Goods');
+                });
+            } elseif ($type === 'sales') {
+                $query->whereHas('transaction', function ($q) {
+                    $q->whereIn('transaction_type', ['sales', 'purchase']); // Combine sales & purchases
+                })->whereHas('taxType', function ($q) {
+                    $q->whereNotIn('tax_type', ['Capital Goods', 'Importation of Goods', 'Percentage Tax']);
+                });
+            }
+        })
+        ->whereHas('transaction', function ($query) use ($transactionIds) {
+            $query->whereIn('id', $transactionIds);
+        })
+        ->with(['transaction.contactDetails', 'taxType', 'atc', 'coaAccount'])
+        ->get();
+        
+        // Transform data into BIR DAT format
+        
+        
+        // Add header record
+        $firstRow = $taxRows->first();
+        $transactions[] = [
+            'record_type' => 'H',
+            'transaction_type' => $firstRow->transaction->transaction_type === 'Sales' ? 'S' : 'P',
+            'tin' => $firstRow->transaction->contactDetails->contact_tin ?? '',
+            'business_name' => $firstRow->transaction->contactDetails->bus_name ?? '',
+            'first_name' => '', 
+            'middle_name' => '',
+            'last_name' => '',
+            'address' => $firstRow->transaction->contactDetails->contact_address ?? '',
+            'city' => '',
+            'zero_rated' => 0,
+            'exempt' => 0,
+            'taxable' => $firstRow->net_amount ?? 0,
+            'atc' => $firstRow->atc?->tax_code ?? '',
+            'gross_amount' => $firstRow->net_amount ?? 0,
+            'tax_withheld' => $firstRow->atc_amount ?? 0,
+            'tax_amount' => $row->tax_amount ?? 0,
+            'payor_tin' => $organization->tin ?? '',
+            'transaction_date' => Carbon::parse($firstRow->transaction->date)->format('m/d/Y')
+        ];
+        
+        // Add detail records
+        foreach ($taxRows->skip(1) as $row) {
+            $transactions[] = [
+                'record_type' => 'D',
+                'transaction_type' => $row->transaction->transaction_type === 'Sales' ? 'S' : 'P',
+                'tin' => $row->transaction->contactDetails->contact_tin ?? '',
+                'business_name' => $row->transaction->contactDetails->bus_name ?? '',
+                'first_name' => '', // Add if you have this data
+                'middle_name' => '', // Add if you have this data
+                'last_name' => '', // Add if you have this data
+                'address' => $row->transaction->contactDetails->contact_address ?? '',
+                'city' => $row->transaction->contactDetails->contact_city ?? '',
+                'zero_rated' => 0, // Add if you have this data
+                'exempt' => 0, // Add if you have this data
+                'taxable' => $row->net_amount ?? 0,
+                'atc' => $row->atc?->tax_code ?? '',
+                'gross_amount' => $row->net_amount ?? 0,
+                'tax_amount' => $row->tax_amount ?? 0,
+                'tax_withheld' => $row->atc_amount ?? 0,
+                'payor_tin' => $organization->tin ?? '',
+                'transaction_date' => Carbon::parse($row->transaction->date)->format('m/d/Y')
+            ];
+        }
+        
+        // Generate filename
+        $fileName = $this->datGenerator->generateDatFileName(
+            $organization->tin ?? '',
+            $type,
+            $taxReturn->month,
+            $taxReturn->year
+        );
+        
+        // Generate content
+        $content = $this->datGenerator->generateDatContent($transactions);
+        
+        // Return file for download
+        return response($content)
+            ->header('Content-Type', 'text/plain')
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+    }
+
 // Function for showing 2550Q Returns Table
 public function vatReturn(Request $request)
 {
@@ -1423,7 +1551,7 @@ public function showVatReport($id)
          // Query for Individual Sales TaxRows
          $individualSalesTaxRowsQuery = TaxRow::whereHas('transaction', function ($q) use ($individualTransactionIds, $search) {
              $q->whereIn('id', $individualTransactionIds)
-               ->where('transaction_type', 'sales');
+             ->whereIn('transaction_type', ['sales', 'purchase']);
      
              // Apply search filter if search term is provided
              if (!empty($search)) {
